@@ -67,6 +67,17 @@
         <div><label>Actief</label><select id="g_actief"><option value="1">Ja</option><option value="0">Nee</option></select></div>
       </div>
       <div class="rij" style="margin-top:12px"><button class="knop" id="gopslaan">Opslaan</button><button class="knop rand" id="gannuleer">Sluiten</button></div>
+      <div id="linkblok" class="verborgen" style="margin-top:18px;border-top:1px solid var(--lijn);padding-top:12px">
+        <h2 style="font-size:16px">Vaste inloglink</h2>
+        <p class="zacht" style="margin-top:0">Met deze link komt de klant direct in zijn eigen omgeving, zonder wachtwoord. Deel hem alleen met de klant zelf.</p>
+        <input id="g_link" readonly placeholder="Nog geen link">
+        <div class="rij" style="margin-top:8px">
+          <button class="knop licht klein" id="linkmaak">Link tonen / maken</button>
+          <button class="knop rand klein" id="linkkopie">Kopiëren</button>
+          <button class="knop rand klein" id="linknieuw">Nieuwe link (oude vervalt)</button>
+          <button class="knop rand klein" id="linkuit">Link uitzetten</button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -203,7 +214,7 @@ $("#ktest").onclick = async () => {
 function tekenGebruikers() {
   $("#gtabel").innerHTML = `<table><thead><tr><th>E-mail</th><th>Naam</th><th>Klant</th><th>Rol</th><th></th></tr></thead><tbody>
     ${data.gebruikers.map((g) => `<tr><td>${esc(g.email)}${g.actief ? "" : ' <span class="zacht">(uit)</span>'}</td><td>${esc(g.naam)}</td>
-      <td>${g.klant_id ? esc(klantNaam(g.klant_id)) : "–"}</td><td>${g.rol === "admin" ? "Beheerder" : "Klant"}</td>
+      <td>${g.klant_id ? esc(klantNaam(g.klant_id)) : "–"}${g.heeft_link ? ' <span class="chip klaar">link</span>' : ""}</td><td>${g.rol === "admin" ? "Beheerder" : "Klant"}</td>
       <td><button class="knop rand klein" data-g="${esc(g.email)}">Wijzigen</button></td></tr>`).join("")}</tbody></table>`;
   document.querySelectorAll("[data-g]").forEach((b) => b.onclick = () => gebruikerForm(data.gebruikers.find((g) => g.email === b.dataset.g)));
 }
@@ -212,6 +223,8 @@ function gebruikerForm(g) {
   $("#g_email").value = g?.email || ""; $("#g_email").disabled = !!g;
   $("#g_naam").value = g?.naam || ""; $("#g_klant").value = g?.klant_id || ""; $("#g_rol").value = g?.rol || "klant";
   $("#g_actief").value = g?.actief === false ? "0" : "1"; $("#g_ww").value = "";
+  $("#linkblok").classList.toggle("verborgen", !g || g.rol !== "klant");
+  $("#g_link").value = ""; $("#g_link").placeholder = g?.heeft_link ? "Link is actief – tik op 'Link tonen'" : "Nog geen link";
   $("#gform").scrollIntoView({ behavior: "smooth" });
 }
 $("#nieuwegebruiker").onclick = () => gebruikerForm(null);
@@ -228,6 +241,17 @@ $("#gopslaan").onclick = async () => {
 $("#apiopslaan").onclick = async () => {
   try { await api("api_sleutel_opslaan", { sleutel: $("#a_api").value }); $("#a_api").value = ""; meld("API-sleutel opgeslagen.", "ok"); await laad(); }
   catch (e) { meld(e.message); }
+};
+const linkActie = async (extra) => {
+  try { const r = await api("inloglink", { email: $("#g_email").value, ...extra }); $("#g_link").value = r.link || ""; $("#g_link").placeholder = r.link ? "" : "Link uitgezet"; if (extra.nieuw) meld("Nieuwe link gemaakt. De oude werkt niet meer.", "ok"); if (extra.uitzetten) meld("Inloglink uitgezet.", "ok"); await laad(); }
+  catch (e) { meld(e.message); }
+};
+$("#linkmaak").onclick = () => linkActie({});
+$("#linknieuw").onclick = () => { if (confirm("Nieuwe link maken? De oude link werkt dan niet meer.")) linkActie({ nieuw: true }); };
+$("#linkuit").onclick = () => { if (confirm("Inloglink uitzetten?")) linkActie({ uitzetten: true }); };
+$("#linkkopie").onclick = async () => {
+  const v = $("#g_link").value; if (!v) { meld("Tik eerst op 'Link tonen / maken'."); return; }
+  try { await navigator.clipboard.writeText(v); meld("Link gekopieerd.", "ok"); } catch { $("#g_link").select(); }
 };
 $("#aopslaan").onclick = async () => {
   try { await api("wachtwoord_wijzigen", { wachtwoord: $("#a_ww").value }); $("#a_ww").value = ""; meld("Wachtwoord gewijzigd.", "ok"); }

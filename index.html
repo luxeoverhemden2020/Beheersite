@@ -39,7 +39,13 @@ async function naarScherm() {
   const d = await api("ik");
   location.href = d.gebruiker.rol === "admin" ? "beheer" : "verzoeken";
 }
-if (sessie() && !code) naarScherm().catch(() => {});
+const link = new URLSearchParams(location.search).get("link");
+if (link) {
+  history.replaceState(null, "", location.pathname);
+  $("#uitleg").textContent = "Even inloggen…";
+  api("link_inloggen", { link }).then((d) => { zetSessie(d.token); location.href = "verzoeken"; })
+    .catch((e) => { $("#uitleg").textContent = "Log in om aanpassingen aan je website door te geven."; toonMelding($("#meld"), e.message); });
+} else if (sessie() && !code) naarScherm().catch(() => {});
 $("#inlog").onsubmit = async (e) => {
   e.preventDefault();
   toonMelding($("#meld"), "");
