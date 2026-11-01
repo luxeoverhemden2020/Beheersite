@@ -1,4 +1,22 @@
 // Gedeelde hulpjes voor Beheersite
+// Thema: licht/donker (onthouden per apparaat; standaard volgt het apparaat)
+function huidigThema() {
+  let t = null; try { t = localStorage.getItem("bs_thema"); } catch {}
+  return t || (matchMedia("(prefers-color-scheme: light)").matches ? "licht" : "donker");
+}
+document.documentElement.dataset.thema = huidigThema();
+function themaKnop(el) {
+  const zet = () => { el.textContent = document.documentElement.dataset.thema === "licht" ? "🌙" : "☀️";
+    el.title = document.documentElement.dataset.thema === "licht" ? "Donker thema" : "Licht thema"; };
+  zet();
+  el.onclick = () => {
+    const t = document.documentElement.dataset.thema === "licht" ? "donker" : "licht";
+    document.documentElement.dataset.thema = t; try { localStorage.setItem("bs_thema", t); } catch {}
+    zet();
+  };
+}
+document.addEventListener("DOMContentLoaded", () => document.querySelectorAll(".thema").forEach(themaKnop));
+
 const API = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/beheersite";
 
 function sessie() { try { return localStorage.getItem("bs_sessie") || ""; } catch { return ""; } }
