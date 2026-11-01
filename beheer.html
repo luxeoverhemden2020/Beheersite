@@ -20,7 +20,7 @@
     <button data-tab="verzoeken" class="aan">Verzoeken</button>
     <button data-tab="klanten">Klanten &amp; limieten</button>
     <button data-tab="gebruikers">Accounts</button>
-    <button data-tab="account">Mijn wachtwoord</button>
+    <button data-tab="account">Instellingen</button>
   </div>
   <div id="meld" class="verborgen"></div>
 
@@ -41,6 +41,7 @@
         <div><label>Soort site</label><select id="k_soort"><option value="wordpress">WordPress</option><option value="vercel">Vercel / GitHub</option><option value="anders">Anders</option></select></div>
         <div><label>Verzoeken per maand</label><input id="k_limiet" type="number" min="0" value="30"></div>
         <div><label>Actief</label><select id="k_actief"><option value="1">Ja</option><option value="0">Nee</option></select></div>
+        <div><label>Budget snelle webbeheerder (€ per maand)</label><input id="k_budget" type="number" min="0" step="0.5" value="5"></div>
       </div>
       <label>Deurbel-adres (URL van de routine)</label><input id="k_url" placeholder="https://api.anthropic.com/v1/claude_code/routines/trig_…/fire">
       <label>Deurbel-sleutel (leeg laten = niet wijzigen)</label><input id="k_token" type="password" autocomplete="off" placeholder="sk-ant-oat01-…">
@@ -70,6 +71,12 @@
   </section>
 
   <section id="t-account" class="verborgen">
+    <div class="kaart" style="max-width:520px">
+      <h2>Snelle webbeheerder (Claude API)</h2>
+      <p class="zacht" style="margin-top:0" id="apistatus"></p>
+      <label>Claude API-sleutel (begint met sk-ant-)</label><input id="a_api" type="password" autocomplete="off" placeholder="Plak hier je API-sleutel">
+      <button class="knop" id="apiopslaan" style="margin-top:12px">Opslaan</button>
+    </div>
     <div class="kaart" style="max-width:420px">
       <h2>Mijn wachtwoord wijzigen</h2>
       <label>Nieuw wachtwoord (min. 8 tekens)</label><input id="a_ww" type="password" autocomplete="new-password">
@@ -98,6 +105,9 @@ async function laad() {
   try {
     data = await api("admin_overzicht", { maand: $("#maand").value });
     tekenVerzoeken(); tekenKlanten(); tekenGebruikers();
+    $("#apistatus").textContent = data.api_sleutel_ingesteld
+      ? "✓ API-sleutel is ingesteld. WordPress-verzoeken worden nu snel afgehandeld (Haiku), binnen het budget per klant. Daarboven neemt de gewone routine het over."
+      : "Nog geen API-sleutel. Verzoeken gaan via de gewone (tragere) routine.";
   } catch (e) { meld(e.message); }
 }
 const klantNaam = (id) => data.klanten.find((k) => k.id === id)?.naam || id;
@@ -159,9 +169,9 @@ $("#paneel").onclick = (e) => { if (e.target.id === "paneel") sluitPaneel(); };
 
 // ---- klanten ----
 function tekenKlanten() {
-  $("#ktabel").innerHTML = data.klanten.length ? `<table><thead><tr><th>Klant</th><th>Site</th><th>Gebruikt</th><th>Deurbel</th><th></th></tr></thead><tbody>
+  $("#ktabel").innerHTML = data.klanten.length ? `<table><thead><tr><th>Klant</th><th>Site</th><th>Verzoeken</th><th>AI-kosten</th><th>Deurbel</th><th></th></tr></thead><tbody>
     ${data.klanten.map((k) => `<tr><td>${esc(k.naam)}${k.actief ? "" : ' <span class="zacht">(uit)</span>'}</td><td class="zacht">${esc(k.site)}</td>
-      <td><b>${k.gebruikt}</b> / ${k.limiet}</td><td>${k.deurbel_ingesteld ? "✓" : '<span class="zacht">nog niet</span>'}</td>
+      <td><b>${k.gebruikt}</b> / ${k.limiet}</td><td>€${(k.ai_kosten_eur || 0).toFixed(2)} / €${Number(k.ai_budget_eur ?? 5).toFixed(2)}</td><td>${k.deurbel_ingesteld ? "✓" : '<span class="zacht">nog niet</span>'}</td>
       <td><button class="knop rand klein" data-k="${esc(k.id)}">Wijzigen</button></td></tr>`).join("")}
     </tbody></table>` : `<p class="zacht">Nog geen klanten.</p>`;
   document.querySelectorAll("[data-k]").forEach((b) => b.onclick = () => klantForm(data.klanten.find((k) => k.id === b.dataset.k)));
@@ -172,7 +182,7 @@ function klantForm(k) {
   $("#k_id").value = k?.id || ""; $("#k_id").disabled = !!k;
   $("#k_naam").value = k?.naam || ""; $("#k_site").value = k?.site || ""; $("#k_soort").value = k?.soort || "wordpress";
   $("#k_limiet").value = k?.limiet ?? 30; $("#k_actief").value = k?.actief === false ? "0" : "1";
-  $("#k_url").value = k?.deurbel_url || ""; $("#k_token").value = "";
+  $("#k_url").value = k?.deurbel_url || ""; $("#k_token").value = ""; $("#k_budget").value = k?.ai_budget_eur ?? 5;
   $("#kform").scrollIntoView({ behavior: "smooth" });
 }
 $("#nieuweklant").onclick = () => klantForm(null);
@@ -180,7 +190,7 @@ $("#kannuleer").onclick = () => $("#kform").classList.add("verborgen");
 $("#kopslaan").onclick = async () => {
   try {
     await api("klant_opslaan", { id: $("#k_id").value, naam: $("#k_naam").value, site: $("#k_site").value, soort: $("#k_soort").value,
-      limiet: $("#k_limiet").value, actief: $("#k_actief").value === "1", deurbel_url: $("#k_url").value.trim(), deurbel_token: $("#k_token").value.trim() });
+      limiet: $("#k_limiet").value, actief: $("#k_actief").value === "1", deurbel_url: $("#k_url").value.trim(), deurbel_token: $("#k_token").value.trim(), ai_budget_eur: $("#k_budget").value });
     $("#k_token").value = ""; meld("Klant opgeslagen.", "ok"); await laad();
   } catch (e) { meld(e.message); }
 };
@@ -214,6 +224,10 @@ $("#gopslaan").onclick = async () => {
       rol: $("#g_rol").value, wachtwoord: $("#g_ww").value, actief: $("#g_actief").value === "1" });
     $("#g_ww").value = ""; meld("Account opgeslagen.", "ok"); await laad();
   } catch (e) { meld(e.message); }
+};
+$("#apiopslaan").onclick = async () => {
+  try { await api("api_sleutel_opslaan", { sleutel: $("#a_api").value }); $("#a_api").value = ""; meld("API-sleutel opgeslagen.", "ok"); await laad(); }
+  catch (e) { meld(e.message); }
 };
 $("#aopslaan").onclick = async () => {
   try { await api("wachtwoord_wijzigen", { wachtwoord: $("#a_ww").value }); $("#a_ww").value = ""; meld("Wachtwoord gewijzigd.", "ok"); }
