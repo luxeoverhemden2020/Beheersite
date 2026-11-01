@@ -9,8 +9,9 @@
 <body>
 <div class="inlog">
   <div class="kaart">
-    <h1>Webbeheer</h1>
-    <p class="zacht" id="uitleg">Log in om aanpassingen aan je website door te geven.</p>
+    <div id="bot"></div>
+    <h1>Web<span style="color:var(--accent)">beheer</span></h1>
+    <p class="zacht sub" id="uitleg">Log in om aanpassingen aan je website door te geven.</p>
     <form id="inlog">
       <div id="emailveld"><label for="email">E-mailadres</label>
       <input id="email" type="email" autocomplete="username" required></div>
@@ -25,6 +26,7 @@
 </div>
 <script src="assets/basis.js"></script>
 <script>
+$("#bot").innerHTML = robotSvg();
 const code = new URLSearchParams(location.search).get("code");
 if (code) {
   $("#uitleg").textContent = "Kies je eigen wachtwoord voor het beheerscherm (minimaal 8 tekens).";

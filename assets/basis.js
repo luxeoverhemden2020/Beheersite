@@ -126,8 +126,73 @@ function maakInvoer(houder, { plaats = "Wat wil je laten aanpassen?", knop = "Ve
 function berichtenHtml(berichten, wieNamen = WIE) {
   return berichten.map((b) => `
     <div class="bericht ${b.van}">
-      <div class="wie">${esc(wieNamen[b.van] || b.van)} · ${datum(b.aangemaakt)}</div>
+      <div class="wie">${b.van === "webbeheer" ? robotSvg("rust") : ""}${esc(wieNamen[b.van] || b.van)} · ${datum(b.aangemaakt)}</div>
       ${b.tekst ? `<div class="tekst">${esc(b.tekst)}</div>` : ""}
       ${(b.fotos || []).map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="Foto"></a>`).join("")}
     </div>`).join("");
 }
+
+// ---------- Webbeheer-robot ----------
+let _botNr = 0;
+function robotSvg(extra = "") {
+  const id = "bg" + (++_botNr);
+  return `<svg class="bot ${extra}" viewBox="0 0 64 64" aria-hidden="true">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22e3c4"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+    <g class="antenne"><line x1="32" y1="6" x2="32" y2="14" stroke="url(#${id})" stroke-width="2.5" stroke-linecap="round"/><circle cx="32" cy="5" r="3" fill="#22e3c4"/></g>
+    <rect x="8" y="26" width="5" height="12" rx="2.5" fill="url(#${id})" opacity=".8"/><rect x="51" y="26" width="5" height="12" rx="2.5" fill="url(#${id})" opacity=".8"/>
+    <rect x="12" y="14" width="40" height="36" rx="12" fill="#0c1322" stroke="url(#${id})" stroke-width="2.5"/>
+    <rect x="18" y="22" width="28" height="15" rx="7.5" fill="#06101c" stroke="#22e3c4" stroke-opacity=".35"/>
+    <rect class="oog" x="23" y="26" width="6" height="7" rx="3" fill="#22e3c4"/><rect class="oog" x="35" y="26" width="6" height="7" rx="3" fill="#22e3c4"/>
+    <rect class="scan" x="18" y="18" width="28" height="2" rx="1" fill="#8b5cf6"/>
+    <path d="M25 43 q7 4 14 0" stroke="#22e3c4" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <rect x="22" y="52" width="20" height="6" rx="3" fill="url(#${id})" opacity=".6"/>
+  </svg>`;
+}
+
+const WEETJES = [
+  "Het world wide web werd in 1989 bedacht door Tim Berners-Lee bij CERN in Zwitserland.",
+  "De allereerste website, info.cern.ch, ging in 1991 online en is nog steeds te bezoeken.",
+  "Het eerste .com-domein ooit was symbolics.com, geregistreerd in 1985.",
+  "Nederland kreeg de extensie .nl in 1986, als een van de eerste landen ter wereld.",
+  "Er zijn ruim 6 miljoen .nl-domeinnamen geregistreerd.",
+  "WordPress draait op meer dan 40% van alle websites ter wereld.",
+  "Meer dan de helft van al het websiteverkeer komt van mobiele telefoons.",
+  "Google verwerkt elke dag miljarden zoekopdrachten.",
+  "Het apenstaartje (@) in e-mailadressen werd in 1971 gekozen door Ray Tomlinson.",
+  "De eerste webcam liet een koffiepot zien op de universiteit van Cambridge, zodat niemand voor niets naar een lege pot liep.",
+  "Het woord 'spam' komt uit een sketch van Monty Python.",
+  "De QR-code werd in 1994 in Japan bedacht om auto-onderdelen te volgen.",
+  "Het slotje in je adresbalk betekent dat de verbinding met de website versleuteld is.",
+  "Een favicon is het kleine icoontje dat je in je browsertabblad ziet.",
+  "De grijze tekst onder je link in Google heet de meta-omschrijving. Die kun je zelf bepalen.",
+  "Een alt-tekst bij een foto helpt blinde bezoekers én Google begrijpen wat erop staat.",
+  "Kleinere foto's laden sneller, en snelle sites scoren beter in Google.",
+  "Google kijkt bij het rangschikken vooral naar hoe je site op mobiel werkt.",
+  "Veel bezoekers lezen een pagina in een F-vorm: eerst bovenaan, dan langs de linkerkant naar beneden.",
+  "Webshops testen soms twee versies van een knop om te zien welke meer klikken krijgt. Dat heet A/B-testen.",
+  "Elke pagina op je site kan een eigen titel in Google krijgen. Dat is een van de belangrijkste SEO-instellingen.",
+  "Een duidelijke telefoonknop op mobiel levert lokale bedrijven vaak extra telefoontjes op.",
+];
+const FASES = ["Verbinding maken met je website", "Verzoek analyseren", "Momentopname maken", "Aanpassing doorvoeren", "Resultaat controleren"];
+
+function wachtHtml(status, sinds) {
+  const titel = status === "terugdraaien" ? "Terugdraaien" : status === "nieuw" ? "Webbeheer wordt opgestart" : "Webbeheer is aan het werk";
+  return `<div class="wacht" data-sinds="${esc(sinds || "")}">
+    ${robotSvg()}
+    <div><div style="font-weight:600">${titel}</div>
+    <div class="fase"></div>
+    <div class="weetje"></div></div></div>`;
+}
+function tikWacht() {
+  const nu = Date.now();
+  const w = WEETJES[Math.floor(nu / 8000) % WEETJES.length];
+  document.querySelectorAll(".wacht").forEach((el) => {
+    const s = Date.parse(el.dataset.sinds) || nu;
+    const f = Math.min(FASES.length - 1, Math.floor((nu - s) / 9000));
+    const fe = el.querySelector(".fase"), we = el.querySelector(".weetje");
+    if (fe.textContent !== FASES[f] + "…") fe.textContent = FASES[f] + "…";
+    const wt = "💡 Wist je dat… " + w;
+    if (we.textContent !== wt) we.textContent = wt;
+  });
+}
+setInterval(tikWacht, 1000);

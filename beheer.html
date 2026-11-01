@@ -8,7 +8,8 @@
 </head>
 <body>
 <div class="kop">
-  <div class="merk">Beheersite<small>Beheerscherm Jan</small></div>
+  <span class="bot-klein" id="kopbot"></span>
+  <div class="merk">Beheer<b>site</b><small>Beheerscherm Jan</small></div>
   <div class="rechts">
     <input type="month" id="maand" style="width:auto;padding:6px 8px">
     <button class="knop rand klein" id="uit">Uitloggen</button>
@@ -130,7 +131,7 @@ async function toonVerzoek(id) {
     <div class="rij"><h2 class="vul" style="margin:0">#${v.nr} · ${esc(v.klant_naam)}</h2><button class="knop rand klein" id="sluit">Sluiten</button></div>
     <p class="zacht">${esc(v.site)} · <span class="chip ${v.status}">${STATUS[v.status]}</span>
       ${v.deurbel_sessie ? ` · <a href="${esc(v.deurbel_sessie)}" target="_blank" rel="noopener">sessie bekijken</a>` : ""}</p>
-    ${actief ? `<div class="balk"></div>` : ""}
+    ${actief ? wachtHtml(v.status, v.bijgewerkt) : ""}
     ${berichtenHtml(v.berichten, WIEJAN)}
     <div class="rij" style="margin:12px 0">
       ${v.status === "doorgestuurd" ? `<button class="knop" id="akkoord">✓ Akkoord, uitvoeren</button>` : ""}
@@ -219,6 +220,7 @@ $("#aopslaan").onclick = async () => {
   catch (e) { meld(e.message); }
 };
 
+$("#kopbot").innerHTML = robotSvg("rust");
 api("ik").then((d) => {
   ik = d.gebruiker;
   if (ik.rol !== "admin") { location.href = "verzoeken"; return; }

@@ -8,12 +8,13 @@
 </head>
 <body>
 <div class="kop">
-  <div class="merk">Webbeheer<small id="site"></small></div>
+  <span class="bot-klein" id="kopbot"></span>
+  <div class="merk">Web<b>beheer</b><small id="site"></small></div>
   <div class="rechts"><button class="knop rand klein" id="uit">Uitloggen</button></div>
 </div>
 <div class="wrap">
   <div class="kaart">
-    <h2>Nieuw verzoek</h2>
+    <h2><span class="tag">&gt;_</span>Nieuw verzoek</h2>
     <p class="zacht" style="margin-top:0">Beschrijf wat er op je website moet veranderen. Je kunt ook inspreken of foto's toevoegen (of plakken).</p>
     <div id="nieuw"></div>
     <div id="meld" class="verborgen"></div>
@@ -52,13 +53,14 @@ function teken(lijst) {
   if (!lijst.length) { el.innerHTML = `<p class="zacht">Nog geen verzoeken. Je eerste verzoek verschijnt hier.</p>`; return; }
   el.innerHTML = lijst.map((v) => {
     const isOpen = open.has(v.id), d = cache[v.id], actief = ACTIEF.includes(v.status);
-    return `<div class="verzoek" data-id="${v.id}">
+    return `<div class="verzoek${actief ? " actief" : ""}" data-id="${v.id}">
       ${actief ? `<div class="balk" aria-label="Bezig"></div>` : ""}
       <div class="hoofd"><span class="nr">#${v.nr}</span><span class="titel">${esc(v.onderwerp)}</span>
         <span class="chip ${v.status}">${STATUS[v.status]}</span></div>
+      ${actief && !isOpen ? `<div style="padding:0 16px 4px">${wachtHtml(v.status, v.bijgewerkt)}</div>` : ""}
       ${isOpen && d ? `<div class="lijf">
         ${berichtenHtml(d.verzoek.berichten)}
-        ${actief ? `<p class="bezigtekst">${v.status === "terugdraaien" ? "Wordt teruggedraaid…" : "Webbeheer is ermee bezig…"}</p>` : ""}
+        ${actief ? wachtHtml(v.status, v.bijgewerkt) : ""}
         ${!actief && d.reacties_over > 0 ? `<div class="reactie" style="margin-top:12px"></div>` : ""}
         ${!actief && d.reacties_over === 0 ? `<p class="zacht">Dit gesprek is vol. Start hierboven een nieuw verzoek.</p>` : ""}
         ${v.status === "klaar" ? `<div class="rij" style="margin-top:8px"><button class="knop rand klein terug">↩ Deze aanpassing terugdraaien</button></div>` : ""}
@@ -66,6 +68,7 @@ function teken(lijst) {
       </div>` : ""}
     </div>`;
   }).join("");
+  tikWacht();
 
   el.querySelectorAll(".verzoek").forEach((blok) => {
     const id = blok.dataset.id;
@@ -106,6 +109,7 @@ async function laad(geforceerd = true) {
   }
 }
 
+$("#kopbot").innerHTML = robotSvg("rust");
 api("ik").then((d) => {
   if (d.gebruiker.rol === "admin" && !d.klant) { location.href = "beheer"; return; }
   $("#site").textContent = d.klant ? `${d.klant.naam} · ${d.klant.site.replace(/^https?:\/\//, "")}` : "";
