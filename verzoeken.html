@@ -58,6 +58,7 @@ function teken(lijst) {
       <div class="hoofd"><span class="nr">#${v.nr}</span><span class="titel">${esc(v.onderwerp)}</span>
         <span class="chip ${v.status}">${STATUS[v.status]}</span></div>
       ${actief && !isOpen ? `<div style="padding:0 16px 4px">${wachtHtml(v.status, v.bijgewerkt)}</div>` : ""}
+      ${isOpen && !d ? `<div class="lijf"><p class="zacht">Laden…</p></div>` : ""}
       ${isOpen && d ? `<div class="lijf">
         ${berichtenHtml(d.verzoek.berichten)}
         ${actief ? wachtHtml(v.status, v.bijgewerkt) : ""}
@@ -72,9 +73,10 @@ function teken(lijst) {
 
   el.querySelectorAll(".verzoek").forEach((blok) => {
     const id = blok.dataset.id;
-    $(".hoofd", blok).onclick = async () => {
-      if (open.has(id)) open.delete(id); else { open.add(id); await laadVerzoek(id).catch(() => {}); }
-      teken(lijst);
+    $(".hoofd", blok).onclick = () => {
+      if (open.has(id)) { open.delete(id); teken(lijst); return; }
+      open.add(id); teken(lijst);                       // direct openen
+      laadVerzoek(id).then(() => { if (open.has(id)) teken(lijst); }).catch(() => {});  // daarna verversen
     };
     const r = $(".reactie", blok);
     if (r) maakInvoer(r, {
@@ -102,6 +104,7 @@ async function laad(geforceerd = true) {
       (document.activeElement && document.activeElement.closest(".reactie"));
     if (geforceerd || (veranderd && !typt)) teken(verzoeken);
     laatsteLijst = verzoeken;
+    verzoeken.slice(0, 8).filter((v) => !cache[v.id]).forEach((v) => laadVerzoek(v.id).catch(() => {}));
     const iemandActief = verzoeken.some((v) => ACTIEF.includes(v.status));
     timer = setTimeout(() => laad(false), iemandActief ? 4000 : 30000);
   } catch (e) {

@@ -46,7 +46,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
 @keyframes puls{50%{box-shadow:0 0 0 6px rgba(255,107,129,.25)}}
 .verzoek{background:var(--kaart);border:1px solid var(--lijn);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;transition:border-color .2s}
 .verzoek.actief{border-color:rgba(34,227,196,.5);box-shadow:var(--glow)}
-.verzoek .hoofd{padding:12px 16px;display:flex;gap:10px;align-items:center;cursor:pointer}
+.verzoek .hoofd{padding:14px 16px;display:flex;gap:10px;align-items:center;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}
+.verzoek .hoofd:active{background:var(--accent2)}
 .verzoek .hoofd .titel{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .verzoek .hoofd .nr{color:var(--accent);font-size:13px;font-family:"JetBrains Mono",monospace}
 .verzoek .lijf{border-top:1px solid var(--lijn);padding:12px 16px}
@@ -104,3 +105,7 @@ tr.klik{cursor:pointer}tr.klik:hover{background:rgba(34,227,196,.06)}
 input[type=month]{color-scheme:dark}
 :root[data-thema=licht] input[type=month]{color-scheme:light}
 .thema{width:38px;height:38px;padding:0;font-size:17px}
+
+button,a,.knop,tr.klik{touch-action:manipulation}
+.bericht .tekst a{color:inherit;text-decoration:underline;word-break:break-all}
+.bericht.webbeheer .tekst a{color:var(--accent)}

@@ -141,11 +141,18 @@ function maakInvoer(houder, { plaats = "Wat wil je laten aanpassen?", knop = "Ve
   return { focus: () => ta.focus() };
 }
 
+// Maak webadressen in een tekst klikbaar (openen in een nieuw tabblad)
+function linkjes(tekst) {
+  return esc(tekst).replace(/\bhttps?:\/\/[^\s<]+/g, (url) => {
+    const eind = url.match(/[.,;:!?)\]]+$/); const schoon = eind ? url.slice(0, -eind[0].length) : url;
+    return `<a href="${schoon}" target="_blank" rel="noopener noreferrer">${schoon}</a>${eind ? eind[0] : ""}`;
+  });
+}
 function berichtenHtml(berichten, wieNamen = WIE) {
   return berichten.map((b) => `
     <div class="bericht ${b.van}">
       <div class="wie">${b.van === "webbeheer" ? robotSvg("rust") : ""}${esc(wieNamen[b.van] || b.van)} · ${datum(b.aangemaakt)}</div>
-      ${b.tekst ? `<div class="tekst">${esc(b.tekst)}</div>` : ""}
+      ${b.tekst ? `<div class="tekst">${linkjes(b.tekst)}</div>` : ""}
       ${(b.fotos || []).map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="Foto"></a>`).join("")}
     </div>`).join("");
 }
