@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beheersite – Beheer</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/stijl.css">
+</head>
+<body>
+<div class="kop">
+  <div class="merk">Beheersite<small>Beheerscherm Jan</small></div>
+  <div class="rechts">
+    <input type="month" id="maand" style="width:auto;padding:6px 8px">
+    <button class="knop rand klein" id="uit">Uitloggen</button>
+  </div>
+</div>
+<div class="wrap breed">
+  <div class="tabs">
+    <button data-tab="verzoeken" class="aan">Verzoeken</button>
+    <button data-tab="klanten">Klanten &amp; limieten</button>
+    <button data-tab="gebruikers">Accounts</button>
+    <button data-tab="account">Mijn wachtwoord</button>
+  </div>
+  <div id="meld" class="verborgen"></div>
+
+  <section id="t-verzoeken">
+    <div id="aandacht"></div>
+    <div class="kaart tabel-scroll"><h2>Verzoeken in deze maand</h2><div id="vtabel"></div></div>
+  </section>
+
+  <section id="t-klanten" class="verborgen">
+    <div class="kaart tabel-scroll"><h2>Klanten – gebruik deze maand</h2><div id="ktabel"></div>
+      <button class="knop licht klein" id="nieuweklant" style="margin-top:10px">+ Klant toevoegen</button></div>
+    <div class="kaart verborgen" id="kform">
+      <h2 id="ktitel">Klant</h2>
+      <div class="grid2">
+        <div><label>Code (vast, kleine letters)</label><input id="k_id" placeholder="softwash-koning"></div>
+        <div><label>Naam</label><input id="k_naam"></div>
+        <div><label>Website</label><input id="k_site" placeholder="https://…"></div>
+        <div><label>Soort site</label><select id="k_soort"><option value="wordpress">WordPress</option><option value="vercel">Vercel / GitHub</option><option value="anders">Anders</option></select></div>
+        <div><label>Verzoeken per maand</label><input id="k_limiet" type="number" min="0" value="20"></div>
+        <div><label>Actief</label><select id="k_actief"><option value="1">Ja</option><option value="0">Nee</option></select></div>
+      </div>
+      <label>Deurbel-adres (URL van de routine)</label><input id="k_url" placeholder="https://api.anthropic.com/v1/claude_code/routines/trig_…/fire">
+      <label>Deurbel-sleutel (leeg laten = niet wijzigen)</label><input id="k_token" type="password" autocomplete="off" placeholder="sk-ant-oat01-…">
+      <div class="rij" style="margin-top:12px">
+        <button class="knop" id="kopslaan">Opslaan</button>
+        <button class="knop rand" id="ktest">Deurbel testen</button>
+        <button class="knop rand" id="kannuleer">Sluiten</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="t-gebruikers" class="verborgen">
+    <div class="kaart tabel-scroll"><h2>Accounts</h2><div id="gtabel"></div>
+      <button class="knop licht klein" id="nieuwegebruiker" style="margin-top:10px">+ Account toevoegen</button></div>
+    <div class="kaart verborgen" id="gform">
+      <h2>Account</h2>
+      <div class="grid2">
+        <div><label>E-mailadres</label><input id="g_email" type="email"></div>
+        <div><label>Naam</label><input id="g_naam"></div>
+        <div><label>Klant / site</label><select id="g_klant"></select></div>
+        <div><label>Rol</label><select id="g_rol"><option value="klant">Klant</option><option value="admin">Beheerder (Jan)</option></select></div>
+        <div><label>Wachtwoord (leeg = niet wijzigen)</label><input id="g_ww" type="password" autocomplete="new-password"></div>
+        <div><label>Actief</label><select id="g_actief"><option value="1">Ja</option><option value="0">Nee</option></select></div>
+      </div>
+      <div class="rij" style="margin-top:12px"><button class="knop" id="gopslaan">Opslaan</button><button class="knop rand" id="gannuleer">Sluiten</button></div>
+    </div>
+  </section>
+
+  <section id="t-account" class="verborgen">
+    <div class="kaart" style="max-width:420px">
+      <h2>Mijn wachtwoord wijzigen</h2>
+      <label>Nieuw wachtwoord (min. 8 tekens)</label><input id="a_ww" type="password" autocomplete="new-password">
+      <button class="knop" id="aopslaan" style="margin-top:12px">Opslaan</button>
+    </div>
+  </section>
+</div>
+
+<div class="paneel verborgen" id="paneel"><div class="in" id="paneelin"></div></div>
+
+<script src="assets/basis.js"></script>
+<script>
+const WIEJAN = { klant: "Klant", webbeheer: "Webbeheer", jan: "Jij (Jan)" };
+let data = null, ik = null, openVerzoek = null, paneelTimer = null;
+$("#maand").value = new Date().toISOString().slice(0, 7);
+const meld = (t, s = "fout") => { toonMelding($("#meld"), t, s); if (t) scrollTo(0, 0); };
+
+document.querySelectorAll(".tabs button").forEach((b) => b.onclick = () => {
+  document.querySelectorAll(".tabs button").forEach((x) => x.classList.toggle("aan", x === b));
+  ["verzoeken", "klanten", "gebruikers", "account"].forEach((t) => $("#t-" + t).classList.toggle("verborgen", t !== b.dataset.tab));
+});
+$("#uit").onclick = async () => { try { await api("uitloggen"); } catch {} zetSessie(""); location.href = "./"; };
+$("#maand").onchange = laad;
+
+async function laad() {
+  try {
+    data = await api("admin_overzicht", { maand: $("#maand").value });
+    tekenVerzoeken(); tekenKlanten(); tekenGebruikers();
+  } catch (e) { meld(e.message); }
+}
+const klantNaam = (id) => data.klanten.find((k) => k.id === id)?.naam || id;
+
+function rijVerzoek(v) {
+  return `<tr class="klik" data-id="${v.id}"><td>#${v.nr}</td><td>${esc(klantNaam(v.klant_id))}</td>
+    <td>${esc(v.onderwerp)}</td><td><span class="chip ${v.status}">${STATUS[v.status]}</span>${v.telt_mee ? "" : ' <span class="zacht">(telt niet)</span>'}</td>
+    <td class="zacht">${datum(v.aangemaakt)}</td></tr>`;
+}
+function tekenVerzoeken() {
+  const maand = $("#maand").value;
+  const inMaand = data.verzoeken.filter((v) => new Date(v.aangemaakt).toISOString().slice(0, 7) === maand);
+  const aandacht = data.verzoeken.filter((v) => ["doorgestuurd", "kan_niet"].includes(v.status));
+  $("#aandacht").innerHTML = aandacht.length ? `<div class="kaart"><h2>Wacht op jou (${aandacht.length})</h2>
+    <table><tbody>${aandacht.map(rijVerzoek).join("")}</tbody></table></div>` : "";
+  $("#vtabel").innerHTML = inMaand.length ? `<table><thead><tr><th>Nr</th><th>Klant</th><th>Verzoek</th><th>Status</th><th>Datum</th></tr></thead>
+    <tbody>${inMaand.map(rijVerzoek).join("")}</tbody></table>` : `<p class="zacht">Geen verzoeken in deze maand.</p>`;
+  document.querySelectorAll("tr.klik[data-id]").forEach((tr) => tr.onclick = () => toonVerzoek(tr.dataset.id));
+}
+
+async function toonVerzoek(id) {
+  openVerzoek = id; clearTimeout(paneelTimer);
+  $("#paneel").classList.remove("verborgen");
+  let d;
+  try { d = await api("verzoek", { id }); } catch (e) { $("#paneelin").innerHTML = `<p>${esc(e.message)}</p>`; return; }
+  const v = d.verzoek, actief = ACTIEF.includes(v.status);
+  const ietsGetypt = $("#paneelin textarea")?.value?.trim();
+  if (ietsGetypt && openVerzoek === id && document.body.dataset.paneel === id) { plan(id, actief); return; }
+  document.body.dataset.paneel = id;
+  $("#paneelin").innerHTML = `
+    <div class="rij"><h2 class="vul" style="margin:0">#${v.nr} · ${esc(v.klant_naam)}</h2><button class="knop rand klein" id="sluit">Sluiten</button></div>
+    <p class="zacht">${esc(v.site)} · <span class="chip ${v.status}">${STATUS[v.status]}</span>
+      ${v.deurbel_sessie ? ` · <a href="${esc(v.deurbel_sessie)}" target="_blank" rel="noopener">sessie bekijken</a>` : ""}</p>
+    ${actief ? `<div class="balk"></div>` : ""}
+    ${berichtenHtml(v.berichten, WIEJAN)}
+    <div class="rij" style="margin:12px 0">
+      ${v.status === "doorgestuurd" ? `<button class="knop" id="akkoord">✓ Akkoord, uitvoeren</button>` : ""}
+      <button class="knop rand klein" data-st="klaar">Markeer klaar</button>
+      <button class="knop rand klein" data-st="kan_niet">Markeer niet gelukt</button>
+      <button class="knop rand klein" id="nietmee">Telt niet mee</button>
+    </div>
+    <h2 style="font-size:16px">Bericht aan klant (als Jan)</h2>
+    <div id="janreactie"></div>
+    <label style="display:flex;gap:8px;align-items:center;color:inherit"><input type="checkbox" id="belaan" style="width:auto"> Ook webbeheer opnieuw laten starten</label>
+    <div id="pmeld" class="verborgen"></div>`;
+  $("#sluit").onclick = sluitPaneel;
+  const actie = async (fn) => { try { await fn(); await laad(); toonVerzoek(id); } catch (e) { toonMelding($("#pmeld"), e.message); } };
+  if ($("#akkoord")) $("#akkoord").onclick = () => actie(() => api("akkoord", { id }));
+  document.querySelectorAll("[data-st]").forEach((b) => b.onclick = () => actie(() => api("status_zetten", { id, status: b.dataset.st })));
+  $("#nietmee").textContent = v.telt_mee ? "Telt niet mee voor limiet" : "Telt weer mee voor limiet";
+  $("#nietmee").onclick = () => actie(() => api("telt_mee_zetten", { id, telt_mee: !v.telt_mee }));
+  maakInvoer($("#janreactie"), { plaats: "Bericht aan de klant…", knop: "Versturen",
+    opVersturen: async (tekst, fotos) => { await api("reageer", { id, tekst, fotos, bel_aan: $("#belaan").checked }); await laad(); document.body.dataset.paneel = ""; toonVerzoek(id); } });
+  plan(id, actief);
+}
+function plan(id, actief) { clearTimeout(paneelTimer); paneelTimer = setTimeout(() => { if (openVerzoek === id) toonVerzoek(id); }, actief ? 4000 : 30000); }
+function sluitPaneel() { openVerzoek = null; clearTimeout(paneelTimer); document.body.dataset.paneel = ""; $("#paneel").classList.add("verborgen"); }
+$("#paneel").onclick = (e) => { if (e.target.id === "paneel") sluitPaneel(); };
+
+// ---- klanten ----
+function tekenKlanten() {
+  $("#ktabel").innerHTML = data.klanten.length ? `<table><thead><tr><th>Klant</th><th>Site</th><th>Gebruikt</th><th>Deurbel</th><th></th></tr></thead><tbody>
+    ${data.klanten.map((k) => `<tr><td>${esc(k.naam)}${k.actief ? "" : ' <span class="zacht">(uit)</span>'}</td><td class="zacht">${esc(k.site)}</td>
+      <td><b>${k.gebruikt}</b> / ${k.limiet}</td><td>${k.deurbel_ingesteld ? "✓" : '<span class="zacht">nog niet</span>'}</td>
+      <td><button class="knop rand klein" data-k="${esc(k.id)}">Wijzigen</button></td></tr>`).join("")}
+    </tbody></table>` : `<p class="zacht">Nog geen klanten.</p>`;
+  document.querySelectorAll("[data-k]").forEach((b) => b.onclick = () => klantForm(data.klanten.find((k) => k.id === b.dataset.k)));
+  $("#g_klant").innerHTML = `<option value="">– geen –</option>` + data.klanten.map((k) => `<option value="${esc(k.id)}">${esc(k.naam)}</option>`).join("");
+}
+function klantForm(k) {
+  $("#kform").classList.remove("verborgen");
+  $("#k_id").value = k?.id || ""; $("#k_id").disabled = !!k;
+  $("#k_naam").value = k?.naam || ""; $("#k_site").value = k?.site || ""; $("#k_soort").value = k?.soort || "wordpress";
+  $("#k_limiet").value = k?.limiet ?? 20; $("#k_actief").value = k?.actief === false ? "0" : "1";
+  $("#k_url").value = k?.deurbel_url || ""; $("#k_token").value = "";
+  $("#kform").scrollIntoView({ behavior: "smooth" });
+}
+$("#nieuweklant").onclick = () => klantForm(null);
+$("#kannuleer").onclick = () => $("#kform").classList.add("verborgen");
+$("#kopslaan").onclick = async () => {
+  try {
+    await api("klant_opslaan", { id: $("#k_id").value, naam: $("#k_naam").value, site: $("#k_site").value, soort: $("#k_soort").value,
+      limiet: $("#k_limiet").value, actief: $("#k_actief").value === "1", deurbel_url: $("#k_url").value.trim(), deurbel_token: $("#k_token").value.trim() });
+    $("#k_token").value = ""; meld("Klant opgeslagen.", "ok"); await laad();
+  } catch (e) { meld(e.message); }
+};
+$("#ktest").onclick = async () => {
+  try { const r = await api("deurbel_test", { klant_id: $("#k_id").value }); meld(r.ok ? "Deurbel werkt: er is een testsessie gestart." : `Deurbel gaf fout ${r.status}. Controleer adres en sleutel.`, r.ok ? "ok" : "fout"); }
+  catch (e) { meld(e.message); }
+};
+
+// ---- accounts ----
+function tekenGebruikers() {
+  $("#gtabel").innerHTML = `<table><thead><tr><th>E-mail</th><th>Naam</th><th>Klant</th><th>Rol</th><th></th></tr></thead><tbody>
+    ${data.gebruikers.map((g) => `<tr><td>${esc(g.email)}${g.actief ? "" : ' <span class="zacht">(uit)</span>'}</td><td>${esc(g.naam)}</td>
+      <td>${g.klant_id ? esc(klantNaam(g.klant_id)) : "–"}</td><td>${g.rol === "admin" ? "Beheerder" : "Klant"}</td>
+      <td><button class="knop rand klein" data-g="${esc(g.email)}">Wijzigen</button></td></tr>`).join("")}</tbody></table>`;
+  document.querySelectorAll("[data-g]").forEach((b) => b.onclick = () => gebruikerForm(data.gebruikers.find((g) => g.email === b.dataset.g)));
+}
+function gebruikerForm(g) {
+  $("#gform").classList.remove("verborgen");
+  $("#g_email").value = g?.email || ""; $("#g_email").disabled = !!g;
+  $("#g_naam").value = g?.naam || ""; $("#g_klant").value = g?.klant_id || ""; $("#g_rol").value = g?.rol || "klant";
+  $("#g_actief").value = g?.actief === false ? "0" : "1"; $("#g_ww").value = "";
+  $("#gform").scrollIntoView({ behavior: "smooth" });
+}
+$("#nieuwegebruiker").onclick = () => gebruikerForm(null);
+$("#gannuleer").onclick = () => $("#gform").classList.add("verborgen");
+$("#gopslaan").onclick = async () => {
+  try {
+    if ($("#g_email").value.trim().toLowerCase() === ik.email && ($("#g_rol").value !== "admin" || $("#g_actief").value === "0"))
+      throw new Error("Je kunt je eigen beheerdersaccount niet uitzetten.");
+    await api("gebruiker_opslaan", { email: $("#g_email").value, naam: $("#g_naam").value, klant_id: $("#g_klant").value,
+      rol: $("#g_rol").value, wachtwoord: $("#g_ww").value, actief: $("#g_actief").value === "1" });
+    $("#g_ww").value = ""; meld("Account opgeslagen.", "ok"); await laad();
+  } catch (e) { meld(e.message); }
+};
+$("#aopslaan").onclick = async () => {
+  try { await api("wachtwoord_wijzigen", { wachtwoord: $("#a_ww").value }); $("#a_ww").value = ""; meld("Wachtwoord gewijzigd.", "ok"); }
+  catch (e) { meld(e.message); }
+};
+
+api("ik").then((d) => {
+  ik = d.gebruiker;
+  if (ik.rol !== "admin") { location.href = "verzoeken"; return; }
+  laad();
+  setInterval(() => { if (!openVerzoek) laad(); }, 30000);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Webbeheer</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/stijl.css">
+</head>
+<body>
+<div class="kop">
+  <div class="merk">Webbeheer<small id="site"></small></div>
+  <div class="rechts"><button class="knop rand klein" id="uit">Uitloggen</button></div>
+</div>
+<div class="wrap">
+  <div class="kaart">
+    <h2>Nieuw verzoek</h2>
+    <p class="zacht" style="margin-top:0">Beschrijf wat er op je website moet veranderen. Je kunt ook inspreken of foto's toevoegen (of plakken).</p>
+    <div id="nieuw"></div>
+    <div id="meld" class="verborgen"></div>
+  </div>
+  <div id="lijst"><p class="zacht">Laden…</p></div>
+</div>
+<script src="assets/basis.js"></script>
+<script>
+let open = new Set(), cache = {}, timer = null;
+
+$("#uit").onclick = async () => { try { await api("uitloggen"); } catch {} zetSessie(""); location.href = "./"; };
+
+maakInvoer($("#nieuw"), {
+  opVersturen: async (tekst, fotos) => {
+    toonMelding($("#meld"), "");
+    try {
+      const r = await api("verzoek_nieuw", { tekst, fotos });
+      open.add(r.id);
+      if (r.melding) toonMelding($("#meld"), r.melding, "let");
+      await laad();
+    } catch (e) {
+      toonMelding($("#meld"), e.message, e.message.includes("limiet") ? "let" : "fout");
+      throw new Error("");
+    }
+  },
+});
+
+async function laadVerzoek(id) {
+  const d = await api("verzoek", { id });
+  cache[id] = d;
+  return d;
+}
+
+function teken(lijst) {
+  const el = $("#lijst");
+  if (!lijst.length) { el.innerHTML = `<p class="zacht">Nog geen verzoeken. Je eerste verzoek verschijnt hier.</p>`; return; }
+  el.innerHTML = lijst.map((v) => {
+    const isOpen = open.has(v.id), d = cache[v.id], actief = ACTIEF.includes(v.status);
+    return `<div class="verzoek" data-id="${v.id}">
+      ${actief ? `<div class="balk" aria-label="Bezig"></div>` : ""}
+      <div class="hoofd"><span class="nr">#${v.nr}</span><span class="titel">${esc(v.onderwerp)}</span>
+        <span class="chip ${v.status}">${STATUS[v.status]}</span></div>
+      ${isOpen && d ? `<div class="lijf">
+        ${berichtenHtml(d.verzoek.berichten)}
+        ${actief ? `<p class="bezigtekst">${v.status === "terugdraaien" ? "Wordt teruggedraaid…" : "Webbeheer is ermee bezig…"}</p>` : ""}
+        ${!actief && d.reacties_over > 0 ? `<div class="reactie" style="margin-top:12px"></div>` : ""}
+        ${!actief && d.reacties_over === 0 ? `<p class="zacht">Dit gesprek is vol. Start hierboven een nieuw verzoek.</p>` : ""}
+        ${v.status === "klaar" ? `<div class="rij" style="margin-top:8px"><button class="knop rand klein terug">↩ Deze aanpassing terugdraaien</button></div>` : ""}
+        <div class="verborgen fout"></div>
+      </div>` : ""}
+    </div>`;
+  }).join("");
+
+  el.querySelectorAll(".verzoek").forEach((blok) => {
+    const id = blok.dataset.id;
+    $(".hoofd", blok).onclick = async () => {
+      if (open.has(id)) open.delete(id); else { open.add(id); await laadVerzoek(id).catch(() => {}); }
+      teken(lijst);
+    };
+    const r = $(".reactie", blok);
+    if (r) maakInvoer(r, {
+      plaats: "Reageer of geef een aanvulling…", knop: "Reageren",
+      opVersturen: async (tekst, fotos) => { await api("reageer", { id, tekst, fotos }); await laad(); },
+    });
+    const t = $(".terug", blok);
+    if (t) t.onclick = async () => {
+      if (!confirm("Weet je zeker dat je deze aanpassing wilt terugdraaien?")) return;
+      try { await api("terugdraaien", { id }); await laad(); }
+      catch (e) { toonMelding($(".fout", blok), e.message); }
+    };
+  });
+}
+
+let laatsteLijst = [];
+async function laad(geforceerd = true) {
+  clearTimeout(timer);
+  try {
+    const { verzoeken } = await api("verzoeken_lijst");
+    // open blokken verversen
+    await Promise.all([...open].filter((id) => verzoeken.some((v) => v.id === id)).map((id) => laadVerzoek(id).catch(() => {})));
+    const veranderd = JSON.stringify(verzoeken) !== JSON.stringify(laatsteLijst);
+    const typt = [...document.querySelectorAll(".reactie textarea")].some((t) => t.value.trim()) ||
+      (document.activeElement && document.activeElement.closest(".reactie"));
+    if (geforceerd || (veranderd && !typt)) teken(verzoeken);
+    laatsteLijst = verzoeken;
+    const iemandActief = verzoeken.some((v) => ACTIEF.includes(v.status));
+    timer = setTimeout(() => laad(false), iemandActief ? 4000 : 30000);
+  } catch (e) {
+    timer = setTimeout(() => laad(false), 15000);
+  }
+}
+
+api("ik").then((d) => {
+  if (d.gebruiker.rol === "admin" && !d.klant) { location.href = "beheer"; return; }
+  $("#site").textContent = d.klant ? `${d.klant.naam} · ${d.klant.site.replace(/^https?:\/\//, "")}` : "";
+  laad();
+});
+</script>
+</body>
+</html>
