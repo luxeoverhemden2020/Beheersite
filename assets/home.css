@@ -301,3 +301,4 @@ h3{margin:6px 0 6px;font-size:19px}
 @media (max-width:560px){.w-product{grid-template-columns:1fr}.w-foto{aspect-ratio:16/10}.w-kop span:not(.w-mand){display:none}.p-chat{max-height:260px}}
 @media (max-width:1000px){.p-winkel{order:-1;scroll-margin-top:80px}}
 @media (max-width:560px){.w-product{gap:12px;padding:14px}.w-foto{aspect-ratio:16/9}.w-foto span{font-size:72px}.w-info-blok h4{font-size:20px}.w-info-blok p{display:none}}
+html,body.home{overflow-x:clip}
