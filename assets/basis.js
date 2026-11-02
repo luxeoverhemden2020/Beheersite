@@ -76,14 +76,74 @@ async function uploadFoto(bestand) {
   return api("foto_upload", { data, type: "image/jpeg" });
 }
 
-// Invoerblok: tekst + spraak + foto's (kiezen of plakken)
+// Video: max 1 minuut, zo nodig verkleind (720p) en direct naar de opslag gestuurd
+const MAX_VIDEO_SEC = 61;
+function videoInfo(bestand) {
+  return new Promise((ok, fout) => {
+    const v = document.createElement("video"); v.preload = "metadata"; v.muted = true; v.playsInline = true;
+    v.onloadedmetadata = () => ok({ duur: v.duration, b: v.videoWidth, h: v.videoHeight, url: v.src });
+    v.onerror = () => fout(new Error("Deze video kan niet worden geopend. Probeer een MP4- of MOV-video."));
+    v.src = URL.createObjectURL(bestand);
+  });
+}
+function kiesOpnameType() {
+  if (!window.MediaRecorder) return "";
+  for (const t of ["video/mp4;codecs=avc1,mp4a", "video/mp4", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"])
+    if (MediaRecorder.isTypeSupported(t)) return t;
+  return "";
+}
+async function verkleinVideo(bestand, info, voortgang) {
+  const type = kiesOpnameType();
+  const c = document.createElement("canvas");
+  if (!type || !c.captureStream) return null; // browser kan het niet: origineel gebruiken
+  const schaal = Math.min(1, 1280 / Math.max(info.b, info.h));
+  c.width = Math.round(info.b * schaal / 2) * 2; c.height = Math.round(info.h * schaal / 2) * 2;
+  const ctx = c.getContext("2d");
+  const v = document.createElement("video"); v.playsInline = true; v.src = info.url;
+  await new Promise((ok) => { v.oncanplay = ok; v.load(); });
+  const stroom = c.captureStream(30);
+  let actx = null;
+  try { // geluid meenemen zonder het af te spelen
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    const bron = actx.createMediaElementSource(v), doel = actx.createMediaStreamDestination();
+    bron.connect(doel); doel.stream.getAudioTracks().forEach((t) => stroom.addTrack(t));
+  } catch { v.muted = true; }
+  const rec = new MediaRecorder(stroom, { mimeType: type, videoBitsPerSecond: 1_200_000, audioBitsPerSecond: 96_000 });
+  const stukken = []; rec.ondataavailable = (e) => e.data.size && stukken.push(e.data);
+  const klaar = new Promise((ok) => (rec.onstop = ok));
+  let actief = true;
+  const teken = () => { if (!actief) return; ctx.drawImage(v, 0, 0, c.width, c.height); voortgang?.(Math.min(99, Math.round((v.currentTime / info.duur) * 100))); requestAnimationFrame(teken); };
+  rec.start(1000); await v.play(); teken();
+  await new Promise((ok) => (v.onended = ok));
+  actief = false; rec.stop(); await klaar; actx?.close();
+  const blob = new Blob(stukken, { type: type.split(";")[0] });
+  return blob.size > 0 && blob.size < bestand.size ? blob : null;
+}
+async function uploadVideo(bestand, voortgang) {
+  const info = await videoInfo(bestand);
+  if (!isFinite(info.duur) || info.duur > MAX_VIDEO_SEC) throw new Error("Een video mag maximaal 1 minuut zijn.");
+  let blob = bestand;
+  if (bestand.size > 8 * 1024 * 1024 || Math.max(info.b, info.h) > 1280) {
+    try { blob = (await verkleinVideo(bestand, info, voortgang)) || bestand; } catch { blob = bestand; }
+  }
+  const type = (blob.type || "video/mp4").split(";")[0] === "video/quicktime" ? "video/quicktime" : (blob.type || "video/mp4").split(";")[0];
+  if (blob.size > 50 * 1024 * 1024) throw new Error("Deze video is te groot (max. 50 MB). Maak hem iets korter.");
+  const r = await api("video_upload_url", { type, grootte: blob.size });
+  voortgang?.("↑");
+  const res = await fetch(r.url, { method: "PUT", headers: { "Content-Type": r.type }, body: blob });
+  if (!res.ok) throw new Error("Uploaden van de video is niet gelukt. Probeer het nog eens.");
+  return { pad: r.pad };
+}
+const isVideoUrl = (u) => /\.(mp4|webm|mov)$/i.test(String(u).split("?")[0]);
+
+// Invoerblok: tekst + spraak + foto's en video's (kiezen of plakken)
 function maakInvoer(houder, { plaats = "Wat wil je laten aanpassen?", knop = "Versturen", opVersturen }) {
   houder.innerHTML = `
     <textarea placeholder="${esc(plaats)}"></textarea>
     <div class="duimen"></div>
     <div class="rij" style="margin-top:10px">
       <button class="knop rand klein mic" type="button" title="Inspreken">🎤 Inspreken</button>
-      <label class="knop rand klein" style="margin:0;color:inherit">📷 Foto<input type="file" accept="image/*" multiple hidden></label>
+      <label class="knop rand klein" style="margin:0;color:inherit" title="Foto's of een video (max. 1 minuut)">📷 Foto / video<input type="file" accept="image/*,video/*" multiple hidden></label>
       <span class="vul"></span>
       <button class="knop verstuur" type="button">${esc(knop)}</button>
     </div>
@@ -94,14 +154,18 @@ function maakInvoer(houder, { plaats = "Wat wil je laten aanpassen?", knop = "Ve
 
   async function voegToe(files) {
     for (const f of files) {
-      if (!f.type.startsWith("image/")) continue;
-      if (fotos.length >= 10) { toonMelding(meld, "Maximaal 10 foto's per bericht."); break; }
-      const d = document.createElement("div"); d.className = "d";
-      d.innerHTML = `<img alt="" src="${URL.createObjectURL(f)}" style="opacity:.4">`;
+      const video = f.type.startsWith("video/");
+      if (!f.type.startsWith("image/") && !video) continue;
+      if (fotos.length >= 10) { toonMelding(meld, "Maximaal 10 foto's of video's per bericht."); break; }
+      const d = document.createElement("div"); d.className = "d" + (video ? " video" : "");
+      d.innerHTML = video
+        ? `<video muted playsinline preload="metadata" src="${URL.createObjectURL(f)}" style="opacity:.4"></video><span class="voortgang">…</span>`
+        : `<img alt="" src="${URL.createObjectURL(f)}" style="opacity:.4">`;
       duimen.append(d); bezigMet++; verstuur.disabled = true;
       try {
-        const r = await uploadFoto(f);
-        fotos.push(r.pad); $("img", d).style.opacity = 1;
+        const vg = $(".voortgang", d);
+        const r = video ? await uploadVideo(f, (p) => { if (vg) vg.textContent = typeof p === "number" ? `verkleinen ${p}%` : "uploaden…"; }) : await uploadFoto(f);
+        fotos.push(r.pad); d.firstElementChild.style.opacity = 1; vg?.remove();
         const w = document.createElement("button"); w.className = "weg"; w.type = "button"; w.textContent = "✕";
         w.onclick = () => { fotos = fotos.filter((p) => p !== r.pad); d.remove(); };
         d.append(w);
@@ -159,7 +223,9 @@ function berichtenHtml(berichten, wieNamen = WIE) {
     <div class="bericht ${b.van}">
       <div class="wie">${b.van === "webbeheer" ? robotSvg("rust") : ""}${esc(wieNamen[b.van] || b.van)} · ${datum(b.aangemaakt)}</div>
       ${b.tekst ? `<div class="tekst">${linkjes(b.tekst)}</div>` : ""}
-      ${(b.fotos || []).map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="Foto"></a>`).join("")}
+      ${(b.fotos || []).map((u) => isVideoUrl(u)
+        ? `<video class="bijlage-video" controls playsinline preload="metadata" src="${esc(u)}"></video>`
+        : `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="Foto"></a>`).join("")}
     </div>`).join("");
 }
 

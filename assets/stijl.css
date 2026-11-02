@@ -40,7 +40,9 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
 .verborgen{display:none!important}
 .duimen{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .duimen .d{position:relative}
-.duimen img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--lijn);display:block}
+.duimen img,.duimen video{width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--lijn);display:block;background:#000}
+.duimen .d.video::after{content:"▶";position:absolute;left:6px;bottom:4px;color:#fff;font-size:12px;text-shadow:0 1px 3px #000}
+.duimen .voortgang{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;font-size:10px;font-weight:700;color:#fff;background:rgba(0,0,0,.45);border-radius:10px;padding:2px}
 .duimen .weg{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:0;background:var(--fout);color:#fff;cursor:pointer;font-size:12px;line-height:22px;padding:0}
 .mic.aan{background:var(--fout);color:#fff;border-color:var(--fout);animation:puls 1s infinite}
 @keyframes puls{50%{box-shadow:0 0 0 6px rgba(255,107,129,.25)}}
@@ -69,6 +71,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
 .bericht.klant .wie{justify-content:flex-end}
 .bericht.jan .tekst{background:var(--letbg);border-color:rgba(255,209,102,.3)}
 .bericht img{max-width:160px;max-height:160px;border-radius:10px;margin-top:6px;display:block}
+.bericht .bijlage-video{width:100%;max-width:320px;max-height:240px;border-radius:10px;margin-top:6px;display:block;background:#000}
 /* Wachtpaneel met robot */
 .wacht{display:flex;gap:14px;align-items:center;margin:12px 0;padding:14px;border-radius:14px;background:linear-gradient(135deg,rgba(34,227,196,.08),rgba(139,92,246,.1));border:1px solid rgba(34,227,196,.25)}
 .wacht .bot{width:72px;height:72px;flex:none}
