@@ -69,7 +69,7 @@ h3{margin:6px 0 6px;font-size:19px}
 
 /* 3D robot in de held */
 .held-demo{position:relative}
-.grote-bot{position:absolute;width:150px;height:150px;left:-80px;bottom:-30px;z-index:2;filter:drop-shadow(0 18px 24px rgba(0,0,0,.25))}
+.grote-bot{display:none;position:absolute;width:150px;height:150px;left:-80px;bottom:-30px;z-index:2;filter:drop-shadow(0 18px 24px rgba(0,0,0,.25))}
 .grote-bot svg{width:100%;height:100%}
 .inlog .bot{filter:drop-shadow(0 12px 18px rgba(0,0,0,.25))}
 /* aanbod */
@@ -88,3 +88,97 @@ h3{margin:6px 0 6px;font-size:19px}
 .keuze input:focus-visible+span{outline:2px solid var(--accent)}
 @media (max-width:900px){.grote-bot{width:110px;height:110px;left:-6px;bottom:-24px}}
 @media (max-width:640px){.aanbod{grid-template-columns:1fr}.grote-bot{width:96px;height:96px;left:-4px}}
+
+/* ===== Siteregelaar: 3D-podium ===== */
+.navlink{color:var(--tekst);text-decoration:none;font-size:15px;padding:6px 8px;border-radius:8px}
+.navlink:hover{color:var(--accent)}
+.podium{position:relative;overflow:hidden;background:
+  radial-gradient(900px 500px at 75% 45%,rgba(34,227,196,.22),transparent 60%),
+  radial-gradient(700px 500px at 95% 0%,rgba(139,92,246,.28),transparent 60%),
+  radial-gradient(600px 400px at 0% 100%,rgba(59,130,246,.18),transparent 60%),
+  linear-gradient(rgba(34,227,196,.06) 1px,transparent 1px) 0 0/100% 40px,
+  linear-gradient(90deg,rgba(34,227,196,.06) 1px,transparent 1px) 0 0/40px 100%,
+  #050912;color:#e6f1ff;border-bottom:1px solid rgba(34,227,196,.2)}
+.podium::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 70%,rgba(5,9,18,.6));pointer-events:none}
+.podium-gloed{position:absolute;left:50%;top:-200px;width:900px;height:400px;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(34,227,196,.18),transparent);filter:blur(20px);pointer-events:none}
+.podium-inhoud{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center;min-height:min(680px,88vh);padding-top:30px;padding-bottom:30px}
+.podium h1{font-size:clamp(40px,6.5vw,72px);line-height:1.02;margin:10px 0 18px;letter-spacing:-1px;color:#fff}
+.podium .groot{color:#b9c7da}
+.podium .groot b{color:#fff}
+.podium .label{color:#22e3c4}
+.knipper{animation:knipperen 1.6s infinite;color:#22e3c4}
+@keyframes knipperen{50%{opacity:.25}}
+.licht-op-donker{color:#e6f1ff!important;border-color:rgba(230,241,255,.25)!important}
+.stats{display:flex;gap:26px;margin-top:28px;flex-wrap:wrap}
+.stats div{display:flex;flex-direction:column}
+.stats b{font-family:"JetBrains Mono",monospace;font-size:22px;color:#22e3c4;text-shadow:0 0 18px rgba(34,227,196,.5)}
+.stats span{font-size:13px;color:#8aa0bd}
+.held-3d{position:relative;height:min(600px,70vh);min-height:420px}
+#robot3d{position:absolute;inset:0}
+#robot3d canvas{display:block;width:100%!important;height:100%!important}
+#robot3d.fallback{display:grid;place-items:center}
+#robot3d.fallback svg{width:70%;height:70%}
+.holo{position:absolute;z-index:2;padding:10px 14px;border-radius:14px;font-size:13px;color:#e6f1ff;white-space:nowrap;
+  background:linear-gradient(135deg,rgba(34,227,196,.16),rgba(139,92,246,.14));border:1px solid rgba(34,227,196,.45);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 0 24px rgba(34,227,196,.25),inset 0 0 12px rgba(34,227,196,.12);animation:holo 6s ease-in-out infinite}
+.holo span{color:#22e3c4;margin-right:4px}
+.holo em{color:#8aa0bd;font-style:normal}
+.holo.h1{top:14%;left:0}
+.holo.h2{top:46%;right:-2%;animation-delay:-2s;border-color:rgba(139,92,246,.55);box-shadow:0 0 24px rgba(139,92,246,.3)}
+.holo.h3{bottom:16%;left:6%;animation-delay:-4s}
+@keyframes holo{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.naambord{position:absolute;bottom:2%;left:50%;transform:translateX(-50%);text-align:center;z-index:2}
+.naambord b{display:block;font-family:"JetBrains Mono",monospace;font-size:18px;letter-spacing:2px;color:#fff;text-shadow:0 0 16px rgba(34,227,196,.8)}
+.naambord span{font-size:12px;color:#8aa0bd}
+
+/* sitehulpje-sectie */
+.held-sub{display:grid;grid-template-columns:1.2fr .8fr;gap:30px;align-items:center}
+.groot-titel{font-size:clamp(36px,5vw,56px);margin:4px 0 10px}
+.drie.compact{grid-template-columns:repeat(3,1fr);margin-top:18px}
+.drie.compact .stap{padding:14px}
+.drie.compact h3{font-size:16px}
+.drie.compact p{font-size:14px}
+.tussenkop{font-size:18px;margin:34px 0 14px}
+.online{margin-left:auto;font-style:normal;font-size:12px;color:#22e3c4}
+
+/* aanbod 3 kolommen */
+.aanbod.drie-kol{grid-template-columns:repeat(3,1fr)}
+
+/* portfolio */
+.portfolio{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.project{display:block;text-decoration:none;color:inherit;background:var(--kaart);border:1px solid var(--lijn);border-radius:var(--radius);overflow:hidden;transition:transform .25s,border-color .25s,box-shadow .25s}
+.project:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:var(--glow)}
+.browser{display:flex;align-items:center;gap:6px;padding:9px 12px;background:var(--bg2);border-bottom:1px solid var(--lijn)}
+.browser i{width:9px;height:9px;border-radius:50%;background:#ff5f57}.browser i:nth-child(2){background:#febc2e}.browser i:nth-child(3){background:#28c840}
+.browser span{margin-left:8px;font-size:12px;color:var(--zacht);font-family:"JetBrains Mono",monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.voorbeeld{height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;position:relative;overflow:hidden}
+.voorbeeld::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px) 0 0/100% 22px;opacity:.6}
+.voorbeeld .logo{font-size:44px;filter:drop-shadow(0 6px 12px rgba(0,0,0,.3))}
+.voorbeeld b{font-size:18px;position:relative}
+.voorbeeld small{opacity:.85;position:relative}
+.p1{background:linear-gradient(135deg,#0f2d5c,#1e6fd9 60%,#22e3c4)}
+.p2{background:linear-gradient(135deg,#0b3b36,#0e9f8c 55%,#8be9d9)}
+.p3{background:linear-gradient(135deg,#1a1036,#8b5cf6 60%,#22e3c4)}
+.project-tekst{padding:16px}
+.project-tekst h3{margin:0 0 6px}
+.project-tekst p{margin:0 0 10px;color:var(--zacht);font-size:14.5px}
+
+/* verschijnen bij scrollen */
+.verschijn{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.verschijn.zicht{opacity:1;transform:none}
+
+@media (max-width:1000px){
+  .podium-inhoud{grid-template-columns:1fr;min-height:auto}
+  .held-3d{height:440px;min-height:0}
+  .holo.h2{right:0}
+  .aanbod.drie-kol,.portfolio{grid-template-columns:1fr 1fr}
+  .held-sub{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .held-3d{height:380px}
+  .holo{font-size:11.5px;padding:8px 10px}
+  .holo.h1{left:-4px;top:6%}.holo.h3{left:0;bottom:18%}
+  .stats{gap:18px}
+  .aanbod.drie-kol,.portfolio,.drie.compact{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.holo,.knipper{animation:none}.verschijn{opacity:1;transform:none;transition:none}}

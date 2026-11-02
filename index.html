@@ -2,63 +2,79 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sitehulpje – je website aanpassen door het gewoon te vragen</title>
-<meta name="description" content="Typ, spreek in of stuur een foto. Sitehulpje past je website of webshop voor je aan, meestal binnen een minuut. Zonder gedoe, zonder technische kennis.">
+<title>Siteregelaar – websites en webshops, geregeld. Met Sitehulpje.</title>
+<meta name="description" content="Siteregelaar maakt je website of webshop. En met Sitehulpje pas je daarna alles aan door het gewoon te vragen: typen, inspreken of een foto sturen.">
 <script>
-  // Oude inloglinks (?link= of ?code=) gaan naar het inlogscherm
   if (/[?&](link|code)=/.test(location.search)) location.replace("inloggen" + location.search);
 </script>
 <link rel="stylesheet" href="assets/stijl.css">
 <link rel="stylesheet" href="assets/home.css">
 </head>
-<body>
+<body class="home">
 
 <header class="kop">
   <span class="bot-klein" id="kopbot"></span>
-  <div class="merk">Site<b>hulpje</b></div>
+  <div class="merk">Site<b>regelaar</b></div>
   <nav class="rechts">
-    <a class="knop rand klein verberg-mobiel" href="#zo-werkt-het">Zo werkt het</a>
+    <a class="navlink verberg-mobiel" href="#sitehulpje">Sitehulpje</a>
+    <a class="navlink verberg-mobiel" href="#aanbod">Website laten maken</a>
+    <a class="navlink verberg-mobiel" href="#portfolio">Portfolio</a>
     <button class="knop rand klein thema" type="button"></button>
     <a class="knop klein" href="inloggen">Inloggen</a>
   </nav>
 </header>
 
 <main>
-  <!-- HELD -->
-  <section class="held wrap breed">
-    <div class="held-tekst">
-      <p class="label mono">&gt;_ je website, zonder gedoe</p>
-      <h1>Je website aanpassen?<br><span class="glans">Gewoon even vragen.</span></h1>
-      <p class="groot">Typ het, spreek het in of stuur een foto. Sitehulpje past je website of webshop voor je aan. Meestal binnen een minuut.</p>
-      <div class="rij">
-        <a class="knop groot-knop" href="#contact">Gratis kennismaken</a>
-        <a class="knop rand groot-knop" href="#zo-werkt-het">Zo werkt het</a>
+  <!-- HELD: 3D-podium -->
+  <section class="podium">
+    <div class="podium-gloed"></div>
+    <div class="wrap breed podium-inhoud">
+      <div class="held-tekst">
+        <p class="label mono"><span class="knipper">●</span> Siteregelaar · websites &amp; webshops</p>
+        <h1>Je website.<br>Je webshop.<br><span class="glans">Geregeld.</span></h1>
+        <p class="groot">Wij bouwen je site of webshop. En met <b>Sitehulpje</b> pas je daarna alles aan door het gewoon te vragen. Typen, inspreken of een foto sturen. Klaar.</p>
+        <div class="rij">
+          <a class="knop groot-knop" href="#contact">Gratis kennismaken</a>
+          <a class="knop rand groot-knop licht-op-donker" href="#sitehulpje">Maak kennis met Sitehulpje</a>
+        </div>
+        <div class="stats">
+          <div><b>±1 min</b><span>voor een aanpassing</span></div>
+          <div><b>1 tik</b><span>om terug te draaien</span></div>
+          <div><b>0</b><span>technische kennis nodig</span></div>
+        </div>
       </div>
-      <p class="zacht klein-tekst">Geen technische kennis nodig. Geen moeilijke systemen. Geen wachten op een webbouwer.</p>
-    </div>
-    <div class="held-demo" aria-hidden="true">
-      <div class="grote-bot" id="grotebot"></div>
-      <div class="telefoon">
-        <div class="tel-kop"><span class="bot-mini" id="telbot"></span><b>Sitehulpje</b></div>
-        <div class="tel-chat" id="demo"></div>
+      <div class="held-3d">
+        <div id="robot3d" aria-label="Sitehulpje, de robot die je website bijhoudt" role="img"></div>
+        <div class="holo h1 mono"><span>✓</span> Prijs aangepast <em>· 4 sec</em></div>
+        <div class="holo h2 mono"><span>🎤</span> "Zet de kerstactie live"</div>
+        <div class="holo h3 mono"><span>✓</span> Actie staat online</div>
+        <div class="naambord"><b>Sitehulpje</b><span>Jouw robot voor je website</span></div>
       </div>
     </div>
   </section>
 
-  <!-- 3 STAPPEN -->
-  <section id="zo-werkt-het" class="wrap breed blok">
-    <h2 class="sectie"><span class="tag">01</span>Zo simpel werkt het</h2>
-    <div class="drie">
-      <div class="kaart stap"><div class="nr">1</div><h3>Vertel wat je wilt</h3><p>Typ het in je eigen woorden, spreek het in of maak een foto. Net als een appje.</p></div>
-      <div class="kaart stap"><div class="nr">2</div><h3>Sitehulpje regelt het</h3><p>Je ziet een robotje aan het werk. Intussen kun je gewoon verder met je dag.</p></div>
-      <div class="kaart stap"><div class="nr">3</div><h3>Klaar!</h3><p>Je krijgt een berichtje met een link om het te bekijken. Toch niet goed? Eén tik en het staat weer zoals het was.</p></div>
+  <!-- SITEHULPJE -->
+  <section id="sitehulpje" class="wrap breed blok">
+    <div class="held-sub">
+      <div>
+        <p class="label mono">&gt;_ maak kennis met</p>
+        <h2 class="sectie groot-titel">Site<span class="glans">hulpje</span></h2>
+        <p class="groot">Het slimme hulpje dat je website voor je bijhoudt. Je vertelt wat je wilt, Sitehulpje regelt het. <b>Meestal binnen een minuut.</b></p>
+        <div class="drie compact">
+          <div class="kaart stap"><div class="nr">1</div><h3>Vertel wat je wilt</h3><p>Typ het, spreek het in of maak een foto. Net als een appje.</p></div>
+          <div class="kaart stap"><div class="nr">2</div><h3>Sitehulpje regelt het</h3><p>Je ziet het robotje aan het werk. Jij gaat verder met je dag.</p></div>
+          <div class="kaart stap"><div class="nr">3</div><h3>Klaar!</h3><p>Je krijgt een link om het te bekijken. Niet goed? Eén tik en het staat terug.</p></div>
+        </div>
+      </div>
+      <div class="held-demo" aria-hidden="true">
+        <div class="telefoon">
+          <div class="tel-kop"><span class="bot-mini" id="telbot"></span><b>Sitehulpje</b><i class="online">● online</i></div>
+          <div class="tel-chat" id="demo"></div>
+        </div>
+      </div>
     </div>
-  </section>
 
-  <!-- VOORBEELDEN -->
-  <section class="wrap breed blok">
-    <h2 class="sectie"><span class="tag">02</span>Wat kun je vragen?</h2>
-    <p class="groot zacht" style="margin-top:-6px">Eigenlijk alles wat je op je website ziet. Een paar voorbeelden:</p>
+    <h3 class="tussenkop">Wat kun je vragen? Eigenlijk alles wat je op je site ziet:</h3>
     <div class="tegels">
       <div class="tegel"><span>💶</span>"Zet de prijs van de winterjas op €89"</div>
       <div class="tegel"><span>📣</span>"Zet de najaarsactie bovenaan de homepage"</div>
@@ -71,49 +87,74 @@
     </div>
   </section>
 
-  <!-- WAAROM -->
-  <section class="wrap breed blok">
-    <h2 class="sectie"><span class="tag">03</span>Waarom ondernemers het fijn vinden</h2>
-    <div class="twee">
-      <div class="voordeel"><b>⚡ Snel</b><p>Geen mailtjes heen en weer, geen wachten tot iemand tijd heeft. Je vraagt het en het gebeurt.</p></div>
-      <div class="voordeel"><b>📱 Overal</b><p>Werkt op je telefoon, tablet en computer. Ook als je tussen twee klanten door even iets wilt aanpassen.</p></div>
-      <div class="voordeel"><b>↩️ Altijd terug te draaien</b><p>Niet tevreden? Met één tik staat alles weer zoals het was. Je kunt dus niets kapot maken.</p></div>
-      <div class="voordeel"><b>🛡️ Veilig</b><p>Bestellingen, betalingen en wachtwoorden worden nooit zomaar aangepast. Grote dingen worden eerst met jou en Jan overlegd.</p></div>
-      <div class="voordeel"><b>🙋 Een echt aanspreekpunt</b><p>Lukt iets niet automatisch? Dan krijgt Jan direct een seintje en lost hij het voor je op.</p></div>
-      <div class="voordeel"><b>💡 Geen kennis nodig</b><p>Je hoeft niets te leren en nergens in te duiken. Gewoon zeggen wat je wilt.</p></div>
+  <!-- AANBOD -->
+  <section id="aanbod" class="wrap breed blok">
+    <h2 class="sectie"><span class="tag">01</span>Siteregelaar regelt het voor je</h2>
+    <div class="aanbod drie-kol">
+      <div class="kaart pad uitgelicht">
+        <div class="lint mono">meest gekozen</div>
+        <div class="pad-icoon">🌐</div>
+        <h3>Website laten maken</h3>
+        <p>Een mooie, snelle website die bij je bedrijf past. Goed te vinden in Google en perfect op je telefoon. Sitehulpje zit er meteen bij.</p>
+        <a class="knop" href="#contact" data-keuze="Ik wil een nieuwe website">Ik wil een website</a>
+      </div>
+      <div class="kaart pad">
+        <div class="pad-icoon">🛍️</div>
+        <h3>Webshop laten maken</h3>
+        <p>Verkoop online met iDEAL en andere betaalmethodes, je eigen producten en kortingscodes. Prijzen of acties aanpassen? Even vragen aan Sitehulpje.</p>
+        <a class="knop rand" href="#contact" data-keuze="Ik wil een nieuwe webshop">Ik wil een webshop</a>
+      </div>
+      <div class="kaart pad">
+        <div class="pad-icoon">🔗</div>
+        <h3>Al een site? Koppel Sitehulpje</h3>
+        <p>Werkt je site of webshop met <b>WordPress</b> of <b>WooCommerce</b>? Dan koppelen wij Sitehulpje, vaak dezelfde dag nog. Jij hoeft niets te doen.</p>
+        <a class="knop rand" href="#contact" data-keuze="Ik heb al een website en wil Sitehulpje koppelen">Koppel mijn site</a>
+      </div>
     </div>
   </section>
 
-  <!-- AANBOD -->
-  <section id="aanbod" class="wrap breed blok">
-    <h2 class="sectie"><span class="tag">04</span>Wij regelen het voor je</h2>
-    <div class="aanbod">
-      <div class="kaart pad">
-        <div class="pad-icoon">🔗</div>
-        <h3>Heb je al een website of webshop?</h3>
-        <p>Grote kans dat we hem kunnen koppelen. Werkt hij met <b>WordPress</b> of <b>WooCommerce</b>? Dan kun je vaak dezelfde dag al aan de slag. Wij regelen de koppeling, jij hoeft niets te doen.</p>
-        <a class="knop rand" href="#contact" data-keuze="Ik heb al een website en wil die koppelen">Koppel mijn site</a>
-      </div>
-      <div class="kaart pad uitgelicht">
-        <div class="lint mono">alles-in-één</div>
-        <div class="pad-icoon">🚀</div>
-        <h3>Nog geen website of webshop?</h3>
-        <p>Neem contact met ons op en <b>wij regelen het direct</b>: een mooie, snelle website of webshop die bij je bedrijf past. Sitehulpje zit er meteen bij, dus daarna pas je alles zelf aan door het gewoon te vragen.</p>
-        <a class="knop" href="#contact" data-keuze="Ik wil een nieuwe website of webshop">Ik wil een website</a>
-      </div>
+  <!-- PORTFOLIO -->
+  <section id="portfolio" class="wrap breed blok">
+    <h2 class="sectie"><span class="tag">02</span>Portfolio</h2>
+    <div class="portfolio">
+      <a class="project" href="https://softwashkoningtwente.shop" target="_blank" rel="noopener">
+        <div class="browser"><i></i><i></i><i></i><span>softwashkoningtwente.shop</span></div>
+        <div class="voorbeeld p1"><div class="logo">👑</div><b>De Softwash Koning</b><small>Webshop · Twente</small></div>
+        <div class="project-tekst"><h3>De Softwash Koning</h3><p>Webshop voor schoonmaakproducten voor professionals. Met Sitehulpje past de eigenaar zelf prijzen en teksten aan.</p><span class="chip klaar">Webshop + Sitehulpje</span></div>
+      </a>
+      <a class="project" href="https://jksschoonmaakgroep.nl" target="_blank" rel="noopener">
+        <div class="browser"><i></i><i></i><i></i><span>jksschoonmaakgroep.nl</span></div>
+        <div class="voorbeeld p2"><div class="logo">✨</div><b>JKS Schoonmaakgroep</b><small>Website · Hengelo</small></div>
+        <div class="project-tekst"><h3>JKS Schoonmaakgroep</h3><p>Moderne bedrijfswebsite met offerte-aanvraag. Snel, duidelijk en makkelijk bij te houden.</p><span class="chip klaar">Website + Sitehulpje</span></div>
+      </a>
+      <a class="project leeg" href="#contact">
+        <div class="voorbeeld p3"><div class="logo">🚀</div><b>Jouw bedrijf?</b><small>Hier staat straks jouw site</small></div>
+        <div class="project-tekst"><h3>Jij bent de volgende</h3><p>Vertel ons wat je wilt, dan regelen wij de rest.</p><span class="chip">Neem contact op →</span></div>
+      </a>
     </div>
-    <p class="groot zacht" style="text-align:center;margin-top:18px">Website én onderhoud in één. <b style="color:var(--tekst)">Het is echt zo makkelijk.</b></p>
+  </section>
+
+  <!-- WAAROM -->
+  <section class="wrap breed blok">
+    <h2 class="sectie"><span class="tag">03</span>Waarom ondernemers voor Siteregelaar kiezen</h2>
+    <div class="twee">
+      <div class="voordeel"><b>⚡ Snel</b><p>Geen mailtjes heen en weer, geen wachten. Je vraagt het en het gebeurt.</p></div>
+      <div class="voordeel"><b>📱 Overal</b><p>Werkt op je telefoon, tablet en computer. Ook even tussen twee klanten door.</p></div>
+      <div class="voordeel"><b>↩️ Altijd terug te draaien</b><p>Niet tevreden? Eén tik en alles staat weer zoals het was. Je kunt niets kapot maken.</p></div>
+      <div class="voordeel"><b>🛡️ Veilig</b><p>Bestellingen, betalingen en wachtwoorden worden nooit zomaar aangepast. Grote dingen worden eerst overlegd.</p></div>
+      <div class="voordeel"><b>🙋 Een echt aanspreekpunt</b><p>Lukt iets niet automatisch? Dan krijgt Jan direct een seintje en lost hij het op.</p></div>
+      <div class="voordeel"><b>💡 Alles in één</b><p>Website of webshop, onderhoud en aanpassingen. Eén partij, geen gedoe.</p></div>
+    </div>
   </section>
 
   <!-- VRAGEN -->
   <section class="wrap blok">
-    <h2 class="sectie"><span class="tag">05</span>Veelgestelde vragen</h2>
-    <details class="kaart vraag"><summary>Moet ik iets installeren of leren?</summary><p>Nee. Je krijgt een eigen link. Die open je op je telefoon of computer en je kunt meteen beginnen. De koppeling met je website regelen wij.</p></details>
-    <details class="kaart vraag"><summary>Wat als er iets fout gaat?</summary><p>Elke aanpassing kun je met één tik terugdraaien. En lukt iets niet automatisch, dan krijgt Jan direct een melding en pakt hij het op.</p></details>
-    <details class="kaart vraag"><summary>Kan Sitehulpje mijn bestellingen of betalingen aanpassen?</summary><p>Nee. Bestellingen, terugbetalingen, betaalinstellingen en wachtwoorden blijven altijd buiten bereik. Grote of gevoelige aanpassingen worden eerst aan Jan voorgelegd.</p></details>
-    <details class="kaart vraag"><summary>Hoe snel is het klaar?</summary><p>De meeste aanpassingen, zoals een prijs, tekst of foto, zijn binnen een minuut klaar. Grotere klussen kunnen iets langer duren.</p></details>
-    <details class="kaart vraag"><summary>Ik heb nog geen website. Kunnen jullie die maken?</summary><p>Zeker. Vertel ons wat je wilt, dan maken wij een website of webshop die bij je bedrijf past. Sitehulpje zit er meteen bij, zodat je daarna alles zelf kunt aanpassen door het gewoon te vragen.</p></details>
-    <details class="kaart vraag"><summary>Hoeveel kan ik vragen?</summary><p>Ruim genoeg voor een gewone ondernemer. Je spreekt samen met Jan af wat bij jou past.</p></details>
+    <h2 class="sectie"><span class="tag">04</span>Veelgestelde vragen</h2>
+    <details class="kaart vraag"><summary>Wat is het verschil tussen Siteregelaar en Sitehulpje?</summary><p>Siteregelaar is het bedrijf: wij maken je website of webshop en regelen alles eromheen. Sitehulpje is het slimme hulpje dat je daarna gebruikt om zelf, door het gewoon te vragen, alles aan te passen.</p></details>
+    <details class="kaart vraag"><summary>Moet ik iets installeren of leren?</summary><p>Nee. Je krijgt een eigen link. Die open je op je telefoon of computer en je kunt meteen beginnen. De rest regelen wij.</p></details>
+    <details class="kaart vraag"><summary>Wat als er iets fout gaat?</summary><p>Elke aanpassing draai je met één tik terug. En lukt iets niet automatisch, dan krijgt Jan direct een melding en pakt hij het op.</p></details>
+    <details class="kaart vraag"><summary>Kan Sitehulpje mijn bestellingen of betalingen aanpassen?</summary><p>Nee. Bestellingen, terugbetalingen, betaalinstellingen en wachtwoorden blijven altijd buiten bereik. Grote of gevoelige dingen worden eerst aan Jan voorgelegd.</p></details>
+    <details class="kaart vraag"><summary>Ik heb al een website. Kan ik Sitehulpje dan ook gebruiken?</summary><p>Werkt je site met WordPress of WooCommerce? Dan kunnen we Sitehulpje er meestal dezelfde dag aan koppelen. Twijfel je? Vraag het ons gewoon.</p></details>
   </section>
 
   <!-- CONTACT -->
@@ -124,8 +165,9 @@
       <form id="cform">
         <label>Waar ben je naar op zoek?</label>
         <div class="keuzes" role="radiogroup">
-          <label class="keuze"><input type="radio" name="c_keuze" value="Ik wil een nieuwe website of webshop" checked><span>🚀 Een nieuwe website of webshop</span></label>
-          <label class="keuze"><input type="radio" name="c_keuze" value="Ik heb al een website en wil die koppelen"><span>🔗 Mijn bestaande site koppelen</span></label>
+          <label class="keuze"><input type="radio" name="c_keuze" value="Ik wil een nieuwe website" checked><span>🌐 Een website</span></label>
+          <label class="keuze"><input type="radio" name="c_keuze" value="Ik wil een nieuwe webshop"><span>🛍️ Een webshop</span></label>
+          <label class="keuze"><input type="radio" name="c_keuze" value="Ik heb al een website en wil Sitehulpje koppelen"><span>🔗 Sitehulpje koppelen</span></label>
           <label class="keuze"><input type="radio" name="c_keuze" value="Ik wil eerst meer informatie"><span>💬 Eerst meer weten</span></label>
         </div>
         <div class="grid2">
@@ -135,7 +177,7 @@
           <div><label for="c_site">Je website (als je die al hebt)</label><input id="c_site" inputmode="url" placeholder="www.…"></div>
         </div>
         <label for="c_bericht">Waar kunnen we je mee helpen?</label>
-        <textarea id="c_bericht" placeholder="Bijvoorbeeld: ik wil zelf makkelijk mijn prijzen en acties kunnen aanpassen."></textarea>
+        <textarea id="c_bericht" placeholder="Bijvoorbeeld: ik wil een webshop en zelf makkelijk mijn prijzen en acties kunnen aanpassen."></textarea>
         <input id="c_website2" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
         <div id="cmeld" class="verborgen"></div>
         <button class="knop groot-knop" id="cknop" style="margin-top:12px">Verstuur</button>
@@ -145,57 +187,53 @@
 </main>
 
 <footer class="voet wrap breed">
-  <span>Site<b>hulpje</b> · je website, zonder gedoe</span>
+  <span>Site<b>regelaar</b> · websites en webshops, geregeld. Met Sitehulpje.</span>
   <a href="inloggen">Inloggen voor klanten</a>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="assets/basis.js"></script>
+<script src="assets/robot3d.js"></script>
 <script>
 $("#kopbot").innerHTML = robotSvg("rust");
 $("#telbot").innerHTML = robotSvg("rust");
-$("#grotebot").innerHTML = robotSvg("zwaai kijkt");
+$("#contactbot").innerHTML = robotSvg("zwaai");
 document.querySelectorAll("[data-keuze]").forEach((a) => a.addEventListener("click", () => {
   const r = document.querySelector(`input[name=c_keuze][value="${a.dataset.keuze}"]`); if (r) r.checked = true;
 }));
-$("#contactbot").innerHTML = robotSvg();
 
-// Demo-gesprek in de telefoon
+// Demo-gesprek
 const DEMO = [
   { van: "klant", t: "Zet de prijs van de winterjas op €89 🧥" },
   { van: "bezig" },
   { van: "webbeheer", t: "Klaar! De winterjas kost nu €89. Bekijk hem hier 👉 jouwwinkel.nl/winterjas" },
-  { van: "klant", t: "Top! En zet de najaarsactie bovenaan de homepage" },
+  { van: "klant", t: "🎤 Zet de najaarsactie bovenaan de homepage" },
   { van: "bezig" },
   { van: "webbeheer", t: "Gedaan ✅ De najaarsactie staat nu bovenaan je homepage." },
 ];
-const demo = $("#demo");
-let stap = 0;
+const demo = $("#demo"); let stap = 0;
 function volgende() {
   if (stap >= DEMO.length) { setTimeout(() => { demo.innerHTML = ""; stap = 0; volgende(); }, 3500); return; }
-  const m = DEMO[stap++];
-  const el = document.createElement("div");
-  if (m.van === "bezig") {
-    el.className = "demo-bezig"; el.innerHTML = `<span></span><span></span><span></span>`;
-    demo.append(el); setTimeout(() => { el.remove(); volgende(); }, 1400);
-    return;
-  }
-  el.className = "demo-bel " + m.van; el.textContent = m.t;
-  demo.append(el);
+  const m = DEMO[stap++]; const el = document.createElement("div");
+  if (m.van === "bezig") { el.className = "demo-bezig"; el.innerHTML = "<span></span><span></span><span></span>"; demo.append(el); setTimeout(() => { el.remove(); volgende(); }, 1400); return; }
+  el.className = "demo-bel " + m.van; el.textContent = m.t; demo.append(el);
   setTimeout(volgende, m.van === "klant" ? 900 : 2200);
 }
 if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
   DEMO.filter((m) => m.t).forEach((m) => { const el = document.createElement("div"); el.className = "demo-bel " + m.van; el.textContent = m.t; demo.append(el); });
 } else volgende();
 
+// Elementen zacht laten verschijnen bij scrollen
+const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("zicht"); io.unobserve(e.target); } }), { threshold: 0.12 });
+document.querySelectorAll(".blok .kaart, .tegel, .voordeel, .project").forEach((el) => { el.classList.add("verschijn"); io.observe(el); });
+
 // Contactformulier
 $("#cform").onsubmit = async (e) => {
-  e.preventDefault();
-  toonMelding($("#cmeld"), "");
-  $("#cknop").disabled = true;
+  e.preventDefault(); toonMelding($("#cmeld"), ""); $("#cknop").disabled = true;
   try {
-    await api("contact", { naam: $("#c_naam").value, bedrijf: $("#c_bedrijf").value, contact: $("#c_contact").value,
-      site: $("#c_site").value,
-      bericht: "Keuze: " + (document.querySelector("input[name=c_keuze]:checked")?.value || "-") + "\n\n" + $("#c_bericht").value, website2: $("#c_website2").value });
+    await api("contact", { naam: $("#c_naam").value, bedrijf: $("#c_bedrijf").value, contact: $("#c_contact").value, site: $("#c_site").value,
+      bericht: "Keuze: " + (document.querySelector("input[name=c_keuze]:checked")?.value || "-") + "\n\n" + $("#c_bericht").value,
+      website2: $("#c_website2").value });
     $("#cform").reset();
     toonMelding($("#cmeld"), "Bedankt! Je bericht is verstuurd. Jan neemt snel contact met je op.", "ok");
   } catch (err) { toonMelding($("#cmeld"), err.message); }
