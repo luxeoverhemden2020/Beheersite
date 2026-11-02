@@ -14,7 +14,7 @@
   const FOTO_TINT = [0, 140, 200, 300, 40];
   const KLEUREN = { rood: "#dc2626", blauw: "#2563eb", groen: "#16a34a", zwart: "#0f172a", roze: "#db2777", paars: "#7c3aed", oranje: "#ea580c", geel: "#ca8a04", turquoise: "#0d9488", goud: "#b8860b", grijs: "#475569", bruin: "#92400e" };
   const LICHT = { rood: "#fef2f2", blauw: "#eff6ff", groen: "#f0fdf4", zwart: "#f1f5f9", roze: "#fdf2f8", paars: "#f5f3ff", oranje: "#fff7ed", geel: "#fefce8", turquoise: "#f0fdfa", goud: "#fefce8", grijs: "#f8fafc", bruin: "#fdf8f3" };
-  const smal = () => matchMedia("(max-width:1000px)").matches;
+  const smal = () => matchMedia("(max-width:1000px) and (min-width:641px)").matches;
   const euro = (n) => "€" + (Math.round(n * 100) / 100).toFixed(2).replace(".", ",").replace(",00", ",-");
 
   function teken(flits = []) {

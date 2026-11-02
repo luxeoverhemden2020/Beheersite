@@ -302,3 +302,54 @@ h3{margin:6px 0 6px;font-size:19px}
 @media (max-width:1000px){.p-winkel{order:-1;scroll-margin-top:80px}}
 @media (max-width:560px){.w-product{gap:12px;padding:14px}.w-foto{aspect-ratio:16/9}.w-foto span{font-size:72px}.w-info-blok h4{font-size:20px}.w-info-blok p{display:none}}
 html,body.home{overflow-x:clip}
+
+/* ===== Mobiel: rustige eerste blik + demo naast elkaar ===== */
+.kort-tekst{display:none}
+@media (max-width:640px){
+  .podium-inhoud{padding-top:14px;padding-bottom:22px;gap:0}
+  .held-3d{order:-1;height:230px;margin:0 -8px}
+  .holo.h2,.holo.h3,.naambord{display:none}
+  .holo.h1{top:auto;bottom:8px;left:50%;transform:translateX(-50%);animation:none}
+  .held-tekst .label{display:none}
+  .held-tekst h1{font-size:clamp(34px,10.5vw,44px);line-height:1.02;margin:4px 0 10px;text-align:center}
+  .held-tekst h1 br{display:none}
+  .held-tekst h1 .glans{display:block}
+  .held-tekst .groot.lang-tekst{display:none}
+  .kort-tekst{display:block;text-align:center;font-size:17px;line-height:1.45;color:#c9d6ea;margin:0 auto 16px;max-width:30ch}
+  .held-tekst .rij{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .held-tekst .rij .groot-knop{padding:13px 10px;font-size:15px;text-align:center;justify-content:center;width:100%;margin:0}
+  .los-strook{margin-top:12px;padding:8px 10px;font-size:12.5px;gap:8px}
+  .los-strook .los-label{display:none}
+  .stats{justify-content:center;gap:8px;margin-top:14px}
+  .stats div{flex:1;align-items:center;text-align:center;padding:8px 4px;border:1px solid rgba(34,227,196,.25);border-radius:12px;background:rgba(255,255,255,.03)}
+  .stats b{font-size:17px}.stats span{font-size:11px;line-height:1.25}
+
+  /* demo: winkel en chat naast elkaar */
+  .probeer-raster{grid-template-columns:1fr 1fr;gap:8px;align-items:start}
+  .p-winkel{order:-1;border-radius:14px}
+  .w-browser{padding:6px 8px}.w-browser span{display:none}
+  .w-melding{font-size:11px;padding:5px 6px}
+  .w-kop{padding:8px 10px;gap:6px}.w-kop b{font-size:14px}.w-mand{font-size:14px!important}
+  .w-info{margin:8px 8px 0;padding:6px 8px;font-size:11px}
+  .w-product{grid-template-columns:1fr;gap:8px;padding:8px}
+  .w-foto{aspect-ratio:1/1;border-radius:10px}.w-foto span{font-size:58px}
+  .w-sale{top:6px;left:6px;font-size:11px;padding:3px 7px}
+  .w-info-blok h4{font-size:15px;margin-bottom:2px}
+  .w-prijs{gap:6px;margin-bottom:6px}.w-prijs b{font-size:17px}.w-prijs s{font-size:12px}
+  .w-info-blok p{display:none}
+  .w-maten{gap:3px;margin-bottom:8px}.w-maten span{width:auto;flex:1;height:26px;font-size:11px;border-radius:6px}
+  .w-knop{padding:9px 6px;font-size:12px;border-radius:8px}
+  .w-extra{font-size:11px;gap:6px;margin-top:6px}
+  .w-code{font-size:11px;padding:5px 6px}
+  .p-paneel{min-height:0;border-radius:14px}
+  .p-kop{padding:8px 10px;gap:8px}.p-bot{width:34px;height:34px}.p-kop b{font-size:14px}
+  .p-status{font-size:10px}
+  .p-chat{padding:8px;gap:6px;max-height:300px;min-height:180px}
+  .p-bel{font-size:12.5px;padding:7px 9px;max-width:96%}
+  .p-bel.denkt{font-size:12px}.p-fase{font-size:11px}
+  .p-voorbeelden{padding:6px 8px;gap:4px}
+  .p-voorbeeld{font-size:11.5px;padding:5px 8px}
+  .p-invoer{flex-direction:column;gap:6px;padding:8px}
+  .p-invoer input{font-size:16px;padding:9px 10px}
+  .p-invoer .knop{width:100%;padding:9px}
+}
