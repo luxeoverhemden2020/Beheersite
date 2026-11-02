@@ -466,3 +466,9 @@ body.zm-zicht .zm-item,body.zm-los .zm-item{animation:zmIn .5s cubic-bezier(.2,.
   .zm-open{top:70px;bottom:auto;left:12px;width:44px;height:44px;border-radius:13px;padding:0 12px}
   .zijmenu{align-items:flex-start;padding-top:124px}
 }
+/* Mobiel: demo houdt vaste hoogte, zodat de pagina niet verspringt */
+@media (max-width:640px){
+  .p-chat{height:300px;min-height:300px;max-height:300px}
+  .p-winkel{min-height:480px}
+  .probeer-raster{align-items:stretch}
+}
