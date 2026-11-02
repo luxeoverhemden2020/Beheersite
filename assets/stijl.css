@@ -120,3 +120,9 @@ input[type=month]{color-scheme:dark}
 button,a,.knop,tr.klik{touch-action:manipulation}
 .bericht .tekst a{color:inherit;text-decoration:underline;word-break:break-all}
 .bericht.webbeheer .tekst a{color:var(--accent)}
+
+/* snelknoppen klantomgeving */
+.snel{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.snelknop{flex:none;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;border:1px solid var(--lijn);background:var(--veld);color:var(--tekst);font:inherit;font-size:14px;cursor:pointer;touch-action:manipulation;transition:border-color .15s,background .15s}
+.snelknop:hover,.snelknop.aan{border-color:var(--accent);background:var(--accent2);color:var(--accent)}
+.snelknop span{font-size:16px}

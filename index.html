@@ -76,16 +76,45 @@
       </div>
     </div>
 
-    <h3 class="tussenkop">Wat kun je vragen? Eigenlijk alles wat je op je site ziet:</h3>
-    <div class="tegels">
-      <div class="tegel"><span>💶</span>"Zet de prijs van de winterjas op €89"</div>
-      <div class="tegel"><span>📣</span>"Zet de najaarsactie bovenaan de homepage"</div>
-      <div class="tegel"><span>🛒</span>"Voeg dit nieuwe product toe" <em>+ foto</em></div>
-      <div class="tegel"><span>🏷️</span>"Maak een kortingscode van 10% voor deze week"</div>
-      <div class="tegel"><span>📸</span>"Zet deze voor- en na-foto's bij mijn werk"</div>
-      <div class="tegel"><span>🕘</span>"Pas de openingstijden aan voor de feestdagen"</div>
-      <div class="tegel"><span>✍️</span>"Schrijf een pagina over onze nieuwe dienst"</div>
-      <div class="tegel"><span>🔎</span>"Zorg dat we beter gevonden worden op Google"</div>
+    <div class="nooit">
+      <h2 class="sectie" style="margin-bottom:6px">Dit hoef je <span class="glans">nooit meer</span> zelf uit te zoeken</h2>
+      <p class="groot zacht" style="margin-top:0">De klusjes die iedere ondernemer kent, en waar niemand zin in heeft.</p>
+      <div class="vergelijk">
+        <div class="vroeger"><span class="mono">VROEGER</span><p>Inloggen. Zoeken waar het zit. Knoppen proberen. Wachtwoord kwijt. Hopen dat het goed gaat. Of de webbouwer mailen en dagen wachten.</p></div>
+        <div class="pijl" aria-hidden="true">→</div>
+        <div class="nu"><span class="mono">NU</span><p>"Zet alle winterjassen 20% in de sale tot zondag."</p><b>✓ Klaar. Binnen een minuut.</b></div>
+      </div>
+      <div class="klusgroepen">
+        <details class="kaart klusgroep" open>
+          <summary><span>🛍️</span> Webshop <em>8 klusjes</em></summary>
+          <div class="klussen">
+            <div class="klus"><b>💶 Prijzen aanpassen</b><span>Ook veel tegelijk: "alle jassen 20% goedkoper"</span></div>
+            <div class="klus"><b>🏷️ Sale met begin- en einddatum</b><span>Geen gedoe met datums en vinkjes</span></div>
+            <div class="klus"><b>🛒 Nieuw product toevoegen</b><span>Foto erbij, de omschrijving schrijft Sitehulpje</span></div>
+            <div class="klus"><b>👕 Maten en kleuren</b><span>Toevoegen of aanpassen in één zin</span></div>
+            <div class="klus"><b>📦 Voorraad bijwerken</b><span>Of een product op uitverkocht zetten</span></div>
+            <div class="klus"><b>🎟️ Kortingscodes maken</b><span>"10% voor nieuwsbriefklanten, deze week"</span></div>
+            <div class="klus"><b>🚚 Verzendkosten aanpassen</b><span>"Gratis verzending vanaf €50"</span></div>
+            <div class="klus"><b>🗂️ Categorieën indelen</b><span>Opruimen, hernoemen of verplaatsen</span></div>
+          </div>
+        </details>
+        <details class="kaart klusgroep" open>
+          <summary><span>🌐</span> Website <em>11 klusjes</em></summary>
+          <div class="klussen">
+            <div class="klus"><b>🕘 Openingstijden &amp; feestdagen</b><span>"We zijn 27 december dicht"</span></div>
+            <div class="klus"><b>📢 Melding bovenaan je site</b><span>Voor een actie, sluiting of nieuws</span></div>
+            <div class="klus"><b>✍️ Teksten en typfouten</b><span>Even verbeteren of herschrijven</span></div>
+            <div class="klus"><b>📸 Foto's vervangen</b><span>Of voor- en na-foto's van je werk plaatsen</span></div>
+            <div class="klus"><b>📰 Nieuws en blogs</b><span>Sitehulpje schrijft en plaatst het</span></div>
+            <div class="klus"><b>💰 Prijslijst en tarieven</b><span>Altijd up-to-date</span></div>
+            <div class="klus"><b>👥 Nieuwe medewerker</b><span>Op de teampagina, met foto</span></div>
+            <div class="klus"><b>📋 Vacature plaatsen</b><span>En weer weghalen als hij vervuld is</span></div>
+            <div class="klus"><b>❓ Veelgestelde vragen</b><span>Nieuwe vragen en antwoorden toevoegen</span></div>
+            <div class="klus"><b>📞 Contactgegevens</b><span>Nieuw adres of telefoonnummer</span></div>
+            <div class="klus"><b>🔎 Beter gevonden in Google</b><span>Paginatitels, omschrijvingen en fototeksten</span></div>
+          </div>
+        </details>
+      </div>
     </div>
 
     <div id="los" class="kaart los-blok">
@@ -252,7 +281,7 @@ if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
 
 // Elementen zacht laten verschijnen bij scrollen
 const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("zicht"); io.unobserve(e.target); } }), { threshold: 0.12 });
-document.querySelectorAll(".blok .kaart, .tegel, .voordeel, .project").forEach((el) => { el.classList.add("verschijn"); io.observe(el); });
+document.querySelectorAll(".blok .kaart, .tegel, .voordeel, .project, .klus").forEach((el) => { el.classList.add("verschijn"); io.observe(el); });
 
 // Contactformulier
 $("#cform").onsubmit = async (e) => {

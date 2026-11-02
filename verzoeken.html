@@ -16,6 +16,7 @@
   <div class="kaart">
     <h2><span class="tag">&gt;_</span>Nieuw verzoek</h2>
     <p class="zacht" style="margin-top:0">Beschrijf wat er op je website moet veranderen. Je kunt ook inspreken of foto's toevoegen (of plakken).</p>
+    <div class="snel" id="snel"></div>
     <div id="nieuw"></div>
     <div id="meld" class="verborgen"></div>
   </div>
@@ -24,6 +25,18 @@
 <script src="assets/basis.js"></script>
 <script>
 let open = new Set(), cache = {}, timer = null;
+const SNELKNOPPEN = [
+  ["💶", "Prijs aanpassen", "Pas de prijs aan van "],
+  ["🏷️", "Sale / actie", "Zet een actie op de site: "],
+  ["🛒", "Nieuw product", "Voeg dit nieuwe product toe (foto's erbij): "],
+  ["🎟️", "Kortingscode", "Maak een kortingscode: "],
+  ["🕘", "Openingstijden", "Pas de openingstijden aan: "],
+  ["📢", "Melding bovenaan", "Zet een melding bovenaan de site: "],
+  ["✍️", "Tekst aanpassen", "Pas deze tekst aan: "],
+  ["📸", "Foto's", "Zet deze foto's op de site: "],
+  ["📰", "Nieuwsbericht", "Schrijf en plaats een nieuwsbericht over "],
+  ["🔎", "Beter in Google", "Zorg dat deze pagina beter gevonden wordt in Google: "],
+];
 
 $("#uit").onclick = async () => { try { await api("uitloggen"); } catch {} zetSessie(""); location.href = "inloggen"; };
 
@@ -41,6 +54,14 @@ maakInvoer($("#nieuw"), {
     }
   },
 });
+
+$("#snel").innerHTML = SNELKNOPPEN.map(([i, t], n) => `<button type="button" class="snelknop" data-n="${n}"><span>${i}</span>${t}</button>`).join("");
+$("#snel").onclick = (e) => {
+  const k = e.target.closest(".snelknop"); if (!k) return;
+  const ta = $("#nieuw textarea"); const [, , start] = SNELKNOPPEN[k.dataset.n];
+  ta.value = start; ta.focus(); ta.setSelectionRange(start.length, start.length);
+  document.querySelectorAll(".snelknop").forEach((b) => b.classList.toggle("aan", b === k));
+};
 
 async function laadVerzoek(id) {
   const d = await api("verzoek", { id });
