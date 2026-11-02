@@ -355,3 +355,42 @@ html,body.home{overflow-x:clip}
   .p-invoer input{font-size:16px;padding:9px 10px}
   .p-invoer .knop{width:100%;padding:9px}
 }
+
+/* ===== Klusjes als 3D-cyberring ===== */
+.klus-3d{margin-top:26px;position:relative}
+.ko-scene{position:relative;height:420px;perspective:1100px;perspective-origin:50% 35%;overflow:hidden;border-radius:24px;
+  background:radial-gradient(ellipse at 50% 60%,rgba(34,227,196,.18),transparent 60%),linear-gradient(180deg,#071222,#0b1730);border:1px solid rgba(34,227,196,.25);box-shadow:inset 0 0 60px rgba(34,227,196,.08)}
+.ko-vloer{position:absolute;left:-20%;right:-20%;bottom:-30%;height:80%;transform:rotateX(72deg);transform-origin:50% 0;
+  background-image:linear-gradient(rgba(34,227,196,.35) 1px,transparent 1px),linear-gradient(90deg,rgba(34,227,196,.35) 1px,transparent 1px);background-size:44px 44px;
+  mask-image:radial-gradient(ellipse at 50% 20%,#000 20%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at 50% 20%,#000 20%,transparent 70%)}
+.ko-ring{position:absolute;left:50%;top:52%;width:0;height:0;transform-style:preserve-3d;animation:ko-draai 36s linear infinite}
+@keyframes ko-draai{from{transform:rotateX(-10deg) rotateY(0)}to{transform:rotateX(-10deg) rotateY(-360deg)}}
+.ko-chip{--r:300px;position:absolute;left:-62px;top:-34px;width:124px;height:68px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  transform:rotateY(calc(var(--i)*30deg)) translateZ(var(--r));border-radius:14px;color:#e6f1ff;
+  background:linear-gradient(160deg,rgba(34,227,196,.22),rgba(59,130,246,.14) 60%,rgba(139,92,246,.18));border:1px solid rgba(34,227,196,.55);
+  box-shadow:0 0 22px rgba(34,227,196,.35),inset 0 0 18px rgba(34,227,196,.12);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.ko-chip em{font-style:normal;font-size:24px;line-height:1;filter:drop-shadow(0 0 8px rgba(255,255,255,.35))}
+.ko-chip b{font-size:12.5px;font-weight:700;letter-spacing:.2px;white-space:nowrap}
+.ko-kern{position:absolute;left:50%;top:44%;width:170px;height:170px;transform:translate(-50%,-50%);display:grid;place-items:center;
+  border-radius:50%;background:radial-gradient(circle,rgba(34,227,196,.28),rgba(34,227,196,0) 68%)}
+.ko-kern::after{content:"";position:absolute;inset:8px;border-radius:50%;border:1px dashed rgba(34,227,196,.5);animation:ko-spin 14s linear infinite}
+@keyframes ko-spin{to{transform:rotate(360deg)}}
+.ko-bot{width:130px;height:130px;animation:ko-zweef 4s ease-in-out infinite}.ko-bot svg{width:100%;height:100%}
+@keyframes ko-zweef{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.klus-wolk{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:18px auto 0;max-width:900px}
+.klus-wolk span{font-size:13.5px;padding:7px 12px;border-radius:999px;border:1px solid rgba(34,227,196,.4);background:rgba(34,227,196,.07);color:var(--tekst)}
+.klus-wolk span.meer{border-style:dashed;color:var(--accent);font-weight:700}
+.meer-dan{margin:20px auto 0;max-width:640px;text-align:center;font-size:19px;line-height:1.5;padding:18px 20px;border-radius:18px;
+  background:linear-gradient(135deg,rgba(34,227,196,.14),rgba(139,92,246,.12));border:1px solid rgba(34,227,196,.45);box-shadow:var(--glow)}
+.meer-dan .mono{display:block;font-size:12.5px;color:var(--accent);margin-bottom:6px;letter-spacing:.5px}
+.meer-dan b{color:var(--accent)}
+@media (max-width:640px){
+  .ko-scene{height:280px;perspective:700px}
+  .ko-chip{--r:138px;left:-40px;top:-24px;width:80px;height:48px;border-radius:10px}
+  .ko-chip em{font-size:18px}.ko-chip b{font-size:10px}
+  .ko-kern{width:120px;height:120px}.ko-bot{width:92px;height:92px}
+  .klus-wolk{gap:6px}.klus-wolk span{font-size:12px;padding:6px 10px}
+  .klus-wolk span:nth-child(n+12):not(.meer){display:none}
+  .meer-dan{font-size:16.5px;padding:14px}
+}
+@media (prefers-reduced-motion:reduce){.ko-ring,.ko-kern::after,.ko-bot{animation:none}.ko-ring{transform:rotateX(-10deg)}}

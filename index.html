@@ -117,36 +117,14 @@
         <div class="pijl" aria-hidden="true">→</div>
         <div class="nu"><span class="mono">NU</span><p>"Zet alle winterjassen 20% in de sale tot zondag."</p><b>✓ Klaar. Binnen een minuut.</b></div>
       </div>
-      <div class="klusgroepen">
-        <details class="kaart klusgroep" open>
-          <summary><span>🌐</span> Website <em>11 klusjes</em></summary>
-          <div class="klussen">
-            <div class="klus"><b>🕘 Openingstijden &amp; feestdagen</b><span>"We zijn 27 december dicht"</span></div>
-            <div class="klus"><b>📢 Melding bovenaan je site</b><span>Voor een actie, sluiting of nieuws</span></div>
-            <div class="klus"><b>✍️ Teksten en typfouten</b><span>Even verbeteren of herschrijven</span></div>
-            <div class="klus"><b>📸 Foto's vervangen</b><span>Of voor- en na-foto's van je werk plaatsen</span></div>
-            <div class="klus"><b>📰 Nieuws en blogs</b><span>Sitehulpje schrijft en plaatst het</span></div>
-            <div class="klus"><b>💰 Prijslijst en tarieven</b><span>Altijd up-to-date</span></div>
-            <div class="klus"><b>👥 Nieuwe medewerker</b><span>Op de teampagina, met foto</span></div>
-            <div class="klus"><b>📋 Vacature plaatsen</b><span>En weer weghalen als hij vervuld is</span></div>
-            <div class="klus"><b>❓ Veelgestelde vragen</b><span>Nieuwe vragen en antwoorden toevoegen</span></div>
-            <div class="klus"><b>📞 Contactgegevens</b><span>Nieuw adres of telefoonnummer</span></div>
-            <div class="klus"><b>🔎 Beter gevonden in Google</b><span>Paginatitels, omschrijvingen en fototeksten</span></div>
-          </div>
-        </details>
-        <details class="kaart klusgroep" open>
-          <summary><span>🛍️</span> Webshop <em>8 klusjes</em></summary>
-          <div class="klussen">
-            <div class="klus"><b>💶 Prijzen aanpassen</b><span>Ook veel tegelijk: "alle jassen 20% goedkoper"</span></div>
-            <div class="klus"><b>🏷️ Sale met begin- en einddatum</b><span>Geen gedoe met datums en vinkjes</span></div>
-            <div class="klus"><b>🛒 Nieuw product toevoegen</b><span>Foto erbij, de omschrijving schrijft Sitehulpje</span></div>
-            <div class="klus"><b>👕 Maten en kleuren</b><span>Toevoegen of aanpassen in één zin</span></div>
-            <div class="klus"><b>📦 Voorraad bijwerken</b><span>Of een product op uitverkocht zetten</span></div>
-            <div class="klus"><b>🎟️ Kortingscodes maken</b><span>"10% voor nieuwsbriefklanten, deze week"</span></div>
-            <div class="klus"><b>🚚 Verzendkosten aanpassen</b><span>"Gratis verzending vanaf €50"</span></div>
-            <div class="klus"><b>🗂️ Categorieën indelen</b><span>Opruimen, hernoemen of verplaatsen</span></div>
-          </div>
-        </details>
+      <div class="klus-3d">
+        <div class="ko-scene" aria-hidden="true">
+          <div class="ko-vloer"></div>
+          <div class="ko-ring"><span class="ko-chip" style="--i:0"><em>💶</em><b>Prijzen</b></span><span class="ko-chip" style="--i:1"><em>🏷️</em><b>Sale</b></span><span class="ko-chip" style="--i:2"><em>🛒</em><b>Producten</b></span><span class="ko-chip" style="--i:3"><em>🎟️</em><b>Kortingscodes</b></span><span class="ko-chip" style="--i:4"><em>🚚</em><b>Verzending</b></span><span class="ko-chip" style="--i:5"><em>📦</em><b>Voorraad</b></span><span class="ko-chip" style="--i:6"><em>🕘</em><b>Openingstijden</b></span><span class="ko-chip" style="--i:7"><em>📢</em><b>Meldingen</b></span><span class="ko-chip" style="--i:8"><em>✍️</em><b>Teksten</b></span><span class="ko-chip" style="--i:9"><em>📸</em><b>Foto's & video</b></span><span class="ko-chip" style="--i:10"><em>📰</em><b>Nieuws</b></span><span class="ko-chip" style="--i:11"><em>🔎</em><b>Google</b></span></div>
+          <div class="ko-kern"><span class="ko-bot" id="orbitbot"></span></div>
+        </div>
+        <div class="klus-wolk" aria-label="Voorbeelden van wat Sitehulpje regelt"><span>Prijzen aanpassen</span><span>Sale met datum</span><span>Nieuw product</span><span>Maten & kleuren</span><span>Voorraad</span><span>Kortingscodes</span><span>Verzendkosten</span><span>Categorieën</span><span>Openingstijden</span><span>Melding bovenaan</span><span>Teksten & typfouten</span><span>Foto's vervangen</span><span>Video plaatsen</span><span>Nieuws & blogs</span><span>Prijslijst</span><span>Teampagina</span><span>Vacatures</span><span>Veelgestelde vragen</span><span>Contactgegevens</span><span>Beter in Google</span><span class="meer">+ nog veel meer</span></div>
+        <p class="meer-dan"><span class="mono">&gt;_ en dit is pas het begin</span>Sitehulpje doet véél meer dan dit. Alles wat je op je website of webshop wilt veranderen: <b>vraag het gewoon.</b></p>
       </div>
     </div>
 
@@ -288,6 +266,7 @@ $("#kopbot").innerHTML = robotSvg("rust");
 $("#telbot").innerHTML = robotSvg("rust");
 $("#contactbot").innerHTML = robotSvg("zwaai");
 $("#losbot").innerHTML = robotSvg("zwaai kijkt");
+if ($("#orbitbot")) $("#orbitbot").innerHTML = robotSvg("zwaai kijkt");
 document.querySelectorAll("[data-keuze]").forEach((a) => a.addEventListener("click", () => {
   const r = document.querySelector(`input[name=c_keuze][value="${a.dataset.keuze}"]`); if (r) r.checked = true;
 }));
@@ -315,7 +294,7 @@ if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
 
 // Elementen zacht laten verschijnen bij scrollen
 const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("zicht"); io.unobserve(e.target); } }), { threshold: 0.12 });
-document.querySelectorAll(".blok .kaart, .tegel, .voordeel, .project, .klus").forEach((el) => { el.classList.add("verschijn"); io.observe(el); });
+document.querySelectorAll(".blok .kaart, .tegel, .voordeel, .project, .klus-wolk span").forEach((el) => { el.classList.add("verschijn"); io.observe(el); });
 
 // Contactformulier
 $("#cform").onsubmit = async (e) => {
