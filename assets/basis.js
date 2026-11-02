@@ -50,7 +50,7 @@ const STATUS = {
   kan_niet: "Niet gelukt", doorgestuurd: "Wacht op Jan", terugdraaien: "Wordt teruggedraaid", teruggedraaid: "Teruggedraaid",
 };
 const ACTIEF = ["nieuw", "bezig", "terugdraaien"];
-const WIE = { klant: "Jij", webbeheer: "Webbeheer", jan: "Jan" };
+const WIE = { klant: "Jij", webbeheer: "Sitehulpje", jan: "Jan" };
 
 function toonMelding(el, tekst, soort = "fout") {
   if (!tekst) { el.className = "verborgen"; el.textContent = ""; return; }
@@ -157,22 +157,50 @@ function berichtenHtml(berichten, wieNamen = WIE) {
     </div>`).join("");
 }
 
-// ---------- Webbeheer-robot ----------
+// ---------- Sitehulpje-robot (3D-look) ----------
 let _botNr = 0;
 function robotSvg(extra = "") {
-  const id = "bg" + (++_botNr);
-  return `<svg class="bot ${extra}" viewBox="0 0 64 64" aria-hidden="true">
-    <defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22e3c4"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
-    <g class="antenne"><line x1="32" y1="6" x2="32" y2="14" stroke="url(#${id})" stroke-width="2.5" stroke-linecap="round"/><circle cx="32" cy="5" r="3" fill="#22e3c4"/></g>
-    <rect x="8" y="26" width="5" height="12" rx="2.5" fill="url(#${id})" opacity=".8"/><rect x="51" y="26" width="5" height="12" rx="2.5" fill="url(#${id})" opacity=".8"/>
-    <rect x="12" y="14" width="40" height="36" rx="12" fill="#0c1322" stroke="url(#${id})" stroke-width="2.5"/>
-    <rect x="18" y="22" width="28" height="15" rx="7.5" fill="#06101c" stroke="#22e3c4" stroke-opacity=".35"/>
-    <rect class="oog" x="23" y="26" width="6" height="7" rx="3" fill="#22e3c4"/><rect class="oog" x="35" y="26" width="6" height="7" rx="3" fill="#22e3c4"/>
-    <rect class="scan" x="18" y="18" width="28" height="2" rx="1" fill="#8b5cf6"/>
-    <path d="M25 43 q7 4 14 0" stroke="#22e3c4" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-    <rect x="22" y="52" width="20" height="6" rx="3" fill="url(#${id})" opacity=".6"/>
+  const n = ++_botNr, g = (x) => `${x}${n}`;
+  return `<svg class="bot ${extra}" viewBox="0 0 100 100" aria-hidden="true">
+    <defs>
+      <linearGradient id="${g("huid")}" x1=".2" y1="0" x2=".8" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#e6edf6"/><stop offset="1" stop-color="#b9c8db"/></linearGradient>
+      <linearGradient id="${g("zij")}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2ff0d0"/><stop offset="1" stop-color="#0e9f8c"/></linearGradient>
+      <linearGradient id="${g("scherm")}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16253b"/><stop offset="1" stop-color="#070d18"/></linearGradient>
+      <radialGradient id="${g("lamp")}" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#d6fff7"/><stop offset=".4" stop-color="#22e3c4"/><stop offset="1" stop-color="#0b8f7d"/></radialGradient>
+      <radialGradient id="${g("oog")}" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#eafffb"/><stop offset=".45" stop-color="#3cf2d6"/><stop offset="1" stop-color="#11b9a0"/></radialGradient>
+      <filter id="${g("gloed")}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <ellipse class="schaduw" cx="50" cy="94" rx="20" ry="3.5" fill="#000" opacity=".18"/>
+    <g class="lijf">
+      <g class="antenne"><rect x="48.6" y="9" width="2.8" height="10" rx="1.4" fill="#9fb2c8"/><circle cx="50" cy="8" r="4.6" fill="url(#${g("lamp")})" filter="url(#${g("gloed")})"/></g>
+      <rect class="arm-l" x="16" y="62" width="9" height="20" rx="4.5" fill="url(#${g("huid")})" stroke="#9fb2c8" stroke-width=".6"/>
+      <g class="arm-r"><rect x="75" y="62" width="9" height="20" rx="4.5" fill="url(#${g("huid")})" stroke="#9fb2c8" stroke-width=".6"/></g>
+      <rect x="26" y="60" width="48" height="28" rx="12" fill="url(#${g("huid")})" stroke="#9fb2c8" stroke-width=".6"/>
+      <circle cx="50" cy="73" r="4.2" fill="url(#${g("lamp")})" filter="url(#${g("gloed")})" class="hartlamp"/>
+      <rect x="11" y="31" width="8" height="18" rx="4" fill="url(#${g("zij")})"/><rect x="81" y="31" width="8" height="18" rx="4" fill="url(#${g("zij")})"/>
+      <rect x="17" y="17" width="66" height="46" rx="20" fill="url(#${g("huid")})" stroke="#9fb2c8" stroke-width=".6"/>
+      <ellipse cx="36" cy="24" rx="13" ry="4" fill="#fff" opacity=".85"/>
+      <rect x="24" y="25" width="52" height="30" rx="14" fill="url(#${g("scherm")})"/>
+      <rect x="27" y="27" width="46" height="6" rx="3" fill="#fff" opacity=".06"/>
+      <g class="ogen" filter="url(#${g("gloed")})">
+        <rect class="oog" x="34" y="33" width="9" height="11" rx="4.5" fill="url(#${g("oog")})"/>
+        <rect class="oog" x="57" y="33" width="9" height="11" rx="4.5" fill="url(#${g("oog")})"/>
+      </g>
+      <path d="M43 48.5 q7 4.5 14 0" stroke="#3cf2d6" stroke-width="2.4" fill="none" stroke-linecap="round" filter="url(#${g("gloed")})"/>
+      <circle cx="30" cy="48" r="2.6" fill="#ff7aa8" opacity=".35"/><circle cx="70" cy="48" r="2.6" fill="#ff7aa8" opacity=".35"/>
+      <rect class="scan" x="26" y="27" width="48" height="2" rx="1" fill="#8b5cf6" opacity=".8"/>
+    </g>
   </svg>`;
 }
+// Ogen volgen de muis (alleen op grote robots met class "kijkt")
+document.addEventListener("pointermove", (e) => {
+  document.querySelectorAll(".bot.kijkt").forEach((svg) => {
+    const r = svg.getBoundingClientRect(); if (!r.width) return;
+    const dx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / 300));
+    const dy = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / 300));
+    const o = svg.querySelector(".ogen"); if (o) o.style.transform = `translate(${dx * 3}px, ${dy * 2}px)`;
+  });
+}, { passive: true });
 
 const WEETJES = [
   "Het world wide web werd in 1989 bedacht door Tim Berners-Lee bij CERN in Zwitserland.",
@@ -201,7 +229,7 @@ const WEETJES = [
 const FASES = ["Verbinding maken met je website", "Verzoek analyseren", "Momentopname maken", "Aanpassing doorvoeren", "Resultaat controleren"];
 
 function wachtHtml(status, sinds) {
-  const titel = status === "terugdraaien" ? "Terugdraaien" : status === "nieuw" ? "Webbeheer wordt opgestart" : "Webbeheer is aan het werk";
+  const titel = status === "terugdraaien" ? "Terugdraaien" : status === "nieuw" ? "Sitehulpje wordt opgestart" : "Sitehulpje is aan het werk";
   return `<div class="wacht" data-sinds="${esc(sinds || "")}">
     ${robotSvg()}
     <div><div style="font-weight:600">${titel}</div>

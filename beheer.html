@@ -9,7 +9,7 @@
 <body>
 <div class="kop">
   <span class="bot-klein" id="kopbot"></span>
-  <div class="merk">Beheer<b>site</b><small>Beheerscherm Jan</small></div>
+  <div class="merk">Site<b>hulpje</b><small>Beheerscherm Jan</small></div>
   <div class="rechts">
     <input type="month" id="maand" style="width:auto;padding:6px 8px">
     <button class="knop rand klein thema" type="button"></button><button class="knop rand klein" id="uit">Uitloggen</button>
@@ -115,7 +115,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="assets/basis.js"></script>
 <script>
-const WIEJAN = { klant: "Klant", webbeheer: "Webbeheer", jan: "Jij (Jan)" };
+const WIEJAN = { klant: "Klant", webbeheer: "Sitehulpje", jan: "Jij (Jan)" };
 let data = null, ik = null, openVerzoek = null, paneelTimer = null;
 $("#maand").value = new Date().toISOString().slice(0, 7);
 const meld = (t, s = "fout") => { toonMelding($("#meld"), t, s); if (t) scrollTo(0, 0); };

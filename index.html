@@ -2,8 +2,8 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Webbeheer – je website aanpassen door het gewoon te vragen</title>
-<meta name="description" content="Typ, spreek in of stuur een foto. Webbeheer past je website of webshop voor je aan, meestal binnen een minuut. Zonder gedoe, zonder technische kennis.">
+<title>Sitehulpje – je website aanpassen door het gewoon te vragen</title>
+<meta name="description" content="Typ, spreek in of stuur een foto. Sitehulpje past je website of webshop voor je aan, meestal binnen een minuut. Zonder gedoe, zonder technische kennis.">
 <script>
   // Oude inloglinks (?link= of ?code=) gaan naar het inlogscherm
   if (/[?&](link|code)=/.test(location.search)) location.replace("inloggen" + location.search);
@@ -15,7 +15,7 @@
 
 <header class="kop">
   <span class="bot-klein" id="kopbot"></span>
-  <div class="merk">Web<b>beheer</b></div>
+  <div class="merk">Site<b>hulpje</b></div>
   <nav class="rechts">
     <a class="knop rand klein verberg-mobiel" href="#zo-werkt-het">Zo werkt het</a>
     <button class="knop rand klein thema" type="button"></button>
@@ -29,7 +29,7 @@
     <div class="held-tekst">
       <p class="label mono">&gt;_ je website, zonder gedoe</p>
       <h1>Je website aanpassen?<br><span class="glans">Gewoon even vragen.</span></h1>
-      <p class="groot">Typ het, spreek het in of stuur een foto. Webbeheer past je website of webshop voor je aan. Meestal binnen een minuut.</p>
+      <p class="groot">Typ het, spreek het in of stuur een foto. Sitehulpje past je website of webshop voor je aan. Meestal binnen een minuut.</p>
       <div class="rij">
         <a class="knop groot-knop" href="#contact">Gratis kennismaken</a>
         <a class="knop rand groot-knop" href="#zo-werkt-het">Zo werkt het</a>
@@ -37,8 +37,9 @@
       <p class="zacht klein-tekst">Geen technische kennis nodig. Geen moeilijke systemen. Geen wachten op een webbouwer.</p>
     </div>
     <div class="held-demo" aria-hidden="true">
+      <div class="grote-bot" id="grotebot"></div>
       <div class="telefoon">
-        <div class="tel-kop"><span class="bot-mini" id="telbot"></span><b>Webbeheer</b></div>
+        <div class="tel-kop"><span class="bot-mini" id="telbot"></span><b>Sitehulpje</b></div>
         <div class="tel-chat" id="demo"></div>
       </div>
     </div>
@@ -49,7 +50,7 @@
     <h2 class="sectie"><span class="tag">01</span>Zo simpel werkt het</h2>
     <div class="drie">
       <div class="kaart stap"><div class="nr">1</div><h3>Vertel wat je wilt</h3><p>Typ het in je eigen woorden, spreek het in of maak een foto. Net als een appje.</p></div>
-      <div class="kaart stap"><div class="nr">2</div><h3>Webbeheer regelt het</h3><p>Je ziet een robotje aan het werk. Intussen kun je gewoon verder met je dag.</p></div>
+      <div class="kaart stap"><div class="nr">2</div><h3>Sitehulpje regelt het</h3><p>Je ziet een robotje aan het werk. Intussen kun je gewoon verder met je dag.</p></div>
       <div class="kaart stap"><div class="nr">3</div><h3>Klaar!</h3><p>Je krijgt een berichtje met een link om het te bekijken. Toch niet goed? Eén tik en het staat weer zoals het was.</p></div>
     </div>
   </section>
@@ -83,15 +84,25 @@
     </div>
   </section>
 
-  <!-- VOOR WIE -->
-  <section class="wrap breed blok">
-    <div class="kaart voor-wie">
-      <div>
-        <h2 class="sectie" style="margin-bottom:8px"><span class="tag">04</span>Heb je al een website?</h2>
-        <p class="groot">Grote kans dat we hem kunnen koppelen. Werkt jouw site of webshop met <b>WordPress</b> of <b>WooCommerce</b>? Dan is hij meestal dezelfde dag klaar voor gebruik. Wij regelen de koppeling, jij hoeft niets te doen.</p>
-        <p class="groot" style="margin-bottom:0">Nog geen website? <b>Dan maken we er een voor je</b>, met Webbeheer er meteen bij.</p>
+  <!-- AANBOD -->
+  <section id="aanbod" class="wrap breed blok">
+    <h2 class="sectie"><span class="tag">04</span>Wij regelen het voor je</h2>
+    <div class="aanbod">
+      <div class="kaart pad">
+        <div class="pad-icoon">🔗</div>
+        <h3>Heb je al een website of webshop?</h3>
+        <p>Grote kans dat we hem kunnen koppelen. Werkt hij met <b>WordPress</b> of <b>WooCommerce</b>? Dan kun je vaak dezelfde dag al aan de slag. Wij regelen de koppeling, jij hoeft niets te doen.</p>
+        <a class="knop rand" href="#contact" data-keuze="Ik heb al een website en wil die koppelen">Koppel mijn site</a>
+      </div>
+      <div class="kaart pad uitgelicht">
+        <div class="lint mono">alles-in-één</div>
+        <div class="pad-icoon">🚀</div>
+        <h3>Nog geen website of webshop?</h3>
+        <p>Neem contact met ons op en <b>wij regelen het direct</b>: een mooie, snelle website of webshop die bij je bedrijf past. Sitehulpje zit er meteen bij, dus daarna pas je alles zelf aan door het gewoon te vragen.</p>
+        <a class="knop" href="#contact" data-keuze="Ik wil een nieuwe website of webshop">Ik wil een website</a>
       </div>
     </div>
+    <p class="groot zacht" style="text-align:center;margin-top:18px">Website én onderhoud in één. <b style="color:var(--tekst)">Het is echt zo makkelijk.</b></p>
   </section>
 
   <!-- VRAGEN -->
@@ -99,8 +110,9 @@
     <h2 class="sectie"><span class="tag">05</span>Veelgestelde vragen</h2>
     <details class="kaart vraag"><summary>Moet ik iets installeren of leren?</summary><p>Nee. Je krijgt een eigen link. Die open je op je telefoon of computer en je kunt meteen beginnen. De koppeling met je website regelen wij.</p></details>
     <details class="kaart vraag"><summary>Wat als er iets fout gaat?</summary><p>Elke aanpassing kun je met één tik terugdraaien. En lukt iets niet automatisch, dan krijgt Jan direct een melding en pakt hij het op.</p></details>
-    <details class="kaart vraag"><summary>Kan Webbeheer mijn bestellingen of betalingen aanpassen?</summary><p>Nee. Bestellingen, terugbetalingen, betaalinstellingen en wachtwoorden blijven altijd buiten bereik. Grote of gevoelige aanpassingen worden eerst aan Jan voorgelegd.</p></details>
+    <details class="kaart vraag"><summary>Kan Sitehulpje mijn bestellingen of betalingen aanpassen?</summary><p>Nee. Bestellingen, terugbetalingen, betaalinstellingen en wachtwoorden blijven altijd buiten bereik. Grote of gevoelige aanpassingen worden eerst aan Jan voorgelegd.</p></details>
     <details class="kaart vraag"><summary>Hoe snel is het klaar?</summary><p>De meeste aanpassingen, zoals een prijs, tekst of foto, zijn binnen een minuut klaar. Grotere klussen kunnen iets langer duren.</p></details>
+    <details class="kaart vraag"><summary>Ik heb nog geen website. Kunnen jullie die maken?</summary><p>Zeker. Vertel ons wat je wilt, dan maken wij een website of webshop die bij je bedrijf past. Sitehulpje zit er meteen bij, zodat je daarna alles zelf kunt aanpassen door het gewoon te vragen.</p></details>
     <details class="kaart vraag"><summary>Hoeveel kan ik vragen?</summary><p>Ruim genoeg voor een gewone ondernemer. Je spreekt samen met Jan af wat bij jou past.</p></details>
   </section>
 
@@ -110,6 +122,12 @@
       <div class="rij" style="align-items:center;gap:14px;margin-bottom:6px"><span class="bot-mid" id="contactbot"></span>
         <div><h2 style="margin:0">Gratis kennismaken</h2><p class="zacht" style="margin:2px 0 0">Laat je gegevens achter. Jan neemt snel contact met je op.</p></div></div>
       <form id="cform">
+        <label>Waar ben je naar op zoek?</label>
+        <div class="keuzes" role="radiogroup">
+          <label class="keuze"><input type="radio" name="c_keuze" value="Ik wil een nieuwe website of webshop" checked><span>🚀 Een nieuwe website of webshop</span></label>
+          <label class="keuze"><input type="radio" name="c_keuze" value="Ik heb al een website en wil die koppelen"><span>🔗 Mijn bestaande site koppelen</span></label>
+          <label class="keuze"><input type="radio" name="c_keuze" value="Ik wil eerst meer informatie"><span>💬 Eerst meer weten</span></label>
+        </div>
         <div class="grid2">
           <div><label for="c_naam">Je naam *</label><input id="c_naam" autocomplete="name" required></div>
           <div><label for="c_bedrijf">Bedrijf</label><input id="c_bedrijf" autocomplete="organization"></div>
@@ -127,7 +145,7 @@
 </main>
 
 <footer class="voet wrap breed">
-  <span>Web<b>beheer</b> · je website, zonder gedoe</span>
+  <span>Site<b>hulpje</b> · je website, zonder gedoe</span>
   <a href="inloggen">Inloggen voor klanten</a>
 </footer>
 
@@ -135,6 +153,10 @@
 <script>
 $("#kopbot").innerHTML = robotSvg("rust");
 $("#telbot").innerHTML = robotSvg("rust");
+$("#grotebot").innerHTML = robotSvg("zwaai kijkt");
+document.querySelectorAll("[data-keuze]").forEach((a) => a.addEventListener("click", () => {
+  const r = document.querySelector(`input[name=c_keuze][value="${a.dataset.keuze}"]`); if (r) r.checked = true;
+}));
 $("#contactbot").innerHTML = robotSvg();
 
 // Demo-gesprek in de telefoon
@@ -172,7 +194,8 @@ $("#cform").onsubmit = async (e) => {
   $("#cknop").disabled = true;
   try {
     await api("contact", { naam: $("#c_naam").value, bedrijf: $("#c_bedrijf").value, contact: $("#c_contact").value,
-      site: $("#c_site").value, bericht: $("#c_bericht").value, website2: $("#c_website2").value });
+      site: $("#c_site").value,
+      bericht: "Keuze: " + (document.querySelector("input[name=c_keuze]:checked")?.value || "-") + "\n\n" + $("#c_bericht").value, website2: $("#c_website2").value });
     $("#cform").reset();
     toonMelding($("#cmeld"), "Bedankt! Je bericht is verstuurd. Jan neemt snel contact met je op.", "ok");
   } catch (err) { toonMelding($("#cmeld"), err.message); }

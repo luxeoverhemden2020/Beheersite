@@ -66,3 +66,25 @@ h3{margin:6px 0 6px;font-size:19px}
   .tel-chat{height:290px}
 }
 @media (prefers-reduced-motion:reduce){.demo-bel,.demo-bezig span{animation:none}}
+
+/* 3D robot in de held */
+.held-demo{position:relative}
+.grote-bot{position:absolute;width:150px;height:150px;left:-80px;bottom:-30px;z-index:2;filter:drop-shadow(0 18px 24px rgba(0,0,0,.25))}
+.grote-bot svg{width:100%;height:100%}
+.inlog .bot{filter:drop-shadow(0 12px 18px rgba(0,0,0,.25))}
+/* aanbod */
+.aanbod{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pad{padding:24px;position:relative;display:flex;flex-direction:column;gap:6px}
+.pad p{color:var(--zacht);margin:0 0 12px;flex:1}
+.pad .knop{align-self:flex-start;text-decoration:none}
+.pad-icoon{font-size:30px}
+.pad.uitgelicht{border-color:rgba(34,227,196,.55);box-shadow:var(--glow);background:linear-gradient(160deg,rgba(34,227,196,.12),rgba(139,92,246,.12)),var(--kaart)}
+.lint{position:absolute;top:14px;right:14px;font-size:12px;padding:3px 10px;border-radius:999px;background:var(--accent);color:#04111a;font-weight:600}
+.keuzes{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.keuze{margin:0;cursor:pointer}
+.keuze input{position:absolute;opacity:0;pointer-events:none}
+.keuze span{display:inline-block;padding:9px 14px;border-radius:999px;border:1px solid var(--lijn);background:var(--veld);color:var(--tekst);font-size:15px;transition:all .15s}
+.keuze input:checked+span{border-color:var(--accent);background:var(--accent2);color:var(--accent);box-shadow:var(--glow)}
+.keuze input:focus-visible+span{outline:2px solid var(--accent)}
+@media (max-width:900px){.grote-bot{width:110px;height:110px;left:-6px;bottom:-24px}}
+@media (max-width:640px){.aanbod{grid-template-columns:1fr}.grote-bot{width:96px;height:96px;left:-4px}}

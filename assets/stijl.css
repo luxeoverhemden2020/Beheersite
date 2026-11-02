@@ -77,12 +77,23 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
 .wacht .weetje{font-size:14px;color:var(--tekst);margin-top:6px;opacity:.9;transition:opacity .4s}
 .wacht .weetje b{color:var(--let);font-weight:600}
 @keyframes knipper{50%{opacity:0}}
+.bot{overflow:visible}
 .bot .oog{animation:oog 4s infinite;transform-origin:center;transform-box:fill-box}
+.bot .ogen{transition:transform .25s ease-out}
 .bot .antenne{animation:zweef 2s ease-in-out infinite;transform-box:fill-box;transform-origin:bottom}
+.bot .lijf{animation:drijf 3.2s ease-in-out infinite}
+.bot .schaduw{animation:schaduw 3.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.bot .hartlamp{animation:hart 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 .bot .scan{animation:scan 1.6s ease-in-out infinite}
+.bot.zwaai .arm-r{animation:zwaai 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 10%}
 .bot.rust .scan{display:none}
+.bot.rust .lijf,.bot.rust .schaduw{animation:none}
 @keyframes oog{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
 @keyframes zweef{50%{transform:translateY(-2px)}}
+@keyframes drijf{50%{transform:translateY(-4px)}}
+@keyframes schaduw{50%{transform:scaleX(.85);opacity:.12}}
+@keyframes hart{50%{transform:scale(1.15)}}
+@keyframes zwaai{0%,55%,100%{transform:rotate(0)}65%{transform:rotate(-35deg) translateY(-4px)}75%{transform:rotate(-15deg) translateY(-4px)}85%{transform:rotate(-35deg) translateY(-4px)}}
 @keyframes scan{0%{transform:translateY(0);opacity:0}20%{opacity:.9}100%{transform:translateY(26px);opacity:0}}
 @media (prefers-reduced-motion:reduce){.balk::after,.bot *,.wacht .fase::after,.mic.aan{animation:none!important}}
 .bezigtekst{font-size:14px;color:var(--zacht);margin:6px 0}
