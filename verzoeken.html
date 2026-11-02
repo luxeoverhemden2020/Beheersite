@@ -4,6 +4,13 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sitehulpje</title>
 <meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1220">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icoon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sitehulpje">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="stylesheet" href="assets/stijl.css">
 </head>
 <body>
@@ -13,6 +20,7 @@
   <div class="rechts"><button class="knop rand klein thema" type="button"></button><button class="knop rand klein" id="uit">Uitloggen</button></div>
 </div>
 <div class="wrap">
+  <div id="appTip"></div>
   <div class="kaart">
     <h2><span class="tag">&gt;_</span>Nieuw verzoek</h2>
     <p class="zacht" style="margin-top:0">Beschrijf wat er op je website moet veranderen. Je kunt ook inspreken, foto's toevoegen (of plakken) of een korte video sturen (max. 1 minuut).</p>
@@ -139,6 +147,7 @@ api("ik").then((d) => {
   if (d.gebruiker.rol === "admin" && !d.klant) { location.href = "beheer"; return; }
   $("#site").textContent = d.klant ? `${d.klant.naam} · ${d.klant.site.replace(/^https?:\/\//, "")}` : "";
   laad();
+  appTip($("#appTip"));
 });
 </script>
 </body>

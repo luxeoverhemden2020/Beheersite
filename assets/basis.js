@@ -321,3 +321,30 @@ function tikWacht() {
   });
 }
 setInterval(tikWacht, 1000);
+
+// ---------- App (op beginscherm zetten) ----------
+if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+let _installVraag = null;
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); _installVraag = e; document.dispatchEvent(new Event("app-kan")); });
+function appTip(el) {
+  if (!el) return;
+  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+  let weg = null; try { weg = localStorage.getItem("bs_app_weg"); } catch {}
+  if (standalone || weg) return;
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const toon = (inhoud) => {
+    el.innerHTML = `<div class="kaart app-tip"><span class="app-icoon"><img src="assets/icoon-192.png" alt=""></span>
+      <div class="app-tekst"><b>Sitehulpje als app</b><span>${inhoud}</span></div><button class="app-weg" type="button" aria-label="Sluiten">✕</button></div>`;
+    $(".app-weg", el).onclick = () => { try { localStorage.setItem("bs_app_weg", "1"); } catch {} el.innerHTML = ""; };
+  };
+  if (ios) {
+    // Op de iPhone heeft de app een eigen geheugen: laat hem starten via de persoonlijke inloglink
+    let link = null; try { link = localStorage.getItem("bs_link"); } catch {}
+    if (link) history.replaceState(null, "", "inloggen?link=" + encodeURIComponent(link));
+    toon(`Tik onderin op <b>Deel</b> <span class="ios-deel">↑</span> en kies <b>Zet op beginscherm</b>.`);
+    return;
+  }
+  const knop = () => { toon(`Altijd één tik van je website af. <button class="knop klein app-installeer" type="button">Installeren</button>`);
+    $(".app-installeer", el).onclick = async () => { _installVraag.prompt(); const r = await _installVraag.userChoice; if (r.outcome === "accepted") el.innerHTML = ""; }; };
+  if (_installVraag) knop(); else document.addEventListener("app-kan", knop, { once: true });
+}
