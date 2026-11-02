@@ -102,8 +102,9 @@
       const code = (c ? c[1] : "WINTER" + (p ? p[1] : "10")).toUpperCase();
       st.code = `Code ${code} = ${p ? p[1] : 10}% korting`; gedaan.push(`kortingscode <b>${code}</b> is aangemaakt`); flits.push("code");
     }
-    const naam = tekst.match(/(?:noem|hernoem|titel|naam)[^:"“]*(?:naar|in|wordt|:)\s*["“]?([^"”]{2,40})["”]?\s*$/i);
-    if (naam) { st.titel = hoofdletter(naam[1].trim()); gedaan.push(`de naam is nu <b>${esc(st.titel)}</b>`); flits.push("titel"); }
+    const naam = tekst.match(/\b(?:titel|naam|productnaam)\b\s*(?:(?:wordt|naar|in|is|van het product)\b\s*|[:=]\s*)?["“']?([^"”']{2,40}?)["”']?[.!]?\s*$/i)
+      || tekst.match(/\b(?:her)?noem\b\s+(?:(?:het|de|hem|deze)\s+)?(?:(?:product|jas|artikel)\s*)?(?:naar\s+|:\s*)?["“']?([^"”']{2,40}?)["”']?[.!]?\s*$/i);
+    if (naam && !/^(aan|aanpassen|veranderen|wijzigen)$/i.test(naam[1].trim())) { st.titel = hoofdletter(naam[1].trim()); gedaan.push(`de naam is nu <b>${esc(st.titel)}</b>`); flits.push("titel"); }
     if (/(omschrijving|beschrijving|productekst|producttekst)/.test(t)) {
       const o = naDubbelepunt(tekst);
       st.omschrijving = o ? hoofdletter(o) : "Tijdloze winterjas van zacht wolmengsel. Lekker warm, licht van gewicht en met handige binnenzak. Een jas die je jaren meegaat.";
@@ -113,6 +114,14 @@
 
     if (!gedaan.length) {
       st = oud;
+      if (/(fout|verkeerd|klopt niet|waarom|raar|niet goed)/.test(t))
+        return { msg: "Oeps, sorry! 🙈 Dan begreep ik je niet goed. Tik op <b>↩ Terugdraaien</b> en probeer het nog eens, bijvoorbeeld: <i>noem het product: Luxe Winterjas</i>.<br><small>In het echt kun je me altijd verbeteren in het gesprek, of het met één tik terugdraaien.</small>", flits: [] };
+      if (/(kost|prijs van sitehulpje|abonnement|tarief)/.test(t) && /\?/.test(t))
+        return { msg: "Daar maakt Jan graag een voorstel voor dat bij jou past. 😊 Laat onderaan je gegevens achter bij <b>Gratis kennismaken</b>.", flits: [] };
+      if (/^(hoi|hallo|hey|hi|goedemorgen|goedemiddag|goedenavond)\b/.test(t))
+        return { msg: "Hoi! 👋 Vertel me maar wat er aan deze winkel moet veranderen. Bijvoorbeeld: <i>zet de jas 20% in de sale</i>.", flits: [] };
+      if (/\?/.test(t))
+        return { msg: "Goede vraag! In deze demo pas ik alleen deze voorbeeldwinkel aan. Wil je meer weten? Laat onderaan je gegevens achter bij <b>Gratis kennismaken</b>, dan neemt Jan contact met je op. 😊", flits: [] };
       return { msg: "In deze demo kan ik een paar dingen laten zien: <b>prijs</b>, <b>sale</b>, <b>kleur</b>, <b>melding</b>, <b>openingstijden</b>, <b>kortingscode</b>, <b>foto</b>, <b>voorraad</b> en <b>naam</b>. Probeer er een! 👇<br><small>In het echt kan ik álles op je site aanpassen.</small>", flits: [] };
     }
     geschiedenis.push(oud);
