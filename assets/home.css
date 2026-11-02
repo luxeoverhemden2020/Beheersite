@@ -308,8 +308,7 @@ html,body.home{overflow-x:clip}
 @media (max-width:640px){
   .podium-inhoud{padding-top:14px;padding-bottom:22px;gap:0}
   .held-3d{order:-1;height:230px;margin:0 -8px}
-  .holo.h2,.holo.h3,.naambord{display:none}
-  .holo.h1{top:auto;bottom:8px;left:50%;transform:translateX(-50%);animation:none}
+  .holo,.naambord{display:none}
   .held-tekst .label{display:none}
   .held-tekst h1{font-size:clamp(34px,10.5vw,44px);line-height:1.02;margin:4px 0 10px;text-align:center}
   .held-tekst h1 br{display:none}
@@ -318,15 +317,18 @@ html,body.home{overflow-x:clip}
   .kort-tekst{display:block;text-align:center;font-size:17px;line-height:1.45;color:#c9d6ea;margin:0 auto 16px;max-width:30ch}
   .held-tekst .rij{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .held-tekst .rij .groot-knop{padding:13px 10px;font-size:15px;text-align:center;justify-content:center;width:100%;margin:0}
-  .los-strook{margin-top:12px;padding:8px 10px;font-size:12.5px;gap:8px}
+  .held-tekst{display:flex;flex-direction:column}
+  .los-strook{order:5;margin-top:22px;padding:10px 12px;font-size:13px;gap:8px;color:#fff!important;border-color:rgba(255,255,255,.35)}
+  .los-strook b,.los-strook *{color:#fff!important}
   .los-strook .los-label{display:none}
+  .stats{order:4}
   .stats{justify-content:center;gap:8px;margin-top:14px}
   .stats div{flex:1;align-items:center;text-align:center;padding:8px 4px;border:1px solid rgba(34,227,196,.25);border-radius:12px;background:rgba(255,255,255,.03)}
   .stats b{font-size:17px}.stats span{font-size:11px;line-height:1.25}
 
   /* demo: winkel en chat naast elkaar */
   .probeer-raster{grid-template-columns:1fr 1fr;gap:8px;align-items:start}
-  .p-winkel{order:-1;border-radius:14px}
+  .p-winkel{order:0;border-radius:14px}
   .w-browser{padding:6px 8px}.w-browser span{display:none}
   .w-melding{font-size:11px;padding:5px 6px}
   .w-kop{padding:8px 10px;gap:6px}.w-kop b{font-size:14px}.w-mand{font-size:14px!important}
