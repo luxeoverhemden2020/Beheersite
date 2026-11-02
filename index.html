@@ -16,6 +16,7 @@
   <span class="bot-klein" id="kopbot"></span>
   <div class="merk">Site<b>regelaar</b></div>
   <nav class="rechts">
+    <a class="navlink verberg-mobiel" href="#probeer">Probeer het</a>
     <a class="navlink verberg-mobiel" href="#sitehulpje">Sitehulpje</a>
     <a class="navlink verberg-mobiel" href="#los">Al een site?</a>
     <a class="navlink verberg-mobiel" href="#aanbod">Website laten maken</a>
@@ -36,7 +37,7 @@
         <p class="groot">Wij bouwen je site of webshop. En met <b>Sitehulpje</b> pas je daarna alles aan door het gewoon te vragen. Typen, inspreken of een foto sturen. Klaar.</p>
         <div class="rij">
           <a class="knop groot-knop" href="#contact">Gratis kennismaken</a>
-          <a class="knop rand groot-knop licht-op-donker" href="#sitehulpje">Maak kennis met Sitehulpje</a>
+          <a class="knop rand groot-knop licht-op-donker" href="#probeer">▶ Probeer het zelf</a>
         </div>
         <a class="los-strook" href="#los"><span class="los-label mono">NIEUW</span> Heb je al een website of webshop? <b>Neem alleen Sitehulpje →</b></a>
         <div class="stats">
@@ -52,6 +53,38 @@
         <div class="holo h3 mono"><span>✓</span> Actie staat online</div>
         <div class="naambord"><b>Sitehulpje</b><span>Jouw robot voor je website</span></div>
       </div>
+    </div>
+  </section>
+
+  <!-- PROBEER HET ZELF -->
+  <section id="probeer" class="wrap breed blok probeer">
+    <div class="probeer-kop">
+      <p class="label mono">&gt;_ live demo · probeer het zelf</p>
+      <h2 class="sectie" style="margin:4px 0 6px">Vertel het. <span class="glans">Zie het meteen veranderen.</span></h2>
+      <p class="groot zacht" style="margin:0">Dit is een voorbeeldwinkel. Typ wat er moet veranderen, of kies een voorbeeld.</p>
+    </div>
+    <div class="probeer-raster">
+      <div class="kaart p-paneel">
+        <div class="p-kop"><span class="p-bot" id="pbot"></span><div><b>Sitehulpje</b><span class="p-status"><i></i> online · klaar voor je verzoek</span></div></div>
+        <div class="p-chat" id="pchat" aria-live="polite"></div>
+        <div class="p-voorbeelden">
+          <button type="button" class="p-voorbeeld" data-t="Zet de winterjas 25% in de sale">🏷️ 25% sale</button>
+          <button type="button" class="p-voorbeeld" data-t="Maak de prijs €89">💶 Prijs €89</button>
+          <button type="button" class="p-voorbeeld" data-t="Maak de knop roze">🎨 Knop roze</button>
+          <button type="button" class="p-voorbeeld" data-t="Zet bovenaan: 🎄 Kerstactie: gratis inpakken!">📢 Melding</button>
+          <button type="button" class="p-voorbeeld" data-t="Zet erop dat we op 27 december gesloten zijn">🕘 Gesloten</button>
+          <button type="button" class="p-voorbeeld" data-t="Maak kortingscode WINTER15 van 15%">🎟️ Kortingscode</button>
+          <button type="button" class="p-voorbeeld" data-t="Gratis verzending vanaf €50">🚚 Verzending</button>
+          <button type="button" class="p-voorbeeld" data-t="Zet er een andere foto bij">📸 Andere foto</button>
+          <button type="button" class="p-voorbeeld" data-t="Noem het product: Parka Bergen">✍️ Andere naam</button>
+          <button type="button" class="p-voorbeeld" data-t="Zet hem op uitverkocht">📦 Uitverkocht</button>
+        </div>
+        <div class="p-invoer">
+          <input id="pinvoer" placeholder="Bijv. maak de prijs €79 en de knop rood" autocomplete="off" aria-label="Typ je verzoek">
+          <button type="button" class="knop" id="pstuur">Verstuur</button>
+        </div>
+      </div>
+      <div class="p-winkel" id="pwinkel" aria-label="Voorbeeldwinkel"></div>
     </div>
   </section>
 
@@ -249,6 +282,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="assets/basis.js"></script>
 <script src="assets/robot3d.js"></script>
+<script src="assets/demo.js"></script>
 <script>
 $("#kopbot").innerHTML = robotSvg("rust");
 $("#telbot").innerHTML = robotSvg("rust");
