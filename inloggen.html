@@ -4,6 +4,13 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sitehulpje – Inloggen</title>
 <meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1220">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icoon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sitehulpje">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="stylesheet" href="assets/stijl.css">
 </head>
 <body>
@@ -55,7 +62,7 @@ const link = new URLSearchParams(location.search).get("link");
 if (link) {
   history.replaceState(null, "", location.pathname);
   $("#uitleg").textContent = "Even inloggen…";
-  api("link_inloggen", { link }).then((d) => { zetSessieVan("klant", d.token); location.href = "verzoeken"; })
+  api("link_inloggen", { link }).then((d) => { zetSessieVan("klant", d.token); try { localStorage.setItem("bs_link", link); } catch {} location.href = "verzoeken"; })
     .catch((e) => { $("#uitleg").textContent = "Log in om aanpassingen aan je website door te geven."; toonMelding($("#meld"), e.message); });
 } else if (!code) naarScherm();
 $("#inlog").onsubmit = async (e) => {

@@ -1,0 +1,24 @@
+{
+  "name": "Sitehulpje",
+  "short_name": "Sitehulpje",
+  "description": "Pas je website of webshop aan door het gewoon te vragen.",
+  "lang": "nl",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "icons": [
+    {
+      "src": "assets/icoon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icoon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

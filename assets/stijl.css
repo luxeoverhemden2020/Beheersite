@@ -129,3 +129,10 @@ button,a,.knop,tr.klik{touch-action:manipulation}
 .snelknop{flex:none;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;border:1px solid var(--lijn);background:var(--veld);color:var(--tekst);font:inherit;font-size:14px;cursor:pointer;touch-action:manipulation;transition:border-color .15s,background .15s}
 .snelknop:hover,.snelknop.aan{border-color:var(--accent);background:var(--accent2);color:var(--accent)}
 .snelknop span{font-size:16px}
+.app-tip{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:14px;border-color:var(--accent)}
+.app-icoon img{width:44px;height:44px;border-radius:11px;display:block}
+.app-tekst{flex:1;display:flex;flex-direction:column;gap:2px;font-size:14px}
+.app-tekst span{color:var(--zacht)}
+.app-installeer{margin-left:6px;vertical-align:middle}
+.ios-deel{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1.5px solid currentColor;border-radius:4px;font-size:12px;line-height:1;vertical-align:-3px}
+.app-weg{border:0;background:none;color:var(--zacht);font-size:16px;cursor:pointer;padding:4px}
