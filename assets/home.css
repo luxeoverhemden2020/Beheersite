@@ -461,3 +461,8 @@ body.zm-zicht .zm-item,body.zm-los .zm-item{animation:zmIn .5s cubic-bezier(.2,.
 .zm-label{font-weight:600;opacity:0;transition:opacity .25s}
 .zm-paneel:hover .zm-label,.zm-paneel:focus-within .zm-label,body.zm-los .zm-label{opacity:1}
 @media (max-width:1330px){body.zm-los .zijmenu{right:0}}
+/* Menuknop net onder het logo */
+@media (max-width:1330px){
+  .zm-open{top:70px;bottom:auto;left:12px;width:44px;height:44px;border-radius:13px;padding:0 12px}
+  .zijmenu{align-items:flex-start;padding-top:124px}
+}
