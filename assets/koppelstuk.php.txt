@@ -1,0 +1,164 @@
+<?php
+/**
+ * Plugin Name: Beheersite koppeling
+ * Description: Verbindt deze website met Beheersite (webbeheer door Jan). Altijd actief, kan niet worden uitgeschakeld.
+ * Version: 1.0
+ */
+if (!defined('ABSPATH')) exit;
+
+if (!defined('BHS_KLANT')) define('BHS_KLANT', '%%KLANT%%');
+if (!defined('BHS_API')) define('BHS_API', 'https://eiejxciyfcynppldonaw.supabase.co/functions/v1/beheersite');
+
+/** Geldige Beheersite-sleutel? Geeft verzoekgegevens terug of false. */
+function bhs_verzoek() {
+    static $res = null;
+    if ($res !== null) return $res;
+    $k = isset($_SERVER['HTTP_X_BEHEER_KEY']) ? trim(wp_unslash($_SERVER['HTTP_X_BEHEER_KEY'])) : '';
+    if ($k === '' || strlen($k) > 800 || !preg_match('/^[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+$/', $k)) return $res = false;
+    $tk = 'bhs_k_' . md5($k);
+    $c = get_transient($tk);
+    if (is_array($c)) return $res = ($c['ok'] ? $c : false);
+    $r = wp_remote_post(BHS_API, array(
+        'timeout' => 15,
+        'headers' => array('Content-Type' => 'application/json', 'X-Beheer-Key' => $k),
+        'body'    => wp_json_encode(array('actie' => 'ai_lees')),
+    ));
+    $ok = false; $d = array();
+    if (!is_wp_error($r) && wp_remote_retrieve_response_code($r) === 200) {
+        $d = json_decode(wp_remote_retrieve_body($r), true);
+        $ok = is_array($d) && isset($d['klant_id']) && $d['klant_id'] === BHS_KLANT;
+    }
+    $c = array('ok' => $ok, 'id' => $ok ? $d['id'] : '', 'nr' => $ok ? intval($d['nr']) : 0, 'goedgekeurd' => $ok && !empty($d['goedgekeurd']));
+    set_transient($tk, $c, $ok ? 5 * MINUTE_IN_SECONDS : MINUTE_IN_SECONDS);
+    return $res = ($ok ? $c : false);
+}
+
+/** Vaste gebruiker "webbeheer" waaronder alle wijzigingen gebeuren. */
+function bhs_gebruiker_id() {
+    $id = intval(get_option('bhs_gebruiker', 0));
+    if ($id && get_userdata($id)) return $id;
+    $u = get_user_by('login', 'webbeheer');
+    if (!$u) {
+        $id = wp_insert_user(array(
+            'user_login' => 'webbeheer',
+            'user_pass'  => wp_generate_password(48, true, true),
+            'user_email' => 'webbeheer+' . BHS_KLANT . '@luxeoverhemden.nl',
+            'display_name' => 'Webbeheer',
+            'role' => 'administrator',
+        ));
+        if (is_wp_error($id)) return 0;
+    } else { $id = $u->ID; }
+    update_option('bhs_gebruiker', $id, false);
+    return $id;
+}
+
+// Inloggen via sleutel (alleen REST-verzoeken met X-Beheer-Key)
+add_filter('determine_current_user', function ($uid) {
+    if (empty($_SERVER['HTTP_X_BEHEER_KEY'])) return $uid;
+    $v = bhs_verzoek();
+    if (!$v) return $uid;
+    $id = bhs_gebruiker_id();
+    return $id ?: $uid;
+}, 30);
+
+// Grenzen: zonder akkoord van Jan geen plugins, gebruikers, kernbestanden
+add_filter('user_has_cap', function ($allcaps) {
+    if (empty($_SERVER['HTTP_X_BEHEER_KEY'])) return $allcaps;
+    $v = bhs_verzoek();
+    if (!$v || $v['goedgekeurd']) return $allcaps;
+    foreach (array('install_plugins','activate_plugins','update_plugins','delete_plugins','edit_plugins','upload_plugins',
+        'install_themes','update_themes','delete_themes','edit_themes','switch_themes','edit_files','update_core',
+        'create_users','edit_users','delete_users','promote_users','remove_users','add_users','import','export') as $cap) {
+        $allcaps[$cap] = false;
+    }
+    return $allcaps;
+}, 99);
+
+add_filter('rest_pre_dispatch', function ($result, $server, $request) {
+    if (empty($_SERVER['HTTP_X_BEHEER_KEY'])) return $result;
+    $v = bhs_verzoek();
+    if (!$v) return new WP_Error('bhs_sleutel', 'Ongeldige of verlopen Beheersite-sleutel.', array('status' => 401));
+    if ($v['goedgekeurd']) return $result;
+    $route = $request->get_route();
+    $m = $request->get_method();
+    $schrijf = !in_array($m, array('GET', 'HEAD', 'OPTIONS'), true);
+    $fout = function ($t) { return new WP_Error('bhs_doorsturen', $t . ' Stuur dit verzoek door naar Jan (status doorgestuurd).', array('status' => 403)); };
+    if ($m === 'DELETE' && filter_var($request->get_param('force'), FILTER_VALIDATE_BOOLEAN)) return $fout('Definitief verwijderen is niet toegestaan.');
+    if (strpos($route, '/refunds') !== false) return $fout('Terugbetalingen zijn niet toegestaan.');
+    if ($schrijf && preg_match('#^/wc/v\d/(orders|customers|payment_gateways)#', $route)) return $fout('Bestellingen, klanten en betaalinstellingen zijn niet toegestaan.');
+    if ($schrijf && preg_match('#^/wp/v2/(users|plugins|themes)#', $route)) return $fout('Gebruikers, plugins en thema\'s zijn niet toegestaan.');
+    if ($schrijf && preg_match('#^/wc/v\d/(webhooks|system_status)#', $route)) return $fout('Systeeminstellingen zijn niet toegestaan.');
+    return $result;
+}, 10, 3);
+
+// ---------- Momentopnames (terugdraaien per verzoek) ----------
+function bhs_post_foto($id) {
+    $p = get_post($id, ARRAY_A);
+    if (!$p) return null;
+    $tax = array();
+    foreach (get_object_taxonomies($p['post_type']) as $t) $tax[$t] = wp_get_object_terms($id, $t, array('fields' => 'ids'));
+    return array('post' => $p, 'meta' => get_post_meta($id), 'tax' => $tax);
+}
+add_action('rest_api_init', function () {
+    $mag = function () { return (bool) bhs_verzoek(); };
+    register_rest_route('beheersite/v1', '/momentopname', array('methods' => 'POST', 'permission_callback' => $mag,
+        'callback' => function ($req) {
+            $v = bhs_verzoek();
+            $soort = $req->get_param('soort');
+            $id = $req->get_param('id');
+            $item = array('soort' => $soort, 'id' => $id, 'tijd' => time());
+            if ($soort === 'post') { $item['data'] = bhs_post_foto(intval($id)); if (!$item['data']) return new WP_Error('bhs', 'Bestaat niet', array('status' => 404)); }
+            elseif ($soort === 'nieuw_post') { $item['id'] = intval($id); }
+            elseif ($soort === 'option') { $item['bestond'] = get_option($id, '__bhs_geen__') !== '__bhs_geen__'; $item['data'] = get_option($id); }
+            elseif ($soort === 'term') { $t = get_term(intval($id), '', ARRAY_A); if (!$t || is_wp_error($t)) return new WP_Error('bhs', 'Bestaat niet', array('status' => 404)); $item['data'] = array('term' => $t, 'meta' => get_term_meta(intval($id))); }
+            else return new WP_Error('bhs', 'soort moet post, nieuw_post, option of term zijn', array('status' => 400));
+            $sleutel = 'bhs_snap_' . $v['nr'];
+            $lijst = get_option($sleutel, array());
+            $lijst[] = $item;
+            update_option($sleutel, $lijst, false);
+            return array('ok' => true, 'aantal' => count($lijst));
+        }));
+    register_rest_route('beheersite/v1', '/momentopnames', array('methods' => 'GET', 'permission_callback' => $mag,
+        'callback' => function () { $v = bhs_verzoek(); $l = get_option('bhs_snap_' . $v['nr'], array());
+            return array_map(function ($i) { return array('soort' => $i['soort'], 'id' => $i['id'], 'tijd' => $i['tijd']); }, $l); }));
+    register_rest_route('beheersite/v1', '/terugzetten', array('methods' => 'POST', 'permission_callback' => $mag,
+        'callback' => function () {
+            $v = bhs_verzoek();
+            $sleutel = 'bhs_snap_' . $v['nr'];
+            $lijst = array_reverse(get_option($sleutel, array()));
+            $gedaan = array();
+            foreach ($lijst as $i) {
+                if ($i['soort'] === 'post' && $i['data']) {
+                    $p = $i['data']['post']; $id = intval($p['ID']);
+                    wp_update_post(wp_slash($p));
+                    $nu = get_post_meta($id);
+                    foreach ($nu as $k => $_) if (!isset($i['data']['meta'][$k]) && $k !== '_edit_lock' && $k !== '_edit_last') delete_post_meta($id, $k);
+                    foreach ($i['data']['meta'] as $k => $waarden) { delete_post_meta($id, $k); foreach ($waarden as $w) add_post_meta($id, $k, wp_slash(maybe_unserialize($w))); }
+                    foreach ($i['data']['tax'] as $t => $ids) wp_set_object_terms($id, array_map('intval', $ids), $t);
+                    clean_post_cache($id);
+                    if (function_exists('wc_delete_product_transients')) wc_delete_product_transients($id);
+                    $gedaan[] = "post $id";
+                } elseif ($i['soort'] === 'nieuw_post') {
+                    wp_trash_post(intval($i['id'])); $gedaan[] = 'nieuw ' . $i['id'] . ' naar prullenbak';
+                } elseif ($i['soort'] === 'option') {
+                    if ($i['bestond']) update_option($i['id'], $i['data']); else delete_option($i['id']);
+                    $gedaan[] = 'optie ' . $i['id'];
+                } elseif ($i['soort'] === 'term') {
+                    $t = $i['data']['term'];
+                    wp_update_term(intval($t['term_id']), $t['taxonomy'], array('name' => $t['name'], 'slug' => $t['slug'], 'description' => $t['description'], 'parent' => intval($t['parent'])));
+                    foreach ($i['data']['meta'] as $k => $waarden) { delete_term_meta(intval($t['term_id']), $k); foreach ($waarden as $w) add_term_meta(intval($t['term_id']), $k, maybe_unserialize($w)); }
+                    $gedaan[] = 'term ' . $t['term_id'];
+                }
+            }
+            if (function_exists('wc_delete_shop_order_transients')) wc_delete_shop_order_transients();
+            wp_cache_flush();
+            return array('ok' => true, 'teruggezet' => $gedaan);
+        }));
+});
+
+// Laat Beheersite de site tonen in een voorbeeldvenster
+add_action('send_headers', function () {
+    if (is_admin()) return;
+    header_remove('X-Frame-Options');
+    header("Content-Security-Policy: frame-ancestors 'self' https://luxeoverhemden2020.github.io https://beheersite.vercel.app");
+});

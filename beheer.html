@@ -50,6 +50,20 @@
         <button class="knop rand" id="ktest">Deurbel testen</button>
         <button class="knop rand" id="kannuleer">Sluiten</button>
       </div>
+      <div id="wpblok" style="margin-top:18px;border-top:1px solid var(--lijn);padding-top:12px">
+        <h2 style="font-size:16px"><span class="tag">&gt;_</span>WordPress / WooCommerce koppelen</h2>
+        <ol class="zacht" style="margin:0 0 10px;padding-left:18px">
+          <li>Sla de klant eerst op (code en website ingevuld).</li>
+          <li>Download het koppelstuk voor deze klant.</li>
+          <li>In WordPress: <b>Plugins → Nieuwe plugin → Plugin uploaden</b> → zip kiezen → <b>Nu installeren</b> → <b>Activeren</b>.</li>
+          <li>Klik op <b>Koppeling testen</b>.</li>
+        </ol>
+        <div class="rij">
+          <button class="knop licht klein" id="kzip">⬇ Koppelstuk downloaden</button>
+          <button class="knop rand klein" id="kkoppeltest">Koppeling testen</button>
+        </div>
+        <p class="zacht" style="margin-bottom:0">Met de API-sleutel werkt de snelle webbeheerder dan meteen. De deurbel hierboven is alleen nodig als achtervang voor hele grote klussen.</p>
+      </div>
     </div>
   </section>
 
@@ -98,6 +112,7 @@
 
 <div class="paneel verborgen" id="paneel"><div class="in" id="paneelin"></div></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="assets/basis.js"></script>
 <script>
 const WIEJAN = { klant: "Klant", webbeheer: "Webbeheer", jan: "Jij (Jan)" };
@@ -109,7 +124,7 @@ document.querySelectorAll(".tabs button").forEach((b) => b.onclick = () => {
   document.querySelectorAll(".tabs button").forEach((x) => x.classList.toggle("aan", x === b));
   ["verzoeken", "klanten", "gebruikers", "account"].forEach((t) => $("#t-" + t).classList.toggle("verborgen", t !== b.dataset.tab));
 });
-$("#uit").onclick = async () => { try { await api("uitloggen"); } catch {} zetSessie(""); location.href = "./"; };
+$("#uit").onclick = async () => { try { await api("uitloggen"); } catch {} zetSessie(""); location.href = "inloggen"; };
 $("#maand").onchange = laad;
 
 async function laad() {
@@ -194,8 +209,30 @@ function klantForm(k) {
   $("#k_naam").value = k?.naam || ""; $("#k_site").value = k?.site || ""; $("#k_soort").value = k?.soort || "wordpress";
   $("#k_limiet").value = k?.limiet ?? 30; $("#k_actief").value = k?.actief === false ? "0" : "1";
   $("#k_url").value = k?.deurbel_url || ""; $("#k_token").value = ""; $("#k_budget").value = k?.ai_budget_eur ?? 5;
+  $("#wpblok").classList.toggle("verborgen", (k?.soort || "wordpress") !== "wordpress");
   $("#kform").scrollIntoView({ behavior: "smooth" });
 }
+$("#k_soort").onchange = () => $("#wpblok").classList.toggle("verborgen", $("#k_soort").value !== "wordpress");
+$("#kzip").onclick = async () => {
+  const id = $("#k_id").value.trim().toLowerCase();
+  if (!id || !data.klanten.some((k) => k.id === id)) { meld("Sla de klant eerst op."); return; }
+  try {
+    const [mu, inst] = await Promise.all(["assets/koppelstuk.php.txt", "assets/installeer.php.txt"].map((u) => fetch(u, { cache: "no-store" }).then((r) => r.text())));
+    const zip = new JSZip(); const map = zip.folder("beheersite-koppeling");
+    map.file("beheersite-koppeling.php", inst);
+    map.file("beheersite-koppeling.php.txt", mu.replace("%%KLANT%%", id));
+    const blob = await zip.generateAsync({ type: "blob" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `webbeheer-koppeling-${id}.zip`;
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    meld("Koppelstuk gedownload. Upload het in WordPress bij Plugins → Nieuwe plugin → Plugin uploaden.", "ok");
+  } catch (e) { meld("Downloaden mislukt: " + e.message); }
+};
+$("#kkoppeltest").onclick = async () => {
+  try {
+    const r = await api("koppeling_test", { klant_id: $("#k_id").value.trim().toLowerCase() });
+    meld(r.ok ? `✓ Gekoppeld! ${r.woocommerce ? "WordPress + WooCommerce gevonden." : "WordPress gevonden (geen WooCommerce)."} De snelle webbeheerder kan aan de slag.` : r.melding, r.ok ? "ok" : "fout");
+  } catch (e) { meld(e.message); }
+};
 $("#nieuweklant").onclick = () => klantForm(null);
 $("#kannuleer").onclick = () => $("#kform").classList.add("verborgen");
 $("#kopslaan").onclick = async () => {

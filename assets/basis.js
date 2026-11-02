@@ -34,8 +34,8 @@ async function api(actie, data = {}) {
     throw new Error("Geen verbinding. Controleer je internet en probeer het opnieuw.");
   }
   const d = await r.json().catch(() => ({}));
-  if (r.status === 401 && actie !== "inloggen" && actie !== "eerste_wachtwoord") {
-    zetSessie(""); location.href = "./"; throw new Error("Niet ingelogd");
+  if (r.status === 401 && !["inloggen", "eerste_wachtwoord", "link_inloggen", "contact"].includes(actie)) {
+    zetSessie(""); location.href = "inloggen"; throw new Error("Niet ingelogd");
   }
   if (!r.ok) throw new Error(d.fout || "Er ging iets mis.");
   return d;

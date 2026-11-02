@@ -1,0 +1,30 @@
+<?php
+/**
+ * Plugin Name: Beheersite koppeling – installeren
+ * Description: Zet de vaste Beheersite-koppeling (must-use plugin) op deze site en schakelt zichzelf daarna uit.
+ * Version: 1.0
+ */
+if (!defined('ABSPATH')) exit;
+
+register_activation_hook(__FILE__, function () {
+    $bron = file_get_contents(__DIR__ . '/beheersite-koppeling.php.txt');
+    if (!is_dir(WPMU_PLUGIN_DIR)) wp_mkdir_p(WPMU_PLUGIN_DIR);
+    $ok = file_put_contents(trailingslashit(WPMU_PLUGIN_DIR) . 'beheersite-koppeling.php', $bron);
+    update_option('bhs_installatie', $ok ? 'ok' : 'mislukt', false);
+});
+
+add_action('admin_init', function () {
+    $s = get_option('bhs_installatie');
+    if (!$s) return;
+    delete_option('bhs_installatie');
+    set_transient('bhs_melding', $s, 60);
+    deactivate_plugins(plugin_basename(__FILE__));
+});
+add_action('admin_notices', function () {
+    $s = get_transient('bhs_melding');
+    if (!$s) return;
+    delete_transient('bhs_melding');
+    echo $s === 'ok'
+        ? '<div class="notice notice-success"><p><strong>Beheersite-koppeling staat erop.</strong> Je vindt hem onder Plugins → Must-Use. Deze installatieplugin is uitgeschakeld en mag weg.</p></div>'
+        : '<div class="notice notice-error"><p><strong>Beheersite-koppeling kon niet worden geplaatst</strong> (geen schrijfrechten in wp-content/mu-plugins).</p></div>';
+});

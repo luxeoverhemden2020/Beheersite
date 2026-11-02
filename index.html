@@ -2,66 +2,181 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Webbeheer – Inloggen</title>
-<meta name="robots" content="noindex">
+<title>Webbeheer – je website aanpassen door het gewoon te vragen</title>
+<meta name="description" content="Typ, spreek in of stuur een foto. Webbeheer past je website of webshop voor je aan, meestal binnen een minuut. Zonder gedoe, zonder technische kennis.">
+<script>
+  // Oude inloglinks (?link= of ?code=) gaan naar het inlogscherm
+  if (/[?&](link|code)=/.test(location.search)) location.replace("inloggen" + location.search);
+</script>
 <link rel="stylesheet" href="assets/stijl.css">
+<link rel="stylesheet" href="assets/home.css">
 </head>
 <body>
-<div class="inlog">
-  <div style="text-align:right"><button class="knop rand klein thema" type="button"></button></div>
-  <div class="kaart">
-    <div id="bot"></div>
-    <h1>Web<span style="color:var(--accent)">beheer</span></h1>
-    <p class="zacht sub" id="uitleg">Log in om aanpassingen aan je website door te geven.</p>
-    <form id="inlog">
-      <div id="emailveld"><label for="email">E-mailadres</label>
-      <input id="email" type="email" autocomplete="username" required></div>
-      <label for="ww" id="wwlabel">Wachtwoord</label>
-      <input id="ww" type="password" autocomplete="current-password" required minlength="1">
-      <div id="ww2veld" class="verborgen"><label for="ww2">Herhaal wachtwoord</label>
-      <input id="ww2" type="password" autocomplete="new-password"></div>
-      <div id="meld" class="verborgen"></div>
-      <button class="knop" style="width:100%;margin-top:14px" id="knop">Inloggen</button>
-    </form>
-  </div>
-</div>
+
+<header class="kop">
+  <span class="bot-klein" id="kopbot"></span>
+  <div class="merk">Web<b>beheer</b></div>
+  <nav class="rechts">
+    <a class="knop rand klein verberg-mobiel" href="#zo-werkt-het">Zo werkt het</a>
+    <button class="knop rand klein thema" type="button"></button>
+    <a class="knop klein" href="inloggen">Inloggen</a>
+  </nav>
+</header>
+
+<main>
+  <!-- HELD -->
+  <section class="held wrap breed">
+    <div class="held-tekst">
+      <p class="label mono">&gt;_ je website, zonder gedoe</p>
+      <h1>Je website aanpassen?<br><span class="glans">Gewoon even vragen.</span></h1>
+      <p class="groot">Typ het, spreek het in of stuur een foto. Webbeheer past je website of webshop voor je aan. Meestal binnen een minuut.</p>
+      <div class="rij">
+        <a class="knop groot-knop" href="#contact">Gratis kennismaken</a>
+        <a class="knop rand groot-knop" href="#zo-werkt-het">Zo werkt het</a>
+      </div>
+      <p class="zacht klein-tekst">Geen technische kennis nodig. Geen moeilijke systemen. Geen wachten op een webbouwer.</p>
+    </div>
+    <div class="held-demo" aria-hidden="true">
+      <div class="telefoon">
+        <div class="tel-kop"><span class="bot-mini" id="telbot"></span><b>Webbeheer</b></div>
+        <div class="tel-chat" id="demo"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 STAPPEN -->
+  <section id="zo-werkt-het" class="wrap breed blok">
+    <h2 class="sectie"><span class="tag">01</span>Zo simpel werkt het</h2>
+    <div class="drie">
+      <div class="kaart stap"><div class="nr">1</div><h3>Vertel wat je wilt</h3><p>Typ het in je eigen woorden, spreek het in of maak een foto. Net als een appje.</p></div>
+      <div class="kaart stap"><div class="nr">2</div><h3>Webbeheer regelt het</h3><p>Je ziet een robotje aan het werk. Intussen kun je gewoon verder met je dag.</p></div>
+      <div class="kaart stap"><div class="nr">3</div><h3>Klaar!</h3><p>Je krijgt een berichtje met een link om het te bekijken. Toch niet goed? Eén tik en het staat weer zoals het was.</p></div>
+    </div>
+  </section>
+
+  <!-- VOORBEELDEN -->
+  <section class="wrap breed blok">
+    <h2 class="sectie"><span class="tag">02</span>Wat kun je vragen?</h2>
+    <p class="groot zacht" style="margin-top:-6px">Eigenlijk alles wat je op je website ziet. Een paar voorbeelden:</p>
+    <div class="tegels">
+      <div class="tegel"><span>💶</span>"Zet de prijs van de winterjas op €89"</div>
+      <div class="tegel"><span>📣</span>"Zet de najaarsactie bovenaan de homepage"</div>
+      <div class="tegel"><span>🛒</span>"Voeg dit nieuwe product toe" <em>+ foto</em></div>
+      <div class="tegel"><span>🏷️</span>"Maak een kortingscode van 10% voor deze week"</div>
+      <div class="tegel"><span>📸</span>"Zet deze voor- en na-foto's bij mijn werk"</div>
+      <div class="tegel"><span>🕘</span>"Pas de openingstijden aan voor de feestdagen"</div>
+      <div class="tegel"><span>✍️</span>"Schrijf een pagina over onze nieuwe dienst"</div>
+      <div class="tegel"><span>🔎</span>"Zorg dat we beter gevonden worden op Google"</div>
+    </div>
+  </section>
+
+  <!-- WAAROM -->
+  <section class="wrap breed blok">
+    <h2 class="sectie"><span class="tag">03</span>Waarom ondernemers het fijn vinden</h2>
+    <div class="twee">
+      <div class="voordeel"><b>⚡ Snel</b><p>Geen mailtjes heen en weer, geen wachten tot iemand tijd heeft. Je vraagt het en het gebeurt.</p></div>
+      <div class="voordeel"><b>📱 Overal</b><p>Werkt op je telefoon, tablet en computer. Ook als je tussen twee klanten door even iets wilt aanpassen.</p></div>
+      <div class="voordeel"><b>↩️ Altijd terug te draaien</b><p>Niet tevreden? Met één tik staat alles weer zoals het was. Je kunt dus niets kapot maken.</p></div>
+      <div class="voordeel"><b>🛡️ Veilig</b><p>Bestellingen, betalingen en wachtwoorden worden nooit zomaar aangepast. Grote dingen worden eerst met jou en Jan overlegd.</p></div>
+      <div class="voordeel"><b>🙋 Een echt aanspreekpunt</b><p>Lukt iets niet automatisch? Dan krijgt Jan direct een seintje en lost hij het voor je op.</p></div>
+      <div class="voordeel"><b>💡 Geen kennis nodig</b><p>Je hoeft niets te leren en nergens in te duiken. Gewoon zeggen wat je wilt.</p></div>
+    </div>
+  </section>
+
+  <!-- VOOR WIE -->
+  <section class="wrap breed blok">
+    <div class="kaart voor-wie">
+      <div>
+        <h2 class="sectie" style="margin-bottom:8px"><span class="tag">04</span>Heb je al een website?</h2>
+        <p class="groot">Grote kans dat we hem kunnen koppelen. Werkt jouw site of webshop met <b>WordPress</b> of <b>WooCommerce</b>? Dan is hij meestal dezelfde dag klaar voor gebruik. Wij regelen de koppeling, jij hoeft niets te doen.</p>
+        <p class="groot" style="margin-bottom:0">Nog geen website? <b>Dan maken we er een voor je</b>, met Webbeheer er meteen bij.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VRAGEN -->
+  <section class="wrap blok">
+    <h2 class="sectie"><span class="tag">05</span>Veelgestelde vragen</h2>
+    <details class="kaart vraag"><summary>Moet ik iets installeren of leren?</summary><p>Nee. Je krijgt een eigen link. Die open je op je telefoon of computer en je kunt meteen beginnen. De koppeling met je website regelen wij.</p></details>
+    <details class="kaart vraag"><summary>Wat als er iets fout gaat?</summary><p>Elke aanpassing kun je met één tik terugdraaien. En lukt iets niet automatisch, dan krijgt Jan direct een melding en pakt hij het op.</p></details>
+    <details class="kaart vraag"><summary>Kan Webbeheer mijn bestellingen of betalingen aanpassen?</summary><p>Nee. Bestellingen, terugbetalingen, betaalinstellingen en wachtwoorden blijven altijd buiten bereik. Grote of gevoelige aanpassingen worden eerst aan Jan voorgelegd.</p></details>
+    <details class="kaart vraag"><summary>Hoe snel is het klaar?</summary><p>De meeste aanpassingen, zoals een prijs, tekst of foto, zijn binnen een minuut klaar. Grotere klussen kunnen iets langer duren.</p></details>
+    <details class="kaart vraag"><summary>Hoeveel kan ik vragen?</summary><p>Ruim genoeg voor een gewone ondernemer. Je spreekt samen met Jan af wat bij jou past.</p></details>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="wrap blok">
+    <div class="kaart contact">
+      <div class="rij" style="align-items:center;gap:14px;margin-bottom:6px"><span class="bot-mid" id="contactbot"></span>
+        <div><h2 style="margin:0">Gratis kennismaken</h2><p class="zacht" style="margin:2px 0 0">Laat je gegevens achter. Jan neemt snel contact met je op.</p></div></div>
+      <form id="cform">
+        <div class="grid2">
+          <div><label for="c_naam">Je naam *</label><input id="c_naam" autocomplete="name" required></div>
+          <div><label for="c_bedrijf">Bedrijf</label><input id="c_bedrijf" autocomplete="organization"></div>
+          <div><label for="c_contact">E-mail of telefoon *</label><input id="c_contact" autocomplete="email" required></div>
+          <div><label for="c_site">Je website (als je die al hebt)</label><input id="c_site" inputmode="url" placeholder="www.…"></div>
+        </div>
+        <label for="c_bericht">Waar kunnen we je mee helpen?</label>
+        <textarea id="c_bericht" placeholder="Bijvoorbeeld: ik wil zelf makkelijk mijn prijzen en acties kunnen aanpassen."></textarea>
+        <input id="c_website2" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+        <div id="cmeld" class="verborgen"></div>
+        <button class="knop groot-knop" id="cknop" style="margin-top:12px">Verstuur</button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="voet wrap breed">
+  <span>Web<b>beheer</b> · je website, zonder gedoe</span>
+  <a href="inloggen">Inloggen voor klanten</a>
+</footer>
+
 <script src="assets/basis.js"></script>
 <script>
-$("#bot").innerHTML = robotSvg();
-const code = new URLSearchParams(location.search).get("code");
-if (code) {
-  $("#uitleg").textContent = "Kies je eigen wachtwoord voor het beheerscherm (minimaal 8 tekens).";
-  $("#emailveld").classList.add("verborgen"); $("#email").required = false;
-  $("#wwlabel").textContent = "Nieuw wachtwoord"; $("#ww").autocomplete = "new-password"; $("#ww").minLength = 8;
-  $("#ww2veld").classList.remove("verborgen"); $("#knop").textContent = "Wachtwoord opslaan";
+$("#kopbot").innerHTML = robotSvg("rust");
+$("#telbot").innerHTML = robotSvg("rust");
+$("#contactbot").innerHTML = robotSvg();
+
+// Demo-gesprek in de telefoon
+const DEMO = [
+  { van: "klant", t: "Zet de prijs van de winterjas op €89 🧥" },
+  { van: "bezig" },
+  { van: "webbeheer", t: "Klaar! De winterjas kost nu €89. Bekijk hem hier 👉 jouwwinkel.nl/winterjas" },
+  { van: "klant", t: "Top! En zet de najaarsactie bovenaan de homepage" },
+  { van: "bezig" },
+  { van: "webbeheer", t: "Gedaan ✅ De najaarsactie staat nu bovenaan je homepage." },
+];
+const demo = $("#demo");
+let stap = 0;
+function volgende() {
+  if (stap >= DEMO.length) { setTimeout(() => { demo.innerHTML = ""; stap = 0; volgende(); }, 3500); return; }
+  const m = DEMO[stap++];
+  const el = document.createElement("div");
+  if (m.van === "bezig") {
+    el.className = "demo-bezig"; el.innerHTML = `<span></span><span></span><span></span>`;
+    demo.append(el); setTimeout(() => { el.remove(); volgende(); }, 1400);
+    return;
+  }
+  el.className = "demo-bel " + m.van; el.textContent = m.t;
+  demo.append(el);
+  setTimeout(volgende, m.van === "klant" ? 900 : 2200);
 }
-async function naarScherm() {
-  const d = await api("ik");
-  location.href = d.gebruiker.rol === "admin" ? "beheer" : "verzoeken";
-}
-const link = new URLSearchParams(location.search).get("link");
-if (link) {
-  history.replaceState(null, "", location.pathname);
-  $("#uitleg").textContent = "Even inloggen…";
-  api("link_inloggen", { link }).then((d) => { zetSessie(d.token); location.href = "verzoeken"; })
-    .catch((e) => { $("#uitleg").textContent = "Log in om aanpassingen aan je website door te geven."; toonMelding($("#meld"), e.message); });
-} else if (sessie() && !code) naarScherm().catch(() => {});
-$("#inlog").onsubmit = async (e) => {
+if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  DEMO.filter((m) => m.t).forEach((m) => { const el = document.createElement("div"); el.className = "demo-bel " + m.van; el.textContent = m.t; demo.append(el); });
+} else volgende();
+
+// Contactformulier
+$("#cform").onsubmit = async (e) => {
   e.preventDefault();
-  toonMelding($("#meld"), "");
-  $("#knop").disabled = true;
+  toonMelding($("#cmeld"), "");
+  $("#cknop").disabled = true;
   try {
-    let d;
-    if (code) {
-      if ($("#ww").value !== $("#ww2").value) throw new Error("De wachtwoorden zijn niet gelijk.");
-      d = await api("eerste_wachtwoord", { code, wachtwoord: $("#ww").value });
-    } else {
-      d = await api("inloggen", { email: $("#email").value, wachtwoord: $("#ww").value });
-    }
-    zetSessie(d.token);
-    location.href = d.rol === "admin" ? "beheer" : "verzoeken";
-  } catch (err) { toonMelding($("#meld"), err.message); }
-  $("#knop").disabled = false;
+    await api("contact", { naam: $("#c_naam").value, bedrijf: $("#c_bedrijf").value, contact: $("#c_contact").value,
+      site: $("#c_site").value, bericht: $("#c_bericht").value, website2: $("#c_website2").value });
+    $("#cform").reset();
+    toonMelding($("#cmeld"), "Bedankt! Je bericht is verstuurd. Jan neemt snel contact met je op.", "ok");
+  } catch (err) { toonMelding($("#cmeld"), err.message); }
+  $("#cknop").disabled = false;
 };
 </script>
 </body>

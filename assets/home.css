@@ -1,0 +1,68 @@
+/* Promotiesite Webbeheer */
+.kop .rechts a{text-decoration:none}
+.held{display:grid;grid-template-columns:1.15fr .85fr;gap:32px;align-items:center;padding-top:48px;padding-bottom:40px}
+.held h1{font-size:clamp(34px,6vw,58px);line-height:1.05;margin:8px 0 16px;letter-spacing:-.5px}
+.glans{background:linear-gradient(90deg,#22e3c4,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.label{color:var(--accent);font-size:14px;margin:0}
+.groot{font-size:18px;line-height:1.6}
+.klein-tekst{font-size:14px;margin-top:14px}
+.groot-knop{padding:14px 22px;font-size:17px}
+.blok{padding-top:36px;padding-bottom:20px}
+h2.sectie{font-size:clamp(24px,3.5vw,32px);margin:0 0 18px}
+h2.sectie .tag{font-size:14px;vertical-align:middle;margin-right:10px}
+h3{margin:6px 0 6px;font-size:19px}
+
+/* telefoon-demo */
+.held-demo{display:flex;justify-content:center}
+.telefoon{width:min(320px,100%);border-radius:34px;padding:14px;background:var(--bg2);border:1px solid var(--lijn);box-shadow:0 0 0 6px rgba(34,227,196,.06),0 30px 60px rgba(0,0,0,.35)}
+.tel-kop{display:flex;align-items:center;gap:8px;padding:6px 8px 12px;border-bottom:1px solid var(--lijn)}
+.bot-mini{width:28px;height:28px;display:inline-block}
+.bot-mini svg,.bot-klein svg,.bot-mid svg{width:100%;height:100%}
+.bot-mid{width:56px;height:56px;display:inline-block;flex:none}
+.tel-chat{height:330px;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;padding:12px 4px 4px;overflow:hidden}
+.demo-bel{max-width:85%;padding:9px 12px;border-radius:14px;font-size:14.5px;line-height:1.4;animation:in .35s ease-out}
+.demo-bel.klant{align-self:flex-end;background:linear-gradient(135deg,rgba(34,227,196,.25),rgba(59,130,246,.25));border:1px solid rgba(34,227,196,.35);border-top-right-radius:4px}
+.demo-bel.webbeheer{align-self:flex-start;background:var(--bel);border:1px solid rgba(34,227,196,.35);border-top-left-radius:4px}
+.demo-bezig{align-self:flex-start;display:flex;gap:5px;padding:12px 14px;border-radius:14px;background:var(--bel);border:1px solid var(--lijn)}
+.demo-bezig span{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:stip 1s infinite}
+.demo-bezig span:nth-child(2){animation-delay:.15s}.demo-bezig span:nth-child(3){animation-delay:.3s}
+@keyframes stip{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* blokken */
+.drie{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.stap .nr{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-family:"JetBrains Mono",monospace;background:var(--accent2);color:var(--accent);border:1px solid rgba(34,227,196,.35)}
+.stap p{margin:0;color:var(--zacht)}
+.tegels{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.tegel{background:var(--kaart);border:1px solid var(--lijn);border-radius:14px;padding:14px;font-size:15px;line-height:1.45;transition:border-color .2s,transform .2s}
+.tegel:hover{border-color:var(--accent);transform:translateY(-2px)}
+.tegel span{display:block;font-size:24px;margin-bottom:6px}
+.tegel em{color:var(--zacht);font-style:normal;font-size:13px}
+.twee{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.voordeel{padding:16px;border-left:3px solid var(--accent);background:var(--kaart);border-radius:0 14px 14px 0}
+.voordeel b{font-size:17px}
+.voordeel p{margin:6px 0 0;color:var(--zacht)}
+.voor-wie{background:linear-gradient(135deg,rgba(34,227,196,.1),rgba(139,92,246,.12));border-color:rgba(34,227,196,.3);padding:26px}
+.vraag{padding:0;margin-bottom:10px}
+.vraag summary{cursor:pointer;padding:16px;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:10px;touch-action:manipulation}
+.vraag summary::-webkit-details-marker{display:none}
+.vraag summary::after{content:"+";color:var(--accent);font-family:"JetBrains Mono",monospace;font-size:20px;line-height:1}
+.vraag[open] summary::after{content:"–"}
+.vraag p{margin:0;padding:0 16px 16px;color:var(--zacht)}
+.contact{padding:24px;position:relative}
+.voet{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:30px;padding-bottom:40px;color:var(--zacht);font-size:14px;border-top:1px solid var(--lijn);margin-top:30px}
+.voet b{color:var(--accent)}
+
+@media (max-width:900px){
+  .held{grid-template-columns:1fr;padding-top:28px}
+  .tegels{grid-template-columns:repeat(2,1fr)}
+  .twee{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  .drie,.twee{grid-template-columns:1fr}
+  .tegels{grid-template-columns:1fr 1fr}
+  .verberg-mobiel{display:none}
+  .groot{font-size:17px}
+  .tel-chat{height:290px}
+}
+@media (prefers-reduced-motion:reduce){.demo-bel,.demo-bezig span{animation:none}}

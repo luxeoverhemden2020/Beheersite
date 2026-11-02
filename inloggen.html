@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Webbeheer – Inloggen</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/stijl.css">
+</head>
+<body>
+<div class="inlog">
+  <div style="text-align:right"><button class="knop rand klein thema" type="button"></button></div>
+  <div class="kaart">
+    <div id="bot"></div>
+    <h1>Web<span style="color:var(--accent)">beheer</span></h1>
+    <p class="zacht sub" id="uitleg">Log in om aanpassingen aan je website door te geven.</p>
+    <form id="inlog">
+      <div id="emailveld"><label for="email">E-mailadres</label>
+      <input id="email" type="email" autocomplete="username" required></div>
+      <label for="ww" id="wwlabel">Wachtwoord</label>
+      <input id="ww" type="password" autocomplete="current-password" required minlength="1">
+      <div id="ww2veld" class="verborgen"><label for="ww2">Herhaal wachtwoord</label>
+      <input id="ww2" type="password" autocomplete="new-password"></div>
+      <div id="meld" class="verborgen"></div>
+      <button class="knop" style="width:100%;margin-top:14px" id="knop">Inloggen</button>
+    </form>
+  </div>
+</div>
+<script src="assets/basis.js"></script>
+<script>
+$("#bot").innerHTML = robotSvg();
+const code = new URLSearchParams(location.search).get("code");
+if (code) {
+  $("#uitleg").textContent = "Kies je eigen wachtwoord voor het beheerscherm (minimaal 8 tekens).";
+  $("#emailveld").classList.add("verborgen"); $("#email").required = false;
+  $("#wwlabel").textContent = "Nieuw wachtwoord"; $("#ww").autocomplete = "new-password"; $("#ww").minLength = 8;
+  $("#ww2veld").classList.remove("verborgen"); $("#knop").textContent = "Wachtwoord opslaan";
+}
+async function naarScherm() {
+  const d = await api("ik");
+  location.href = d.gebruiker.rol === "admin" ? "beheer" : "verzoeken";
+}
+const link = new URLSearchParams(location.search).get("link");
+if (link) {
+  history.replaceState(null, "", location.pathname);
+  $("#uitleg").textContent = "Even inloggen…";
+  api("link_inloggen", { link }).then((d) => { zetSessie(d.token); location.href = "verzoeken"; })
+    .catch((e) => { $("#uitleg").textContent = "Log in om aanpassingen aan je website door te geven."; toonMelding($("#meld"), e.message); });
+} else if (sessie() && !code) naarScherm().catch(() => {});
+$("#inlog").onsubmit = async (e) => {
+  e.preventDefault();
+  toonMelding($("#meld"), "");
+  $("#knop").disabled = true;
+  try {
+    let d;
+    if (code) {
+      if ($("#ww").value !== $("#ww2").value) throw new Error("De wachtwoorden zijn niet gelijk.");
+      d = await api("eerste_wachtwoord", { code, wachtwoord: $("#ww").value });
+    } else {
+      d = await api("inloggen", { email: $("#email").value, wachtwoord: $("#ww").value });
+    }
+    zetSessie(d.token);
+    location.href = d.rol === "admin" ? "beheer" : "verzoeken";
+  } catch (err) { toonMelding($("#meld"), err.message); }
+  $("#knop").disabled = false;
+};
+</script>
+</body>
+</html>
