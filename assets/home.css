@@ -394,3 +394,70 @@ html,body.home{overflow-x:clip}
   .meer-dan{font-size:16.5px;padding:14px}
 }
 @media (prefers-reduced-motion:reduce){.ko-ring,.ko-kern::after,.ko-bot{animation:none}.ko-ring{transform:rotateX(-10deg)}}
+
+/* ===== 3D-zijmenu ===== */
+.zijmenu{position:fixed;left:16px;top:50%;z-index:60;perspective:900px;transform:translateY(-50%);pointer-events:none}
+.zm-paneel{position:relative;pointer-events:auto;padding:14px 10px 12px;border-radius:20px;width:58px;overflow:hidden;
+  background:linear-gradient(160deg,rgba(16,25,43,.88),rgba(7,11,20,.78));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(34,227,196,.22);box-shadow:0 0 0 1px rgba(139,92,246,.12),0 18px 50px rgba(0,0,0,.45),inset 0 0 30px rgba(34,227,196,.06);
+  transform:rotateY(18deg) translateX(-90px);transform-origin:left center;opacity:0;transition:transform .6s cubic-bezier(.2,.9,.2,1),opacity .4s,width .45s cubic-bezier(.2,.9,.2,1)}
+body.zm-zicht .zm-paneel{transform:rotateY(18deg);opacity:1}
+.zm-paneel:hover,.zm-paneel:focus-within{width:250px;transform:rotateY(0deg)!important}
+.zm-paneel::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;
+  background:conic-gradient(from var(--zm-h,0deg),transparent 0 60%,var(--accent) 75%,var(--paars) 85%,transparent 95%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:zmDraai 6s linear infinite}
+@property --zm-h{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes zmDraai{to{--zm-h:360deg}}
+.zm-paneel::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(0deg,rgba(34,227,196,.05) 0 1px,transparent 1px 4px)}
+.zm-kop{display:flex;align-items:center;gap:8px;height:18px;margin:0 0 8px 9px;font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.3em;color:var(--accent);white-space:nowrap}
+.zm-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:zmPuls 2s ease-in-out infinite;flex:none}
+.zm-sluit{display:none;margin-left:auto;font-size:22px;letter-spacing:0;color:var(--zacht);cursor:pointer;padding:0 4px}
+.zm-lijn{position:absolute;left:38px;top:44px;bottom:30px;width:2px;background:linear-gradient(var(--lijn),rgba(34,227,196,.25),var(--lijn));border-radius:2px}
+.zm-lijn i{position:absolute;left:-1px;width:4px;height:40px;border-radius:4px;background:linear-gradient(transparent,var(--accent),transparent);box-shadow:0 0 12px var(--accent);animation:zmStroom 3.2s ease-in-out infinite}
+@keyframes zmStroom{0%{top:-10%;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:100%;opacity:0}}
+@keyframes zmPuls{50%{opacity:.35;transform:scale(.7)}}
+.zm-item{position:relative;display:flex;align-items:center;gap:12px;padding:5px 0 5px 1px;text-decoration:none;color:var(--zacht);white-space:nowrap;
+  opacity:0;transform:translateX(-14px);transition:color .2s}
+body.zm-zicht .zm-item,body.zm-los .zm-item{animation:zmIn .5s cubic-bezier(.2,.9,.2,1) forwards;animation-delay:calc(var(--n)*60ms + .15s)}
+@keyframes zmIn{to{opacity:1;transform:none}}
+.zm-node{position:relative;flex:none;width:36px;height:36px;display:grid;place-items:center;border-radius:11px;
+  background:rgba(7,11,20,.7);border:1px solid var(--lijn);transform:rotate(45deg) scale(.78);transition:all .3s cubic-bezier(.2,.9,.2,1)}
+.zm-node svg{width:18px;height:18px;transform:rotate(-45deg);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.zm-tekst{display:flex;flex-direction:column;font-size:14px;line-height:1.2;opacity:0;transform:translateX(-6px);transition:opacity .25s,transform .3s}
+.zm-tekst small{font:600 10px "JetBrains Mono",monospace;color:var(--accent);opacity:.7;letter-spacing:.1em}
+.zm-paneel:hover .zm-tekst,.zm-paneel:focus-within .zm-tekst,body.zm-los .zm-tekst{opacity:1;transform:none}
+.zm-item:hover,.zm-item:focus-visible{color:var(--tekst);outline:none}
+.zm-item:hover .zm-node,.zm-item:focus-visible .zm-node{border-color:var(--accent);transform:rotate(45deg) scale(.9);box-shadow:0 0 16px rgba(34,227,196,.35)}
+.zm-item.aan{color:var(--tekst)}
+.zm-item.aan .zm-node{color:#04110e;background:linear-gradient(135deg,var(--accent),#6ee7d6);border-color:transparent;transform:rotate(45deg) scale(.92);
+  box-shadow:0 0 0 4px rgba(34,227,196,.12),0 0 22px rgba(34,227,196,.55)}
+.zm-item.aan .zm-node::after{content:"";position:absolute;inset:-7px;border-radius:14px;border:1px solid rgba(34,227,196,.45);animation:zmRing 2.2s ease-out infinite}
+@keyframes zmRing{from{opacity:1;transform:scale(.85)}to{opacity:0;transform:scale(1.35)}}
+:root[data-thema=licht] .zm-paneel{background:linear-gradient(160deg,rgba(255,255,255,.92),rgba(238,244,251,.85));box-shadow:0 18px 40px rgba(15,40,80,.15)}
+:root[data-thema=licht] .zm-node{background:#fff}
+.zm-open{display:none}
+/* Te smal voor een rail: knop linksonder met uitschuifpaneel */
+@media (max-width:1330px){
+  .zijmenu{top:0;bottom:0;left:0;transform:none;display:flex;align-items:center;padding-left:14px;perspective:1100px}
+  .zm-paneel,body.zm-zicht .zm-paneel{width:270px!important;padding:16px 14px 14px;transform:rotateY(-75deg) translateX(-60px)!important;opacity:0;pointer-events:none}
+  body.zm-los .zm-paneel{transform:rotateY(0) translateX(0)!important;opacity:1;pointer-events:auto}
+  body.zm-los .zijmenu{pointer-events:auto;background:radial-gradient(circle at 0 50%,rgba(34,227,196,.12),rgba(7,11,20,.55) 60%);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+  .zm-sluit{display:block}
+  .zm-lijn{left:42px}
+  .zm-item{padding:7px 0 7px 5px}
+  .zm-open{display:grid;align-content:center;gap:4px;position:fixed;left:14px;bottom:18px;z-index:61;width:50px;height:50px;border-radius:15px;cursor:pointer;
+    background:linear-gradient(160deg,rgba(16,25,43,.92),rgba(7,11,20,.85));border:1px solid rgba(34,227,196,.35);padding:0 14px;
+    box-shadow:0 0 22px rgba(34,227,196,.25),0 10px 26px rgba(0,0,0,.4);backdrop-filter:blur(10px);transform:perspective(300px) rotateY(14deg);transition:transform .3s}
+  .zm-open:hover{transform:perspective(300px) rotateY(0)}
+  .zm-open span{display:block;height:2px;border-radius:2px;background:var(--accent);box-shadow:0 0 6px var(--accent);transition:transform .3s,opacity .3s}
+  .zm-open span:nth-child(2){width:70%}
+  body.zm-los .zm-open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+  body.zm-los .zm-open span:nth-child(2){opacity:0}
+  body.zm-los .zm-open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+  :root[data-thema=licht] .zm-open{background:#fff}
+}
+@media (prefers-reduced-motion:reduce){.zm-paneel::before,.zm-lijn i,.zm-dot,.zm-item.aan .zm-node::after{animation:none}}
+.zm-label{font-weight:600;opacity:0;transition:opacity .25s}
+.zm-paneel:hover .zm-label,.zm-paneel:focus-within .zm-label,body.zm-los .zm-label{opacity:1}
+@media (max-width:1330px){body.zm-los .zijmenu{right:0}}
