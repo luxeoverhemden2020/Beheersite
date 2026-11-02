@@ -124,7 +124,7 @@ document.querySelectorAll(".tabs button").forEach((b) => b.onclick = () => {
   document.querySelectorAll(".tabs button").forEach((x) => x.classList.toggle("aan", x === b));
   ["verzoeken", "klanten", "gebruikers", "account"].forEach((t) => $("#t-" + t).classList.toggle("verborgen", t !== b.dataset.tab));
 });
-$("#uit").onclick = async () => { try { await api("uitloggen"); } catch {} zetSessie(""); location.href = "inloggen"; };
+$("#uit").onclick = async () => { try { await api("uitloggen"); } catch {} zetSessie(""); location.href = "inloggen?voor=beheer"; };
 $("#maand").onchange = laad;
 
 async function laad() {
@@ -296,12 +296,21 @@ $("#aopslaan").onclick = async () => {
 };
 
 $("#kopbot").innerHTML = robotSvg("rust");
-api("ik").then((d) => {
+(async () => {
+  // Overstap: vroeger stond ook Jans sessie in het klantvakje. Is dat een beheerder, verhuis hem.
+  if (!sessie() && sessieVan("klant")) {
+    try {
+      const d = await api("ik", {}, sessieVan("klant"));
+      if (d.gebruiker.rol === "admin") { zetSessie(sessieVan("klant")); zetSessieVan("klant", ""); }
+    } catch {}
+  }
+  if (!sessie()) { location.href = "inloggen?voor=beheer"; return; }
+  const d = await api("ik");
   ik = d.gebruiker;
-  if (ik.rol !== "admin") { location.href = "verzoeken"; return; }
+  if (ik.rol !== "admin") { zetSessie(""); location.href = "inloggen?voor=beheer"; return; }
   laad();
   setInterval(() => { if (!openVerzoek) laad(); }, 30000);
-});
+})();
 </script>
 </body>
 </html>

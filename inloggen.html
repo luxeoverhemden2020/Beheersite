@@ -35,17 +35,29 @@ if (code) {
   $("#wwlabel").textContent = "Nieuw wachtwoord"; $("#ww").autocomplete = "new-password"; $("#ww").minLength = 8;
   $("#ww2veld").classList.remove("verborgen"); $("#knop").textContent = "Wachtwoord opslaan";
 }
+const voorBeheer = new URLSearchParams(location.search).get("voor") === "beheer";
+if (voorBeheer) $("#uitleg").textContent = "Log in op het beheerscherm.";
+// Bewaar de sessie in het juiste vakje: beheerder en klant staan los van elkaar.
+const bewaar = (rol, token) => zetSessieVan(rol === "admin" ? "beheer" : "klant", token);
 async function naarScherm() {
-  const d = await api("ik");
-  location.href = d.gebruiker.rol === "admin" ? "beheer" : "verzoeken";
+  // Al ingelogd? Dan direct door. Bij "voor=beheer" alleen met een beheer-sessie.
+  for (const soort of voorBeheer ? ["beheer"] : ["beheer", "klant"]) {
+    const t = sessieVan(soort);
+    if (!t) continue;
+    try {
+      const d = await api("ik", {}, t);
+      if (soort === "beheer" && d.gebruiker.rol === "admin") { location.href = "beheer"; return; }
+      if (soort === "klant") { location.href = d.gebruiker.rol === "admin" && !d.klant ? "beheer" : "verzoeken"; return; }
+    } catch { zetSessieVan(soort, ""); }
+  }
 }
 const link = new URLSearchParams(location.search).get("link");
 if (link) {
   history.replaceState(null, "", location.pathname);
   $("#uitleg").textContent = "Even inloggen…";
-  api("link_inloggen", { link }).then((d) => { zetSessie(d.token); location.href = "verzoeken"; })
+  api("link_inloggen", { link }).then((d) => { zetSessieVan("klant", d.token); location.href = "verzoeken"; })
     .catch((e) => { $("#uitleg").textContent = "Log in om aanpassingen aan je website door te geven."; toonMelding($("#meld"), e.message); });
-} else if (sessie() && !code) naarScherm().catch(() => {});
+} else if (!code) naarScherm();
 $("#inlog").onsubmit = async (e) => {
   e.preventDefault();
   toonMelding($("#meld"), "");
@@ -58,7 +70,7 @@ $("#inlog").onsubmit = async (e) => {
     } else {
       d = await api("inloggen", { email: $("#email").value, wachtwoord: $("#ww").value });
     }
-    zetSessie(d.token);
+    bewaar(d.rol, d.token);
     location.href = d.rol === "admin" ? "beheer" : "verzoeken";
   } catch (err) { toonMelding($("#meld"), err.message); }
   $("#knop").disabled = false;

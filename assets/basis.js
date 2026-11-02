@@ -19,23 +19,29 @@ document.addEventListener("DOMContentLoaded", () => document.querySelectorAll(".
 
 const API = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/beheersite";
 
-function sessie() { try { return localStorage.getItem("bs_sessie") || ""; } catch { return ""; } }
-function zetSessie(t) { try { t ? localStorage.setItem("bs_sessie", t) : localStorage.removeItem("bs_sessie"); } catch {} }
+// Twee aparte sessies per browser: één voor het beheerscherm (Jan) en één voor de klantpagina.
+// Zo kan Jan een klant-inloglink openen zonder dat zijn beheerscherm uitlogt.
+const IS_BEHEER = /\/beheer(\.html)?$/.test(location.pathname);
+const SESSIE_SLEUTEL = { beheer: "bs_sessie_beheer", klant: "bs_sessie" };
+function sessieVan(soort) { try { return localStorage.getItem(SESSIE_SLEUTEL[soort]) || ""; } catch { return ""; } }
+function zetSessieVan(soort, t) { try { t ? localStorage.setItem(SESSIE_SLEUTEL[soort], t) : localStorage.removeItem(SESSIE_SLEUTEL[soort]); } catch {} }
+function sessie() { return sessieVan(IS_BEHEER ? "beheer" : "klant"); }
+function zetSessie(t) { zetSessieVan(IS_BEHEER ? "beheer" : "klant", t); }
 
-async function api(actie, data = {}) {
+async function api(actie, data = {}, metToken) {
   let r;
   try {
     r = await fetch(API, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-Sessie": sessie() },
+      headers: { "Content-Type": "application/json", "X-Sessie": metToken ?? sessie() },
       body: JSON.stringify({ actie, ...data }),
     });
   } catch {
     throw new Error("Geen verbinding. Controleer je internet en probeer het opnieuw.");
   }
   const d = await r.json().catch(() => ({}));
-  if (r.status === 401 && !["inloggen", "eerste_wachtwoord", "link_inloggen", "contact"].includes(actie)) {
-    zetSessie(""); location.href = "inloggen"; throw new Error("Niet ingelogd");
+  if (r.status === 401 && metToken === undefined && !["inloggen", "eerste_wachtwoord", "link_inloggen", "contact"].includes(actie)) {
+    zetSessie(""); location.href = IS_BEHEER ? "inloggen?voor=beheer" : "inloggen"; throw new Error("Niet ingelogd");
   }
   if (!r.ok) throw new Error(d.fout || "Er ging iets mis.");
   return d;
