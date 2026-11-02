@@ -182,3 +182,30 @@ h3{margin:6px 0 6px;font-size:19px}
   .aanbod.drie-kol,.portfolio,.drie.compact{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){.holo,.knipper{animation:none}.verschijn{opacity:1;transform:none;transition:none}}
+
+/* Sitehulpje los */
+.los-strook{display:inline-flex;align-items:center;gap:10px;margin-top:18px;padding:9px 14px 9px 9px;border-radius:999px;text-decoration:none;color:#e6f1ff;
+  background:rgba(34,227,196,.08);border:1px solid rgba(34,227,196,.4);box-shadow:0 0 22px rgba(34,227,196,.15);font-size:15px;transition:background .2s}
+.los-strook:hover{background:rgba(34,227,196,.16)}
+.los-strook b{color:#22e3c4}
+.los-label{font-size:11px;padding:3px 8px;border-radius:999px;background:#22e3c4;color:#04111a;font-weight:700}
+.los-blok{margin-top:34px;padding:30px;display:grid;grid-template-columns:1.3fr .7fr;gap:24px;align-items:center;
+  border-color:rgba(139,92,246,.5);background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(34,227,196,.1)),var(--kaart);box-shadow:0 0 0 1px rgba(139,92,246,.2),0 0 40px rgba(139,92,246,.12)}
+.los-blok h2{font-size:clamp(24px,3.2vw,34px);margin:10px 0 10px;line-height:1.15}
+.lint-inline{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;background:#8b5cf6;color:#fff;font-weight:600}
+.lint.paars{background:#8b5cf6;color:#fff}
+.vinkjes{list-style:none;padding:0;margin:4px 0 20px;display:grid;gap:8px}
+.vinkjes li{padding-left:30px;position:relative}
+.vinkjes li::before{content:"✓";position:absolute;left:0;top:0;width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:13px;font-weight:700;background:var(--accent2);color:var(--accent);border:1px solid rgba(34,227,196,.4)}
+.los-visual{display:flex;align-items:center;justify-content:center;gap:10px}
+.los-site{width:150px;border-radius:12px;overflow:hidden;border:1px solid var(--lijn);background:var(--bg2);box-shadow:var(--schaduw)}
+.los-site .browser{padding:6px 8px}.los-site .browser span{font-size:10px}
+.los-site-inhoud{padding:12px;display:grid;gap:7px}
+.los-site-inhoud b{height:38px;border-radius:6px;background:linear-gradient(135deg,#3b82f6,#22e3c4);opacity:.7}
+.los-site-inhoud i{height:7px;border-radius:4px;background:var(--lijn)}
+.los-site-inhoud i.kort{width:60%}
+.los-plus{font-size:30px;color:var(--accent);font-weight:700}
+.los-bot{width:120px;height:120px}
+.los-bot svg{width:100%;height:100%}
+@media (max-width:900px){.los-blok{grid-template-columns:1fr}.los-visual{order:-1}}
+@media (max-width:640px){.los-strook{font-size:13.5px;border-radius:14px}.los-blok{padding:20px}.los-site{width:120px}.los-bot{width:96px;height:96px}}

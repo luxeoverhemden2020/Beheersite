@@ -17,6 +17,7 @@
   <div class="merk">Site<b>regelaar</b></div>
   <nav class="rechts">
     <a class="navlink verberg-mobiel" href="#sitehulpje">Sitehulpje</a>
+    <a class="navlink verberg-mobiel" href="#los">Al een site?</a>
     <a class="navlink verberg-mobiel" href="#aanbod">Website laten maken</a>
     <a class="navlink verberg-mobiel" href="#portfolio">Portfolio</a>
     <button class="knop rand klein thema" type="button"></button>
@@ -37,6 +38,7 @@
           <a class="knop groot-knop" href="#contact">Gratis kennismaken</a>
           <a class="knop rand groot-knop licht-op-donker" href="#sitehulpje">Maak kennis met Sitehulpje</a>
         </div>
+        <a class="los-strook" href="#los"><span class="los-label mono">NIEUW</span> Heb je al een website of webshop? <b>Neem alleen Sitehulpje →</b></a>
         <div class="stats">
           <div><b>±1 min</b><span>voor een aanpassing</span></div>
           <div><b>1 tik</b><span>om terug te draaien</span></div>
@@ -85,6 +87,29 @@
       <div class="tegel"><span>✍️</span>"Schrijf een pagina over onze nieuwe dienst"</div>
       <div class="tegel"><span>🔎</span>"Zorg dat we beter gevonden worden op Google"</div>
     </div>
+
+    <div id="los" class="kaart los-blok">
+      <div class="los-tekst">
+        <span class="lint-inline mono">ook los te nemen</span>
+        <h2>Al een website of webshop? <span class="glans">Neem alleen Sitehulpje.</span></h2>
+        <p class="groot">Je hoeft niet over te stappen of een nieuwe site te laten maken. Wij koppelen Sitehulpje aan je bestaande site, en vanaf dat moment pas je alles aan door het gewoon te vragen.</p>
+        <ul class="vinkjes">
+          <li>Werkt met <b>WordPress</b> en <b>WooCommerce</b>, de meest gebruikte websites en webshops</li>
+          <li>Wij regelen de koppeling, vaak <b>dezelfde dag</b> nog</li>
+          <li>Je site blijft gewoon van jou, bij je eigen hoster</li>
+          <li>Je eigen inloglink op telefoon en computer</li>
+        </ul>
+        <div class="rij">
+          <a class="knop groot-knop" href="#contact" data-keuze="Ik heb al een website en wil Sitehulpje koppelen">Koppel Sitehulpje aan mijn site</a>
+          <span class="zacht klein-tekst" style="margin:0">Twijfel je of jouw site werkt? Vraag het ons gewoon.</span>
+        </div>
+      </div>
+      <div class="los-visual" aria-hidden="true">
+        <div class="los-site"><div class="browser"><i></i><i></i><i></i><span>jouwwebsite.nl</span></div><div class="los-site-inhoud"><b></b><i></i><i></i><i class="kort"></i></div></div>
+        <div class="los-plus mono">+</div>
+        <div class="los-bot" id="losbot"></div>
+      </div>
+    </div>
   </section>
 
   <!-- AANBOD -->
@@ -105,10 +130,11 @@
         <a class="knop rand" href="#contact" data-keuze="Ik wil een nieuwe webshop">Ik wil een webshop</a>
       </div>
       <div class="kaart pad">
-        <div class="pad-icoon">🔗</div>
-        <h3>Al een site? Koppel Sitehulpje</h3>
-        <p>Werkt je site of webshop met <b>WordPress</b> of <b>WooCommerce</b>? Dan koppelen wij Sitehulpje, vaak dezelfde dag nog. Jij hoeft niets te doen.</p>
-        <a class="knop rand" href="#contact" data-keuze="Ik heb al een website en wil Sitehulpje koppelen">Koppel mijn site</a>
+        <div class="lint mono paars">los te nemen</div>
+        <div class="pad-icoon">🤖</div>
+        <h3>Alleen Sitehulpje</h3>
+        <p>Heb je al een website of webshop met <b>WordPress</b> of <b>WooCommerce</b>? Neem dan alleen Sitehulpje. Wij koppelen hem aan je bestaande site, vaak dezelfde dag nog.</p>
+        <a class="knop rand" href="#los">Meer over Sitehulpje los</a>
       </div>
     </div>
   </section>
@@ -154,7 +180,7 @@
     <details class="kaart vraag"><summary>Moet ik iets installeren of leren?</summary><p>Nee. Je krijgt een eigen link. Die open je op je telefoon of computer en je kunt meteen beginnen. De rest regelen wij.</p></details>
     <details class="kaart vraag"><summary>Wat als er iets fout gaat?</summary><p>Elke aanpassing draai je met één tik terug. En lukt iets niet automatisch, dan krijgt Jan direct een melding en pakt hij het op.</p></details>
     <details class="kaart vraag"><summary>Kan Sitehulpje mijn bestellingen of betalingen aanpassen?</summary><p>Nee. Bestellingen, terugbetalingen, betaalinstellingen en wachtwoorden blijven altijd buiten bereik. Grote of gevoelige dingen worden eerst aan Jan voorgelegd.</p></details>
-    <details class="kaart vraag"><summary>Ik heb al een website. Kan ik Sitehulpje dan ook gebruiken?</summary><p>Werkt je site met WordPress of WooCommerce? Dan kunnen we Sitehulpje er meestal dezelfde dag aan koppelen. Twijfel je? Vraag het ons gewoon.</p></details>
+    <details class="kaart vraag"><summary>Kan ik alleen Sitehulpje nemen voor mijn bestaande site?</summary><p>Ja! Je hoeft geen nieuwe website te laten maken. Werkt je site of webshop met WordPress of WooCommerce, dan koppelen wij Sitehulpje er meestal dezelfde dag aan. Je site blijft gewoon van jou en bij je eigen hoster. Twijfel je? Vraag het ons gewoon.</p></details>
   </section>
 
   <!-- CONTACT -->
@@ -167,7 +193,7 @@
         <div class="keuzes" role="radiogroup">
           <label class="keuze"><input type="radio" name="c_keuze" value="Ik wil een nieuwe website" checked><span>🌐 Een website</span></label>
           <label class="keuze"><input type="radio" name="c_keuze" value="Ik wil een nieuwe webshop"><span>🛍️ Een webshop</span></label>
-          <label class="keuze"><input type="radio" name="c_keuze" value="Ik heb al een website en wil Sitehulpje koppelen"><span>🔗 Sitehulpje koppelen</span></label>
+          <label class="keuze"><input type="radio" name="c_keuze" value="Ik heb al een website en wil Sitehulpje koppelen"><span>🤖 Alleen Sitehulpje (ik heb al een site)</span></label>
           <label class="keuze"><input type="radio" name="c_keuze" value="Ik wil eerst meer informatie"><span>💬 Eerst meer weten</span></label>
         </div>
         <div class="grid2">
@@ -198,6 +224,7 @@
 $("#kopbot").innerHTML = robotSvg("rust");
 $("#telbot").innerHTML = robotSvg("rust");
 $("#contactbot").innerHTML = robotSvg("zwaai");
+$("#losbot").innerHTML = robotSvg("zwaai kijkt");
 document.querySelectorAll("[data-keuze]").forEach((a) => a.addEventListener("click", () => {
   const r = document.querySelector(`input[name=c_keuze][value="${a.dataset.keuze}"]`); if (r) r.checked = true;
 }));
