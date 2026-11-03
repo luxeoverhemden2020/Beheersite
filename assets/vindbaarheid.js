@@ -1,0 +1,256 @@
+// Sitehulpje Vindbaarheid – dashboard (klantpagina en beheer gebruiken dit allebei)
+const VB_API = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vindbaarheid";
+
+async function vbApi(actie, data = {}) {
+  let r;
+  try {
+    r = await fetch(VB_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Sessie": sessie() },
+      body: JSON.stringify({ actie, ...data }),
+    });
+  } catch { throw new Error("Geen verbinding. Controleer je internet en probeer het opnieuw."); }
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(d.fout || "Er ging iets mis."); e.status = r.status; throw e; }
+  return d;
+}
+
+const vbGetal = (n) => Math.round(n || 0).toLocaleString("nl-NL");
+const vbPos = (p) => (p == null ? "–" : p.toLocaleString("nl-NL", { minimumFractionDigits: 1, maximumFractionDigits: 1 }));
+const vbDatum = (s, opt = { day: "numeric", month: "short" }) => new Date(s + (s.length === 10 ? "T12:00:00" : "")).toLocaleDateString("nl-NL", opt);
+const vbDag = (d, n) => new Date(new Date(d + "T12:00:00").getTime() + n * 86400000).toISOString().slice(0, 10);
+
+function vbVerschil(nu, vorig, eenheid = "") {
+  if (!vorig && !nu) return `<span class="vb-gelijk">geen verschil</span>`;
+  if (!vorig) return `<span class="vb-op">nieuw</span>`;
+  const pct = Math.round(((nu - vorig) / vorig) * 100);
+  if (pct === 0) return `<span class="vb-gelijk">gelijk aan de 28 dagen ervoor</span>`;
+  return `<span class="${pct > 0 ? "vb-op" : "vb-af"}">${pct > 0 ? "▲" : "▼"} ${Math.abs(pct)}%${eenheid}</span> <span class="vb-gelijk">t.o.v. de 28 dagen ervoor</span>`;
+}
+
+function vbPositieVerschil(nu, vorig) {
+  if (vorig == null) return `<span class="vb-op">nieuw</span>`;
+  const v = vorig - nu; // lager getal = beter
+  if (Math.abs(v) < 0.5) return `<span class="vb-gelijk">gelijk</span>`;
+  return `<span class="${v > 0 ? "vb-op" : "vb-af"}">${v > 0 ? "▲" : "▼"} ${vbPos(Math.abs(v))} <span class="verberg-mobiel">${Math.abs(v) >= 1.5 ? "plaatsen" : "plaats"}</span></span>`;
+}
+
+// Som over een periode van dagrijen [datum, ...waarden]
+function vbSom(rijen, kol, vanaf, tot) {
+  return rijen.filter((r) => r[0] >= vanaf && r[0] <= tot).reduce((s, r) => s + (r[kol] || 0), 0);
+}
+
+// Lijngrafiek per week (SVG, zonder extra bibliotheek)
+function vbGrafiek(weken, titel, breedte = 640) {
+  if (weken.length < 2) return `<p class="zacht">Nog te weinig gegevens voor een grafiek.</p>`;
+  const W = Math.max(300, Math.round(breedte)), H = W < 500 ? 180 : 230, L = 44, R = 12, T = 14, B = 28;
+  const max = Math.max(1, ...weken.map((w) => w.k));
+  const stap = Math.pow(10, Math.floor(Math.log10(max)));
+  const top = Math.ceil(max / stap) * stap;
+  const x = (i) => L + (i * (W - L - R)) / (weken.length - 1);
+  const y = (v) => T + (H - T - B) * (1 - v / top);
+  const pad = weken.map((w, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(w.k).toFixed(1)}`).join("");
+  const vlak = `${pad}L${x(weken.length - 1).toFixed(1)},${y(0)}L${x(0).toFixed(1)},${y(0)}Z`;
+  const lijnen = [0, top / 2, top].map((v) => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" class="vb-as"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" class="vb-label">${vbGetal(v)}</text>`).join("");
+  const labels = [0, Math.floor((weken.length - 1) / 2), weken.length - 1].map((i) => `<text x="${x(i)}" y="${H - 6}" text-anchor="${i === 0 ? "start" : i === weken.length - 1 ? "end" : "middle"}" class="vb-label">${vbDatum(weken[i].d, { day: "numeric", month: "short" })}</text>`).join("");
+  const laatste = weken[weken.length - 1];
+  const punten = weken.map((w, i) => `<circle cx="${x(i)}" cy="${y(w.k)}" r="10" class="vb-raak"><title>Week van ${vbDatum(w.d)}: ${vbGetal(w.k)} klikken, ${vbGetal(w.v)} vertoningen</title></circle>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" class="vb-svg" role="img" aria-label="${esc(titel)}">${lijnen}
+    <path d="${vlak}" class="vb-vlak"/><path d="${pad}" class="vb-lijn"/>
+    <circle cx="${x(weken.length - 1)}" cy="${y(laatste.k)}" r="4" class="vb-punt"/>
+    ${labels}${punten}</svg>`;
+}
+
+function vbWeken(gsc) {
+  // Hele weken (ma–zo) tot en met de laatste dag met gegevens
+  const per = new Map();
+  for (const [d, k, v] of gsc) {
+    const dt = new Date(d + "T12:00:00"), ma = new Date(dt.getTime() - ((dt.getDay() + 6) % 7) * 86400000).toISOString().slice(0, 10);
+    const w = per.get(ma) || { d: ma, k: 0, v: 0, n: 0 };
+    w.k += k; w.v += v; w.n++; per.set(ma, w);
+  }
+  const lijst = [...per.values()].sort((a, b) => (a.d < b.d ? -1 : 1));
+  if (lijst.length && lijst[lijst.length - 1].n < 7) lijst.pop(); // onvolledige laatste week weglaten
+  if (lijst.length && lijst[0].n < 7) lijst.shift();
+  return lijst;
+}
+
+const VB_UITLEG = {
+  klikken: "Hoe vaak iemand in Google op jouw website klikte.",
+  vertoningen: "Hoe vaak jouw website in de zoekresultaten van Google stond.",
+  organisch: "Bezoeken die via de gewone (niet betaalde) zoekresultaten binnenkwamen. Bron: Google Analytics.",
+  acties: "Belangrijke acties op je site, zoals een bestelling, offerteaanvraag of contactformulier. Bron: Google Analytics.",
+  positie: "De gemiddelde plek in Google. 1 is bovenaan; lager is beter.",
+};
+
+function vbTegel(titel, waarde, verschil, uitleg, label = "Gemeten") {
+  return `<div class="vb-tegel"><div class="vb-tegel-kop"><span>${titel}</span><span class="vb-label-chip" title="${label === "Gemeten" ? "Echte cijfers uit Google" : ""}">${label}</span></div>
+    <div class="vb-waarde">${waarde}</div><div class="vb-sub">${verschil}</div><p class="vb-uitleg">${uitleg}</p></div>`;
+}
+
+function vbTabel(rijen, soort, n) {
+  if (!rijen.length) return `<p class="zacht">Nog geen ${soort === "pagina" ? "pagina's" : "zoekwoorden"} met vertoningen in deze periode.</p>`;
+  const naam = (s) => soort === "pagina" ? esc(s.replace(/^https?:\/\/[^/]+/, "") || "/") : esc(s);
+  return `<div class="vb-tabelwrap"><table class="vb-tabel"><thead><tr><th>${soort === "pagina" ? "Pagina" : "Zoekwoord"}</th><th class="r">Positie</th><th class="r">Klikken</th><th class="r verberg-mobiel">Vertoningen</th><th class="r"><span class="verberg-mobiel">Verschil</span><span class="alleen-mobiel">±</span></th></tr></thead><tbody>
+    ${rijen.slice(0, n).map((r) => `<tr><td class="vb-naam" title="${esc(r.sleutel)}">${naam(r.sleutel)}</td><td class="r mono">${vbPos(r.positie)}</td><td class="r mono">${vbGetal(r.klikken)}</td><td class="r mono verberg-mobiel">${vbGetal(r.vertoningen)}</td><td class="r">${vbPositieVerschil(r.positie, r.vorige_positie)}</td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+
+// Hoofdfunctie: teken het dashboard in `el`. klantId alleen nodig voor Jan (beheer).
+async function vbToon(el, klantId) {
+  el.innerHTML = `<div class="kaart"><p class="zacht">Laden…</p></div>`;
+  let d;
+  try { d = await vbApi("dashboard", { klant_id: klantId }); }
+  catch (e) { el.innerHTML = `<div class="kaart"><div class="melding fout">${esc(e.message)}</div></div>`; return; }
+  const k = d.koppeling;
+  const params = new URLSearchParams(location.search);
+  let melding = "";
+  if (params.get("google") === "ok") melding = `<div class="melding ok">Google is gekoppeld. De cijfers staan hieronder; ze worden elke nacht bijgewerkt.</div>`;
+  if (params.get("google") === "kies") melding = `<div class="melding let">Google is gekoppeld. Kies hieronder welke website en welke Analytics-gegevens bij jouw bedrijf horen.</div>`;
+
+  const koppelKaart = `<div class="kaart vb-koppel">
+    <h2><span class="tag">&gt;_</span>Koppelingen</h2>
+    <ul class="vb-bronnen">
+      <li><span class="vb-stip ${k?.gsc_site && k.status !== "ingetrokken" ? "aan" : ""}"></span>Google Search Console${k?.gsc_site ? ` · <span class="zacht">${esc(k.gsc_site.replace(/^sc-domain:/, ""))}</span>` : ""}</li>
+      <li><span class="vb-stip ${k?.ga4_property && k.status !== "ingetrokken" ? "aan" : ""}"></span>Google Analytics${k?.ga4_naam ? ` · <span class="zacht">${esc(k.ga4_naam)}</span>` : ""}</li>
+      <li><span class="vb-stip later"></span>Google Bedrijfsprofiel · <span class="zacht">binnenkort</span></li>
+      <li><span class="vb-stip later"></span>Bing · <span class="zacht">binnenkort</span></li>
+    </ul>
+    ${k ? `<p class="zacht vb-klein">Gekoppeld met ${esc(k.google_email || "je Google-account")}${k.laatst_opgehaald ? ` · bijgewerkt ${datum(k.laatst_opgehaald)}` : ""}.
+      Wij kunnen alleen meekijken, niets aanpassen. Je kunt de koppeling altijd stoppen.</p>` :
+      `<p class="zacht">Koppel je Google-account, dan zie je hier hoe vaak je gevonden wordt. Je logt in bij Google zelf; wij krijgen geen wachtwoord en kunnen alleen meekijken.</p>`}
+    ${k?.fout ? `<div class="melding ${k.status === "ingetrokken" ? "fout" : "let"}">${esc(k.status === "ingetrokken" ? k.fout : "Niet alles kon worden opgehaald. Jan is op de hoogte.")}</div>` : ""}
+    <div class="rij">
+      <button class="knop ${k ? "rand klein" : ""}" data-vb="koppel">${k ? (k.status === "ingetrokken" ? "Google opnieuw koppelen" : "Ander Google-account koppelen") : "Koppel Google"}</button>
+      ${k ? `<button class="knop rand klein" data-vb="kies">Website kiezen</button><button class="knop rand klein" data-vb="ontkoppel">Koppeling stoppen</button>` : ""}
+    </div>
+    <div data-vb-kies></div>
+    <div class="verborgen" data-vb-fout></div>
+  </div>`;
+
+  if (!k || (!d.gsc.length && !d.ga4.length)) {
+    el.innerHTML = melding + koppelKaart + (k ? `<div class="kaart"><p class="zacht">Er zijn nog geen cijfers. ${!k.gsc_site && !k.ga4_property ? "Kies eerst hierboven welke website bij jouw bedrijf hoort." : "Ze worden vannacht opgehaald."}</p></div>` : "");
+    vbKnoppen(el, klantId, d);
+    if (k && !k.gsc_site && !k.ga4_property) vbKiezer(el, klantId);
+    return;
+  }
+
+  // Periode: laatste 28 dagen met gegevens vs de 28 dagen daarvoor
+  const eind = (d.gsc.length ? d.gsc[d.gsc.length - 1][0] : d.ga4[d.ga4.length - 1][0]);
+  const start = vbDag(eind, -27), vEind = vbDag(eind, -28), vStart = vbDag(eind, -55);
+  const kl = vbSom(d.gsc, 1, start, eind), klV = vbSom(d.gsc, 1, vStart, vEind);
+  const vt = vbSom(d.gsc, 2, start, eind), vtV = vbSom(d.gsc, 2, vStart, vEind);
+  const og = vbSom(d.ga4, 3, start, eind), ogV = vbSom(d.ga4, 3, vStart, vEind);
+  const ac = vbSom(d.ga4, 4, start, eind), acV = vbSom(d.ga4, 4, vStart, vEind);
+  const heeftVorig = d.gsc.some((r) => r[0] <= vEind) || d.ga4.some((r) => r[0] <= vEind);
+  const v = (nu, vorig) => (heeftVorig ? vbVerschil(nu, vorig) : `<span class="vb-gelijk">vergelijking volgt</span>`);
+
+  let zin = "";
+  if (heeftVorig && klV) {
+    const pct = Math.round(((kl - klV) / klV) * 100);
+    zin = pct > 2 ? `Je kreeg <b>${pct}% meer klikken</b> uit Google dan in de 28 dagen ervoor.` :
+      pct < -2 ? `Je kreeg <b>${Math.abs(pct)}% minder klikken</b> uit Google dan in de 28 dagen ervoor.` :
+      `Je kreeg ongeveer <b>evenveel klikken</b> uit Google als in de 28 dagen ervoor.`;
+  }
+  const weken = vbWeken(d.gsc);
+
+  el.innerHTML = `${melding}
+  <div class="vb-tabs" role="tablist">
+    <button class="vb-tab aan" data-vb-tab="overzicht">Overzicht</button>
+    <button class="vb-tab" data-vb-tab="zoekwoorden">Zoekwoorden</button>
+    <button class="vb-tab" data-vb-tab="paginas">Pagina's</button>
+    <button class="vb-tab" data-vb-tab="koppelingen">Koppelingen</button>
+  </div>
+  <div data-vb-paneel="overzicht">
+    <div class="kaart">
+      <h2><span class="tag">&gt;_</span>Laatste 28 dagen in één oogopslag</h2>
+      <p class="zacht vb-klein" style="margin-top:-4px">${vbDatum(start)} t/m ${vbDatum(eind, { day: "numeric", month: "short", year: "numeric" })}${zin ? ` · ${zin}` : ""}</p>
+      <div class="vb-tegels">
+        ${d.gsc.length ? vbTegel("Klikken uit Google", vbGetal(kl), v(kl, klV), VB_UITLEG.klikken) : ""}
+        ${d.gsc.length ? vbTegel("Vertoningen in Google", vbGetal(vt), v(vt, vtV), VB_UITLEG.vertoningen) : ""}
+        ${d.ga4.length ? vbTegel("Bezoeken via Google", vbGetal(og), v(og, ogV), VB_UITLEG.organisch) : ""}
+        ${d.ga4.length ? vbTegel("Acties op je site", vbGetal(ac), v(ac, acV), VB_UITLEG.acties) : ""}
+      </div>
+    </div>
+    ${d.gsc.length ? `<div class="kaart"><h2><span class="tag">&gt;_</span>Klikken uit Google per week</h2><div data-vb-grafiek></div>
+      <p class="zacht vb-klein">Bron: Google Search Console. De laatste twee dagen kunnen nog iets veranderen.</p></div>` : ""}
+    ${d.zoekwoorden.length ? `<div class="kaart"><h2><span class="tag">&gt;_</span>Beste zoekwoorden</h2>${vbTabel(d.zoekwoorden, "zoekwoord", 10)}
+      <div class="rij" style="margin-top:10px"><button class="knop rand klein" data-vb-naar="zoekwoorden">Alle zoekwoorden</button></div>
+      <p class="zacht vb-klein">${VB_UITLEG.positie} "Verschil" vergelijkt met de 28 dagen ervoor.</p></div>` : ""}
+  </div>
+  <div data-vb-paneel="zoekwoorden" class="verborgen"><div class="kaart">
+    <h2><span class="tag">&gt;_</span>Alle zoekwoorden</h2>
+    <p class="zacht vb-klein" style="margin-top:-4px">Waarop mensen zochten toen jouw site in Google verscheen, laatste 28 dagen. Google toont om privacyredenen niet elke zoekopdracht.</p>
+    <input type="search" placeholder="Zoek een woord…" data-vb-filter="zoekwoord" style="margin-bottom:10px">
+    <div data-vb-lijst="zoekwoord">${vbTabel(d.zoekwoorden, "zoekwoord", 200)}</div>
+  </div></div>
+  <div data-vb-paneel="paginas" class="verborgen"><div class="kaart">
+    <h2><span class="tag">&gt;_</span>Pagina's in Google</h2>
+    <p class="zacht vb-klein" style="margin-top:-4px">Welke pagina's van je site het vaakst in Google verschenen, laatste 28 dagen.</p>
+    <input type="search" placeholder="Zoek een pagina…" data-vb-filter="pagina" style="margin-bottom:10px">
+    <div data-vb-lijst="pagina">${vbTabel(d.paginas, "pagina", 200)}</div>
+  </div></div>
+  <div data-vb-paneel="koppelingen" class="verborgen">${koppelKaart}</div>`;
+
+  const gr = el.querySelector("[data-vb-grafiek]");
+  if (gr) {
+    const teken = () => { gr.innerHTML = vbGrafiek(weken, "Klikken uit Google per week", gr.clientWidth || 640); };
+    teken();
+    let w = gr.clientWidth;
+    if (window.ResizeObserver) new ResizeObserver(() => { if (Math.abs(gr.clientWidth - w) > 40) { w = gr.clientWidth; teken(); } }).observe(gr);
+  }
+  const toonTab = (t) => {
+    el.querySelectorAll(".vb-tab").forEach((b) => b.classList.toggle("aan", b.dataset.vbTab === t));
+    el.querySelectorAll("[data-vb-paneel]").forEach((p) => p.classList.toggle("verborgen", p.dataset.vbPaneel !== t));
+  };
+  el.querySelectorAll(".vb-tab").forEach((b) => (b.onclick = () => toonTab(b.dataset.vbTab)));
+  el.querySelectorAll("[data-vb-naar]").forEach((b) => (b.onclick = () => { toonTab(b.dataset.vbNaar); el.scrollIntoView({ behavior: "smooth" }); }));
+  el.querySelectorAll("[data-vb-filter]").forEach((inp) => {
+    const soort = inp.dataset.vbFilter, bron = soort === "pagina" ? d.paginas : d.zoekwoorden;
+    inp.oninput = () => {
+      const q = inp.value.trim().toLowerCase();
+      el.querySelector(`[data-vb-lijst="${soort}"]`).innerHTML = vbTabel(q ? bron.filter((r) => r.sleutel.toLowerCase().includes(q)) : bron, soort, 200);
+    };
+  });
+  if (params.get("google") === "kies") { toonTab("koppelingen"); vbKiezer(el, klantId); }
+  vbKnoppen(el, klantId, d);
+}
+
+function vbKnoppen(el, klantId, d) {
+  const fout = (t) => el.querySelectorAll("[data-vb-fout]").forEach((f) => toonMelding(f, t));
+  el.querySelectorAll('[data-vb="koppel"]').forEach((b) => (b.onclick = async () => {
+    b.disabled = true;
+    try { const r = await vbApi("google_start", { klant_id: klantId }); location.href = r.url; }
+    catch (e) { fout(e.message); b.disabled = false; }
+  }));
+  el.querySelectorAll('[data-vb="kies"]').forEach((b) => (b.onclick = () => vbKiezer(el, klantId)));
+  el.querySelectorAll('[data-vb="ontkoppel"]').forEach((b) => (b.onclick = async () => {
+    if (!confirm("Koppeling met Google stoppen? Je dashboard toont dan geen nieuwe cijfers meer.")) return;
+    try { await vbApi("ontkoppel", { klant_id: klantId }); vbToon(el, klantId); } catch (e) { fout(e.message); }
+  }));
+}
+
+async function vbKiezer(el, klantId) {
+  const houders = el.querySelectorAll("[data-vb-kies]");
+  const houder = [...houders].find((h) => h.offsetParent !== null) || houders[0];
+  if (!houder) return;
+  houder.innerHTML = `<p class="zacht">Even kijken wat er bij dit Google-account hoort…</p>`;
+  try {
+    const [b, s] = await Promise.all([vbApi("bronnen", { klant_id: klantId }), vbApi("status", { klant_id: klantId })]);
+    const k = s.koppeling || {};
+    houder.innerHTML = `<label>Website in Search Console</label>
+      <select data-vb-gsc><option value="">– geen –</option>${b.gsc.map((x) => `<option value="${esc(x.id)}" ${x.id === k.gsc_site ? "selected" : ""}>${esc(x.naam)}</option>`).join("")}</select>
+      ${!b.gsc.length ? `<p class="zacht vb-klein">Dit Google-account heeft geen websites in Search Console. Koppel het account dat de website beheert.</p>` : ""}
+      <label>Gegevens in Google Analytics</label>
+      <select data-vb-ga4><option value="">– geen –</option>${b.ga4.map((x) => `<option value="${esc(x.id)}" ${x.id === k.ga4_property ? "selected" : ""}>${esc(x.naam)}</option>`).join("")}</select>
+      <div class="rij" style="margin-top:10px"><button class="knop" data-vb-opslaan>Opslaan en cijfers ophalen</button></div>`;
+    houder.querySelector("[data-vb-opslaan]").onclick = async (e) => {
+      e.target.disabled = true; e.target.textContent = "Cijfers ophalen… (kan een minuut duren)";
+      try {
+        await vbApi("bron_kies", { klant_id: klantId, gsc: houder.querySelector("[data-vb-gsc]").value, ga4: houder.querySelector("[data-vb-ga4]").value });
+        history.replaceState(null, "", location.pathname + location.hash);
+        vbToon(el, klantId);
+      } catch (err) { houder.insertAdjacentHTML("beforeend", `<div class="melding fout">${esc(err.message)}</div>`); e.target.disabled = false; e.target.textContent = "Opslaan en cijfers ophalen"; }
+    };
+  } catch (e) { houder.innerHTML = `<div class="melding fout">${esc(e.message)}</div>`; }
+}

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Google koppelen – Sitehulpje</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="assets/icoon-192.png">
+<link rel="stylesheet" href="assets/stijl.css">
+</head>
+<body>
+<div class="kop"><div class="merk">Site<b>hulpje</b></div></div>
+<div class="wrap">
+  <div class="kaart">
+    <h2><span class="tag">&gt;_</span>Google koppelen</h2>
+    <p id="tekst">Even geduld, we maken de koppeling en halen je cijfers op. Dit kan een minuut duren…</p>
+    <div id="meld" class="verborgen"></div>
+    <div class="rij"><a class="knop rand klein verborgen" id="terug" href="verzoeken#vindbaarheid">Terug naar Sitehulpje</a></div>
+  </div>
+</div>
+<script src="assets/basis.js"></script>
+<script src="assets/vindbaarheid.js"></script>
+<script>
+(async () => {
+  const p = new URLSearchParams(location.search);
+  history.replaceState(null, "", location.pathname); // code niet in de geschiedenis laten staan
+  const klaar = (tekst, soort, href) => {
+    $("#tekst").textContent = "";
+    toonMelding($("#meld"), tekst, soort);
+    const a = $("#terug"); a.classList.remove("verborgen"); if (href) a.href = href;
+  };
+  if (p.get("error")) { klaar(p.get("error") === "access_denied" ? "Je hebt de koppeling geannuleerd. Er is niets veranderd." : "Google gaf een foutmelding. Probeer het opnieuw.", "let"); return; }
+  try {
+    const r = await vbApi("google_terug", { code: p.get("code") || "", state: p.get("state") || "" });
+    const doel = r.beheer ? `beheer?vb=${encodeURIComponent(r.klant_id)}&google=${r.kiezen ? "kies" : "ok"}#vindbaarheid`
+                          : `verzoeken?google=${r.kiezen ? "kies" : "ok"}#vindbaarheid`;
+    location.replace(doel);
+  } catch (e) { klaar(e.message, "fout"); }
+})();
+</script>
+</body>
+</html>

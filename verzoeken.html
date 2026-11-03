@@ -21,6 +21,9 @@
 </div>
 <div class="wrap">
   <div id="appTip"></div>
+  <div class="hooftabs verborgen" id="hooftabs"><button class="aan" data-hoofd="verzoeken">Verzoeken</button><button data-hoofd="vindbaarheid">Vindbaarheid</button></div>
+  <div id="vindbaarheid" class="verborgen"></div>
+  <div id="verzoekenDeel">
   <div class="kaart">
     <h2><span class="tag">&gt;_</span>Nieuw verzoek</h2>
     <p class="zacht" style="margin-top:0">Beschrijf wat er op je website moet veranderen. Je kunt ook inspreken, foto's toevoegen (of plakken) of een korte video sturen (max. 1 minuut).</p>
@@ -29,8 +32,10 @@
     <div id="meld" class="verborgen"></div>
   </div>
   <div id="lijst"><p class="zacht">Laden…</p></div>
+  </div>
 </div>
 <script src="assets/basis.js"></script>
+<script src="assets/vindbaarheid.js"></script>
 <script>
 let open = new Set(), cache = {}, timer = null;
 const SNELKNOPPEN = [
@@ -148,6 +153,22 @@ api("ik").then((d) => {
   $("#site").textContent = d.klant ? `${d.klant.naam} · ${d.klant.site.replace(/^https?:\/\//, "")}` : "";
   laad();
   appTip($("#appTip"));
+  // Vindbaarheid: alleen als de klant dit pakket heeft
+  vbApi("status").then((s) => {
+    if (!s.klant.aan) return;
+    const tabs = $("#hooftabs"); tabs.classList.remove("verborgen");
+    let geladen = false;
+    const kies = (t) => {
+      tabs.querySelectorAll("button").forEach((b) => b.classList.toggle("aan", b.dataset.hoofd === t));
+      $("#verzoekenDeel").classList.toggle("verborgen", t !== "verzoeken");
+      $("#vindbaarheid").classList.toggle("verborgen", t !== "vindbaarheid");
+      $(".wrap").classList.toggle("breed", t === "vindbaarheid");
+      if (t === "vindbaarheid" && !geladen) { geladen = true; vbToon($("#vindbaarheid")); }
+      try { history.replaceState(null, "", location.pathname + location.search + (t === "vindbaarheid" ? "#vindbaarheid" : "")); } catch {}
+    };
+    tabs.querySelectorAll("button").forEach((b) => (b.onclick = () => kies(b.dataset.hoofd)));
+    if (location.hash === "#vindbaarheid" || new URLSearchParams(location.search).get("google")) kies("vindbaarheid");
+  }).catch(() => {});
 });
 </script>
 </body>

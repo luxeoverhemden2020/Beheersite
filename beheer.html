@@ -26,6 +26,7 @@
   <div class="tabs">
     <button data-tab="verzoeken" class="aan">Verzoeken</button>
     <button data-tab="klanten">Klanten &amp; limieten</button>
+    <button data-tab="vindbaarheid">Vindbaarheid</button>
     <button data-tab="gebruikers">Accounts</button>
     <button data-tab="account">Instellingen</button>
   </div>
@@ -72,6 +73,13 @@
         <p class="zacht" style="margin-bottom:0">Met de API-sleutel werkt de snelle webbeheerder dan meteen. De deurbel hierboven is alleen nodig als achtervang voor hele grote klussen.</p>
       </div>
     </div>
+  </section>
+
+  <section id="t-vindbaarheid" class="verborgen">
+    <div class="kaart tabel-scroll"><h2>Vindbaarheid – alle klanten</h2>
+      <p class="zacht vb-klein" style="margin-top:-4px">Alleen klanten met een pakket zien de tab Vindbaarheid. Cijfers: laatste 28 dagen, bijgewerkt elke nacht.</p>
+      <div id="vbtabel"><p class="zacht">Laden…</p></div></div>
+    <div id="vbdetail"></div>
   </section>
 
   <section id="t-gebruikers" class="verborgen">
@@ -121,6 +129,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="assets/basis.js"></script>
+<script src="assets/vindbaarheid.js"></script>
 <script>
 const WIEJAN = { klant: "Klant", webbeheer: "Sitehulpje", jan: "Jij (Jan)" };
 let data = null, ik = null, openVerzoek = null, paneelTimer = null;
@@ -129,8 +138,60 @@ const meld = (t, s = "fout") => { toonMelding($("#meld"), t, s); if (t) scrollTo
 
 document.querySelectorAll(".tabs button").forEach((b) => b.onclick = () => {
   document.querySelectorAll(".tabs button").forEach((x) => x.classList.toggle("aan", x === b));
-  ["verzoeken", "klanten", "gebruikers", "account"].forEach((t) => $("#t-" + t).classList.toggle("verborgen", t !== b.dataset.tab));
+  ["verzoeken", "klanten", "vindbaarheid", "gebruikers", "account"].forEach((t) => $("#t-" + t).classList.toggle("verborgen", t !== b.dataset.tab));
+  if (b.dataset.tab === "vindbaarheid") vbBeheerLaad();
 });
+
+// ---------- Vindbaarheid (overzicht alle klanten) ----------
+const VB_PAKKET = { basis: "Basis", plus: "Plus", pro: "Pro" };
+async function vbBeheerLaad() {
+  const el = $("#vbtabel");
+  try {
+    const { klanten } = await vbApi("beheer_lijst");
+    el.innerHTML = `<table><thead><tr><th>Klant</th><th>Pakket</th><th>Google</th><th class="r">Klikken</th><th class="r">Bezoeken via Google</th><th class="r">Acties</th><th>Bijgewerkt</th><th></th></tr></thead><tbody>
+      ${klanten.map((k) => {
+        const pct = k.klikken_vorige ? Math.round(((k.klikken_28 - k.klikken_vorige) / k.klikken_vorige) * 100) : null;
+        const google = !k.status ? `<span class="zacht">niet gekoppeld</span>` :
+          k.status === "ok" ? `<span class="vb-op">● gekoppeld</span>` :
+          `<span class="vb-af" title="${esc(k.fout || "")}">● ${k.status === "ingetrokken" ? "ingetrokken" : "fout"}</span>`;
+        return `<tr>
+          <td><b>${esc(k.naam)}</b><br><span class="zacht vb-klein">${esc((k.site || "").replace(/^https?:\/\//, ""))}</span></td>
+          <td><select data-vbpakket="${esc(k.id)}" style="width:auto;padding:5px 8px">
+            <option value="">Uit</option>${Object.entries(VB_PAKKET).map(([w, n]) => `<option value="${w}" ${k.vindbaarheid && k.vb_pakket === w ? "selected" : ""}>${n}</option>`).join("")}</select></td>
+          <td>${google}${k.fout ? `<br><span class="zacht vb-klein">${esc(k.fout.slice(0, 90))}</span>` : ""}</td>
+          <td class="r mono">${k.status ? vbGetal(k.klikken_28) : "–"}${pct != null ? `<br><span class="${pct >= 0 ? "vb-op" : "vb-af"} vb-klein">${pct >= 0 ? "▲" : "▼"} ${Math.abs(pct)}%</span>` : ""}</td>
+          <td class="r mono">${k.status ? vbGetal(k.organisch_28) : "–"}</td>
+          <td class="r mono">${k.status ? vbGetal(k.acties_28) : "–"}</td>
+          <td class="zacht vb-klein">${k.laatst_opgehaald ? datum(k.laatst_opgehaald) : "–"}</td>
+          <td>${k.vindbaarheid ? `<button class="knop rand klein" data-vbbekijk="${esc(k.id)}">Bekijk</button>` : ""}</td></tr>`;
+      }).join("")}</tbody></table>`;
+    el.querySelectorAll("[data-vbpakket]").forEach((sel) => (sel.onchange = async () => {
+      try { await vbApi("beheer_zet", { klant_id: sel.dataset.vbpakket, aan: !!sel.value, pakket: sel.value || null }); vbBeheerLaad(); }
+      catch (e) { meld(e.message); }
+    }));
+    el.querySelectorAll("[data-vbbekijk]").forEach((b) => (b.onclick = () => vbBeheerBekijk(b.dataset.vbbekijk, klanten)));
+  } catch (e) { el.innerHTML = `<div class="melding fout">${esc(e.message)}</div>`; }
+}
+function vbBeheerBekijk(id, klanten) {
+  const k = (klanten || []).find((x) => x.id === id);
+  $("#vbdetail").innerHTML = `<div class="rij" style="margin:4px 0 10px"><h2 class="vul" style="margin:0">${esc(k ? k.naam : id)} <span class="zacht" style="font-weight:400;font-size:14px">· zo ziet de klant het</span></h2>
+    <button class="knop rand klein" id="vbververs">Nu bijwerken</button><button class="knop rand klein" id="vbsluit">Sluiten</button></div><div id="vbpaneel"></div>`;
+  vbToon($("#vbpaneel"), id);
+  $("#vbsluit").onclick = () => { $("#vbdetail").innerHTML = ""; };
+  $("#vbververs").onclick = async (e) => {
+    e.target.disabled = true; e.target.textContent = "Bezig…";
+    try { await vbApi("ververs", { klant_id: id }); vbToon($("#vbpaneel"), id); vbBeheerLaad(); } catch (err) { meld(err.message); }
+    e.target.disabled = false; e.target.textContent = "Nu bijwerken";
+  };
+  $("#vbdetail").scrollIntoView({ behavior: "smooth" });
+}
+{ // terug van Google koppelen
+  const p = new URLSearchParams(location.search);
+  if (p.get("vb")) setTimeout(() => {
+    document.querySelector('.tabs button[data-tab="vindbaarheid"]').click();
+    vbBeheerBekijk(p.get("vb"), []);
+  }, 0);
+}
 $("#uit").onclick = async () => { try { await api("uitloggen"); } catch {} zetSessie(""); location.href = "inloggen?voor=beheer"; };
 $("#maand").onchange = laad;
 

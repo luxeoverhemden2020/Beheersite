@@ -136,3 +136,41 @@ button,a,.knop,tr.klik{touch-action:manipulation}
 .app-installeer{margin-left:6px;vertical-align:middle}
 .ios-deel{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1.5px solid currentColor;border-radius:4px;font-size:12px;line-height:1;vertical-align:-3px}
 .app-weg{border:0;background:none;color:var(--zacht);font-size:16px;cursor:pointer;padding:4px}
+/* ---------- Vindbaarheid ---------- */
+.hooftabs{display:flex;gap:6px;margin:0 0 14px;padding:4px;background:var(--kaart);border:1px solid var(--lijn);border-radius:14px;width:max-content;max-width:100%}
+.hooftabs button{border:0;background:transparent;color:var(--zacht);font:inherit;font-weight:600;padding:8px 14px;border-radius:10px;cursor:pointer}
+.hooftabs button.aan{background:var(--accent2);color:var(--accent)}
+.vb-tabs{display:flex;gap:4px;overflow-x:auto;margin-bottom:12px;border-bottom:1px solid var(--lijn);scrollbar-width:none}
+.vb-tab{border:0;background:transparent;color:var(--zacht);font:inherit;font-size:15px;font-weight:600;padding:8px 12px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.vb-tab.aan{color:var(--accent);border-bottom-color:var(--accent)}
+.vb-tegels{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr));gap:10px;margin-top:10px}
+.vb-tegel{border:1px solid var(--lijn);border-radius:12px;padding:12px;background:var(--veld)}
+.vb-tegel-kop{display:flex;justify-content:space-between;gap:6px;font-size:14px;color:var(--zacht)}
+.vb-label-chip{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--accent);background:var(--accent2);padding:2px 7px;border-radius:999px;height:max-content}
+.vb-waarde{font-size:30px;font-weight:700;margin:4px 0 2px;font-family:"JetBrains Mono",monospace}
+.vb-sub{font-size:13px}
+.vb-uitleg{font-size:12.5px;color:var(--zacht);margin:8px 0 0;line-height:1.4}
+.vb-op{color:var(--accent);font-weight:600}.vb-af{color:var(--fout);font-weight:600}.vb-gelijk{color:var(--zacht)}
+.vb-klein{font-size:13.5px}
+.vb-svg{width:100%;height:auto;display:block;margin-top:6px}
+.vb-svg .vb-as{stroke:var(--lijn);stroke-width:1}
+.vb-svg .vb-label{fill:var(--zacht);font-size:11px;font-family:"JetBrains Mono",monospace}
+.vb-svg .vb-lijn{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round}
+.vb-svg .vb-vlak{fill:var(--accent2)}
+.vb-svg .vb-punt{fill:var(--accent)}
+.vb-svg .vb-raak{fill:transparent}
+.vb-svg .vb-raak:hover{fill:var(--accent2)}
+.vb-tabelwrap{overflow-x:auto}
+.vb-tabel{width:100%;border-collapse:collapse;font-size:14.5px}
+.vb-tabel th{text-align:left;font-size:12.5px;color:var(--zacht);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--lijn);white-space:nowrap}
+.vb-tabel td{padding:8px;border-bottom:1px solid var(--lijn);white-space:nowrap}
+.vb-tabel .r{text-align:right}
+.vb-tabel .vb-naam{max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vb-bronnen{list-style:none;padding:0;margin:0 0 10px}
+.vb-bronnen li{display:flex;align-items:center;gap:8px;padding:5px 0;flex-wrap:wrap}
+.vb-stip{width:10px;height:10px;border-radius:50%;background:var(--fout);flex:none}
+.vb-stip.aan{background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.vb-stip.later{background:var(--lijn)}
+@media (max-width:560px){.verberg-mobiel{display:none}.vb-tabel{font-size:13.5px}.vb-tabel .vb-naam{max-width:118px}.vb-tabel th{font-size:11px}.vb-waarde{font-size:26px}.vb-tegels{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.vb-tegel{padding:10px}.vb-tegel-kop{flex-direction:column-reverse;align-items:flex-start;gap:4px;font-size:13px}.vb-uitleg{display:none}.vb-tabel td,.vb-tabel th{padding:7px 5px}}
+td.r,th.r{text-align:right}
+.alleen-mobiel{display:none}@media (max-width:560px){.alleen-mobiel{display:inline}}
