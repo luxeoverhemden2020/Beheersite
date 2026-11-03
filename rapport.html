@@ -112,9 +112,9 @@ function teken(d) {
   let zin = "";
   if (g.dagen && gv.dagen && gv.klikken) {
     const v = Math.round(((g.klikken - gv.klikken) / gv.klikken) * 100);
-    zin = v > 2 ? `In ${d.maand_naam} kwamen er <b>${v}% meer bezoekers via Google</b> dan in ${d.vorige_naam}.`
-        : v < -2 ? `In ${d.maand_naam} kwamen er <b>${Math.abs(v)}% minder bezoekers via Google</b> dan in ${d.vorige_naam}.`
-        : `In ${d.maand_naam} kwamen er <b>ongeveer evenveel bezoekers via Google</b> als in ${d.vorige_naam}.`;
+    zin = v > 2 ? `In ${d.maand_naam} kwamen er <b>${v}% meer klikken uit Google</b> dan in ${d.vorige_naam}.`
+        : v < -2 ? `In ${d.maand_naam} kwamen er <b>${Math.abs(v)}% minder klikken uit Google</b> dan in ${d.vorige_naam}.`
+        : `In ${d.maand_naam} kwamen er <b>ongeveer evenveel klikken uit Google</b> als in ${d.vorige_naam}.`;
   } else if (g.dagen) zin = `In ${d.maand_naam} klikten mensen <b>${getal(g.klikken)} keer</b> vanuit Google door naar je website.`;
   if (d.gezondheid) zin += ` Je website scoort <b>${d.gezondheid.score} van 100</b> op gezondheid${d.gezondheid.vorige != null ? ` (vorige keer ${d.gezondheid.vorige})` : ""}.`;
   if (d.werk.length) zin += ` Sitehulpje voerde <b>${d.werk.length} aanpassing${d.werk.length > 1 ? "en" : ""}</b> uit.`;
@@ -138,11 +138,11 @@ function teken(d) {
 
   ${d.reeks.length > 1 ? `<div class="blok"><h2><span class="tag">&gt;_</span>Klikken uit Google per maand</h2>${staven(d.reeks, d.maand)}</div>` : ""}
 
-  ${d.zoekwoorden.length ? `<h2><span class="tag">&gt;_</span>Beste zoekwoorden</h2>
+  ${d.zoekwoorden.length ? `<div class="blok"><h2><span class="tag">&gt;_</span>Beste zoekwoorden</h2>
     <p class="zacht klein" style="margin-top:-4px">Waarop mensen zochten toen ze je site vonden (laatste 28 dagen). Positie 1 is bovenaan in Google.</p>
     <table><thead><tr><th>Zoekwoord</th><th class="r">Positie</th><th class="r">Klikken</th><th class="r verberg-mobiel">Vertoningen</th><th class="r">Verschil</th></tr></thead><tbody>
     ${d.zoekwoorden.map((z) => `<tr><td class="naam">${esc(z.sleutel)}</td><td class="r mono">${pos(z.positie)}</td><td class="r mono">${getal(z.klikken)}</td><td class="r mono verberg-mobiel">${getal(z.vertoningen)}</td><td class="r">${posVerschil(z.positie, z.vorige_positie)}</td></tr>`).join("")}
-    </tbody></table>` : ""}
+    </tbody></table></div>` : ""}
 
   ${d.kansen.length ? `<div class="blok"><h2><span class="tag">&gt;_</span>Kansen: net niet bovenaan</h2>
     <p class="zacht klein" style="margin-top:-4px">Op deze zoekwoorden word je vaak gezien, maar sta je nog niet in de top 3. Een paar plekken hoger levert vaak veel extra klikken op.</p>
