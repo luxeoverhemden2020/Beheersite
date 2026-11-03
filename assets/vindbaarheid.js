@@ -320,6 +320,21 @@ async function vbGezondheid(el, klantId, toonTab) {
   };
   try { teken(await vbGzApi("laatste", { klant_id: klantId })); }
   catch (e) { paneel.innerHTML = `<div class="kaart"><div class="melding fout">${esc(e.message)}</div></div>`; }
+  vbBereikbaarheid(paneel, klantId);
+}
+
+async function vbBereikbaarheid(paneel, klantId) {
+  try {
+    const r = await fetch(VB_API.replace(/vindbaarheid$/, "vb-waakhond"), { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "bereikbaarheid", klant_id: klantId }) });
+    const d = await r.json(); if (!r.ok || !d.metingen) return;
+    const kaart = document.createElement("div"); kaart.className = "kaart";
+    const dagen = Math.max(1, Math.round((Date.now() - new Date(d.sinds).getTime()) / 86400000));
+    kaart.innerHTML = `<h2><span class="tag">&gt;_</span>Bereikbaarheid</h2>
+      <div class="vb-tegels">${vbTegel("Online", String(d.procent).replace(".", ",") + "%", `laatste ${Math.min(30, dagen)} dag${dagen > 1 ? "en" : ""}, elk half uur gecontroleerd`, "Hoe vaak je website bereikbaar was als we keken.", "Gemeten")}
+      ${d.ms ? vbTegel("Reactietijd", (d.ms / 1000).toFixed(1).replace(".", ",") + " s", "gemiddeld, homepage", "Hoe snel je server antwoordt. Onder 1 seconde is goed.", "Gemeten") : ""}</div>
+      ${d.storingen.length ? `<p class="zacht vb-klein" style="margin-bottom:0">Niet bereikbaar op: ${d.storingen.map((x) => datum(x.tijd)).join(", ")}</p>` : `<p class="zacht vb-klein" style="margin-bottom:0">Geen storingen gezien.</p>`}`;
+    paneel.appendChild(kaart);
+  } catch { /* niet erg */ }
 }
 
 function vbKnoppen(el, klantId, d) {

@@ -78,7 +78,7 @@
   <section id="t-vindbaarheid" class="verborgen">
     <div class="kaart tabel-scroll"><h2>Vindbaarheid – alle klanten</h2>
       <p class="zacht vb-klein" style="margin-top:-4px">Alleen klanten met een pakket zien de tab Vindbaarheid. Cijfers: laatste 28 dagen, bijgewerkt elke nacht.</p>
-      <div id="vbtabel"><p class="zacht">Laden…</p></div></div>
+      <div id="vbmeldingen"></div><div id="vbtabel"><p class="zacht">Laden…</p></div></div>
     <div id="vbdetail"></div>
   </section>
 
@@ -144,7 +144,26 @@ document.querySelectorAll(".tabs button").forEach((b) => b.onclick = () => {
 
 // ---------- Vindbaarheid (overzicht alle klanten) ----------
 const VB_PAKKET = { basis: "Basis", plus: "Plus", pro: "Pro" };
+async function vbMeldingen() {
+  const el = $("#vbmeldingen");
+  try {
+    const r = await fetch("https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vb-waakhond", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "meldingen" }) });
+    const { meldingen = [] } = await r.json();
+    const open = meldingen.filter((m) => !m.opgelost);
+    el.innerHTML = !meldingen.length ? `<div class="melding ok">Geen meldingen: alle sites zijn bereikbaar en de cijfers lopen normaal.</div>` :
+      `<div style="margin-bottom:12px">${meldingen.map((m) => `<div class="melding ${m.opgelost ? "ok" : m.ernst === "hoog" ? "fout" : "let"}" style="display:flex;gap:10px;align-items:center">
+        <div class="vul"><b>${esc(m.naam)}</b>: ${esc(m.tekst)} <span class="zacht vb-klein">· ${datum(m.gemaakt)}${m.opgelost ? " · opgelost" : ""}</span></div>
+        ${m.opgelost ? "" : `<button class="knop rand klein" data-vbopgelost="${m.id}">Opgelost</button>`}</div>`).join("")}</div>`;
+    el.querySelectorAll("[data-vbopgelost]").forEach((b) => (b.onclick = async () => {
+      await fetch("https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vb-waakhond", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "opgelost", id: b.dataset.vbopgelost }) });
+      vbMeldingen();
+    }));
+    const knop = document.querySelector('.tabs button[data-tab="vindbaarheid"]');
+    if (knop) knop.textContent = open.length ? `Vindbaarheid (${open.length})` : "Vindbaarheid";
+  } catch { el.innerHTML = ""; }
+}
 async function vbBeheerLaad() {
+  vbMeldingen();
   const el = $("#vbtabel");
   try {
     const { klanten } = await vbApi("beheer_lijst");
@@ -198,6 +217,7 @@ function vbBeheerBekijk(id, klanten) {
   };
   $("#vbdetail").scrollIntoView({ behavior: "smooth" });
 }
+setTimeout(vbMeldingen, 1500);
 { // terug van Google koppelen
   const p = new URLSearchParams(location.search);
   if (p.get("vb")) setTimeout(async () => {
