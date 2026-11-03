@@ -139,10 +139,11 @@ async function vbToon(el, klantId) {
 
   if (!k || (!d.gsc.length && !d.ga4.length)) {
     el.innerHTML = melding + koppelKaart + (k ? `<div class="kaart"><p class="zacht">Er zijn nog geen cijfers uit Google. ${!k.gsc_site && !k.ga4_property ? "Kies eerst hierboven welke website bij jouw bedrijf hoort." : "Ze worden vannacht opgehaald."}</p></div>` : "") +
-      `<div data-vb-gz-kort class="verborgen"></div><div data-vb-gz></div>`;
+      `<div data-vb-vs></div><div data-vb-gz-kort class="verborgen"></div><div data-vb-gz></div>`;
     vbKnoppen(el, klantId, d);
     if (k && !k.gsc_site && !k.ga4_property) vbKiezer(el, klantId);
     vbGezondheid(el, klantId, () => {});
+    vbVoorstellen(el.querySelector("[data-vb-vs]"), klantId, el);
     return;
   }
 
@@ -170,6 +171,7 @@ async function vbToon(el, klantId) {
     <button class="vb-tab aan" data-vb-tab="overzicht">Overzicht</button>
     <button class="vb-tab" data-vb-tab="zoekwoorden">Zoekwoorden</button>
     <button class="vb-tab" data-vb-tab="paginas">Pagina's</button>
+    <button class="vb-tab" data-vb-tab="voorstellen">Voorstellen</button>
     <button class="vb-tab" data-vb-tab="gezondheid">Website-gezondheid</button>
     <button class="vb-tab" data-vb-tab="rapporten">Rapporten</button>
     <button class="vb-tab" data-vb-tab="koppelingen">Koppelingen</button>
@@ -204,6 +206,7 @@ async function vbToon(el, klantId) {
     <input type="search" placeholder="Zoek een pagina…" data-vb-filter="pagina" style="margin-bottom:10px">
     <div data-vb-lijst="pagina">${vbTabel(d.paginas, "pagina", 200)}</div>
   </div></div>
+  <div data-vb-paneel="voorstellen" class="verborgen" data-vb-vs></div>
   <div data-vb-paneel="gezondheid" class="verborgen" data-vb-gz></div>
   <div data-vb-paneel="rapporten" class="verborgen" data-vb-rap></div>
   <div data-vb-paneel="koppelingen" class="verborgen">${koppelKaart}</div>`;
@@ -233,6 +236,7 @@ async function vbToon(el, klantId) {
   vbGezondheid(el, klantId, toonTab);
   vbRapporten(el.querySelector("[data-vb-rap]"), klantId);
   vbBing(el, klantId, eind);
+  vbVoorstellen(el.querySelector("[data-vb-vs]"), klantId, el);
 }
 
 // ---------- Bing ----------
@@ -397,4 +401,90 @@ async function vbKiezer(el, klantId) {
       } catch (err) { houder.insertAdjacentHTML("beforeend", `<div class="melding fout">${esc(err.message)}</div>`); e.target.disabled = false; e.target.textContent = "Opslaan en cijfers ophalen"; }
     };
   } catch (e) { houder.innerHTML = `<div class="melding fout">${esc(e.message)}</div>`; }
+}
+
+// ---------- Verbetervoorstellen ----------
+async function vbVsApi(actie, data = {}) {
+  const r = await fetch(VB_API.replace(/vindbaarheid$/, "vb-voorstellen"), { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, ...data }) })
+    .catch(() => { throw new Error("Geen verbinding. Controleer je internet en probeer het opnieuw."); });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.fout || "Er ging iets mis.");
+  return d;
+}
+const VB_VS_SOORT = { titel_omschrijving: "Titel en omschrijving in Google", alt: "Beschrijvingen bij afbeeldingen", llms: "Uitleg voor AI-diensten (llms.txt)", schema: "Bedrijfsgegevens voor Google (LocalBusiness)" };
+const VB_VS_STATUS = { nieuw: ["Wacht op jou", "vb-let"], goedgekeurd: ["Wordt uitgevoerd", "vb-op"], uitgevoerd: ["Uitgevoerd", "vb-op"], handmatig: ["Goedgekeurd · Jan zet het erop", "vb-op"], geweigerd: ["Niet gedaan", "vb-gelijk"] };
+function vbTeller(n, max) { return `<span class="${n > max ? "vb-af" : "vb-gelijk"} vb-klein">${n} tekens</span>`; }
+
+async function vbVoorstellen(houder, klantId, el) {
+  if (!houder) return;
+  let d;
+  try { d = await vbVsApi("lijst", { klant_id: klantId }); } catch (e) { houder.innerHTML = ""; return; }
+  const open = d.voorstellen.filter((v) => v.status === "nieuw");
+  const tab = el?.querySelector('.vb-tab[data-vb-tab="voorstellen"]');
+  if (tab) tab.textContent = open.length ? `Voorstellen (${open.length})` : "Voorstellen";
+  const kaart = (v) => {
+    const [st, kl] = VB_VS_STATUS[v.status] || [v.status, ""];
+    const pad = (v.pagina || "").replace(/^https?:\/\/[^/]+/, "") || "/";
+    let inhoud = "";
+    if (v.soort === "titel_omschrijving") {
+      inhoud = `<div class="vb-vs-grid"><div><div class="vb-vs-kop">Nu</div>
+          <div class="vb-vs-titel">${esc(v.huidig.titel || "(geen titel)")}</div>${vbTeller((v.huidig.titel || "").length, 60)}
+          <div class="vb-vs-oms">${esc(v.huidig.omschrijving || "(geen omschrijving)")}</div>${vbTeller((v.huidig.omschrijving || "").length, 155)}</div>
+        <div><div class="vb-vs-kop">Voorstel</div>
+          ${v.status === "nieuw" ? `<input data-vs-titel value="${esc(v.voorstel.titel)}"><textarea data-vs-oms rows="3">${esc(v.voorstel.omschrijving)}</textarea>`
+            : `<div class="vb-vs-titel">${esc(v.voorstel.titel)}</div><div class="vb-vs-oms">${esc(v.voorstel.omschrijving)}</div>`}
+          <div data-vs-tel class="vb-klein"></div></div></div>`;
+    } else if (v.soort === "alt") {
+      inhoud = `<ul class="vb-vb">${v.voorstel.afbeeldingen.map((a) => `<li><span class="zacht">${esc(a.src.split("/").pop().slice(0, 60))}</span> → <b>${esc(a.alt)}</b></li>`).join("")}</ul>`;
+    } else if (v.soort === "llms") {
+      inhoud = `<pre class="vb-pre">${esc(v.voorstel.tekst)}</pre>`;
+    } else if (v.soort === "schema") {
+      inhoud = `<pre class="vb-pre">${esc(JSON.stringify(v.voorstel.jsonld, null, 2))}</pre>`;
+    }
+    const handmatig = v.soort === "llms" || v.soort === "schema" || !d.automatisch;
+    return `<div class="vb-voorstel" data-vs="${v.id}">
+      <div class="rij" style="gap:8px"><b class="vul">${VB_VS_SOORT[v.soort] || v.soort}</b><span class="${kl} vb-klein">${st}${v.verzoek_nr ? ` · verzoek #${v.verzoek_nr}` : ""}</span></div>
+      <div class="zacht vb-klein" style="margin:2px 0 8px"><a href="${esc(v.pagina)}" target="_blank" rel="noopener">${esc(pad)}</a>${v.uitleg ? " · " + esc(v.uitleg) : ""}</div>
+      ${inhoud}
+      ${v.status === "nieuw" ? `<div class="rij" style="margin-top:10px"><button class="knop klein" data-vs-ja>${handmatig ? "Goedkeuren" : "Goedkeuren en uitvoeren"}</button><button class="knop rand klein" data-vs-nee>Niet doen</button>
+        ${handmatig && v.soort !== "titel_omschrijving" ? `<button class="knop rand klein" data-vs-kopie>Kopiëren</button>` : ""}</div>` : ""}
+      ${v.status === "handmatig" ? `<div class="rij" style="margin-top:10px"><button class="knop rand klein" data-vs-kopie>Kopiëren</button>${IS_BEHEER ? `<button class="knop rand klein" data-vs-klaar>Staat erop</button>` : ""}</div>` : ""}
+      <div data-vs-meld></div></div>`;
+  };
+  houder.innerHTML = `<div class="kaart"><div class="rij"><h2 class="vul" style="margin:0"><span class="tag">&gt;_</span>Verbetervoorstellen</h2>
+      <button class="knop ${d.voorstellen.length ? "rand " : ""}klein" data-vs-maak>${d.voorstellen.length ? "Nieuwe voorstellen maken" : "Maak voorstellen"}</button></div>
+    <p class="zacht vb-klein" style="margin:6px 0 0">Sitehulpje stelt betere teksten voor op basis van de website-check. Er verandert niets op je site zonder jouw goedkeuring.${d.automatisch ? " Na goedkeuren voert Sitehulpje het meteen uit; terugdraaien kan altijd via Verzoeken." : ""}</p>
+    <div data-vs-maakmeld></div></div>
+    ${d.voorstellen.length ? `<div class="kaart">${d.voorstellen.map(kaart).join("")}</div>` : ""}`;
+
+  const tekst = (v) => v.soort === "llms" ? v.voorstel.tekst : v.soort === "schema" ? `<script type="application/ld+json">\n${JSON.stringify(v.voorstel.jsonld, null, 2)}\n</script>` :
+    v.soort === "alt" ? v.voorstel.afbeeldingen.map((a) => `${a.src}\t${a.alt}`).join("\n") : `Titel: ${v.voorstel.titel}\nOmschrijving: ${v.voorstel.omschrijving}`;
+  houder.querySelectorAll("[data-vs]").forEach((blok) => {
+    const v = d.voorstellen.find((x) => String(x.id) === blok.dataset.vs);
+    const meld = (t, s = "fout") => toonMelding(blok.querySelector("[data-vs-meld]"), t, s);
+    const ti = blok.querySelector("[data-vs-titel]"), om = blok.querySelector("[data-vs-oms]"), tel = blok.querySelector("[data-vs-tel]");
+    const telBij = () => { if (tel) tel.innerHTML = `Titel ${vbTeller(ti.value.length, 60)} · omschrijving ${vbTeller(om.value.length, 155)}`; };
+    if (ti) { ti.oninput = om.oninput = telBij; telBij(); }
+    const ja = blok.querySelector("[data-vs-ja]");
+    if (ja) ja.onclick = async () => {
+      ja.disabled = true; ja.textContent = "Bezig…";
+      try {
+        const r = await vbVsApi("goedkeuren", { klant_id: klantId, id: v.id, voorstel: ti ? { titel: ti.value, omschrijving: om.value } : undefined });
+        meld(r.status === "handmatig" ? "Goedgekeurd. Jan zet dit op de site." : "Goedgekeurd. Sitehulpje voert het nu uit; je ziet het ook bij Verzoeken.", "ok");
+        setTimeout(() => vbVoorstellen(houder, klantId, el), 1500);
+      } catch (e) { meld(e.message); ja.disabled = false; ja.textContent = "Goedkeuren"; }
+    };
+    const nee = blok.querySelector("[data-vs-nee]");
+    if (nee) nee.onclick = async () => { try { await vbVsApi("weiger", { klant_id: klantId, id: v.id }); vbVoorstellen(houder, klantId, el); } catch (e) { meld(e.message); } };
+    const kopie = blok.querySelector("[data-vs-kopie]");
+    if (kopie) kopie.onclick = async () => { try { await navigator.clipboard.writeText(tekst(v)); meld("Gekopieerd.", "ok"); } catch { meld("Kopiëren lukte niet; selecteer de tekst zelf."); } };
+    const klaar = blok.querySelector("[data-vs-klaar]");
+    if (klaar) klaar.onclick = async () => { try { await vbVsApi("klaar", { klant_id: klantId, id: v.id }); vbVoorstellen(houder, klantId, el); } catch (e) { meld(e.message); } };
+  });
+  const maak = houder.querySelector("[data-vs-maak]");
+  maak.onclick = async () => {
+    maak.disabled = true; maak.textContent = "Voorstellen maken… (± 1 minuut)";
+    try { const r = await vbVsApi("maak", { klant_id: klantId }); toonMelding(houder.querySelector("[data-vs-maakmeld]"), r.nieuw ? `${r.nieuw} nieuwe voorstellen.` : "Geen nieuwe voorstellen: alles wat de check vond, staat al in de lijst of is in orde.", "ok"); setTimeout(() => vbVoorstellen(houder, klantId, el), 1200); }
+    catch (e) { toonMelding(houder.querySelector("[data-vs-maakmeld]"), e.message); maak.disabled = false; maak.textContent = "Maak voorstellen"; }
+  };
 }

@@ -187,3 +187,11 @@ td.r,th.r{text-align:right}
 .vb-goed{margin:0;padding-left:0;list-style:none}.vb-goed li{padding:4px 0 4px 24px;position:relative}.vb-goed li::before{content:"✓";position:absolute;left:2px;color:var(--accent);font-weight:700}
 .vb-kansen{margin:0;padding-left:18px}.vb-kansen li{margin:3px 0}
 .vb-rapporten{list-style:none;padding:0;margin:8px 0}.vb-rapporten li{padding:8px 0;border-bottom:1px solid var(--lijn)}.vb-rapporten a{font-weight:600;text-decoration:none}.vb-rapporten a::before{content:"📄 "}
+.vb-voorstel{border:1px solid var(--lijn);border-radius:12px;padding:12px;margin:10px 0;background:var(--veld)}
+.vb-vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.vb-vs-kop{font-size:11px;font-family:"JetBrains Mono",monospace;text-transform:uppercase;color:var(--zacht);letter-spacing:.5px;margin-bottom:4px}
+.vb-vs-titel{color:#1a0dab;font-size:16px;line-height:1.3}:root[data-thema=donker] .vb-vs-titel,:root:not([data-thema]) .vb-vs-titel{color:#8ab4f8}
+.vb-vs-oms{font-size:14px;margin-top:4px;color:var(--tekst)}
+.vb-voorstel input,.vb-voorstel textarea{font-size:14px;padding:8px 10px;margin-bottom:6px;min-height:0}
+.vb-pre{white-space:pre-wrap;word-break:break-word;font-size:12.5px;background:var(--bg2);border:1px solid var(--lijn);border-radius:10px;padding:10px;max-height:320px;overflow:auto;margin:0}
+@media (max-width:640px){.vb-vs-grid{grid-template-columns:1fr}}
