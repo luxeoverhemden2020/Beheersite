@@ -41,8 +41,13 @@ ul.lijst,ol.lijst{padding-left:20px;margin:6px 0}ul.lijst li,ol.lijst li{margin:
 .voet{margin-top:34px;border-top:1px solid var(--lijn);padding-top:12px;font-size:12px;color:var(--zacht)}
 .leeg{color:var(--zacht);font-style:italic}
 .melding{background:#fff3cd;border:1px solid #f0d58a;padding:10px 14px;border-radius:8px;margin-bottom:16px}
-.bars rect.b{fill:var(--accent)}.bars rect.b.nu{fill:#0a7f6f}.bars text{font-size:10.5px;fill:var(--zacht);font-family:"JetBrains Mono",monospace}
+.bars rect.b{fill:var(--accent)}.bars rect.b.nu{fill:#0a7f6f}.bars rect.b.jr{fill:#9fc9c1}.bars text{font-size:10.5px;fill:var(--zacht);font-family:"JetBrains Mono",monospace}
 .blok{break-inside:avoid}
+.verg td:first-child{color:var(--zacht)}.verg th.nu,.verg td.nu{font-weight:700}
+.reden{display:flex;gap:10px;margin:8px 0}.reden .ico{font-family:"JetBrains Mono",monospace;color:var(--accent);flex:0 0 22px;font-weight:700}
+.wl{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:10px}.wl h3{font-size:14px;margin:0 0 4px}
+.tabel-scroll{overflow-x:auto}
+@media (max-width:700px){.wl{grid-template-columns:1fr}}
 @media (max-width:700px){.vel{padding:22px 16px;margin:0;border-radius:0}.tegels{grid-template-columns:1fr 1fr}.kop{flex-direction:column}.logo{text-align:left}.naam{max-width:150px}.verberg-mobiel{display:none}}
 @media print{
   html,body{background:#fff}.balk{display:none}.vel{box-shadow:none;margin:0;max-width:none;padding:0}
@@ -95,6 +100,7 @@ function posVerschil(nu, vorig) {
 function tegel(t, w, v) { return `<div class="tegel"><div class="t">${t}</div><div class="w">${w}</div><div class="klein">${v}</div></div>`; }
 
 function staven(reeks, maand) {
+  const jr = `${+maand.slice(0, 4) - 1}${maand.slice(4)}`;
   if (!reeks.length) return "";
   const W = 760, H = 170, L = 40, B = 22, T = 10, max = Math.max(1, ...reeks.map((r) => r.k));
   const stap = Math.pow(10, Math.floor(Math.log10(max))), top = Math.ceil(max / stap) * stap;
@@ -102,9 +108,44 @@ function staven(reeks, maand) {
   const y = (v) => T + (H - T - B) * (1 - v / top);
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" class="bars" role="img" aria-label="Klikken uit Google per maand">
     ${[0, top / 2, top].map((v) => `<line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="#e3eaf3"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${getal(v)}</text>`).join("")}
-    ${reeks.map((r, i) => `<rect class="b${r.m === maand ? " nu" : ""}" x="${L + i * bw + bw * 0.18}" y="${y(r.k)}" width="${bw * 0.64}" height="${Math.max(0, y(0) - y(r.k))}" rx="3"><title>${r.m}: ${getal(r.k)} klikken</title></rect>
+    ${reeks.map((r, i) => `<rect class="b${r.m === maand ? " nu" : r.m === jr ? " jr" : ""}" x="${L + i * bw + bw * 0.18}" y="${y(r.k)}" width="${bw * 0.64}" height="${Math.max(0, y(0) - y(r.k))}" rx="3"><title>${r.m}: ${getal(r.k)} klikken</title></rect>
       <text x="${L + i * bw + bw / 2}" y="${H - 6}" text-anchor="middle">${MAANDEN[+r.m.slice(5) - 1]}</text>`).join("")}
   </svg>`;
+}
+
+function vergelijking(d) {
+  const kol = [{ n: d.maand_naam, t: d.nu, nu: true }, { n: d.vorige_naam, t: d.vorig }];
+  if (d.jaar) kol.push({ n: d.jaar_naam, t: d.jaar });
+  if (d.nulmeting && d.nulmeting.maand !== d.vorig_maand && d.nulmeting.naam !== d.vorige_naam && d.nulmeting.naam !== d.jaar_naam) kol.push({ n: `Start (${d.nulmeting.naam})`, t: d.nulmeting });
+  if (kol.length < 3 || !(d.nu.gsc.dagen || d.nu.ga4.dagen)) return "";
+  // per dag omrekenen, zodat korte en lange maanden eerlijk vergeleken worden
+  const pd = (t, bron, v) => (t[bron].dagen ? (t[bron][v] / t[bron].dagen) * 30 : null);
+  const rij = (label, f, fmt = getal) => `<tr><td>${label}</td>${kol.map((k) => { const w = f(k.t); return `<td class="r mono${k.nu ? " nu" : ""}">${w == null ? "–" : fmt(w)}</td>`; }).join("")}</tr>`;
+  const rijen = [
+    d.nu.gsc.dagen ? rij("Klikken uit Google", (t) => pd(t, "gsc", "klikken")) : "",
+    d.nu.gsc.dagen ? rij("Vertoningen in Google", (t) => pd(t, "gsc", "vertoningen")) : "",
+    d.nu.gsc.dagen ? rij("Gemiddelde positie", (t) => t.gsc.positie, pos) : "",
+    d.nu.ga4.dagen ? rij("Bezoeken via Google", (t) => pd(t, "ga4", "organisch")) : "",
+    d.nu.ga4.dagen ? rij("Acties op je site", (t) => pd(t, "ga4", "acties")) : "",
+  ].join("");
+  return `<div class="blok"><h2><span class="tag">&gt;_</span>Vergelijking</h2>
+    <p class="zacht klein" style="margin-top:-4px">Omgerekend naar 30 dagen, zodat een korte maand eerlijk naast een lange staat.${d.nulmeting ? " De start is de laatste maand voordat Sitehulpje Vindbaarheid begon." : ""}</p>
+    <div class="tabel-scroll"><table class="verg"><thead><tr><th></th>${kol.map((k) => `<th class="r${k.nu ? " nu" : ""}">${esc(k.n)}</th>`).join("")}</tr></thead><tbody>${rijen}</tbody></table></div></div>`;
+}
+
+function uitlegBlok(d, meer) {
+  const u = d.uitleg;
+  if (!u || u.richting === "onbekend") return "";
+  const kop = u.richting === "daling" ? "Waarom minder?" : u.richting === "stijging" ? "Waarom meer?" : "Wat gebeurde er?";
+  const redenen = (u.ai ? [{ tekst: u.ai }] : u.redenen) || [];
+  const lijst = (rijen, plus) => rijen.length ? `<ul class="lijst">${rijen.map((x) => `<li>${esc(x.sleutel)} <span class="${plus ? "op" : "af"} mono">${x.verschil > 0 ? "+" : ""}${x.verschil}</span></li>`).join("")}</ul>` : `<p class="leeg">Geen</p>`;
+  return `<div class="blok"><h2><span class="tag">&gt;_</span>${kop}</h2>
+    <p style="margin-top:0">${esc(u.samenvatting)}</p>
+    ${redenen.map((r) => `<div class="reden"><span class="ico">→</span><span>${esc(r.tekst)}</span></div>`).join("")}
+    ${u.bereikbaar != null ? `<p class="zacht klein">Je website was deze maand ${String(u.bereikbaar).replace(".", ",")}% van de tijd bereikbaar (we controleren elk half uur).</p>` : ""}
+    ${meer && (u.verliezers.length || u.winnaars.length) ? `<div class="wl"><div><h3>Grootste stijgers (klikken)</h3>${lijst(u.winnaars, true)}</div><div><h3>Grootste dalers (klikken)</h3>${lijst(u.verliezers, false)}</div></div>
+      <p class="zacht klein">Laatste 28 dagen tegenover de 28 dagen daarvoor.</p>` : ""}
+  </div>`;
 }
 
 function teken(d) {
@@ -137,7 +178,10 @@ function teken(d) {
     ${!a.dagen && g.positie ? tegel("Gemiddelde positie", pos(g.positie), gv.positie ? posVerschil(g.positie, gv.positie) + ' <span class="gelijk">t.o.v. vorige maand</span>' : "") : ""}
   </div>` : `<p class="leeg">Er zijn nog geen cijfers uit Google voor deze maand. Zodra Search Console en Analytics gekoppeld zijn, staan ze hier.</p>`}
 
-  ${d.reeks.length > 1 ? `<div class="blok"><h2><span class="tag">&gt;_</span>Klikken uit Google per maand</h2>${staven(d.reeks, d.maand)}</div>` : ""}
+
+  ${vergelijking(d)}
+  ${uitlegBlok(d, meer)}
+  ${d.reeks.length > 1 ? `<div class="blok"><h2><span class="tag">&gt;_</span>Klikken uit Google per maand</h2>${staven(d.reeks, d.maand)}${d.reeks.some((r) => r.m === `${+d.maand.slice(0, 4) - 1}${d.maand.slice(4)}`) ? `<p class="zacht klein">Donkergroen: ${esc(d.maand_naam)}. Lichtgroen: dezelfde maand vorig jaar.</p>` : ""}</div>` : ""}
 
   ${d.zoekwoorden.length ? `<div class="blok"><h2><span class="tag">&gt;_</span>Beste zoekwoorden</h2>
     <p class="zacht klein" style="margin-top:-4px">Waarop mensen zochten toen ze je site vonden (laatste 28 dagen). Positie 1 is bovenaan in Google.</p>
