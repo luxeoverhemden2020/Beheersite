@@ -186,3 +186,4 @@ td.r,th.r{text-align:right}
 .vb-vb{margin:0;padding-left:18px;font-size:13.5px}.vb-vb li{margin:2px 0;word-break:break-all}
 .vb-goed{margin:0;padding-left:0;list-style:none}.vb-goed li{padding:4px 0 4px 24px;position:relative}.vb-goed li::before{content:"✓";position:absolute;left:2px;color:var(--accent);font-weight:700}
 .vb-kansen{margin:0;padding-left:18px}.vb-kansen li{margin:3px 0}
+.vb-rapporten{list-style:none;padding:0;margin:8px 0}.vb-rapporten li{padding:8px 0;border-bottom:1px solid var(--lijn)}.vb-rapporten a{font-weight:600;text-decoration:none}.vb-rapporten a::before{content:"📄 "}

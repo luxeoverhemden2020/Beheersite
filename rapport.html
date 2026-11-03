@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vindbaarheidsrapport – Sitehulpje</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="assets/icoon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--tekst:#0b1a2e;--zacht:#5a6b82;--lijn:#d3deec;--accent:#0b9f8a;--accent2:rgba(11,159,138,.1);--fout:#d63355;--let:#a86b00;--vlak:#f5f8fc}
+*{box-sizing:border-box}
+html,body{background:#e9eef5;margin:0}
+body{color:var(--tekst);font:15px/1.55 "Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+.balk{position:sticky;top:0;z-index:3;background:#0b1220;color:#fff;padding:10px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.balk .merk{font-weight:700}.balk .merk b{color:#22e3c4;font-family:"JetBrains Mono",monospace;font-weight:600}
+.balk .vul{flex:1}
+.balk select,.balk button,.balk a{font:inherit;font-size:14px;border-radius:10px;border:1px solid #2b3d5c;background:#16213a;color:#fff;padding:7px 12px;cursor:pointer;text-decoration:none}
+.balk .hoofd{background:linear-gradient(135deg,#22e3c4,#3b82f6);color:#04111a;border:0;font-weight:700}
+.vel{max-width:860px;margin:20px auto;background:#fff;padding:40px 44px;box-shadow:0 10px 30px rgba(15,40,80,.12);border-radius:6px}
+.kop{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;border-bottom:3px solid var(--accent);padding-bottom:16px;margin-bottom:22px}
+.kop h1{font-size:28px;margin:0 0 2px;letter-spacing:-.3px}.kop .sub{color:var(--zacht)}
+.logo{font-weight:700;font-size:18px;text-align:right;white-space:nowrap}.logo b{color:var(--accent);font-family:"JetBrains Mono",monospace;font-weight:600}.logo small{display:block;font-weight:400;font-size:12px;color:var(--zacht)}
+h2{font-size:18px;margin:28px 0 10px;padding-top:4px}
+h2 .tag{font-family:"JetBrains Mono",monospace;color:var(--accent);font-size:13px;margin-right:6px}
+.samen{background:var(--accent2);border-left:4px solid var(--accent);padding:12px 16px;border-radius:6px;font-size:16px}
+.tegels{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.tegel{border:1px solid var(--lijn);border-radius:10px;padding:12px;background:var(--vlak)}
+.tegel .t{font-size:13px;color:var(--zacht)}.tegel .w{font-size:26px;font-weight:700;font-family:"JetBrains Mono",monospace;margin:2px 0}
+.op{color:var(--accent);font-weight:600}.af{color:var(--fout);font-weight:600}.gelijk{color:var(--zacht)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;color:var(--zacht);font-weight:600;border-bottom:1px solid var(--lijn);padding:6px 8px}
+td{border-bottom:1px solid var(--lijn);padding:7px 8px}
+.r{text-align:right}.mono{font-family:"JetBrains Mono",monospace}
+.naam{max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ul.lijst,ol.lijst{padding-left:20px;margin:6px 0}ul.lijst li,ol.lijst li{margin:5px 0}
+.goed li{list-style:none;position:relative;padding-left:4px}.goed li::before{content:"✓";position:absolute;left:-18px;color:var(--accent);font-weight:700}
+.ernst{font-size:10.5px;font-family:"JetBrains Mono",monospace;text-transform:uppercase;padding:1px 6px;border-radius:999px;background:#eef2f7;margin-right:6px}
+.ernst.hoog{color:var(--fout)}.ernst.middel{color:var(--let)}
+.score{display:flex;gap:16px;align-items:center}
+.zacht{color:var(--zacht)}.klein{font-size:12.5px}
+.voet{margin-top:34px;border-top:1px solid var(--lijn);padding-top:12px;font-size:12px;color:var(--zacht)}
+.leeg{color:var(--zacht);font-style:italic}
+.melding{background:#fff3cd;border:1px solid #f0d58a;padding:10px 14px;border-radius:8px;margin-bottom:16px}
+.bars rect.b{fill:var(--accent)}.bars rect.b.nu{fill:#0a7f6f}.bars text{font-size:10.5px;fill:var(--zacht);font-family:"JetBrains Mono",monospace}
+.blok{break-inside:avoid}
+@media (max-width:700px){.vel{padding:22px 16px;margin:0;border-radius:0}.tegels{grid-template-columns:1fr 1fr}.kop{flex-direction:column}.logo{text-align:left}.naam{max-width:150px}.verberg-mobiel{display:none}}
+@media print{
+  html,body{background:#fff}.balk{display:none}.vel{box-shadow:none;margin:0;max-width:none;padding:0}
+  @page{size:A4;margin:16mm 14mm}
+  h2{break-after:avoid}.blok,table,tr{break-inside:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="balk">
+  <span class="merk">Site<b>hulpje</b></span><span class="vul"></span>
+  <select id="maand" aria-label="Kies maand"></select>
+  <button class="hoofd" id="pdf" type="button">⬇ Download als PDF</button>
+  <a id="terug" href="verzoeken#vindbaarheid">Terug</a>
+</div>
+<div class="vel" id="vel"><p class="zacht">Rapport laden…</p></div>
+
+<script>
+const API = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vb-rapport";
+const p = new URLSearchParams(location.search);
+const BEHEER = p.get("beheer") === "1", KLANT = p.get("klant") || undefined;
+const token = (() => { try { return localStorage.getItem(BEHEER ? "bs_sessie_beheer" : "bs_sessie") || ""; } catch { return ""; } })();
+if (BEHEER) document.getElementById("terug").href = `beheer?vb=${encodeURIComponent(KLANT || "")}`;
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const getal = (n) => Math.round(n || 0).toLocaleString("nl-NL");
+const pos = (x) => (x == null ? "–" : Number(x).toLocaleString("nl-NL", { minimumFractionDigits: 1, maximumFractionDigits: 1 }));
+const MAANDEN = ["jan", "feb", "mrt", "apr", "mei", "jun", "jul", "aug", "sep", "okt", "nov", "dec"];
+
+async function api(actie, data = {}) {
+  const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": token }, body: JSON.stringify({ actie, klant_id: KLANT, ...data }) });
+  const d = await r.json().catch(() => ({}));
+  if (r.status === 401) { location.href = BEHEER ? "inloggen?voor=beheer" : "inloggen"; throw new Error("Niet ingelogd"); }
+  if (!r.ok) throw new Error(d.fout || "Er ging iets mis.");
+  return d;
+}
+
+function verschil(nu, vorig, tekst = "t.o.v. vorige maand") {
+  if (!vorig) return `<span class="gelijk">${nu ? "nieuw" : "–"}</span>`;
+  const v = Math.round(((nu - vorig) / vorig) * 100);
+  if (!v) return `<span class="gelijk">gelijk ${tekst}</span>`;
+  return `<span class="${v > 0 ? "op" : "af"}">${v > 0 ? "▲" : "▼"} ${Math.abs(v)}%</span> <span class="gelijk">${tekst}</span>`;
+}
+function posVerschil(nu, vorig) {
+  if (vorig == null) return `<span class="op">nieuw</span>`;
+  const v = vorig - nu;
+  if (Math.abs(v) < 0.5) return `<span class="gelijk">gelijk</span>`;
+  return `<span class="${v > 0 ? "op" : "af"}">${v > 0 ? "▲" : "▼"} ${pos(Math.abs(v))}</span>`;
+}
+function tegel(t, w, v) { return `<div class="tegel"><div class="t">${t}</div><div class="w">${w}</div><div class="klein">${v}</div></div>`; }
+
+function staven(reeks, maand) {
+  if (!reeks.length) return "";
+  const W = 760, H = 170, L = 40, B = 22, T = 10, max = Math.max(1, ...reeks.map((r) => r.k));
+  const stap = Math.pow(10, Math.floor(Math.log10(max))), top = Math.ceil(max / stap) * stap;
+  const bw = (W - L) / reeks.length;
+  const y = (v) => T + (H - T - B) * (1 - v / top);
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" class="bars" role="img" aria-label="Klikken uit Google per maand">
+    ${[0, top / 2, top].map((v) => `<line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="#e3eaf3"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${getal(v)}</text>`).join("")}
+    ${reeks.map((r, i) => `<rect class="b${r.m === maand ? " nu" : ""}" x="${L + i * bw + bw * 0.18}" y="${y(r.k)}" width="${bw * 0.64}" height="${Math.max(0, y(0) - y(r.k))}" rx="3"><title>${r.m}: ${getal(r.k)} klikken</title></rect>
+      <text x="${L + i * bw + bw / 2}" y="${H - 6}" text-anchor="middle">${MAANDEN[+r.m.slice(5) - 1]}</text>`).join("")}
+  </svg>`;
+}
+
+function teken(d) {
+  const g = d.nu.gsc, gv = d.vorig.gsc, a = d.nu.ga4, av = d.vorig.ga4;
+  let zin = "";
+  if (g.dagen && gv.dagen && gv.klikken) {
+    const v = Math.round(((g.klikken - gv.klikken) / gv.klikken) * 100);
+    zin = v > 2 ? `In ${d.maand_naam} kwamen er <b>${v}% meer bezoekers via Google</b> dan in ${d.vorige_naam}.`
+        : v < -2 ? `In ${d.maand_naam} kwamen er <b>${Math.abs(v)}% minder bezoekers via Google</b> dan in ${d.vorige_naam}.`
+        : `In ${d.maand_naam} kwamen er <b>ongeveer evenveel bezoekers via Google</b> als in ${d.vorige_naam}.`;
+  } else if (g.dagen) zin = `In ${d.maand_naam} klikten mensen <b>${getal(g.klikken)} keer</b> vanuit Google door naar je website.`;
+  if (d.gezondheid) zin += ` Je website scoort <b>${d.gezondheid.score} van 100</b> op gezondheid${d.gezondheid.vorige != null ? ` (vorige keer ${d.gezondheid.vorige})` : ""}.`;
+  if (d.werk.length) zin += ` Sitehulpje voerde <b>${d.werk.length} aanpassing${d.werk.length > 1 ? "en" : ""}</b> uit.`;
+
+  document.title = `Vindbaarheidsrapport ${d.maand_naam} – ${d.klant.naam}`;
+  document.getElementById("vel").innerHTML = `
+  ${d.tussenstand ? `<div class="melding">Dit is een tussenstand: de maand is nog niet voorbij. Het definitieve rapport komt begin volgende maand.</div>` : ""}
+  <div class="kop"><div><h1>Vindbaarheidsrapport ${esc(d.maand_naam)}</h1>
+    <div class="sub">${esc(d.klant.naam)} · ${esc((d.klant.site || "").replace(/^https?:\/\//, "").replace(/\/$/, ""))}</div></div>
+    <div class="logo">Site<b>hulpje</b><small>door Siteregelaar</small></div></div>
+
+  ${zin ? `<div class="samen blok">${zin}</div>` : ""}
+
+  ${g.dagen || a.dagen ? `<div class="tegels blok">
+    ${g.dagen ? tegel("Klikken uit Google", getal(g.klikken), verschil(g.klikken, gv.klikken)) : ""}
+    ${g.dagen ? tegel("Vertoningen in Google", getal(g.vertoningen), verschil(g.vertoningen, gv.vertoningen)) : ""}
+    ${a.dagen ? tegel("Bezoeken via Google", getal(a.organisch), verschil(a.organisch, av.organisch)) : ""}
+    ${a.dagen ? tegel("Acties op je site", getal(a.acties), verschil(a.acties, av.acties)) : ""}
+    ${!a.dagen && g.positie ? tegel("Gemiddelde positie", pos(g.positie), gv.positie ? posVerschil(g.positie, gv.positie) + ' <span class="gelijk">t.o.v. vorige maand</span>' : "") : ""}
+  </div>` : `<p class="leeg">Er zijn nog geen cijfers uit Google voor deze maand. Zodra Search Console en Analytics gekoppeld zijn, staan ze hier.</p>`}
+
+  ${d.reeks.length > 1 ? `<div class="blok"><h2><span class="tag">&gt;_</span>Klikken uit Google per maand</h2>${staven(d.reeks, d.maand)}</div>` : ""}
+
+  ${d.zoekwoorden.length ? `<h2><span class="tag">&gt;_</span>Beste zoekwoorden</h2>
+    <p class="zacht klein" style="margin-top:-4px">Waarop mensen zochten toen ze je site vonden (laatste 28 dagen). Positie 1 is bovenaan in Google.</p>
+    <table><thead><tr><th>Zoekwoord</th><th class="r">Positie</th><th class="r">Klikken</th><th class="r verberg-mobiel">Vertoningen</th><th class="r">Verschil</th></tr></thead><tbody>
+    ${d.zoekwoorden.map((z) => `<tr><td class="naam">${esc(z.sleutel)}</td><td class="r mono">${pos(z.positie)}</td><td class="r mono">${getal(z.klikken)}</td><td class="r mono verberg-mobiel">${getal(z.vertoningen)}</td><td class="r">${posVerschil(z.positie, z.vorige_positie)}</td></tr>`).join("")}
+    </tbody></table>` : ""}
+
+  ${d.kansen.length ? `<div class="blok"><h2><span class="tag">&gt;_</span>Kansen: net niet bovenaan</h2>
+    <p class="zacht klein" style="margin-top:-4px">Op deze zoekwoorden word je vaak gezien, maar sta je nog niet in de top 3. Een paar plekken hoger levert vaak veel extra klikken op.</p>
+    <ul class="lijst">${d.kansen.map((z) => `<li><b>${esc(z.sleutel)}</b>: positie ${pos(z.positie)}, ${getal(z.vertoningen)} vertoningen</li>`).join("")}</ul></div>` : ""}
+
+  ${d.paginas.length ? `<div class="blok"><h2><span class="tag">&gt;_</span>Best bezochte pagina's uit Google</h2>
+    <table><thead><tr><th>Pagina</th><th class="r">Klikken</th><th class="r verberg-mobiel">Vertoningen</th></tr></thead><tbody>
+    ${d.paginas.map((z) => `<tr><td class="naam">${esc(z.sleutel.replace(/^https?:\/\/[^/]+/, "") || "/")}</td><td class="r mono">${getal(z.klikken)}</td><td class="r mono verberg-mobiel">${getal(z.vertoningen)}</td></tr>`).join("")}
+    </tbody></table></div>` : ""}
+
+  ${d.gezondheid ? `<div class="blok"><h2><span class="tag">&gt;_</span>Website-gezondheid</h2>
+    <div class="score"><div class="w mono" style="font-size:38px;font-weight:700;color:${d.gezondheid.score >= 80 ? "var(--accent)" : d.gezondheid.score >= 55 ? "var(--let)" : "var(--fout)"}">${d.gezondheid.score}</div>
+      <div class="zacht">van 100${d.gezondheid.vorige != null ? ` · vorige maand ${d.gezondheid.vorige}` : ""}${d.gezondheid.snelheid != null ? ` · snelheid mobiel ${d.gezondheid.snelheid}` : ""}<br>
+      <span class="klein">Gecontroleerd op ${new Date(d.gezondheid.gemeten).toLocaleDateString("nl-NL", { day: "numeric", month: "long" })}</span></div></div>
+    ${d.gezondheid.problemen.length ? `<p style="margin:12px 0 2px"><b>Aandachtspunten</b></p><ul class="lijst">${d.gezondheid.problemen.map((x) => `<li><span class="ernst ${x.ernst}">${{ hoog: "belangrijk", middel: "verbeteren", laag: "klein" }[x.ernst]}</span>${esc(x.tekst)}</li>`).join("")}</ul>` : ""}
+    ${d.gezondheid.goed.length ? `<p style="margin:12px 0 2px"><b>In orde</b></p><ul class="lijst goed">${d.gezondheid.goed.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
+  </div>` : ""}
+
+  <div class="blok"><h2><span class="tag">&gt;_</span>Uitgevoerd door Sitehulpje</h2>
+    ${d.werk.length ? `<ul class="lijst">${d.werk.map((w) => `<li>#${w.nr} ${esc(w.onderwerp)} <span class="zacht klein">(${new Date(w.datum).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })})</span></li>`).join("")}</ul>`
+      : `<p class="leeg">Deze maand geen aanpassingen via Sitehulpje.</p>`}</div>
+
+  ${d.stappen.length ? `<div class="blok"><h2><span class="tag">&gt;_</span>Volgende stappen</h2>
+    <ol class="lijst">${d.stappen.map((s) => `<li>${esc(s)}</li>`).join("")}</ol>
+    <p class="zacht klein">Wil je dat we een van deze punten oppakken? Stuur een verzoek in Sitehulpje.</p></div>` : ""}
+
+  <div class="voet">
+    <b>Wat betekenen de cijfers?</b> Klikken: hoe vaak iemand in Google op je site klikte. Vertoningen: hoe vaak je site in de zoekresultaten stond.
+    Bezoeken via Google en acties komen uit Google Analytics. Alle cijfers zijn gemeten, geen schattingen.<br>
+    Bronnen: ${[d.bronnen.search_console ? "Google Search Console (" + esc(d.bronnen.search_console.replace(/^sc-domain:/, "")) + ")" : "", d.bronnen.analytics ? "Google Analytics" : "", d.gezondheid ? "Sitehulpje website-check, Google PageSpeed" : ""].filter(Boolean).join(" · ") || "–"}.<br>
+    Sitehulpje is een dienst van Siteregelaar · Markt 9, 7551 CG Hengelo · KvK 55667147 · info@sitehulpje.nl
+  </div>`;
+}
+
+async function start() {
+  const sel = document.getElementById("maand");
+  const nu = new Date(), deze = nu.toISOString().slice(0, 7);
+  let lijst = [];
+  try { lijst = (await api("lijst")).rapporten; } catch (e) { document.getElementById("vel").innerHTML = `<p>${esc(e.message)}</p>`; return; }
+  const opties = [{ maand: deze, naam: "Deze maand (tussenstand)" }, ...lijst.filter((r) => r.maand !== deze)];
+  const vorige = (() => { const d = new Date(nu.getFullYear(), nu.getMonth() - 1, 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`; })();
+  if (!opties.some((o) => o.maand === vorige)) opties.splice(1, 0, { maand: vorige, naam: "Vorige maand" });
+  sel.innerHTML = opties.map((o) => `<option value="${o.maand}">${esc(o.naam)}</option>`).join("");
+  sel.value = p.get("maand") && opties.some((o) => o.maand === p.get("maand")) ? p.get("maand") : (lijst[0]?.maand || vorige);
+  const laad = async () => {
+    document.getElementById("vel").innerHTML = `<p class="zacht">Rapport laden…</p>`;
+    try { teken((await api("toon", { maand: sel.value })).rapport); }
+    catch (e) { document.getElementById("vel").innerHTML = `<p>${esc(e.message)}</p>`; }
+    const q = new URLSearchParams(location.search); q.set("maand", sel.value); history.replaceState(null, "", "?" + q);
+  };
+  sel.onchange = laad;
+  document.getElementById("pdf").onclick = () => window.print();
+  laad();
+}
+start();
+</script>
+</body>
+</html>

@@ -176,9 +176,21 @@ async function vbBeheerLaad() {
 function vbBeheerBekijk(id, klanten) {
   const k = (klanten || []).find((x) => x.id === id);
   $("#vbdetail").innerHTML = `<div class="rij" style="margin:4px 0 10px"><h2 class="vul" style="margin:0">${esc(k ? k.naam : id)} <span class="zacht" style="font-weight:400;font-size:14px">· zo ziet de klant het</span></h2>
-    <button class="knop rand klein" id="vbververs">Nu bijwerken</button><button class="knop rand klein" id="vbsluit">Sluiten</button></div><div id="vbpaneel"></div>`;
+    <button class="knop rand klein" id="vbververs">Nu bijwerken</button><button class="knop rand klein" id="vbsluit">Sluiten</button></div>
+    <div class="kaart"><h2 style="font-size:16px"><span class="tag">&gt;_</span>Maandrapport</h2>
+      <p class="zacht vb-klein" style="margin-top:-4px">Elke maand op de 3e gemaakt. Zonder adres gaat het alleen naar jou; met adres naar de klant (jij krijgt een kopie).</p>
+      <div class="rij"><input id="vbrapmail" type="email" placeholder="E-mail klant (leeg = alleen naar jou)" class="vul" value="${esc(k?.vb_rapport_mail || "")}" style="min-width:220px">
+        <button class="knop rand klein" id="vbrapmailopslaan">Opslaan</button>
+        <button class="knop rand klein" id="vbraptest">Rapport vorige maand naar mij mailen</button>
+        <a class="knop licht klein" href="rapport?beheer=1&klant=${encodeURIComponent(id)}">Rapport bekijken</a></div>
+      <div id="vbrapmeld"></div></div>
+    <div id="vbpaneel"></div>`;
   vbToon($("#vbpaneel"), id);
   $("#vbsluit").onclick = () => { $("#vbdetail").innerHTML = ""; };
+  const VBR = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vb-rapport";
+  const rap = async (actie, data) => { const r = await fetch(VBR, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, klant_id: id, ...data }) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d; };
+  $("#vbrapmailopslaan").onclick = async () => { try { await rap("mail_instellen", { adres: $("#vbrapmail").value }); toonMelding($("#vbrapmeld"), $("#vbrapmail").value ? "Opgeslagen. Het volgende maandrapport gaat naar de klant." : "Opgeslagen. Het rapport gaat alleen naar jou.", "ok"); } catch (e) { toonMelding($("#vbrapmeld"), e.message); } };
+  $("#vbraptest").onclick = async (e) => { e.target.disabled = true; try { const r = await rap("maak", { mail: "jan" }); toonMelding($("#vbrapmeld"), `Rapport ${r.maand} gemaakt en naar jou gemaild.`, "ok"); } catch (err) { toonMelding($("#vbrapmeld"), err.message); } e.target.disabled = false; };
   $("#vbververs").onclick = async (e) => {
     e.target.disabled = true; e.target.textContent = "Bezig…";
     try { await vbApi("ververs", { klant_id: id }); vbToon($("#vbpaneel"), id); vbBeheerLaad(); } catch (err) { meld(err.message); }

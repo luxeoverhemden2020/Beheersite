@@ -171,6 +171,7 @@ async function vbToon(el, klantId) {
     <button class="vb-tab" data-vb-tab="zoekwoorden">Zoekwoorden</button>
     <button class="vb-tab" data-vb-tab="paginas">Pagina's</button>
     <button class="vb-tab" data-vb-tab="gezondheid">Website-gezondheid</button>
+    <button class="vb-tab" data-vb-tab="rapporten">Rapporten</button>
     <button class="vb-tab" data-vb-tab="koppelingen">Koppelingen</button>
   </div>
   <div data-vb-paneel="overzicht">
@@ -204,6 +205,7 @@ async function vbToon(el, klantId) {
     <div data-vb-lijst="pagina">${vbTabel(d.paginas, "pagina", 200)}</div>
   </div></div>
   <div data-vb-paneel="gezondheid" class="verborgen" data-vb-gz></div>
+  <div data-vb-paneel="rapporten" class="verborgen" data-vb-rap></div>
   <div data-vb-paneel="koppelingen" class="verborgen">${koppelKaart}</div>`;
 
   const gr = el.querySelector("[data-vb-grafiek]");
@@ -229,6 +231,29 @@ async function vbToon(el, klantId) {
   if (params.get("google") === "kies") { toonTab("koppelingen"); vbKiezer(el, klantId); }
   vbKnoppen(el, klantId, d);
   vbGezondheid(el, klantId, toonTab);
+  vbRapporten(el.querySelector("[data-vb-rap]"), klantId);
+}
+
+// ---------- Maandrapporten ----------
+function vbRapportUrl(klantId, maand) {
+  const q = new URLSearchParams(); if (maand) q.set("maand", maand);
+  if (IS_BEHEER) { q.set("beheer", "1"); q.set("klant", klantId || ""); }
+  return "rapport?" + q;
+}
+async function vbRapporten(el, klantId) {
+  if (!el) return;
+  let lijst = [];
+  try {
+    const r = await fetch(VB_API.replace(/vindbaarheid$/, "vb-rapport"), { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "lijst", klant_id: klantId }) });
+    lijst = (await r.json()).rapporten || [];
+  } catch { /* lege lijst */ }
+  el.innerHTML = `<div class="kaart"><h2><span class="tag">&gt;_</span>Maandrapporten</h2>
+    <p class="zacht vb-klein" style="margin-top:-4px">Elke maand een overzicht van je vindbaarheid, wat er is gedaan en wat de volgende stappen zijn. Te downloaden als PDF.</p>
+    <ul class="vb-rapporten">
+      <li><a href="${vbRapportUrl(klantId, new Date().toISOString().slice(0, 7))}">Deze maand (tussenstand)</a></li>
+      ${lijst.map((r) => `<li><a href="${vbRapportUrl(klantId, r.maand)}">${esc(r.naam.charAt(0).toUpperCase() + r.naam.slice(1))}</a></li>`).join("")}
+    </ul>
+    ${!lijst.length ? `<p class="zacht vb-klein">Het eerste volledige rapport verschijnt begin volgende maand.</p>` : ""}</div>`;
 }
 
 // ---------- Website-gezondheid ----------
