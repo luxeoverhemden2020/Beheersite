@@ -170,6 +170,7 @@ async function vbBeheerLaad() {
       catch (e) { meld(e.message); }
     }));
     el.querySelectorAll("[data-vbbekijk]").forEach((b) => (b.onclick = () => vbBeheerBekijk(b.dataset.vbbekijk, klanten)));
+    return klanten;
   } catch (e) { el.innerHTML = `<div class="melding fout">${esc(e.message)}</div>`; }
 }
 function vbBeheerBekijk(id, klanten) {
@@ -187,9 +188,11 @@ function vbBeheerBekijk(id, klanten) {
 }
 { // terug van Google koppelen
   const p = new URLSearchParams(location.search);
-  if (p.get("vb")) setTimeout(() => {
-    document.querySelector('.tabs button[data-tab="vindbaarheid"]').click();
-    vbBeheerBekijk(p.get("vb"), []);
+  if (p.get("vb")) setTimeout(async () => {
+    document.querySelectorAll(".tabs button").forEach((x) => x.classList.toggle("aan", x.dataset.tab === "vindbaarheid"));
+    ["verzoeken", "klanten", "vindbaarheid", "gebruikers", "account"].forEach((t) => $("#t-" + t).classList.toggle("verborgen", t !== "vindbaarheid"));
+    const klanten = await vbBeheerLaad();
+    vbBeheerBekijk(p.get("vb"), klanten || []);
   }, 0);
 }
 $("#uit").onclick = async () => { try { await api("uitloggen"); } catch {} zetSessie(""); location.href = "inloggen?voor=beheer"; };
