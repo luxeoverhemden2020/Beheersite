@@ -108,6 +108,7 @@ function staven(reeks, maand) {
 }
 
 function teken(d) {
+  const pakket = d.klant.pakket || "basis", meer = pakket !== "basis"; // verbeterpunten en uitleg vanaf Plus
   const g = d.nu.gsc, gv = d.vorig.gsc, a = d.nu.ga4, av = d.vorig.ga4;
   let zin = "";
   if (g.dagen && gv.dagen && gv.klikken) {
@@ -144,7 +145,7 @@ function teken(d) {
     ${d.zoekwoorden.map((z) => `<tr><td class="naam">${esc(z.sleutel)}</td><td class="r mono">${pos(z.positie)}</td><td class="r mono">${getal(z.klikken)}</td><td class="r mono verberg-mobiel">${getal(z.vertoningen)}</td><td class="r">${posVerschil(z.positie, z.vorige_positie)}</td></tr>`).join("")}
     </tbody></table></div>` : ""}
 
-  ${d.kansen.length ? `<div class="blok"><h2><span class="tag">&gt;_</span>Kansen: net niet bovenaan</h2>
+  ${meer && d.kansen.length ? `<div class="blok"><h2><span class="tag">&gt;_</span>Kansen: net niet bovenaan</h2>
     <p class="zacht klein" style="margin-top:-4px">Op deze zoekwoorden word je vaak gezien, maar sta je nog niet in de top 3. Een paar plekken hoger levert vaak veel extra klikken op.</p>
     <ul class="lijst">${d.kansen.map((z) => `<li><b>${esc(z.sleutel)}</b>: positie ${pos(z.positie)}, ${getal(z.vertoningen)} vertoningen</li>`).join("")}</ul></div>` : ""}
 
@@ -157,7 +158,7 @@ function teken(d) {
     <div class="score"><div class="w mono" style="font-size:38px;font-weight:700;color:${d.gezondheid.score >= 80 ? "var(--accent)" : d.gezondheid.score >= 55 ? "var(--let)" : "var(--fout)"}">${d.gezondheid.score}</div>
       <div class="zacht">van 100${d.gezondheid.vorige != null ? ` · vorige maand ${d.gezondheid.vorige}` : ""}${d.gezondheid.snelheid != null ? ` · snelheid mobiel ${d.gezondheid.snelheid}` : ""}<br>
       <span class="klein">Gecontroleerd op ${new Date(d.gezondheid.gemeten).toLocaleDateString("nl-NL", { day: "numeric", month: "long" })}</span></div></div>
-    ${d.gezondheid.problemen.length ? `<p style="margin:12px 0 2px"><b>Aandachtspunten</b></p><ul class="lijst">${d.gezondheid.problemen.map((x) => `<li><span class="ernst ${x.ernst}">${{ hoog: "belangrijk", middel: "verbeteren", laag: "klein" }[x.ernst]}</span>${esc(x.tekst)}</li>`).join("")}</ul>` : ""}
+    ${meer && d.gezondheid.problemen.length ? `<p style="margin:12px 0 2px"><b>Aandachtspunten</b></p><ul class="lijst">${d.gezondheid.problemen.map((x) => `<li><span class="ernst ${x.ernst}">${{ hoog: "belangrijk", middel: "verbeteren", laag: "klein" }[x.ernst]}</span>${esc(x.tekst)}</li>`).join("")}</ul>` : ""}
     ${d.gezondheid.goed.length ? `<p style="margin:12px 0 2px"><b>In orde</b></p><ul class="lijst goed">${d.gezondheid.goed.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
   </div>` : ""}
 
@@ -165,7 +166,8 @@ function teken(d) {
     ${d.werk.length ? `<ul class="lijst">${d.werk.map((w) => `<li>#${w.nr} ${esc(w.onderwerp)} <span class="zacht klein">(${new Date(w.datum).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })})</span></li>`).join("")}</ul>`
       : `<p class="leeg">Deze maand geen aanpassingen via Sitehulpje.</p>`}</div>
 
-  ${d.stappen.length ? `<div class="blok"><h2><span class="tag">&gt;_</span>Volgende stappen</h2>
+  ${pakket === "pro" ? `<div class="blok samen" style="margin-top:22px">Pro: je hebt elk kwartaal een gesprek van 30 minuten met Jan over je vindbaarheid. Plan het via info@sitehulpje.nl.</div>` : ""}
+  ${meer && d.stappen.length ? `<div class="blok"><h2><span class="tag">&gt;_</span>Volgende stappen</h2>
     <ol class="lijst">${d.stappen.map((s) => `<li>${esc(s)}</li>`).join("")}</ol>
     <p class="zacht klein">Wil je dat we een van deze punten oppakken? Stuur een verzoek in Sitehulpje.</p></div>` : ""}
 

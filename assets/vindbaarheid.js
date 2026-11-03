@@ -24,6 +24,14 @@ async function vbGzApi(actie, data = {}) {
   return d;
 }
 
+// Wat er per pakket bij hoort (zie plan). "later" = komt nog.
+const VB_PAKKETTEN = {
+  basis: { naam: "Basis", zoekwoorden: 25, voorstellen: 5, punten: ["Dashboard met Google- en Bing-cijfers, dagelijks bijgewerkt", "Website-check elke week", "5 pagina's per maand verbeterd (titels, omschrijvingen)", "Bedrijfsgegevens voor Google en AI (structured data)", "Maandrapport met cijfers en uitgevoerd werk"], later: ["15 vaste vragen aan AI-diensten, maandelijks", "3 concurrenten gevolgd", "Bedrijfsprofiel: cijfers en melding bij nieuwe review"] },
+  plus: { naam: "Plus", zoekwoorden: 75, voorstellen: 15, punten: ["Alles uit Basis", "15 pagina's per maand verbeterd", "75 zoekwoorden gevolgd", "Maandrapport met verbeterpunten en uitleg", "Openingstijden, diensten en veelgestelde vragen als structured data"], later: ["30 vaste vragen aan AI-diensten, elke 2 weken", "5 concurrenten gevolgd", "1 nieuwe pagina of artikel per maand", "Conceptantwoorden op reviews"] },
+  pro: { naam: "Pro", zoekwoorden: 200, voorstellen: 30, punten: ["Alles uit Plus", "30 pagina's per maand verbeterd", "200 zoekwoorden gevolgd", "Melding binnen een dag bij problemen", "Kwartaalgesprek van 30 minuten met Jan"], later: ["50 vaste vragen aan AI-diensten, wekelijks", "10 concurrenten gevolgd", "3 nieuwe pagina's of artikelen per maand", "2 Bedrijfsprofiel-berichten per maand en foto-advies", "Tot 3 websites"] },
+};
+const vbPakket = (p) => VB_PAKKETTEN[p] || VB_PAKKETTEN.basis;
+
 const vbGetal = (n) => Math.round(n || 0).toLocaleString("nl-NL");
 const vbPos = (p) => (p == null ? "–" : p.toLocaleString("nl-NL", { minimumFractionDigits: 1, maximumFractionDigits: 1 }));
 const vbDatum = (s, opt = { day: "numeric", month: "short" }) => new Date(s + (s.length === 10 ? "T12:00:00" : "")).toLocaleDateString("nl-NL", opt);
@@ -117,7 +125,12 @@ async function vbToon(el, klantId) {
   if (params.get("google") === "ok") melding = `<div class="melding ok">Google is gekoppeld. De cijfers staan hieronder; ze worden elke nacht bijgewerkt.</div>`;
   if (params.get("google") === "kies") melding = `<div class="melding let">Google is gekoppeld. Kies hieronder welke website en welke Analytics-gegevens bij jouw bedrijf horen.</div>`;
 
-  const koppelKaart = `<div class="kaart vb-koppel">
+  const pk = vbPakket(d.klant.pakket);
+  const pakketKaart = `<div class="kaart"><h2><span class="tag">&gt;_</span>Jouw pakket: ${pk.naam}</h2>
+    <ul class="vb-goed">${pk.punten.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
+    ${pk.later.length ? `<p class="zacht vb-klein" style="margin:10px 0 4px"><b>Komt eraan</b> (zonder extra kosten):</p><ul class="lijst vb-klein zacht" style="margin:0;padding-left:18px">${pk.later.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
+    <p class="zacht vb-klein" style="margin-bottom:0">Ander pakket? Neem contact op met Jan.</p></div>`;
+  const koppelKaart = pakketKaart + `<div class="kaart vb-koppel">
     <h2><span class="tag">&gt;_</span>Koppelingen</h2>
     <ul class="vb-bronnen">
       <li><span class="vb-stip ${k?.gsc_site && k.status !== "ingetrokken" ? "aan" : ""}"></span>Google Search Console${k?.gsc_site ? ` · <span class="zacht">${esc(k.gsc_site.replace(/^sc-domain:/, ""))}</span>` : ""}</li>
@@ -198,7 +211,8 @@ async function vbToon(el, klantId) {
     <h2><span class="tag">&gt;_</span>Alle zoekwoorden</h2>
     <p class="zacht vb-klein" style="margin-top:-4px">Waarop mensen zochten toen jouw site in Google verscheen, laatste 28 dagen. Google toont om privacyredenen niet elke zoekopdracht.</p>
     <input type="search" placeholder="Zoek een woord…" data-vb-filter="zoekwoord" style="margin-bottom:10px">
-    <div data-vb-lijst="zoekwoord">${vbTabel(d.zoekwoorden, "zoekwoord", 200)}</div>
+    <div data-vb-lijst="zoekwoord">${vbTabel(d.zoekwoorden, "zoekwoord", vbPakket(d.klant.pakket).zoekwoorden)}</div>
+    ${d.zoekwoorden.length > vbPakket(d.klant.pakket).zoekwoorden ? `<p class="zacht vb-klein">Je pakket ${vbPakket(d.klant.pakket).naam} toont de beste ${vbPakket(d.klant.pakket).zoekwoorden} zoekwoorden. Met een groter pakket zie je er meer.</p>` : ""}
   </div></div>
   <div data-vb-paneel="paginas" class="verborgen"><div class="kaart">
     <h2><span class="tag">&gt;_</span>Pagina's in Google</h2>
@@ -228,7 +242,7 @@ async function vbToon(el, klantId) {
     const soort = inp.dataset.vbFilter, bron = soort === "pagina" ? d.paginas : d.zoekwoorden;
     inp.oninput = () => {
       const q = inp.value.trim().toLowerCase();
-      el.querySelector(`[data-vb-lijst="${soort}"]`).innerHTML = vbTabel(q ? bron.filter((r) => r.sleutel.toLowerCase().includes(q)) : bron, soort, 200);
+      el.querySelector(`[data-vb-lijst="${soort}"]`).innerHTML = vbTabel(q ? bron.filter((r) => r.sleutel.toLowerCase().includes(q)) : bron, soort, soort === "zoekwoord" ? vbPakket(d.klant.pakket).zoekwoorden : 200);
     };
   });
   if (params.get("google") === "kies") { toonTab("koppelingen"); vbKiezer(el, klantId); }
@@ -454,6 +468,7 @@ async function vbVoorstellen(houder, klantId, el) {
   houder.innerHTML = `<div class="kaart"><div class="rij"><h2 class="vul" style="margin:0"><span class="tag">&gt;_</span>Verbetervoorstellen</h2>
       <button class="knop ${d.voorstellen.length ? "rand " : ""}klein" data-vs-maak>${d.voorstellen.length ? "Nieuwe voorstellen maken" : "Maak voorstellen"}</button></div>
     <p class="zacht vb-klein" style="margin:6px 0 0">Sitehulpje stelt betere teksten voor op basis van de website-check. Er verandert niets op je site zonder jouw goedkeuring.${d.automatisch ? " Na goedkeuren voert Sitehulpje het meteen uit; terugdraaien kan altijd via Verzoeken." : ""}</p>
+    <p class="zacht vb-klein" style="margin:4px 0 0">Deze maand: ${d.deze_maand} van ${d.per_maand} pagina's (pakket ${vbPakket(d.pakket).naam}).</p>
     <div data-vs-maakmeld></div></div>
     ${d.voorstellen.length ? `<div class="kaart">${d.voorstellen.map(kaart).join("")}</div>` : ""}`;
 
@@ -484,7 +499,7 @@ async function vbVoorstellen(houder, klantId, el) {
   const maak = houder.querySelector("[data-vs-maak]");
   maak.onclick = async () => {
     maak.disabled = true; maak.textContent = "Voorstellen maken… (± 1 minuut)";
-    try { const r = await vbVsApi("maak", { klant_id: klantId }); toonMelding(houder.querySelector("[data-vs-maakmeld]"), r.nieuw ? `${r.nieuw} nieuwe voorstellen.` : "Geen nieuwe voorstellen: alles wat de check vond, staat al in de lijst of is in orde.", "ok"); setTimeout(() => vbVoorstellen(houder, klantId, el), 1200); }
+    try { const r = await vbVsApi("maak", { klant_id: klantId }); toonMelding(houder.querySelector("[data-vs-maakmeld]"), r.vol ? "Je hebt het aantal pagina's voor deze maand bereikt. Volgende maand komen er nieuwe voorstellen." : r.nieuw ? `${r.nieuw} nieuwe voorstellen.` : "Geen nieuwe voorstellen: alles wat de check vond, staat al in de lijst of is in orde.", "ok"); setTimeout(() => vbVoorstellen(houder, klantId, el), 1200); }
     catch (e) { toonMelding(houder.querySelector("[data-vs-maakmeld]"), e.message); maak.disabled = false; maak.textContent = "Maak voorstellen"; }
   };
 }
