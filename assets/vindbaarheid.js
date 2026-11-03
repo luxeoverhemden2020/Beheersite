@@ -15,6 +15,15 @@ async function vbApi(actie, data = {}) {
   return d;
 }
 
+async function vbGzApi(actie, data = {}) {
+  const r = await fetch(VB_API.replace(/vindbaarheid$/, "vb-gezondheid"), {
+    method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, ...data }),
+  }).catch(() => { throw new Error("Geen verbinding. Controleer je internet en probeer het opnieuw."); });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.fout || "Er ging iets mis.");
+  return d;
+}
+
 const vbGetal = (n) => Math.round(n || 0).toLocaleString("nl-NL");
 const vbPos = (p) => (p == null ? "–" : p.toLocaleString("nl-NL", { minimumFractionDigits: 1, maximumFractionDigits: 1 }));
 const vbDatum = (s, opt = { day: "numeric", month: "short" }) => new Date(s + (s.length === 10 ? "T12:00:00" : "")).toLocaleDateString("nl-NL", opt);
@@ -129,9 +138,11 @@ async function vbToon(el, klantId) {
   </div>`;
 
   if (!k || (!d.gsc.length && !d.ga4.length)) {
-    el.innerHTML = melding + koppelKaart + (k ? `<div class="kaart"><p class="zacht">Er zijn nog geen cijfers. ${!k.gsc_site && !k.ga4_property ? "Kies eerst hierboven welke website bij jouw bedrijf hoort." : "Ze worden vannacht opgehaald."}</p></div>` : "");
+    el.innerHTML = melding + koppelKaart + (k ? `<div class="kaart"><p class="zacht">Er zijn nog geen cijfers uit Google. ${!k.gsc_site && !k.ga4_property ? "Kies eerst hierboven welke website bij jouw bedrijf hoort." : "Ze worden vannacht opgehaald."}</p></div>` : "") +
+      `<div data-vb-gz-kort class="verborgen"></div><div data-vb-gz></div>`;
     vbKnoppen(el, klantId, d);
     if (k && !k.gsc_site && !k.ga4_property) vbKiezer(el, klantId);
+    vbGezondheid(el, klantId, () => {});
     return;
   }
 
@@ -159,6 +170,7 @@ async function vbToon(el, klantId) {
     <button class="vb-tab aan" data-vb-tab="overzicht">Overzicht</button>
     <button class="vb-tab" data-vb-tab="zoekwoorden">Zoekwoorden</button>
     <button class="vb-tab" data-vb-tab="paginas">Pagina's</button>
+    <button class="vb-tab" data-vb-tab="gezondheid">Website-gezondheid</button>
     <button class="vb-tab" data-vb-tab="koppelingen">Koppelingen</button>
   </div>
   <div data-vb-paneel="overzicht">
@@ -174,6 +186,7 @@ async function vbToon(el, klantId) {
     </div>
     ${d.gsc.length ? `<div class="kaart"><h2><span class="tag">&gt;_</span>Klikken uit Google per week</h2><div data-vb-grafiek></div>
       <p class="zacht vb-klein">Bron: Google Search Console. De laatste twee dagen kunnen nog iets veranderen.</p></div>` : ""}
+    <div data-vb-gz-kort></div>
     ${d.zoekwoorden.length ? `<div class="kaart"><h2><span class="tag">&gt;_</span>Beste zoekwoorden</h2>${vbTabel(d.zoekwoorden, "zoekwoord", 10)}
       <div class="rij" style="margin-top:10px"><button class="knop rand klein" data-vb-naar="zoekwoorden">Alle zoekwoorden</button></div>
       <p class="zacht vb-klein">${VB_UITLEG.positie} "Verschil" vergelijkt met de 28 dagen ervoor.</p></div>` : ""}
@@ -190,6 +203,7 @@ async function vbToon(el, klantId) {
     <input type="search" placeholder="Zoek een pagina…" data-vb-filter="pagina" style="margin-bottom:10px">
     <div data-vb-lijst="pagina">${vbTabel(d.paginas, "pagina", 200)}</div>
   </div></div>
+  <div data-vb-paneel="gezondheid" class="verborgen" data-vb-gz></div>
   <div data-vb-paneel="koppelingen" class="verborgen">${koppelKaart}</div>`;
 
   const gr = el.querySelector("[data-vb-grafiek]");
@@ -214,6 +228,73 @@ async function vbToon(el, klantId) {
   });
   if (params.get("google") === "kies") { toonTab("koppelingen"); vbKiezer(el, klantId); }
   vbKnoppen(el, klantId, d);
+  vbGezondheid(el, klantId, toonTab);
+}
+
+// ---------- Website-gezondheid ----------
+const VB_ERNST = { hoog: ["Belangrijk", "vb-af"], middel: ["Verbeterpunt", "vb-let"], laag: ["Klein", "vb-gelijk"] };
+const VB_ECHT = { FAST: "snel", AVERAGE: "gemiddeld", SLOW: "traag" };
+function vbScoreRing(score, groot = true) {
+  const r = groot ? 34 : 22, o = 2 * Math.PI * r, kleur = score >= 80 ? "var(--accent)" : score >= 55 ? "var(--let)" : "var(--fout)", z = (r + 6) * 2;
+  return `<svg viewBox="0 0 ${z} ${z}" width="${z}" height="${z}" class="vb-ring" role="img" aria-label="Score ${score} van 100">
+    <circle cx="${z / 2}" cy="${z / 2}" r="${r}" fill="none" stroke="var(--lijn)" stroke-width="7"/>
+    <circle cx="${z / 2}" cy="${z / 2}" r="${r}" fill="none" stroke="${kleur}" stroke-width="7" stroke-linecap="round"
+      stroke-dasharray="${(o * score) / 100} ${o}" transform="rotate(-90 ${z / 2} ${z / 2})"/>
+    <text x="50%" y="50%" dy=".35em" text-anchor="middle" class="vb-ring-getal" style="font-size:${groot ? 22 : 15}px">${score}</text></svg>`;
+}
+function vbKort(u) { return (u || "").replace(/^https?:\/\/[^/]+/, "") || "/"; }
+
+async function vbGezondheid(el, klantId, toonTab) {
+  const paneel = el.querySelector("[data-vb-gz]"), kort = el.querySelector("[data-vb-gz-kort]");
+  if (!paneel) return;
+  const teken = (d) => {
+    const L = d.laatste;
+    if (!L) {
+      kort.innerHTML = "";
+      paneel.innerHTML = `<div class="kaart"><h2><span class="tag">&gt;_</span>Website-gezondheid</h2>
+        <p class="zacht">Nog niet gecontroleerd. De controle loopt elke maandagnacht vanzelf, of start hem nu (duurt 1 tot 2 minuten).</p>
+        <div class="rij"><button class="knop" data-vb-gz-nu>Nu controleren</button></div><div data-vb-gz-meld></div></div>`;
+    } else {
+      const u = L.uitslag, ps = u.snelheid, p = u.problemen || [];
+      const tel = (e) => p.filter((x) => x.ernst === e).length;
+      const verschil = d.vorige ? L.score - d.vorige.score : null;
+      kort.innerHTML = `<div class="kaart vb-gz-kort"><div class="rij" style="gap:14px;flex-wrap:nowrap">${vbScoreRing(L.score, false)}
+        <div class="vul"><b>Website-gezondheid: ${L.score} van 100</b>${verschil ? ` <span class="${verschil > 0 ? "vb-op" : "vb-af"}">${verschil > 0 ? "▲" : "▼"} ${Math.abs(verschil)}</span>` : ""}
+        <div class="zacht vb-klein">${tel("hoog")} belangrijk · ${tel("middel")} verbeterpunten · ${tel("laag")} klein · gecontroleerd ${datum(L.gemeten)}</div></div>
+        <button class="knop rand klein" data-vb-naar-gz>Bekijk</button></div></div>`;
+      kort.querySelector("[data-vb-naar-gz]").onclick = () => toonTab("gezondheid");
+      const groepen = ["Techniek", "Inhoud", "Snelheid", "AI-vindbaarheid"];
+      const probleemHtml = (x) => `<details class="vb-probleem"><summary><span class="vb-ernst ${VB_ERNST[x.ernst][1]}">${VB_ERNST[x.ernst][0]}</span><span>${esc(x.tekst)}</span></summary>
+        <div class="vb-probleem-lijf">${x.oplossing ? `<p><b>Zo los je het op:</b> ${esc(x.oplossing)}</p>` : ""}
+        ${x.voorbeelden?.length ? `<p class="zacht vb-klein" style="margin-bottom:4px">${x.aantal > x.voorbeelden.length ? `Voorbeelden (${x.voorbeelden.length} van ${x.aantal}):` : "Waar:"}</p>
+          <ul class="vb-vb">${x.voorbeelden.map((v) => { const [url, rest] = v.split(" (op "); return `<li><a href="${esc(url)}" target="_blank" rel="noopener">${esc(vbKort(url))}</a>${rest ? ` <span class="zacht">(op ${esc(vbKort(rest.replace(/\)$/, "")))})</span>` : ""}</li>`; }).join("")}</ul>` : ""}
+        <p class="zacht vb-klein" style="margin:6px 0 0">Wil je dat Sitehulpje dit oplost? Stuur een verzoek, dan pakken we het op.</p></div></details>`;
+      paneel.innerHTML = `<div class="kaart">
+        <div class="rij" style="gap:18px;align-items:center">${vbScoreRing(L.score)}
+          <div class="vul"><h2 style="margin:0"><span class="tag">&gt;_</span>Website-gezondheid</h2>
+          <p class="zacht vb-klein" style="margin:4px 0 0">${u.gecontroleerd} pagina's gecontroleerd${u.sitemap_aantal ? ` (van de ${u.sitemap_aantal} in de sitemap)` : ""}${u.links_gecontroleerd ? ` en ${u.links_gecontroleerd} extra links` : ""} · ${datum(L.gemeten)}${d.vorige ? ` · vorige keer ${d.vorige.score}` : ""}</p></div>
+          <button class="knop rand klein" data-vb-gz-nu>Opnieuw controleren</button></div>
+        <div data-vb-gz-meld></div>
+        ${ps?.fout ? `<p class="zacht vb-klein">De snelheidsmeting van Google lukte deze keer niet; bij de volgende controle opnieuw.</p>` : ""}
+        ${ps && !ps.fout ? `<div class="vb-tegels" style="margin-top:14px">
+          ${vbTegel("Snelheid mobiel", ps.score ?? "–", ps.lcp ? `hoofdinhoud zichtbaar na ${String(ps.lcp).replace(".", ",")} s` : "", "Score van Google (0 tot 100) voor hoe snel je homepage laadt op een telefoon.", "Google")}
+          ${ps.echt ? vbTegel("Echte bezoekers", VB_ECHT[ps.echt.oordeel] || "–", "cijfers van Chrome-gebruikers, laatste 28 dagen", "Hoe snel de site aanvoelt voor echte bezoekers met Chrome, gemeten door Google.", "Google") : ""}
+          ${ps.seo != null ? vbTegel("SEO-basis", ps.seo, "technische zoekmachinecheck van Google", "Basischeck van Google: titels, omschrijvingen, links en indexeerbaarheid.", "Google") : ""}
+          ${ps.toegankelijkheid != null ? vbTegel("Toegankelijkheid", ps.toegankelijkheid, "leesbaarheid en bruikbaarheid", "Hoe goed de site werkt voor iedereen, ook met een beperking.", "Google") : ""}
+        </div>
+        ${ps.kansen?.length ? `<p style="margin:14px 0 4px"><b>Snelste winst volgens Google:</b></p><ul class="vb-kansen">${ps.kansen.map((k) => `<li>${esc(k.tekst)} <span class="zacht">· tot ${String(k.winst_s).replace(".", ",")} s sneller</span></li>`).join("")}</ul>` : ""}` : ""}
+      </div>
+      ${groepen.map((g) => { const lijst = p.filter((x) => (x.groep || "Techniek") === g); return lijst.length ? `<div class="kaart"><h2><span class="tag">&gt;_</span>${g} <span class="zacht" style="font-weight:400">(${lijst.length})</span></h2>${lijst.map(probleemHtml).join("")}</div>` : ""; }).join("")}
+      ${u.goed?.length ? `<div class="kaart"><h2><span class="tag">&gt;_</span>Dit is in orde</h2><ul class="vb-goed">${u.goed.map((t) => `<li>${esc(t)}</li>`).join("")}</ul></div>` : ""}`;
+    }
+    paneel.querySelectorAll("[data-vb-gz-nu]").forEach((b) => (b.onclick = async () => {
+      b.disabled = true; b.textContent = "Bezig met controleren… (1 tot 2 minuten)";
+      try { await vbGzApi("nu", { klant_id: klantId }); teken(await vbGzApi("laatste", { klant_id: klantId })); }
+      catch (e) { toonMelding(paneel.querySelector("[data-vb-gz-meld]"), e.message); b.disabled = false; b.textContent = "Opnieuw controleren"; }
+    }));
+  };
+  try { teken(await vbGzApi("laatste", { klant_id: klantId })); }
+  catch (e) { paneel.innerHTML = `<div class="kaart"><div class="melding fout">${esc(e.message)}</div></div>`; }
 }
 
 function vbKnoppen(el, klantId, d) {

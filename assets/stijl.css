@@ -174,3 +174,15 @@ button,a,.knop,tr.klik{touch-action:manipulation}
 @media (max-width:560px){.verberg-mobiel{display:none}.vb-tabel{font-size:13.5px}.vb-tabel .vb-naam{max-width:118px}.vb-tabel th{font-size:11px}.vb-waarde{font-size:26px}.vb-tegels{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.vb-tegel{padding:10px}.vb-tegel-kop{flex-direction:column-reverse;align-items:flex-start;gap:4px;font-size:13px}.vb-uitleg{display:none}.vb-tabel td,.vb-tabel th{padding:7px 5px}}
 td.r,th.r{text-align:right}
 .alleen-mobiel{display:none}@media (max-width:560px){.alleen-mobiel{display:inline}}
+.vb-let{color:var(--let);font-weight:600}
+.vb-ring{flex:none}.vb-ring-getal{fill:var(--tekst);font-weight:700;font-family:"JetBrains Mono",monospace}
+.vb-probleem{border:1px solid var(--lijn);border-radius:12px;margin:8px 0;background:var(--veld)}
+.vb-probleem summary{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;cursor:pointer;list-style:none}
+.vb-probleem summary::-webkit-details-marker{display:none}
+.vb-probleem summary::after{content:"▾";margin-left:auto;color:var(--zacht);transition:transform .2s}
+.vb-probleem[open] summary::after{transform:rotate(180deg)}
+.vb-ernst{font-size:11px;font-family:"JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.5px;padding:2px 7px;border-radius:999px;background:rgba(138,160,189,.12);white-space:nowrap;margin-top:2px}
+.vb-probleem-lijf{padding:0 12px 12px;font-size:14.5px}.vb-probleem-lijf p{margin:6px 0}
+.vb-vb{margin:0;padding-left:18px;font-size:13.5px}.vb-vb li{margin:2px 0;word-break:break-all}
+.vb-goed{margin:0;padding-left:0;list-style:none}.vb-goed li{padding:4px 0 4px 24px;position:relative}.vb-goed li::before{content:"✓";position:absolute;left:2px;color:var(--accent);font-weight:700}
+.vb-kansen{margin:0;padding-left:18px}.vb-kansen li{margin:3px 0}
