@@ -129,7 +129,7 @@ async function vbToon(el, klantId) {
   const pakketKaart = `<div class="kaart"><h2><span class="tag">&gt;_</span>Jouw pakket: ${pk.naam}</h2>
     <ul class="vb-goed">${pk.punten.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
     ${pk.later.length ? `<p class="zacht vb-klein" style="margin:10px 0 4px"><b>Komt eraan</b> (zonder extra kosten):</p><ul class="lijst vb-klein zacht" style="margin:0;padding-left:18px">${pk.later.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
-    <p class="zacht vb-klein" style="margin-bottom:0">Ander pakket? Neem contact op met Jan.</p></div>`;
+    <p class="zacht vb-klein" style="margin-bottom:0">Ander pakket? Neem contact op met Jan. · <a href="uitleg-vindbaarheid">Uitleg: hoe werkt Vindbaarheid?</a></p></div>`;
   const koppelKaart = pakketKaart + `<div class="kaart vb-koppel">
     <h2><span class="tag">&gt;_</span>Koppelingen</h2>
     <ul class="vb-bronnen">
@@ -192,7 +192,7 @@ async function vbToon(el, klantId) {
   <div data-vb-paneel="overzicht">
     <div class="kaart">
       <h2><span class="tag">&gt;_</span>Laatste 28 dagen in één oogopslag</h2>
-      <p class="zacht vb-klein" style="margin-top:-4px">${vbDatum(start)} t/m ${vbDatum(eind, { day: "numeric", month: "short", year: "numeric" })}${zin ? ` · ${zin}` : ""}</p>
+      <p class="zacht vb-klein" style="margin-top:-4px"><a href="uitleg-vindbaarheid#cijfers" style="float:right">Wat betekenen de cijfers?</a>${vbDatum(start)} t/m ${vbDatum(eind, { day: "numeric", month: "short", year: "numeric" })}${zin ? ` · ${zin}` : ""}</p>
       <div class="vb-tegels">
         ${d.gsc.length ? vbTegel("Klikken uit Google", vbGetal(kl), v(kl, klV), VB_UITLEG.klikken) : ""}
         ${d.gsc.length ? vbTegel("Vertoningen in Google", vbGetal(vt), v(vt, vtV), VB_UITLEG.vertoningen) : ""}
