@@ -232,6 +232,29 @@ async function vbToon(el, klantId) {
   vbKnoppen(el, klantId, d);
   vbGezondheid(el, klantId, toonTab);
   vbRapporten(el.querySelector("[data-vb-rap]"), klantId);
+  vbBing(el, klantId, eind);
+}
+
+// ---------- Bing ----------
+async function vbBing(el, klantId, eind) {
+  try {
+    const r = await fetch(VB_API.replace(/vindbaarheid$/, "vb-bing"), { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "dashboard", klant_id: klantId }) });
+    const d = await r.json(); if (!r.ok || !d.koppeling) return;
+    el.querySelectorAll(".vb-bronnen li").forEach((li) => {
+      if (/^\s*Bing/.test(li.textContent)) li.innerHTML = `<span class="vb-stip ${d.koppeling.fout ? "" : "aan"}"></span>Bing Webmaster Tools · <span class="zacht">${esc(d.koppeling.site.replace(/^https?:\/\//, "").replace(/\/$/, ""))}</span>`;
+    });
+    if (!d.dagen.length) return;
+    const e = eind || d.dagen[d.dagen.length - 1][0];
+    const start = vbDag(e, -27), vEind = vbDag(e, -28), vStart = vbDag(e, -55);
+    const kl = vbSom(d.dagen, 1, start, e), klV = vbSom(d.dagen, 1, vStart, vEind);
+    const tegels = el.querySelector('[data-vb-paneel="overzicht"] .vb-tegels');
+    if (tegels) tegels.insertAdjacentHTML("beforeend", vbTegel("Klikken uit Bing", vbGetal(kl), d.dagen.some((x) => x[0] <= vEind) ? vbVerschil(kl, klV) : `<span class="vb-gelijk">vergelijking volgt</span>`, "Hoe vaak iemand in Bing (ook gebruikt door ChatGPT-zoeken en Copilot) op jouw website klikte."));
+    if (d.zoekwoorden.length) {
+      const zw = el.querySelector('[data-vb-paneel="zoekwoorden"]');
+      if (zw) zw.insertAdjacentHTML("beforeend", `<div class="kaart"><h2><span class="tag">&gt;_</span>Zoekwoorden in Bing</h2>${vbTabel(d.zoekwoorden.map((z) => ({ ...z, vorige_positie: z.positie })), "zoekwoord", 50)}
+        <p class="zacht vb-klein">Bing wordt ook gebruikt door ChatGPT-zoeken, Copilot en DuckDuckGo.</p></div>`);
+    }
+  } catch { /* geen Bing */ }
 }
 
 // ---------- Maandrapporten ----------

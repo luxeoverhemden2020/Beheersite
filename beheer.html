@@ -203,11 +203,30 @@ function vbBeheerBekijk(id, klanten) {
         <button class="knop rand klein" id="vbraptest">Rapport vorige maand naar mij mailen</button>
         <a class="knop licht klein" href="rapport?beheer=1&klant=${encodeURIComponent(id)}">Rapport bekijken</a></div>
       <div id="vbrapmeld"></div></div>
+    <div class="kaart"><h2 style="font-size:16px"><span class="tag">&gt;_</span>Bing Webmaster Tools</h2>
+      <div id="vbbing"><p class="zacht vb-klein">Laden…</p></div></div>
     <div id="vbpaneel"></div>`;
   vbToon($("#vbpaneel"), id);
   $("#vbsluit").onclick = () => { $("#vbdetail").innerHTML = ""; };
   const VBR = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vb-rapport";
   const rap = async (actie, data) => { const r = await fetch(VBR, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, klant_id: id, ...data }) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d; };
+  (async () => {
+    const VBB = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vb-bing";
+    const bg = async (actie, data) => { const r = await fetch(VBB, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, klant_id: id, ...data }) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d; };
+    const vak = $("#vbbing");
+    try {
+      const s = await bg("sites");
+      vak.innerHTML = `<div class="rij"><select id="vbbingsite" class="vul" style="min-width:220px"><option value="">– niet koppelen –</option>${s.sites.map((u) => `<option ${u === s.gekozen ? "selected" : ""}>${esc(u)}</option>`).join("")}</select>
+        <button class="knop rand klein" id="vbbingopslaan">Opslaan en ophalen</button></div>
+        <p class="zacht vb-klein" style="margin-bottom:0">${s.sites.length ? "Kies de site van deze klant uit je Bing-account." : "Er staan nog geen sites in je Bing-account. Voeg de site toe in Bing Webmaster Tools (kan in één klik vanuit Search Console)."}</p><div id="vbbingmeld"></div>`;
+      $("#vbbingopslaan").onclick = async (e) => {
+        e.target.disabled = true;
+        try { const r = await bg("kies", { site: $("#vbbingsite").value }); toonMelding($("#vbbingmeld"), r.fout ? r.fout : "Opgeslagen.", r.fout ? "let" : "ok"); vbToon($("#vbpaneel"), id); }
+        catch (err) { toonMelding($("#vbbingmeld"), err.message); }
+        e.target.disabled = false;
+      };
+    } catch (err) { vak.innerHTML = `<p class="zacht vb-klein" style="margin:0">${esc(err.message)} Zodra de sleutel er is, kies je hier de site.</p>`; }
+  })();
   $("#vbrapmailopslaan").onclick = async () => { try { await rap("mail_instellen", { adres: $("#vbrapmail").value }); toonMelding($("#vbrapmeld"), $("#vbrapmail").value ? "Opgeslagen. Het volgende maandrapport gaat naar de klant." : "Opgeslagen. Het rapport gaat alleen naar jou.", "ok"); } catch (e) { toonMelding($("#vbrapmeld"), e.message); } };
   $("#vbraptest").onclick = async (e) => { e.target.disabled = true; try { const r = await rap("maak", { mail: "jan" }); toonMelding($("#vbrapmeld"), `Rapport ${r.maand} gemaakt en naar jou gemaild.`, "ok"); } catch (err) { toonMelding($("#vbrapmeld"), err.message); } e.target.disabled = false; };
   $("#vbververs").onclick = async (e) => {
