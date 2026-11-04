@@ -115,8 +115,7 @@ body.home .keuze input:checked+span{color:var(--tekst);border-color:transparent;
   box-shadow:0 14px 30px -14px rgba(59,130,246,.55)}
 body.home .keuze input:checked+span::after{border-color:transparent;background:linear-gradient(135deg,#22e3c4,#3b82f6) ;
   box-shadow:inset 0 0 0 4px var(--bg2)}
-:root[data-thema=licht] body.home .contact input:not([type=radio]):not([type=checkbox]),:root[data-thema=licht] body.home .contact textarea{background:#fff;border-color:#cfdbea}
-body.home .contact input:not([type=radio]):not([type=checkbox]):focus,body.home .contact textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent2);outline:none}
+body.home .contact input:focus,body.home .contact textarea:focus{outline:none}
 
 @media (prefers-reduced-motion:reduce){
   body.home::before,body.home::after,.wow-wereld,.zk-wereld,.wow-chip,.wow-ring,.zk-stat{animation:none}
@@ -125,3 +124,30 @@ body.home .contact input:not([type=radio]):not([type=checkbox]):focus,body.home 
 }
 [data-tilt]{position:relative}
 @media (max-width:560px){.wow-chip.c1{transform:translate(-170px,-160px) translateZ(90px)}.wow-chip.c3{transform:translate(-175px,80px) translateZ(140px)}.wow-chip.c2{transform:translate(60px,-130px) translateZ(130px)}.wow-chip.c4{transform:translate(70px,120px) translateZ(80px)}}
+
+/* ---------- lichtflits langs de rand (zo af en toe, subtiel) ---------- */
+@property --zw{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes zwRond{0%{--zw:0deg}28%{--zw:360deg}100%{--zw:360deg}}
+@keyframes zwEenmaal{from{--zw:0deg}to{--zw:360deg}}
+body.home .keuze input:checked+span{
+  background:linear-gradient(var(--bg2),var(--bg2)) padding-box,
+    conic-gradient(from var(--zw),transparent 0deg 318deg,rgba(255,255,255,.95) 340deg,transparent 360deg) border-box,
+    linear-gradient(135deg,#22e3c4,#3b82f6 55%,#8b5cf6) border-box;
+  animation:zwRond 7s ease-in-out infinite}
+body.home .contact input:not([type=radio]):not([type=checkbox]),body.home .contact textarea{
+  border:1.5px solid transparent;
+  background:linear-gradient(var(--zw-vlak,var(--bg2)),var(--zw-vlak,var(--bg2))) padding-box,
+    linear-gradient(var(--lijn),var(--lijn)) border-box;
+  transition:box-shadow .25s}
+:root[data-thema=licht] body.home .contact{--zw-vlak:#fff}
+body.home .contact input:not([type=radio]):not([type=checkbox]):focus,body.home .contact textarea:focus{
+  background:linear-gradient(var(--zw-vlak,var(--bg2)),var(--zw-vlak,var(--bg2))) padding-box,
+    conic-gradient(from var(--zw),rgba(34,227,196,.25) 0deg 290deg,#fff 330deg,rgba(34,227,196,.25) 360deg) border-box,
+    linear-gradient(135deg,#22e3c4,#3b82f6 55%,#8b5cf6) border-box;
+  animation:zwEenmaal 1.1s ease-out 1;box-shadow:0 0 0 4px var(--accent2),0 10px 24px -14px rgba(59,130,246,.5)}
+/* verstuurknop: af en toe een glans erover */
+body.home .contact form button.knop,body.home .contact form .groot-knop{position:relative;overflow:hidden}
+body.home .contact form button.knop::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;transform:skewX(-20deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:zwGlans 6s ease-in-out infinite;pointer-events:none}
+@keyframes zwGlans{0%,70%{left:-60%}85%,100%{left:130%}}
+@media (prefers-reduced-motion:reduce){body.home .keuze input:checked+span,body.home .contact input,body.home .contact textarea,body.home .contact form button.knop::after{animation:none}}
