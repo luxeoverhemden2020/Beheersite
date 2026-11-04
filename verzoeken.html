@@ -86,6 +86,15 @@ async function laadVerzoek(id) {
   return d;
 }
 
+// Voorstel op de testsite? Dan knoppen "Bekijk de testsite" en "Akkoord" tonen
+function testLink(v, d) {
+  if (v.status !== "wacht_op_klant" || !d) return "";
+  const b = d.verzoek.berichten, laatste = b[b.length - 1];
+  if (!laatste || laatste.van !== "webbeheer") return "";
+  const m = String(laatste.tekst || "").match(/https?:\/\/[^\s)<>"']*-test\.vercel\.app[^\s)<>"']*/);
+  return m ? m[0].replace(/[.,!?]+$/, "") : "";
+}
+
 function teken(lijst) {
   const el = $("#lijst");
   if (!lijst.length) { el.innerHTML = `<p class="zacht">Nog geen verzoeken. Je eerste verzoek verschijnt hier.</p>`; return; }
@@ -99,6 +108,9 @@ function teken(lijst) {
       ${isOpen && !d ? `<div class="lijf"><p class="zacht">Laden…</p></div>` : ""}
       ${isOpen && d ? `<div class="lijf">
         ${berichtenHtml(d.verzoek.berichten)}
+        ${testLink(v, d) ? `<div class="rij testknoppen" style="margin-top:12px;gap:8px;flex-wrap:wrap">
+          <a class="knop rand" href="${esc(testLink(v, d))}" target="_blank" rel="noopener">👀 Bekijk de testsite</a>
+          <button class="knop akkoord">✓ Akkoord, zet het live</button></div>` : ""}
         ${actief ? wachtHtml(v.status, v.bijgewerkt) : ""}
         ${!actief && d.reacties_over > 0 ? `<div class="reactie" style="margin-top:12px"></div>` : ""}
         ${!actief && d.reacties_over === 0 ? `<p class="zacht">Dit gesprek is vol. Start hierboven een nieuw verzoek.</p>` : ""}
@@ -121,6 +133,12 @@ function teken(lijst) {
       plaats: "Reageer of geef een aanvulling…", knop: "Reageren",
       opVersturen: async (tekst, fotos) => { await api("reageer", { id, tekst, fotos }); await laad(); },
     });
+    const ak = $(".akkoord", blok);
+    if (ak) ak.onclick = async () => {
+      ak.disabled = true; ak.textContent = "Bezig…";
+      try { await api("reageer", { id, tekst: "Akkoord, zet het maar live." }); await laad(); }
+      catch (e) { ak.disabled = false; ak.textContent = "✓ Akkoord, zet het live"; toonMelding($(".fout", blok), e.message); }
+    };
     const t = $(".terug", blok);
     if (t) t.onclick = async () => {
       if (!confirm("Weet je zeker dat je deze aanpassing wilt terugdraaien?")) return;
