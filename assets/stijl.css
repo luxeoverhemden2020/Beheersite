@@ -228,3 +228,14 @@ td.r,th.r{text-align:right}
 .vbs-gegevens{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:14px;margin-top:8px}
 .vbs-gegevens>div{min-width:0;overflow-wrap:anywhere}
 @media (max-width:640px){.vbs-raster{grid-template-columns:1fr}.vbs-gegevens{grid-template-columns:1fr}.vbs-gegevens .zacht{margin-top:6px}.vbs-stap>summary{padding:12px 10px}.vbs-inhoud{padding:0 10px 12px}}
+
+/* Voorstel op de testsite: paneel met "Bekijk de testsite" en "Akkoord" */
+.testpaneel{margin:14px 0 4px;padding:14px;border-radius:14px;background:linear-gradient(135deg,rgba(34,227,196,.08),rgba(139,92,246,.1));border:1px solid rgba(34,227,196,.25);box-shadow:var(--glow)}
+.testpaneel .tp-kop{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.testpaneel .tp-kop .bot{width:56px;height:56px;flex:none}
+.testpaneel .fase{font-family:"JetBrains Mono",monospace;color:var(--accent);font-size:14px;font-weight:600;margin-bottom:2px}
+.testpaneel .zacht{font-size:14px}
+.testpaneel .tp-knoppen{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.testpaneel .knop.groot{padding:13px 12px;font-size:15px;width:100%;text-align:center}
+.testpaneel .knop.rand{background:var(--veld)}
+@media (max-width:420px){.testpaneel .tp-knoppen{grid-template-columns:1fr}}

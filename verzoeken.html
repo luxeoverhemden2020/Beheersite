@@ -108,9 +108,12 @@ function teken(lijst) {
       ${isOpen && !d ? `<div class="lijf"><p class="zacht">Laden…</p></div>` : ""}
       ${isOpen && d ? `<div class="lijf">
         ${berichtenHtml(d.verzoek.berichten)}
-        ${testLink(v, d) ? `<div class="rij testknoppen" style="margin-top:12px;gap:8px;flex-wrap:wrap">
-          <a class="knop rand" href="${esc(testLink(v, d))}" target="_blank" rel="noopener">👀 Bekijk de testsite</a>
-          <button class="knop akkoord">✓ Akkoord, zet het live</button></div>` : ""}
+        ${testLink(v, d) ? `<div class="testpaneel">
+          <div class="tp-kop">${robotSvg("rust")}<div><div class="fase">&gt;_ klaar op de testsite</div>
+            <div class="zacht">Bekijk het voorbeeld. Goed? Dan zet ik het met één klik op je echte website.</div></div></div>
+          <div class="tp-knoppen">
+            <a class="knop rand groot" href="${esc(testLink(v, d))}" target="_blank" rel="noopener">👀 Bekijk de testsite</a>
+            <button class="knop groot akkoord">✓ Akkoord, zet het live</button></div></div>` : ""}
         ${actief ? wachtHtml(v.status, v.bijgewerkt) : ""}
         ${!actief && d.reacties_over > 0 ? `<div class="reactie" style="margin-top:12px"></div>` : ""}
         ${!actief && d.reacties_over === 0 ? `<p class="zacht">Dit gesprek is vol. Start hierboven een nieuw verzoek.</p>` : ""}
