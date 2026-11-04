@@ -21,6 +21,7 @@
 </div>
 <div class="wrap">
   <div id="appTip"></div>
+  <div id="vbpauze"></div>
   <div class="hooftabs verborgen" id="hooftabs"><button class="aan" data-hoofd="verzoeken">Verzoeken</button><button data-hoofd="vindbaarheid">Vindbaarheid</button></div>
   <div id="vindbaarheid" class="verborgen"></div>
   <div id="verzoekenDeel">
@@ -37,6 +38,7 @@
 <script src="assets/basis.js"></script>
 <script src="assets/vindbaarheid.js"></script>
 <script src="assets/vb-start.js"></script>
+<script src="assets/vb-factuur.js"></script>
 <script>
 let open = new Set(), cache = {}, timer = null;
 const SNELKNOPPEN = [
@@ -155,6 +157,7 @@ api("ik").then((d) => {
   laad();
   appTip($("#appTip"));
   // Vindbaarheid: alleen als de klant dit pakket heeft
+  if (d.klant) vbfPauzeMelding($("#vbpauze"));
   vbApi("status").then((s) => {
     if (!s.klant.aan) return;
     const tabs = $("#hooftabs"); tabs.classList.remove("verborgen");

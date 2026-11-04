@@ -149,7 +149,7 @@ function vbsStapInhoud(s, d, admin) {
     return `<ul class="vbs-afspraken">
         <li><b>Pakket:</b> Vindbaarheid ${esc(pk)}${d.klant.prijs ? `, €${d.klant.prijs} per maand (excl. btw)` : ""}.</li>
         <li><b>Looptijd:</b> minimaal 3 maanden. Daarna per maand opzegbaar.</li>
-        <li><b>Betalen:</b> automatische incasso per maand. Je krijgt de factuur een dag van tevoren, samen met je rapport.</li>
+        <li><b>Betalen:</b> de eerste (deel)maand betaal je met iDEAL; daarmee geef je ook toestemming voor de automatische incasso. Daarna gaat het elke maand vanzelf. Je krijgt de factuur een dag van tevoren, samen met je rapport.</li>
         <li><b>Geen garantie op een plek in Google:</b> niemand kan dat beloven. Wel doen we elke maand het werk uit je pakket en laten we precies zien wat het oplevert.</li>
         <li><b>Je gegevens:</b> we gebruiken ze alleen voor deze dienst en bewaren ze in de EU. Hoe we dat regelen staat in de verwerkersovereenkomst.</li></ul>
       ${admin ? `<p class="zacht">De klant bevestigt dit zelf in het eigen portaal.</p>` : `<form class="vbs-form" data-stap="akkoord">
@@ -197,6 +197,8 @@ async function vbStartToon(el, klantId, opties = {}) {
     try {
       if (f.dataset.stap === "akkoord") {
         await vbsApi("akkoord", { voorwaarden: fd.get("voorwaarden") === "on", verwerker: fd.get("verwerker") === "on", naam: fd.get("naam") });
+        // eerste (deel)maand met iDEAL betalen; dat geeft ook toestemming voor de automatische incasso (alleen als betalen aan staat)
+        if (typeof vbfApi === "function") { try { const b = await vbfApi("eerste"); if (b.url) { location.href = b.url; return; } } catch { /* betalen nog niet aan */ } }
       } else {
         const g = Object.fromEntries(fd.entries());
         if (f.dataset.stap === "doelen") g.doel = fd.getAll("doel");

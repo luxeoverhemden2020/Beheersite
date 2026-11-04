@@ -77,6 +77,7 @@
 
   <section id="t-vindbaarheid" class="verborgen">
     <div id="vbstart"></div>
+    <div id="vbfacturen"></div>
     <div class="kaart tabel-scroll"><h2>Vindbaarheid – alle klanten</h2>
       <p class="zacht vb-klein" style="margin-top:-4px">Alleen klanten met een pakket zien de tab Vindbaarheid. Cijfers: laatste 28 dagen, bijgewerkt elke nacht.</p>
       <div id="vbmeldingen"></div><div id="vbtabel"><p class="zacht">Laden…</p></div></div>
@@ -132,6 +133,7 @@
 <script src="assets/basis.js"></script>
 <script src="assets/vindbaarheid.js"></script>
 <script src="assets/vb-start.js"></script>
+<script src="assets/vb-factuur.js"></script>
 <script>
 const WIEJAN = { klant: "Klant", webbeheer: "Sitehulpje", jan: "Jij (Jan)" };
 let data = null, ik = null, openVerzoek = null, paneelTimer = null;
@@ -170,6 +172,7 @@ async function vbBeheerLaad() {
   try {
     const { klanten } = await vbApi("beheer_lijst");
     vbStartOverzicht($("#vbstart"), (id) => vbBeheerBekijk(id, klanten));
+    vbfBeheer($("#vbfacturen"));
     el.innerHTML = `<table><thead><tr><th>Klant</th><th>Pakket</th><th>Google</th><th class="r">Klikken</th><th class="r">Bezoeken via Google</th><th class="r">Acties</th><th>Bijgewerkt</th><th></th></tr></thead><tbody>
       ${klanten.map((k) => {
         const pct = k.klikken_vorige ? Math.round(((k.klikken_28 - k.klikken_vorige) / k.klikken_vorige) * 100) : null;
@@ -201,11 +204,12 @@ function vbBeheerBekijk(id, klanten) {
     <button class="knop rand klein" id="vbververs">Nu bijwerken</button><button class="knop rand klein" id="vbsluit">Sluiten</button></div>
     <div id="vbstartbeheer"></div>
     <div class="kaart"><h2 style="font-size:16px"><span class="tag">&gt;_</span>Maandrapport</h2>
-      <p class="zacht vb-klein" style="margin-top:-4px">Elke maand op de 3e gemaakt. Zonder adres gaat het alleen naar jou; met adres naar de klant (jij krijgt een kopie).</p>
+      <p class="zacht vb-klein" style="margin-top:-4px">Elke maand op de 2e gemaakt, samen met de factuur. Zonder adres gaat het alleen naar jou; met adres naar de klant (jij krijgt een kopie).</p>
       <div class="rij"><input id="vbrapmail" type="email" placeholder="E-mail klant (leeg = alleen naar jou)" class="vul" value="${esc(k?.vb_rapport_mail || "")}" style="min-width:220px">
         <button class="knop rand klein" id="vbrapmailopslaan">Opslaan</button>
         <button class="knop rand klein" id="vbraptest">Rapport vorige maand naar mij mailen</button>
-        <a class="knop licht klein" href="rapport?beheer=1&klant=${encodeURIComponent(id)}">Rapport bekijken</a></div>
+        <a class="knop licht klein" href="rapport?beheer=1&klant=${encodeURIComponent(id)}">Rapport bekijken</a>
+        <button class="knop rand klein" id="vbproef">Proeffactuur bekijken</button></div>
       <div id="vbrapmeld"></div></div>
     <div class="kaart"><h2 style="font-size:16px"><span class="tag">&gt;_</span>Bing Webmaster Tools</h2>
       <div id="vbbing"><p class="zacht vb-klein">Laden…</p></div></div>
@@ -213,6 +217,7 @@ function vbBeheerBekijk(id, klanten) {
   vbToon($("#vbpaneel"), id);
   if (k?.vindbaarheid) vbStartBeheer($("#vbstartbeheer"), id);
   $("#vbsluit").onclick = () => { $("#vbdetail").innerHTML = ""; };
+  $("#vbproef").onclick = async (e) => { e.target.disabled = true; try { const r = await vbfApi("proef", { klant_id: id }); location.href = `factuur?beheer=1&id=${r.id}`; } catch (err) { toonMelding($("#vbrapmeld"), err.message); e.target.disabled = false; } };
   const VBR = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vb-rapport";
   const rap = async (actie, data) => { const r = await fetch(VBR, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, klant_id: id, ...data }) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d; };
   (async () => {
