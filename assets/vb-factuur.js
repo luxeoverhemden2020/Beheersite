@@ -37,8 +37,15 @@ async function vbfBeheer(el) {
         <td class="mono">${esc(f.nummer || "–")}</td><td>${esc(f.naam)}</td><td class="vb-klein">${esc(f.omschrijving)}</td><td class="r mono">${vbfEuro(f.totaal)}</td>
         <td><span class="${c}">${t}</span>${f.betaald_via === "handmatig" ? ` <span class="zacht vb-klein">(handmatig)</span>` : ""}</td>
         <td><div class="rij"><a class="knop rand klein" href="factuur?beheer=1&id=${esc(f.id)}">Bekijk</a>
-          ${["open", "teruggeboekt", "mislukt"].includes(f.status) ? `<button class="knop rand klein" data-vbfbetaald="${esc(f.id)}">Betaald (buiten Mollie)</button>` : ""}</div></td></tr>`; }).join("")}
+          ${["open", "teruggeboekt", "mislukt"].includes(f.status) ? `<button class="knop rand klein" data-vbfbetaald="${esc(f.id)}">Betaald (buiten Mollie)</button>` : ""}
+          ${f.aanmaning && !f.incasso_gestuurd && f.status !== "betaald" ? `<button class="knop klein" data-vbfincasso="${esc(f.id)}">Naar incasso sturen</button>` : ""}
+          ${f.incasso_gestuurd ? `<span class="zacht vb-klein">bij incassobureau</span>` : ""}</div></td></tr>`; }).join("")}
       </tbody></table></div>` : `<p class="zacht">Nog geen facturen. De eerste worden gemaakt zodra een klant akkoord heeft gegeven.</p>`}
+    <details class="vbs-alt"><summary>Incassobureau ${d.incasso_email ? `<span class="zacht">(${esc(d.incasso_email)}${d.incasso_auto ? ", automatisch" : ""})</span>` : `<span class="zacht">(nog niet ingesteld)</span>`}</summary>
+      <p class="zacht vb-klein" style="margin:6px 0">Niet betaald na herinneringen op dag 7 en 14 en een laatste aanmaning op dag 21? Dan staat op dag 28 het dossier klaar voor het incassobureau.</p>
+      <div class="rij"><input id="vbfincmail" type="email" class="vul" placeholder="E-mailadres van het incassobureau" value="${esc(d.incasso_email || "")}" style="min-width:220px">
+        <label class="vbs-vink" style="margin:0"><input type="checkbox" id="vbfincauto" ${d.incasso_auto ? "checked" : ""}> Automatisch doorsturen</label>
+        <button class="knop rand klein" id="vbfincopslaan">Opslaan</button></div></details>
     <details class="vbs-alt"><summary>Kwartaaloverzicht voor de btw-aangifte</summary>
       <div class="rij" style="margin-top:8px"><select id="vbfkw" style="width:auto">${[1, 2, 3, 4].map((q) => `<option value="${q}" ${q === Math.ceil((new Date().getMonth() + 1) / 3) ? "selected" : ""}>Kwartaal ${q}</option>`).join("")}</select>
         <input id="vbfjaar" type="number" value="${new Date().getFullYear()}" style="width:100px"><button class="knop rand klein" id="vbfkwtoon">Toon</button></div>
@@ -58,6 +65,16 @@ async function vbfBeheer(el) {
     b.disabled = true;
     try { await vbfApi("pauze", { klant_id: b.dataset.vbfhervat, aan: false }); vbfBeheer(el); } catch (e) { toonMelding(meld, e.message); b.disabled = false; }
   }));
+  el.querySelectorAll("[data-vbfincasso]").forEach((b) => (b.onclick = async () => {
+    b.disabled = true;
+    try { await vbfApi("naar_incasso", { id: b.dataset.vbfincasso }); toonMelding(meld, "Dossier naar het incassobureau gestuurd. Je krijgt een kopie.", "ok"); vbfBeheer(el); }
+    catch (e) { toonMelding(meld, e.message); b.disabled = false; }
+  }));
+  el.querySelector("#vbfincopslaan").onclick = async (e) => {
+    e.target.disabled = true;
+    try { await vbfApi("incasso_instellen", { adres: el.querySelector("#vbfincmail").value, auto: el.querySelector("#vbfincauto").checked }); vbfBeheer(el); }
+    catch (err) { toonMelding(meld, err.message); e.target.disabled = false; }
+  };
   el.querySelector("#vbfkwtoon").onclick = async () => {
     const uit = el.querySelector("#vbfkwuit");
     try {
