@@ -76,6 +76,7 @@
   </section>
 
   <section id="t-vindbaarheid" class="verborgen">
+    <div id="vbchecks"></div>
     <div id="vbstart"></div>
     <div id="vbfacturen"></div>
     <div class="kaart tabel-scroll"><h2>Vindbaarheid – alle klanten</h2>
@@ -134,6 +135,7 @@
 <script src="assets/vindbaarheid.js"></script>
 <script src="assets/vb-start.js"></script>
 <script src="assets/vb-factuur.js"></script>
+<script src="assets/vb-check.js"></script>
 <script>
 const WIEJAN = { klant: "Klant", webbeheer: "Sitehulpje", jan: "Jij (Jan)" };
 let data = null, ik = null, openVerzoek = null, paneelTimer = null;
@@ -173,6 +175,7 @@ async function vbBeheerLaad() {
     const { klanten } = await vbApi("beheer_lijst");
     vbStartOverzicht($("#vbstart"), (id) => vbBeheerBekijk(id, klanten));
     vbfBeheer($("#vbfacturen"));
+    vbcBeheer($("#vbchecks"), new URLSearchParams(location.search).get("check"));
     el.innerHTML = `<table><thead><tr><th>Klant</th><th>Pakket</th><th>Google</th><th class="r">Klikken</th><th class="r">Bezoeken via Google</th><th class="r">Acties</th><th>Bijgewerkt</th><th></th></tr></thead><tbody>
       ${klanten.map((k) => {
         const pct = k.klikken_vorige ? Math.round(((k.klikken_28 - k.klikken_vorige) / k.klikken_vorige) * 100) : null;
@@ -255,6 +258,14 @@ setTimeout(vbMeldingen, 1500);
     const klanten = await vbBeheerLaad();
     vbBeheerBekijk(p.get("vb"), klanten || []);
   }, 0);
+}
+{ // link uit een mail: beheer?check=<id> opent de gratis checks
+  const cid = new URLSearchParams(location.search).get("check");
+  if (cid) setTimeout(() => {
+    document.querySelectorAll(".tabs button").forEach((x) => x.classList.toggle("aan", x.dataset.tab === "vindbaarheid"));
+    ["verzoeken", "klanten", "vindbaarheid", "gebruikers", "account"].forEach((t) => $("#t-" + t).classList.toggle("verborgen", t !== "vindbaarheid"));
+    if (!$("#vbtabel table")) vbBeheerLaad();
+  }, 300);
 }
 { // link uit een mail: beheer?verzoek=<id> opent dat verzoek meteen
   const vid = new URLSearchParams(location.search).get("verzoek");

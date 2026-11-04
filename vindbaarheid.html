@@ -49,6 +49,18 @@
 .pk-extra-prijs s{color:var(--zacht);font-weight:400;margin-left:4px}.pk-extra-tekst{flex-basis:100%;color:var(--zacht)}.pk-extra-link{font-weight:600}
 .sh-los{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;margin-top:14px}.sh-los h3{margin:2px 0 6px}.sh-los .zacht{margin:0}.sh-los-tekst{min-width:0}
 @media (max-width:700px){.sh-los{grid-template-columns:1fr}}
+.labelveld{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:7px 8px;border-radius:12px;border:1.5px solid var(--lijn);background:var(--bg2);cursor:text}
+:root[data-thema=licht] .labelveld{background:#fff}
+.labelveld:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent2)}
+.labelveld input{flex:1;min-width:140px;border:0!important;background:transparent!important;box-shadow:none!important;padding:5px 4px!important;animation:none!important}
+.labelveld .lbl{display:inline-flex;align-items:center;gap:6px;padding:5px 6px 5px 11px;border-radius:999px;font-size:14px;font-weight:600;background:linear-gradient(135deg,rgba(34,227,196,.18),rgba(59,130,246,.16));border:1px solid rgba(34,227,196,.45)}
+.labelveld .lbl button{border:0;background:transparent;color:inherit;font-size:16px;line-height:1;cursor:pointer;padding:0 4px;border-radius:50%}
+.labelveld .lbl button:focus-visible{outline:2px solid var(--accent)}
+.veld-hint{font-size:13px;color:var(--zacht);margin:6px 0 4px}
+.keuzes.gebied{grid-template-columns:repeat(4,1fr)}
+.keuzes.gebied .keuze span{flex-direction:column;align-items:flex-start;gap:2px;padding-right:34px}
+.keuzes.gebied .keuze span small{font-weight:400;font-size:12.5px;color:var(--zacht)}
+@media (max-width:700px){.keuzes.gebied{grid-template-columns:1fr 1fr}}
 .keuze{position:relative}.pakket-mobiel{display:none}
 .pakket-mobiel .kaart{position:relative}.pakket-mobiel h3{margin:0;display:flex;justify-content:space-between;align-items:baseline;font-size:20px}
 .prijs-m{font-family:"JetBrains Mono",monospace;font-size:24px}.prijs-m small{font-size:12px;color:var(--zacht);font-family:"Space Grotesk",sans-serif}
@@ -240,11 +252,22 @@
         </div>
         <label class="sh-vink" style="display:flex;gap:8px;align-items:center;margin:10px 0 0;font-weight:400"><input type="checkbox" id="c_sh" style="width:auto"> Ook Sitehulpje webbeheer erbij (€75 i.p.v. €125 per maand)</label>
         <div class="grid2">
-          <div><label for="c_naam">Je naam *</label><input id="c_naam" autocomplete="name" required></div>
+          <div><label for="c_site">Adres van je website *</label><input id="c_site" inputmode="url" autocomplete="url" placeholder="www.jouwbedrijf.nl" required></div>
+          <div><label for="c_email">E-mailadres *</label><input id="c_email" type="email" autocomplete="email" placeholder="Hier sturen we het rapport naartoe" required></div>
+          <div><label for="c_naam">Je naam</label><input id="c_naam" autocomplete="name"></div>
           <div><label for="c_bedrijf">Bedrijf</label><input id="c_bedrijf" autocomplete="organization"></div>
-          <div><label for="c_contact">E-mail of telefoon *</label><input id="c_contact" autocomplete="email" required></div>
-          <div><label for="c_site">Adres van je website *</label><input id="c_site" inputmode="url" placeholder="www.…" required></div>
         </div>
+        <label for="c_woord">Wat verkoop je of wat doe je?</label>
+        <div class="labelveld" id="c_labels"><input id="c_woord" autocomplete="off" placeholder="Typ en druk op Enter"></div>
+        <p class="veld-hint">Bijvoorbeeld: loodgieter Hengelo, bruidskapsel, e-bike reparatie, elektricien. Een paar woorden is genoeg.</p>
+        <label>Waar zitten je klanten?</label>
+        <div class="keuzes gebied" role="radiogroup" aria-label="Waar zitten je klanten?">
+          <label class="keuze"><input type="radio" name="c_gebied" value="plaatselijk"><span>📍 Plaatselijk<small>je eigen stad of dorp</small></span></label>
+          <label class="keuze"><input type="radio" name="c_gebied" value="regionaal"><span>🗺️ Regionaal<small>bijvoorbeeld Twente</small></span></label>
+          <label class="keuze"><input type="radio" name="c_gebied" value="landelijk"><span>🇳🇱 Landelijk<small>heel Nederland</small></span></label>
+          <label class="keuze"><input type="radio" name="c_gebied" value="internationaal"><span>🌍 Internationaal<small>ook buiten Nederland</small></span></label>
+        </div>
+        <div id="c_plaatsrij" hidden><label for="c_plaats">In welke plaats zit je? <span class="zacht">(mag leeg, dan zoeken we het op je site)</span></label><input id="c_plaats" autocomplete="address-level2" placeholder="Bijvoorbeeld Hengelo"></div>
         <label for="c_bericht">Iets wat we moeten weten? (mag leeg)</label>
         <textarea id="c_bericht" placeholder="Bijvoorbeeld: we willen beter gevonden worden in Enschede en Hengelo."></textarea>
         <input id="c_website2" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
@@ -262,14 +285,46 @@ document.querySelectorAll("[data-keuze]").forEach((a) => a.addEventListener("cli
   const r = document.querySelector(`input[name=c_keuze][value="${a.dataset.keuze}"]`); if (r) r.checked = true;
   const v = document.getElementById("c_sh"); if (v) v.checked = a.dataset.sitehulpje === "1";
 }));
+// labeltjes voor "Wat verkoop je of wat doe je?"
+const woorden = [];
+const tekenLabels = () => {
+  const veld = $("#c_labels"), inp = $("#c_woord");
+  veld.querySelectorAll(".lbl").forEach((x) => x.remove());
+  woorden.forEach((w, i) => {
+    const l = document.createElement("span"); l.className = "lbl"; l.textContent = w;
+    const x = document.createElement("button"); x.type = "button"; x.textContent = "×"; x.setAttribute("aria-label", "Verwijder " + w);
+    x.onclick = () => { woorden.splice(i, 1); tekenLabels(); inp.focus(); };
+    l.appendChild(x); veld.insertBefore(l, inp);
+  });
+  inp.placeholder = woorden.length >= 5 ? "Maximaal 5" : woorden.length ? "Nog een?" : "Typ en druk op Enter";
+  inp.disabled = woorden.length >= 5;
+};
+const voegToe = () => {
+  const inp = $("#c_woord");
+  inp.value.split(",").map((w) => w.trim()).filter(Boolean).forEach((w) => { if (woorden.length < 5 && !woorden.includes(w)) woorden.push(w.slice(0, 60)); });
+  inp.value = ""; tekenLabels();
+};
+$("#c_woord").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === ",") { e.preventDefault(); voegToe(); }
+  else if (e.key === "Backspace" && !e.target.value && woorden.length) { woorden.pop(); tekenLabels(); }
+});
+$("#c_woord").addEventListener("blur", voegToe);
+$("#c_labels").addEventListener("click", (e) => { if (e.target.id === "c_labels") $("#c_woord").focus(); });
+document.querySelectorAll("input[name=c_gebied]").forEach((r) => r.addEventListener("change", () => {
+  $("#c_plaatsrij").hidden = !["plaatselijk", "regionaal"].includes(r.value);
+}));
 $("#cform").onsubmit = async (e) => {
-  e.preventDefault(); toonMelding($("#cmeld"), ""); $("#cknop").disabled = true;
+  e.preventDefault(); voegToe(); toonMelding($("#cmeld"), ""); $("#cknop").disabled = true;
   try {
-    await api("contact", { naam: $("#c_naam").value, bedrijf: $("#c_bedrijf").value, contact: $("#c_contact").value, site: $("#c_site").value,
-      bericht: "Vindbaarheid – keuze: " + (document.querySelector("input[name=c_keuze]:checked")?.value || "-") + ($("#c_sh").checked ? "\nMet Sitehulpje webbeheer erbij (€75/mnd)" : "") + "\n\n" + $("#c_bericht").value,
-      website2: $("#c_website2").value, bron: location.hostname });
-    $("#cform").reset();
-    toonMelding($("#cmeld"), "Bedankt! Je aanvraag is verstuurd. Jan stuurt je de uitkomst van de check en neemt snel contact met je op.", "ok");
+    const r = await fetch(API.replace(/beheersite$/, "vb-check"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+      actie: "aanvraag", site: $("#c_site").value, email: $("#c_email").value, naam: $("#c_naam").value, bedrijf: $("#c_bedrijf").value,
+      woorden, werkgebied: document.querySelector("input[name=c_gebied]:checked")?.value || "", plaats: $("#c_plaatsrij").hidden ? "" : $("#c_plaats").value,
+      bericht: $("#c_bericht").value, keuze: document.querySelector("input[name=c_keuze]:checked")?.value || "", sitehulpje: $("#c_sh").checked,
+      website2: $("#c_website2").value, bron: location.hostname }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.fout || "Versturen lukte niet. Probeer het zo nog eens.");
+    $("#cform").reset(); woorden.length = 0; tekenLabels(); $("#c_plaatsrij").hidden = true;
+    toonMelding($("#cmeld"), "Bedankt! We controleren je website nu. Je krijgt het rapport binnen een werkdag per mail.", "ok");
   } catch (err) { toonMelding($("#cmeld"), err.message); }
   $("#cknop").disabled = false;
 };
