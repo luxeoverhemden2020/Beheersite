@@ -36,6 +36,7 @@
 </div>
 <script src="assets/basis.js"></script>
 <script src="assets/vindbaarheid.js"></script>
+<script src="assets/vb-start.js"></script>
 <script>
 let open = new Set(), cache = {}, timer = null;
 const SNELKNOPPEN = [
@@ -163,11 +164,17 @@ api("ik").then((d) => {
       $("#verzoekenDeel").classList.toggle("verborgen", t !== "verzoeken");
       $("#vindbaarheid").classList.toggle("verborgen", t !== "vindbaarheid");
       $(".wrap").classList.toggle("breed", t === "vindbaarheid");
-      if (t === "vindbaarheid" && !geladen) { geladen = true; vbToon($("#vindbaarheid")); }
+      if (t === "vindbaarheid" && !geladen) { geladen = true; vbMetStart($("#vindbaarheid")); }
       try { history.replaceState(null, "", location.pathname + location.search + (t === "vindbaarheid" ? "#vindbaarheid" : "")); } catch {}
     };
     tabs.querySelectorAll("button").forEach((b) => (b.onclick = () => kies(b.dataset.hoofd)));
     if (location.hash === "#vindbaarheid" || new URLSearchParams(location.search).get("google")) kies("vindbaarheid");
+    // nieuwe klant: zolang de startstappen niet af zijn, meteen naar Vindbaarheid
+    vbsApi("status").then((st) => {
+      if (st.klant_klaar) return;
+      tabs.querySelector('[data-hoofd="vindbaarheid"]').innerHTML = 'Vindbaarheid <span class="vbs-label" style="margin-left:4px">start</span>';
+      kies("vindbaarheid");
+    }).catch(() => {});
   }).catch(() => {});
 });
 </script>

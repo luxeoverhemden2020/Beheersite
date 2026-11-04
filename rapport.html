@@ -140,7 +140,7 @@ function uitlegBlok(d, meer) {
   const redenen = (u.ai ? [{ tekst: u.ai }] : u.redenen) || [];
   const lijst = (rijen, plus) => rijen.length ? `<ul class="lijst">${rijen.map((x) => `<li>${esc(x.sleutel)} <span class="${plus ? "op" : "af"} mono">${x.verschil > 0 ? "+" : ""}${x.verschil}</span></li>`).join("")}</ul>` : `<p class="leeg">Geen</p>`;
   return `<div class="blok"><h2><span class="tag">&gt;_</span>${kop}</h2>
-    <p style="margin-top:0">${esc(u.samenvatting)}</p>
+    ${u.richting === "stabiel" ? `<p style="margin-top:0">${esc(u.samenvatting)}</p>` : ""}
     ${redenen.map((r) => `<div class="reden"><span class="ico">→</span><span>${esc(r.tekst)}</span></div>`).join("")}
     ${u.bereikbaar != null ? `<p class="zacht klein">Je website was deze maand ${String(u.bereikbaar).replace(".", ",")}% van de tijd bereikbaar (we controleren elk half uur).</p>` : ""}
     ${meer && (u.verliezers.length || u.winnaars.length) ? `<div class="wl"><div><h3>Grootste stijgers (klikken)</h3>${lijst(u.winnaars, true)}</div><div><h3>Grootste dalers (klikken)</h3>${lijst(u.verliezers, false)}</div></div>

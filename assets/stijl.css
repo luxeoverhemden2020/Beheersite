@@ -195,3 +195,36 @@ td.r,th.r{text-align:right}
 .vb-voorstel input,.vb-voorstel textarea{font-size:14px;padding:8px 10px;margin-bottom:6px;min-height:0}
 .vb-pre{white-space:pre-wrap;word-break:break-word;font-size:12.5px;background:var(--bg2);border:1px solid var(--lijn);border-radius:10px;padding:10px;max-height:320px;overflow:auto;margin:0}
 @media (max-width:640px){.vb-vs-grid{grid-template-columns:1fr}}
+/* Vindbaarheid – startstappen */
+.vbs-teller{font-size:13px;color:var(--zacht)}
+.vbs-balk{height:6px;border-radius:99px;background:var(--lijn);overflow:hidden;margin-top:10px}
+.vbs-balk span{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .4s}
+.vbs-stap{border:1px solid var(--lijn);border-radius:12px;margin-top:10px;background:var(--veld)}
+.vbs-stap>summary{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;list-style:none;font-weight:600}
+.vbs-stap>summary::-webkit-details-marker{display:none}
+.vbs-stap>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:12px}
+.vbs-nr{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:600 13px "JetBrains Mono",monospace;border:1px solid var(--lijn);flex:none}
+.vbs-stap[data-st=klaar] .vbs-nr,.vbs-stap[data-st=wacht] .vbs-nr{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.vbs-label{font:500 11px "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.04em;color:var(--zacht);padding:2px 8px;border:1px solid var(--lijn);border-radius:99px;white-space:nowrap}
+.vbs-stap[data-st=open] .vbs-label{color:var(--let);border-color:var(--let)}
+.vbs-stap[data-st=klaar] .vbs-label,.vbs-stap[data-st=wacht] .vbs-label{color:var(--accent);border-color:var(--accent)}
+.vbs-inhoud{padding:0 14px 14px;min-width:0}
+.vbs-stap>summary .vul{flex:1;min-width:0}
+.vbs-raster{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.vbs-raster>div{min-width:0}
+.vbs-ol{padding-left:20px;margin:8px 0}.vbs-ol li{margin:8px 0;line-height:1.6}
+.vbs-kopie{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;vertical-align:middle;max-width:100%}
+.vbs-kopie code{font:13px "JetBrains Mono",monospace;background:var(--accent2);color:var(--accent);padding:2px 7px;border-radius:6px;overflow-wrap:anywhere}
+.vbs-kopie .knop.klein{padding:3px 8px;font-size:12px}
+.vbs-alt{margin:10px 0;border-left:2px solid var(--lijn);padding-left:12px}
+.vbs-alt>summary{cursor:pointer;color:var(--accent);font-weight:500}
+.vbs-vinkjes{display:flex;flex-wrap:wrap;gap:6px 16px}
+.vbs-vink{display:flex;align-items:center;gap:8px;color:var(--tekst);margin:6px 0}
+.vbs-vink input{width:auto;margin:0}
+.vbs-afspraken{padding-left:18px;line-height:1.6}.vbs-afspraken li{margin:6px 0}
+.vbs-klein{font-size:13px}
+.vbs-mini{display:flex;gap:3px}.vbs-mini span{width:14px;height:6px;border-radius:3px;background:var(--lijn)}
+.vbs-mini span[data-st=klaar]{background:var(--accent)}.vbs-mini span[data-st=wacht]{background:var(--let)}
+.vbs-gegevens{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:14px;margin-top:8px}
+.vbs-gegevens>div{min-width:0;overflow-wrap:anywhere}
+@media (max-width:640px){.vbs-raster{grid-template-columns:1fr}.vbs-gegevens{grid-template-columns:1fr}.vbs-gegevens .zacht{margin-top:6px}.vbs-stap>summary{padding:12px 10px}.vbs-inhoud{padding:0 10px 12px}}
