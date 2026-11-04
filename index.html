@@ -9,6 +9,7 @@
 </script>
 <link rel="stylesheet" href="assets/stijl.css">
 <link rel="stylesheet" href="assets/home.css">
+<link rel="stylesheet" href="assets/wow.css">
 <style>
 .prijs-blok{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;align-items:stretch}
 .prijs-links{min-width:0}.prijs-groot{font-size:clamp(40px,6vw,56px);margin:0;line-height:1}.prijs-groot small{font-size:16px;color:var(--zacht);font-family:"Space Grotesk",sans-serif}
@@ -160,6 +161,33 @@
         <div class="los-site"><div class="browser"><i></i><i></i><i></i><span>jouwwebsite.nl</span></div><div class="los-site-inhoud"><b></b><i></i><i></i><i class="kort"></i></div></div>
         <div class="los-plus mono">+</div>
         <div class="los-bot" id="losbot"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WOW -->
+  <section class="wrap breed blok">
+    <div class="wow-band">
+      <div class="wow-tekst">
+        <p class="label mono">&gt;_ altijd bij de hand</p>
+        <h2>Je eigen webbouwer.<br><span class="glans">In je broekzak.</span></h2>
+        <p>Sitehulpje staat als app op je telefoon. Midden in de nacht een actie, op zondag een nieuwe foto of tussen twee klanten door een prijs aanpassen: vraag het en het staat er.</p>
+        <div class="rij"><a class="knop groot-knop" href="#prijs">Bekijk de prijs</a><a class="knop rand groot-knop" href="#probeer">▶ Probeer het zelf</a></div>
+      </div>
+      <div class="wow-scene" aria-hidden="true">
+        <div class="wow-wereld">
+          <div class="wow-ring"></div><div class="wow-ring r2"></div>
+          <div class="wow-telefoon"><div class="wow-scherm">
+            <div class="wow-bel k">Zet de wintercollectie 20% in de sale 🧥</div>
+            <div class="wow-bel w">Klaar! 24 producten staan nu in de sale ✅</div>
+            <div class="wow-bel k">En een banner op de homepage?</div>
+            <div class="wow-bel w">Staat erop. Bekijk hem hier 👉</div>
+          </div></div>
+          <div class="wow-chip c1">24/7<small>dag en nacht</small></div>
+          <div class="wow-chip c2">±1 min<small>en het staat er</small></div>
+          <div class="wow-chip c3">€€€<small>bespaard op webbouwers</small></div>
+          <div class="wow-chip c4">1 tik<small>terugdraaien</small></div>
+        </div>
       </div>
     </div>
   </section>
@@ -354,5 +382,6 @@ $("#cform").onsubmit = async (e) => {
   $("#cknop").disabled = false;
 };
 </script>
+<script src="assets/wow.js"></script>
 </body>
 </html>

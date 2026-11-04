@@ -1,0 +1,127 @@
+/* Sitehulpje / Siteregelaar / Shopregelaar – extra diepte, 3D-beeld en een chique keuzeformulier.
+   Gedeeld bestand: zelfde inhoud op sitehulpje.nl, siteregelaar.nl en shopregelaar.nl. */
+
+/* ---------- zwevende kleurvlakken op de achtergrond ---------- */
+body.home{isolation:isolate}
+body.home::before,body.home::after{content:"";position:fixed;z-index:-1;pointer-events:none;border-radius:50%;filter:blur(70px);opacity:.0;transition:opacity .6s}
+body.home::before{width:56vw;height:56vw;left:-14vw;top:30vh;background:radial-gradient(circle at 40% 40%,rgba(34,227,196,.55),rgba(59,130,246,.0) 65%);animation:wowDrijf1 26s ease-in-out infinite alternate}
+body.home::after{width:50vw;height:50vw;right:-12vw;top:-6vh;background:radial-gradient(circle at 50% 50%,rgba(139,92,246,.45),rgba(59,130,246,.0) 65%);animation:wowDrijf2 32s ease-in-out infinite alternate}
+:root[data-thema=licht] body.home::before{opacity:.55}
+:root[data-thema=licht] body.home::after{opacity:.45}
+:root:not([data-thema=licht]) body.home::before,:root:not([data-thema=licht]) body.home::after{opacity:.18}
+@keyframes wowDrijf1{to{transform:translate(18vw,-22vh) scale(1.15)}}
+@keyframes wowDrijf2{to{transform:translate(-16vw,48vh) scale(.9)}}
+
+/* ---------- kaarten in licht thema: meer diepte ---------- */
+:root[data-thema=licht] body.home .kaart{background:rgba(255,255,255,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-color:rgba(160,185,215,.55);
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 14px 34px -12px rgba(20,50,100,.18),0 2px 6px rgba(20,50,100,.05)}
+:root[data-thema=licht] body.home .kaart.uitgelicht,:root[data-thema=licht] body.home .pk.uit{border-color:transparent;
+  background:linear-gradient(rgba(255,255,255,.92),rgba(255,255,255,.92)) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6 50%,#8b5cf6) border-box;border:1.5px solid transparent;
+  box-shadow:0 24px 50px -18px rgba(59,130,246,.35),0 2px 8px rgba(20,50,100,.06)}
+:root[data-thema=licht] body.home h2.sectie .tag{background:linear-gradient(135deg,#0b9f8a,#3b82f6);color:#fff;border:0}
+:root[data-thema=licht] body.home .voordeel{background:rgba(255,255,255,.8);box-shadow:0 10px 26px -14px rgba(20,50,100,.2)}
+:root[data-thema=licht] body.home .tegel{background:rgba(255,255,255,.85);box-shadow:0 6px 16px -10px rgba(20,50,100,.25)}
+:root[data-thema=licht] body.home .voet{background:transparent}
+
+/* 3D kantelen bij muis (alleen fijne aanwijzer) */
+[data-tilt]{transform-style:preserve-3d;will-change:transform}
+.verschijn.zicht[data-tilt],[data-tilt]:not(.verschijn){transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px));transition:transform .25s ease-out,opacity .6s ease,box-shadow .25s}
+[data-tilt].tilt-aan{--ty:-4px}
+[data-tilt]::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .25s;
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.35),transparent 45%)}
+[data-tilt].tilt-aan::after{opacity:1}
+:root:not([data-thema=licht]) [data-tilt]::after{background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(34,227,196,.12),transparent 45%)}
+
+/* ---------- WOW-band: 3D-telefoon met zwevende voordelen ---------- */
+.wow-band{position:relative;overflow:hidden;border-radius:28px;padding:44px 28px;margin:10px 0;display:grid;grid-template-columns:1fr 1.05fr;gap:24px;align-items:center;
+  background:radial-gradient(120% 140% at 85% 20%,rgba(139,92,246,.35),transparent 55%),radial-gradient(90% 120% at 10% 90%,rgba(34,227,196,.35),transparent 55%),linear-gradient(160deg,#081226,#0c1a36 60%,#101034);
+  color:#e6f1ff;box-shadow:0 30px 70px -30px rgba(20,40,100,.55)}
+.wow-band::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(34,227,196,.06) 1px,transparent 1px) 0 0/100% 34px,linear-gradient(90deg,rgba(34,227,196,.06) 1px,transparent 1px) 0 0/34px 100%;
+  mask-image:radial-gradient(circle at 70% 50%,#000,transparent 75%);-webkit-mask-image:radial-gradient(circle at 70% 50%,#000,transparent 75%);pointer-events:none}
+.wow-tekst{position:relative;min-width:0}
+.wow-tekst .label{color:#22e3c4}
+.wow-tekst h2{font-size:clamp(28px,4.2vw,44px);line-height:1.05;margin:8px 0 12px;text-wrap:balance}
+.wow-tekst p{color:#a9bdd8;font-size:17px;margin:0 0 16px;max-width:46ch}
+.wow-tekst .knop.rand{color:#e6f1ff;border-color:rgba(230,241,255,.35)}
+.wow-scene{position:relative;height:440px;perspective:1100px;min-width:0}
+.wow-wereld{position:absolute;inset:0;transform-style:preserve-3d;animation:wowWieg 9s ease-in-out infinite}
+@keyframes wowWieg{0%,100%{transform:rotateY(-18deg) rotateX(8deg)}50%{transform:rotateY(14deg) rotateX(4deg)}}
+.wow-telefoon{position:absolute;left:50%;top:50%;width:200px;height:400px;margin:-200px 0 0 -100px;border-radius:34px;transform:translateZ(0);
+  background:linear-gradient(160deg,#16233f,#0a1428);border:2px solid rgba(160,200,255,.25);box-shadow:0 40px 80px rgba(0,0,0,.55),0 0 60px rgba(34,227,196,.3),inset 0 0 0 6px #050a16}
+.wow-scherm{position:absolute;inset:12px;border-radius:24px;overflow:hidden;background:linear-gradient(180deg,#0f1c35,#0a1328);padding:34px 10px 10px;display:flex;flex-direction:column;gap:8px}
+.wow-scherm::before{content:"";position:absolute;top:10px;left:50%;width:60px;height:14px;margin-left:-30px;border-radius:10px;background:#050a16}
+.wow-bel{font-size:12px;line-height:1.35;padding:8px 10px;border-radius:12px;max-width:88%;opacity:0;animation:wowBel 9s infinite}
+.wow-bel.k{align-self:flex-end;background:linear-gradient(135deg,rgba(34,227,196,.35),rgba(59,130,246,.35));border-top-right-radius:4px}
+.wow-bel.w{align-self:flex-start;background:rgba(255,255,255,.08);border:1px solid rgba(34,227,196,.35);border-top-left-radius:4px}
+.wow-bel:nth-child(1){animation-delay:.3s}.wow-bel:nth-child(2){animation-delay:1.6s}.wow-bel:nth-child(3){animation-delay:3.6s}.wow-bel:nth-child(4){animation-delay:5s}
+@keyframes wowBel{0%{opacity:0;transform:translateY(8px)}6%,88%{opacity:1;transform:none}96%,100%{opacity:0}}
+.wow-chip{position:absolute;left:50%;top:50%;padding:10px 14px;border-radius:14px;font-weight:700;font-size:14px;white-space:nowrap;color:#04111a;
+  background:linear-gradient(135deg,#22e3c4,#7cc4ff);box-shadow:0 14px 30px rgba(0,0,0,.35),0 0 24px rgba(34,227,196,.35);animation:wowZweef 5s ease-in-out infinite}
+.wow-chip small{display:block;font-weight:500;font-size:11px;opacity:.75}
+.wow-chip.c1{transform:translate(-210px,-150px) translateZ(90px)}
+.wow-chip.c2{transform:translate(90px,-120px) translateZ(130px);background:linear-gradient(135deg,#c4b5fd,#8b5cf6);color:#fff;animation-delay:-1.2s}
+.wow-chip.c3{transform:translate(-230px,70px) translateZ(140px);background:linear-gradient(135deg,#ffe08a,#ffb547);animation-delay:-2.4s}
+.wow-chip.c4{transform:translate(100px,110px) translateZ(80px);animation-delay:-3.6s}
+@keyframes wowZweef{50%{margin-top:-12px}}
+.wow-ring{position:absolute;left:50%;top:100%;width:420px;height:420px;margin:-215px 0 0 -210px;border-radius:50%;border:1px dashed rgba(34,227,196,.45);transform:rotateX(78deg);animation:wowRing 18s linear infinite;pointer-events:none}
+.wow-ring.r2{width:520px;height:520px;margin:-265px 0 0 -260px;border-color:rgba(139,92,246,.3);animation-duration:26s;animation-direction:reverse}
+@keyframes wowRing{to{transform:rotateX(78deg) rotateZ(360deg)}}
+@media (max-width:860px){.wow-band{grid-template-columns:1fr;padding:30px 18px}.wow-scene{height:400px}}
+@media (max-width:480px){.wow-scene{height:380px;transform:scale(.82);margin:-20px -30px}}
+
+/* ---------- 3D-zoekbeeld voor Vindbaarheid ---------- */
+.zk-scene{position:relative;height:420px;perspective:1200px;min-width:0}
+.zk-wereld{position:absolute;inset:0;transform-style:preserve-3d;animation:zkWieg 10s ease-in-out infinite}
+@keyframes zkWieg{0%,100%{transform:rotateY(-16deg) rotateX(10deg)}50%{transform:rotateY(10deg) rotateX(6deg)}}
+.zk-kaart{position:absolute;left:50%;top:50%;width:330px;margin:-170px 0 0 -165px;padding:16px;border-radius:20px;transform:translateZ(0);
+  background:rgba(255,255,255,.92);color:#0b1a2e;box-shadow:0 40px 80px -20px rgba(20,40,100,.45),0 0 0 1px rgba(160,185,215,.5)}
+:root:not([data-thema=licht]) .zk-kaart{background:rgba(16,25,43,.92);color:#e6f1ff;box-shadow:0 40px 80px -20px rgba(0,0,0,.6),0 0 0 1px rgba(34,227,196,.25)}
+.zk-balk{display:flex;align-items:center;gap:8px;border-radius:999px;padding:8px 12px;font-size:13px;border:1px solid rgba(120,150,190,.35);margin-bottom:12px}
+.zk-balk i{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;opacity:.6;flex:none}
+.zk-typ{overflow:hidden;white-space:nowrap;border-right:2px solid #3b82f6;width:0;animation:zkTyp 10s steps(22) infinite}
+@keyframes zkTyp{0%{width:0}18%,100%{width:22ch}}
+.zk-lijst{position:relative;height:216px}
+.zk-res{position:absolute;left:0;right:0;height:48px;border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:5px;transition:top .6s}
+.zk-res b{height:8px;border-radius:4px;background:#1a0dab;opacity:.55;width:60%}
+.zk-res span{height:6px;border-radius:3px;background:currentColor;opacity:.18;width:90%}
+:root:not([data-thema=licht]) .zk-res b{background:#8ab4f8}
+.zk-res.r1{top:0}.zk-res.r2{top:56px}.zk-res.r3{top:112px}
+.zk-res.jij{top:168px;background:linear-gradient(135deg,rgba(34,227,196,.22),rgba(59,130,246,.18));box-shadow:0 0 0 1.5px rgba(11,159,138,.6),0 12px 26px -10px rgba(11,159,138,.5);animation:zkStijg 10s ease-in-out infinite}
+.zk-res.jij b{background:#0b9f8a;opacity:1;width:auto;height:auto;font-size:12.5px;color:#fff;padding:1px 8px;border-radius:6px;align-self:flex-start}
+.zk-res.r1,.zk-res.r2,.zk-res.r3{animation:zkZak 10s ease-in-out infinite}
+@keyframes zkStijg{0%,30%{top:168px}45%,92%{top:0;transform:translateZ(40px)}100%{top:168px}}
+@keyframes zkZak{0%,30%{translate:0 0}45%,92%{translate:0 56px}100%{translate:0 0}}
+.zk-ai{position:absolute;left:50%;top:50%;width:210px;margin:70px 0 0 -10px;padding:12px 14px;border-radius:16px 16px 16px 4px;font-size:13px;line-height:1.4;
+  transform:translateZ(120px);background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;box-shadow:0 24px 50px -12px rgba(80,60,200,.55);animation:zkAi 10s ease-in-out infinite}
+.zk-ai small{display:block;opacity:.8;font-size:11px;margin-bottom:3px;font-family:"JetBrains Mono",monospace}
+@keyframes zkAi{0%,48%{opacity:0;margin-top:90px}58%,92%{opacity:1;margin-top:70px}100%{opacity:0}}
+.zk-stat{position:absolute;left:50%;top:50%;margin:-210px 0 0 90px;padding:10px 14px;border-radius:14px;font-weight:700;transform:translateZ(150px);
+  background:linear-gradient(135deg,#22e3c4,#7cc4ff);color:#04111a;box-shadow:0 18px 40px -10px rgba(11,159,138,.6);animation:wowZweef 5s ease-in-out infinite}
+.zk-stat small{display:block;font-size:11px;font-weight:500;opacity:.75}
+.zk-gloed{position:absolute;left:50%;top:50%;width:360px;height:360px;margin:-180px 0 0 -180px;border-radius:50%;background:radial-gradient(circle,rgba(34,227,196,.45),rgba(139,92,246,.25) 45%,transparent 70%);filter:blur(30px);transform:translateZ(-120px)}
+@media (max-width:480px){.zk-scene{height:390px;transform:scale(.86);margin:-14px -24px}}
+
+/* ---------- chic keuzeformulier ---------- */
+body.home .contact{overflow:hidden}
+body.home .contact::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,#22e3c4,#3b82f6,#8b5cf6)}
+body.home .keuzes{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin:6px 0 14px}
+body.home .keuze{position:relative;display:block}
+body.home .keuze span{display:flex;align-items:center;gap:10px;min-height:58px;padding:12px 40px 12px 14px;border-radius:14px;border:1px solid var(--lijn);
+  background:var(--veld);font-size:15px;font-weight:600;line-height:1.25;transition:border-color .2s,box-shadow .2s,transform .2s,background .2s}
+body.home .keuze span::after{content:"";position:absolute;right:14px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;border:2px solid var(--lijn);background:transparent;transition:all .2s}
+body.home .keuze:hover span{border-color:rgba(34,227,196,.6);transform:translateY(-2px);box-shadow:0 10px 22px -14px rgba(20,50,100,.45)}
+body.home .keuze input:checked+span{color:var(--tekst);border-color:transparent;transform:translateY(-2px);
+  background:linear-gradient(var(--bg2),var(--bg2)) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6 55%,#8b5cf6) border-box;border:1.5px solid transparent;
+  box-shadow:0 14px 30px -14px rgba(59,130,246,.55)}
+body.home .keuze input:checked+span::after{border-color:transparent;background:linear-gradient(135deg,#22e3c4,#3b82f6) ;
+  box-shadow:inset 0 0 0 4px var(--bg2)}
+:root[data-thema=licht] body.home .contact input:not([type=radio]):not([type=checkbox]),:root[data-thema=licht] body.home .contact textarea{background:#fff;border-color:#cfdbea}
+body.home .contact input:not([type=radio]):not([type=checkbox]):focus,body.home .contact textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent2);outline:none}
+
+@media (prefers-reduced-motion:reduce){
+  body.home::before,body.home::after,.wow-wereld,.zk-wereld,.wow-chip,.wow-ring,.zk-stat{animation:none}
+  .wow-bel,.zk-ai{animation:none;opacity:1}.zk-typ{animation:none;width:22ch}
+  .zk-res.jij,.zk-res.r1,.zk-res.r2,.zk-res.r3{animation:none}
+}
+[data-tilt]{position:relative}
+@media (max-width:560px){.wow-chip.c1{transform:translate(-170px,-160px) translateZ(90px)}.wow-chip.c3{transform:translate(-175px,80px) translateZ(140px)}.wow-chip.c2{transform:translate(60px,-130px) translateZ(130px)}.wow-chip.c4{transform:translate(70px,120px) translateZ(80px)}}

@@ -7,8 +7,10 @@
 <link rel="icon" type="image/png" href="assets/icoon-192.png">
 <link rel="stylesheet" href="assets/stijl.css">
 <link rel="stylesheet" href="assets/home.css">
+<link rel="stylesheet" href="assets/wow.css">
 <style>
-.vb-held{padding-top:56px;padding-bottom:30px}
+.vb-held{padding-top:56px;padding-bottom:30px;display:grid;grid-template-columns:1.05fr .95fr;gap:24px;align-items:center}.vb-held-tekst{min-width:0}
+@media (max-width:900px){.vb-held{grid-template-columns:1fr;padding-top:30px}}
 .vb-held h1{font-size:clamp(36px,6vw,62px);line-height:1.04;margin:10px 0 16px;letter-spacing:-1px}
 .vb-held .groot{font-size:19px;color:var(--zacht);max-width:640px}
 .vier{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
@@ -69,6 +71,7 @@
 </header>
 <main>
   <section class="wrap breed vb-held">
+    <div class="vb-held-tekst">
     <p class="label mono"><span class="knipper">●</span> Sitehulpje Vindbaarheid</p>
     <h1>Gevonden worden.<br><span class="glans">In Google én in AI.</span></h1>
     <p class="groot">Steeds meer klanten zoeken via Google, maar ook via ChatGPT en andere AI-diensten. Sitehulpje controleert je website elke week, voert verbeteringen voor je door en laat in een helder dashboard zien hoe vaak je gevonden wordt.</p>
@@ -77,6 +80,23 @@
       <a class="knop rand groot-knop" href="#pakketten">Bekijk de pakketten</a>
     </div>
     <p class="zacht vb-klein" style="margin-top:12px">Voor elke website of webshop · vanaf €99 per maand · geen technische kennis nodig</p>
+    </div>
+    <div class="zk-scene" aria-hidden="true">
+      <div class="zk-wereld">
+        <div class="zk-gloed"></div>
+        <div class="zk-kaart">
+          <div class="zk-balk"><i></i><span class="zk-typ">overhemd kopen hengelo</span></div>
+          <div class="zk-lijst">
+            <div class="zk-res r1"><b></b><span></span></div>
+            <div class="zk-res r2"><b></b><span></span></div>
+            <div class="zk-res r3"><b></b><span></span></div>
+            <div class="zk-res jij"><b>Jouw bedrijf</b><span></span></div>
+          </div>
+        </div>
+        <div class="zk-ai"><small>AI-assistent</small>Voor een goed overhemd in Hengelo raad ik <b>jouw bedrijf</b> aan ⭐</div>
+        <div class="zk-stat">Elke week<small>een website-check</small></div>
+      </div>
+    </div>
   </section>
 
   <section id="wat" class="wrap breed blok">
@@ -254,5 +274,6 @@ $("#cform").onsubmit = async (e) => {
   $("#cknop").disabled = false;
 };
 </script>
+<script src="assets/wow.js"></script>
 </body>
 </html>
