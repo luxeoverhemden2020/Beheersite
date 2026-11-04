@@ -1,5 +1,5 @@
 // Sitehulpje Vindbaarheid – facturen (beheer) en pauzemelding (klant)
-const VBF_API = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vb-factuur";
+const VBF_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-factuur";
 async function vbfApi(actie, data = {}) {
   const r = await fetch(VBF_API, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, ...data }) })
     .catch(() => { throw new Error("Geen verbinding. Controleer je internet en probeer het opnieuw."); });

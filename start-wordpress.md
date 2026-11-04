@@ -7,7 +7,7 @@ Het deurbelbericht bevat: site (`SITE`, zonder slash aan het eind), verzoeknumme
 ## 1. Start (exact zo, in één keer)
 ```
 echo '<sleutel>' > /tmp/bk
-P="https://eiejxciyfcynppldonaw.supabase.co/functions/v1/beheersite"
+P="https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/beheersite"
 H=(-H "Content-Type: application/json" -H "X-Beheer-Key: $(cat /tmp/bk)")
 curl -s -X POST "$P" "${H[@]}" -d '{"actie":"ai_update","id":"<id>","status":"bezig"}'
 curl -s -X POST "$P" "${H[@]}" -d '{"actie":"ai_lees","id":"<id>"}' > /tmp/v.json

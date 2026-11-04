@@ -17,7 +17,7 @@ function themaKnop(el) {
 }
 document.addEventListener("DOMContentLoaded", () => document.querySelectorAll(".thema").forEach(themaKnop));
 
-const API = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/beheersite";
+const API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/beheersite";
 
 // Twee aparte sessies per browser: één voor het beheerscherm (Jan) en één voor de klantpagina.
 // Zo kan Jan een klant-inloglink openen zonder dat zijn beheerscherm uitlogt.

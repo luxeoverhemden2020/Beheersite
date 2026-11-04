@@ -1,5 +1,5 @@
 // Sitehulpje Vindbaarheid – startstappen (klant) en overzicht daarvan (beheer)
-const VBS_API = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vb-start";
+const VBS_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-start";
 const VBS_ADRES = "info@sitehulpje.nl";
 
 async function vbsApi(actie, data = {}) {

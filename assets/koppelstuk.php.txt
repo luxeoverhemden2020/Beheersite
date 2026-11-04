@@ -2,12 +2,13 @@
 /**
  * Plugin Name: Beheersite koppeling
  * Description: Verbindt deze website met Beheersite (webbeheer door Jan). Altijd actief, kan niet worden uitgeschakeld.
- * Version: 1.0
+ * Version: 1.1
  */
 if (!defined('ABSPATH')) exit;
 
 if (!defined('BHS_KLANT')) define('BHS_KLANT', '%%KLANT%%');
-if (!defined('BHS_API')) define('BHS_API', 'https://eiejxciyfcynppldonaw.supabase.co/functions/v1/beheersite');
+// Adres van Beheersite. Standaard het vaste adres; kan later via /beheersite/v1/adres worden verplaatst zonder nieuwe upload.
+if (!defined('BHS_API')) define('BHS_API', get_option('bhs_api') ?: 'https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/beheersite');
 
 /** Geldige Beheersite-sleutel? Geeft verzoekgegevens terug of false. */
 function bhs_verzoek() {
@@ -117,6 +118,14 @@ add_action('rest_api_init', function () {
             $lijst[] = $item;
             update_option($sleutel, $lijst, false);
             return array('ok' => true, 'aantal' => count($lijst));
+        }));
+    // Beheersite verhuist naar een ander adres: alleen met een geldige sleutel van het huidige adres
+    register_rest_route('beheersite/v1', '/adres', array('methods' => 'POST', 'permission_callback' => $mag,
+        'callback' => function ($req) {
+            $a = trim((string) $req->get_param('api'));
+            if (!preg_match('#^https://[a-z0-9]{20}\.supabase\.co/functions/v1/beheersite$#', $a)) return new WP_Error('bhs', 'Ongeldig adres', array('status' => 400));
+            update_option('bhs_api', $a, true);
+            return array('ok' => true, 'api' => $a);
         }));
     register_rest_route('beheersite/v1', '/momentopnames', array('methods' => 'GET', 'permission_callback' => $mag,
         'callback' => function () { $v = bhs_verzoek(); $l = get_option('bhs_snap_' . $v['nr'], array());

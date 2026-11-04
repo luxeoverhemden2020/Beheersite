@@ -151,7 +151,7 @@ const VB_PAKKET = { basis: "Basis", plus: "Plus", pro: "Pro" };
 async function vbMeldingen() {
   const el = $("#vbmeldingen");
   try {
-    const r = await fetch("https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vb-waakhond", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "meldingen" }) });
+    const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-waakhond", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "meldingen" }) });
     const { meldingen = [] } = await r.json();
     const open = meldingen.filter((m) => !m.opgelost);
     el.innerHTML = !meldingen.length ? `<div class="melding ok">Geen meldingen: alle sites zijn bereikbaar en de cijfers lopen normaal.</div>` :
@@ -159,7 +159,7 @@ async function vbMeldingen() {
         <div class="vul"><b>${esc(m.naam)}</b>: ${esc(m.tekst)} <span class="zacht vb-klein">· ${datum(m.gemaakt)}${m.opgelost ? " · opgelost" : ""}</span></div>
         ${m.opgelost ? "" : `<button class="knop rand klein" data-vbopgelost="${m.id}">Opgelost</button>`}</div>`).join("")}</div>`;
     el.querySelectorAll("[data-vbopgelost]").forEach((b) => (b.onclick = async () => {
-      await fetch("https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vb-waakhond", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "opgelost", id: b.dataset.vbopgelost }) });
+      await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-waakhond", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "opgelost", id: b.dataset.vbopgelost }) });
       vbMeldingen();
     }));
     const knop = document.querySelector('.tabs button[data-tab="vindbaarheid"]');
@@ -218,10 +218,10 @@ function vbBeheerBekijk(id, klanten) {
   if (k?.vindbaarheid) vbStartBeheer($("#vbstartbeheer"), id);
   $("#vbsluit").onclick = () => { $("#vbdetail").innerHTML = ""; };
   $("#vbproef").onclick = async (e) => { e.target.disabled = true; try { const r = await vbfApi("proef", { klant_id: id }); location.href = `factuur?beheer=1&id=${r.id}`; } catch (err) { toonMelding($("#vbrapmeld"), err.message); e.target.disabled = false; } };
-  const VBR = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vb-rapport";
+  const VBR = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-rapport";
   const rap = async (actie, data) => { const r = await fetch(VBR, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, klant_id: id, ...data }) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d; };
   (async () => {
-    const VBB = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vb-bing";
+    const VBB = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-bing";
     const bg = async (actie, data) => { const r = await fetch(VBB, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, klant_id: id, ...data }) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d; };
     const vak = $("#vbbing");
     try {

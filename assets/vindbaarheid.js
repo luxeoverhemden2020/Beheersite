@@ -1,5 +1,5 @@
 // Sitehulpje Vindbaarheid – dashboard (klantpagina en beheer gebruiken dit allebei)
-const VB_API = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vindbaarheid";
+const VB_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vindbaarheid";
 
 async function vbApi(actie, data = {}) {
   let r;

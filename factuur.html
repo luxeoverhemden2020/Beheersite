@@ -45,7 +45,7 @@ td{border-bottom:1px solid var(--lijn);padding:10px 8px;vertical-align:top}
   <button class="hoofd" id="pdf" type="button">⬇ Download als PDF</button><a id="terug" href="verzoeken#vindbaarheid">Terug</a></div>
 <div class="vel" id="vel"><p class="zacht">Factuur laden…</p></div>
 <script>
-const API = "https://eiejxciyfcynppldonaw.supabase.co/functions/v1/vb-factuur";
+const API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-factuur";
 const p = new URLSearchParams(location.search);
 const BEHEER = p.get("beheer") === "1";
 const token = (() => { try { return localStorage.getItem(BEHEER ? "bs_sessie_beheer" : "bs_sessie") || ""; } catch { return ""; } })();
