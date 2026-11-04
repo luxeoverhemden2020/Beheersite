@@ -79,6 +79,7 @@
     <div id="vbchecks"></div>
     <div id="vbstart"></div>
     <div id="vbfacturen"></div>
+    <div id="vbkosten"></div>
     <div class="kaart tabel-scroll"><h2>Vindbaarheid – alle klanten</h2>
       <p class="zacht vb-klein" style="margin-top:-4px">Alleen klanten met een pakket zien de tab Vindbaarheid. Cijfers: laatste 28 dagen, bijgewerkt elke nacht.</p>
       <div id="vbmeldingen"></div><div id="vbtabel"><p class="zacht">Laden…</p></div></div>
@@ -176,6 +177,7 @@ async function vbBeheerLaad() {
     vbStartOverzicht($("#vbstart"), (id) => vbBeheerBekijk(id, klanten));
     vbfBeheer($("#vbfacturen"));
     vbcBeheer($("#vbchecks"), new URLSearchParams(location.search).get("check"));
+    vbKosten($("#vbkosten"));
     el.innerHTML = `<table><thead><tr><th>Klant</th><th>Pakket</th><th>Google</th><th class="r">Klikken</th><th class="r">Bezoeken via Google</th><th class="r">Acties</th><th>Bijgewerkt</th><th></th></tr></thead><tbody>
       ${klanten.map((k) => {
         const pct = k.klikken_vorige ? Math.round(((k.klikken_28 - k.klikken_vorige) / k.klikken_vorige) * 100) : null;
@@ -200,6 +202,22 @@ async function vbBeheerLaad() {
     el.querySelectorAll("[data-vbbekijk]").forEach((b) => (b.onclick = () => vbBeheerBekijk(b.dataset.vbbekijk, klanten)));
     return klanten;
   } catch (e) { el.innerHTML = `<div class="melding fout">${esc(e.message)}</div>`; }
+}
+async function vbKosten(el) {
+  // AI-kosten van Vindbaarheid, apart van de Sitehulpje-limiet; alleen voor Jan
+  try {
+    const { kosten } = await vbVsApi("kosten");
+    if (!kosten.length) { el.innerHTML = ""; return; }
+    const eur = (n) => "€" + Number(n || 0).toFixed(2).replace(".", ",");
+    const tot = kosten.reduce((s, k) => s + k.deze, 0);
+    el.innerHTML = `<div class="kaart tabel-scroll"><h2 style="font-size:16px"><span class="tag">€</span>AI-kosten Vindbaarheid</h2>
+      <p class="zacht vb-klein" style="margin-top:-4px">Telt niet mee in de €5-limiet van Sitehulpje. Gaat van het API-tegoed af. Bij 80% van de grens krijg je een mail; bij de grens wachten nieuwe verbeteringen tot volgende maand.</p>
+      <table><thead><tr><th>Klant</th><th>Pakket</th><th class="r">Deze maand</th><th class="r">Grens</th><th class="r">Vorige maand</th></tr></thead><tbody>
+      ${kosten.map((k) => { const pct = k.grens ? Math.round((k.deze / k.grens) * 100) : 0;
+        return `<tr><td><b>${esc(k.naam)}</b></td><td>${esc(VB_PAKKET[k.vb_pakket] || k.vb_pakket || "–")}</td>
+        <td class="r mono">${eur(k.deze)}${pct >= 80 ? ` <span class="vb-af vb-klein">${pct}%</span>` : ""}</td><td class="r mono zacht">${eur(k.grens)}</td><td class="r mono zacht">${eur(k.vorige)}</td></tr>`; }).join("")}
+      <tr><td colspan="2"><b>Totaal deze maand</b></td><td class="r mono"><b>${eur(tot)}</b></td><td></td><td></td></tr></tbody></table></div>`;
+  } catch { el.innerHTML = ""; }
 }
 function vbBeheerBekijk(id, klanten) {
   const k = (klanten || []).find((x) => x.id === id);
