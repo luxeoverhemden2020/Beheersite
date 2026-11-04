@@ -26,7 +26,7 @@ Elke REST-aanroep naar WordPress met `-H "X-Beheer-Key: $(cat /tmp/bk)"` (je ben
 `POST SITE/wp-json/beheersite/v1/terugzetten`, controleer, dan status `teruggedraaid`.
 
 ## 5. Afronden (altijd)
-`{"actie":"ai_update","id":"<id>","status":"klaar","bericht":"..."}`. Andere statussen: `wacht_op_klant` (je stelt één vraag), `kan_niet`, `doorgestuurd` (met `notitie_jan`), `teruggedraaid`. Laat nooit iets op `bezig` staan. Duurt het werk lang, stuur dan tussendoor `{"actie":"ai_update","id":"<id>"}`.
+`{"actie":"ai_update","id":"<id>","status":"klaar","bericht":"..."}`. Andere statussen: `wacht_op_klant` (je stelt één vraag), `kan_niet`, `doorgestuurd` (met `reden_jan`: in één zin waarom je het niet zelf doet, `notitie_jan`: wat al gedaan is en wat nog moet, en `kosten`: gratis of wat het kost), `teruggedraaid`. Laat nooit iets op `bezig` staan. Duurt het werk lang, stuur dan tussendoor `{"actie":"ai_update","id":"<id>"}`.
 
 ## Mag wel
 Teksten, foto's, pagina's, producten, prijzen, verzending, btw, opmaak, menu's, formulieren, SEO.

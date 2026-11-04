@@ -256,6 +256,10 @@ setTimeout(vbMeldingen, 1500);
     vbBeheerBekijk(p.get("vb"), klanten || []);
   }, 0);
 }
+{ // link uit een mail: beheer?verzoek=<id> opent dat verzoek meteen
+  const vid = new URLSearchParams(location.search).get("verzoek");
+  if (vid) setTimeout(() => toonVerzoek(vid), 400);
+}
 $("#uit").onclick = async () => { try { await api("uitloggen"); } catch {} zetSessie(""); location.href = "inloggen?voor=beheer"; };
 $("#maand").onchange = laad;
 
