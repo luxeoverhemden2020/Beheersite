@@ -47,7 +47,7 @@
         <div><label>Naam</label><input id="k_naam"></div>
         <div><label>Website</label><input id="k_site" placeholder="https://…"></div>
         <div><label>Soort site</label><select id="k_soort"><option value="wordpress">WordPress</option><option value="vercel">Vercel / GitHub</option><option value="anders">Anders</option></select></div>
-        <div><label>Verzoeken per maand</label><input id="k_limiet" type="number" min="0" value="30"></div>
+        <div hidden><label>Verzoeken per maand</label><input id="k_limiet" type="number" min="0" value="999"></div>
         <div><label>Actief</label><select id="k_actief"><option value="1">Ja</option><option value="0">Nee</option></select></div>
         <div><label>Budget snelle webbeheerder (€ per maand)</label><input id="k_budget" type="number" min="0" step="0.5" value="5"></div>
       </div>
@@ -331,9 +331,9 @@ $("#paneel").onclick = (e) => { if (e.target.id === "paneel") sluitPaneel(); };
 
 // ---- klanten ----
 function tekenKlanten() {
-  $("#ktabel").innerHTML = data.klanten.length ? `<table><thead><tr><th>Klant</th><th>Site</th><th>Verzoeken</th><th>AI-kosten</th><th>Deurbel</th><th></th></tr></thead><tbody>
+  $("#ktabel").innerHTML = data.klanten.length ? `<table><thead><tr><th>Klant</th><th>Site</th><th>Verzoeken</th><th>AI-kosten (limiet)</th><th>Deurbel</th><th></th></tr></thead><tbody>
     ${data.klanten.map((k) => `<tr><td>${esc(k.naam)}${k.actief ? "" : ' <span class="zacht">(uit)</span>'}</td><td class="zacht">${esc(k.site)}</td>
-      <td><b>${k.gebruikt}</b> / ${k.limiet}</td><td>€${(k.ai_kosten_eur || 0).toFixed(2)} / €${Number(k.ai_budget_eur ?? 5).toFixed(2)}</td><td>${k.deurbel_ingesteld ? "✓" : '<span class="zacht">nog niet</span>'}</td>
+      <td><b>${k.gebruikt}</b></td><td>€${(k.ai_kosten_eur || 0).toFixed(2)} / €${Number(k.ai_budget_eur ?? 5).toFixed(2)}</td><td>${k.deurbel_ingesteld ? "✓" : '<span class="zacht">nog niet</span>'}</td>
       <td><button class="knop rand klein" data-k="${esc(k.id)}">Wijzigen</button></td></tr>`).join("")}
     </tbody></table>` : `<p class="zacht">Nog geen klanten.</p>`;
   document.querySelectorAll("[data-k]").forEach((b) => b.onclick = () => klantForm(data.klanten.find((k) => k.id === b.dataset.k)));
@@ -343,7 +343,7 @@ function klantForm(k) {
   $("#kform").classList.remove("verborgen");
   $("#k_id").value = k?.id || ""; $("#k_id").disabled = !!k;
   $("#k_naam").value = k?.naam || ""; $("#k_site").value = k?.site || ""; $("#k_soort").value = k?.soort || "wordpress";
-  $("#k_limiet").value = k?.limiet ?? 30; $("#k_actief").value = k?.actief === false ? "0" : "1";
+  $("#k_limiet").value = k?.limiet ?? 999; $("#k_actief").value = k?.actief === false ? "0" : "1";
   $("#k_url").value = k?.deurbel_url || ""; $("#k_token").value = ""; $("#k_budget").value = k?.ai_budget_eur ?? 5;
   $("#wpblok").classList.toggle("verborgen", (k?.soort || "wordpress") !== "wordpress");
   $("#kform").scrollIntoView({ behavior: "smooth" });
