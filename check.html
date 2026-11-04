@@ -19,6 +19,7 @@
 .rp-held::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(rgba(34,227,196,.06) 1px,transparent 1px) 0 0/100% 34px,linear-gradient(90deg,rgba(34,227,196,.06) 1px,transparent 1px) 0 0/34px 100%;mask-image:radial-gradient(circle at 75% 45%,#000,transparent 75%);-webkit-mask-image:radial-gradient(circle at 75% 45%,#000,transparent 75%)}
 .rp-held>*{position:relative;min-width:0}
 .rp-held .label{color:#22e3c4;margin:0 0 6px}
+.rp-held h1.lang{font-size:clamp(24px,3.6vw,34px)}
 .rp-held h1{font-size:clamp(28px,5vw,46px);line-height:1.05;margin:0 0 12px;word-break:break-word}
 .rp-held p{color:#a9bdd8;margin:0}
 .rp-bot{display:flex;align-items:flex-end;gap:10px;margin-top:18px}
@@ -40,9 +41,9 @@
 .m3-schijf em{display:block;font-style:normal;font-size:13px;font-weight:700;margin-top:4px;color:var(--kl)}
 .m3-chip{position:absolute;left:50%;top:50%;padding:8px 12px;border-radius:12px;font-weight:700;font-size:13px;white-space:nowrap;color:#04111a;background:linear-gradient(135deg,#22e3c4,#7cc4ff);box-shadow:0 14px 30px rgba(0,0,0,.35);animation:wowZweef 5s ease-in-out infinite}
 .m3-chip small{display:block;font-weight:500;font-size:11px;opacity:.75}
-.m3-chip.a{transform:translate(-190px,-120px) translateZ(80px)}
-.m3-chip.b{transform:translate(70px,-130px) translateZ(110px);background:linear-gradient(135deg,#c4b5fd,#8b5cf6);color:#fff;animation-delay:-1.6s}
-.m3-chip.c{transform:translate(60px,80px) translateZ(90px);background:linear-gradient(135deg,#ffe08a,#ffb547);animation-delay:-3.2s}
+.m3-chip.a{transform:translate(-170px,-110px) translateZ(80px)}
+.m3-chip.b{transform:translate(20px,-140px) translateZ(110px);background:linear-gradient(135deg,#c4b5fd,#8b5cf6);color:#fff;animation-delay:-1.6s}
+.m3-chip.c{transform:translate(10px,92px) translateZ(90px);background:linear-gradient(135deg,#ffe08a,#ffb547);animation-delay:-3.2s}
 .m3-baan{position:absolute;left:50%;top:50%;width:300px;height:300px;margin:-150px 0 0 -150px;border-radius:50%;border:1px dashed rgba(34,227,196,.35);transform:translateZ(-40px)}
 /* tegels */
 .rp-tegels{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
@@ -143,7 +144,7 @@ function opbouw(d) {
   <section class="rp-held">
     <div>
       <p class="label mono">&gt;_ gratis website-check · ${dat(d.datum)}</p>
-      <h1>${esc(host)}</h1>
+      <h1 class="${host.length > 18 ? "lang" : ""}">${esc(host)}</h1>
       <p>We hebben ${nl(u.gecontroleerd || 0)}${u.sitemap_aantal > u.gecontroleerd ? " van je " + nl(u.sitemap_aantal) : ""} pagina's gecontroleerd op ruim 30 punten, en de snelheid op mobiel gemeten met de meetmethode van Google.</p>
       <div class="rp-bot"><span class="bot-mid" id="rpbot"></span><div class="rp-ballon">Hoi${d.naam ? " " + esc(String(d.naam).split(" ")[0]) : ""}! Ik heb je site bekeken. Hieronder zie je wat er goed gaat en wat beter kan.</div></div>
     </div>
