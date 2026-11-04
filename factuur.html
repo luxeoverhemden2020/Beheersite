@@ -78,7 +78,7 @@ document.getElementById("pdf").onclick = () => window.print();
       <div class="gegevens">
         <div><h3>Factuurnummer</h3><span class="mono">${esc(f.nummer || "concept")}</span></div>
         <div><h3>Datum</h3>${dat(f.datum)}</div>
-        <div><h3>Periode</h3>${esc(f.periode)}</div></div>
+        <div><h3>Periode</h3>${esc(new Date(f.periode + "-15").toLocaleDateString("nl-NL", { month: "long", year: "numeric" }))}</div></div>
       <table><thead><tr><th>Omschrijving</th><th class="r">Bedrag</th></tr></thead>
         <tbody><tr><td>${esc(f.omschrijving)}</td><td class="r mono">${euro(f.bedrag_excl)}</td></tr></tbody></table>
       <div class="som mono"><div><span>Subtotaal</span><span>${euro(f.bedrag_excl)}</span></div><div><span>Btw 21%</span><span>${euro(f.btw)}</span></div>
