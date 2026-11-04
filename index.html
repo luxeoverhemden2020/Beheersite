@@ -9,6 +9,15 @@
 </script>
 <link rel="stylesheet" href="assets/stijl.css">
 <link rel="stylesheet" href="assets/home.css">
+<style>
+.prijs-blok{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;align-items:stretch}
+.prijs-links{min-width:0}.prijs-groot{font-size:clamp(40px,6vw,56px);margin:0;line-height:1}.prijs-groot small{font-size:16px;color:var(--zacht);font-family:"Space Grotesk",sans-serif}
+.prijs-combi{display:flex;flex-direction:column;gap:8px;padding:18px;border-radius:16px;border:1px solid rgba(34,227,196,.55);background:linear-gradient(180deg,rgba(34,227,196,.10),transparent);color:inherit;text-decoration:none;min-width:0}
+.prijs-combi .lint-inline{align-self:flex-start}.prijs-combi b{font-size:20px}
+.prijs-combi-bedrag{font-size:30px}.prijs-combi-bedrag small{font-size:13px;color:var(--zacht);font-family:"Space Grotesk",sans-serif}.prijs-combi-bedrag s{font-size:16px;color:var(--zacht);margin-left:6px}
+.prijs-combi-link{font-weight:700;color:var(--accent);margin-top:auto}
+@media (max-width:860px){.prijs-blok{grid-template-columns:1fr}}
+</style>
 </head>
 <body class="home">
 
@@ -20,6 +29,7 @@
     <a class="navlink verberg-mobiel" href="#sitehulpje">Hoe werkt het</a>
     <a class="navlink verberg-mobiel" href="#los">Werkt het met mijn site?</a>
     <a class="navlink verberg-mobiel" href="#contact">Koppelen</a>
+    <a class="navlink verberg-mobiel" href="#prijs">Prijs</a>
     <a class="navlink verberg-mobiel" href="vindbaarheid">Vindbaarheid</a>
     <button class="knop rand klein thema" type="button"></button>
     <a class="knop klein" href="inloggen">Inloggen</a>
@@ -154,6 +164,36 @@
     </div>
   </section>
 
+  <!-- PRIJS -->
+  <section id="prijs" class="wrap breed blok">
+    <h2 class="sectie"><span class="tag">€</span>Wat kost Sitehulpje?</h2>
+    <div class="kaart prijs-blok">
+      <div class="prijs-links">
+        <p class="prijs-groot mono">€125<small> per maand</small></p>
+        <p class="zacht" style="margin:0 0 14px">Vaste prijs, exclusief btw. Maandelijks opzegbaar. Geen uurtje-factuurtje.</p>
+        <ul class="vinkjes">
+          <li><b>Bespaar al snel duizenden euro's</b> per jaar aan een webbouwer</li>
+          <li><b>24 uur per dag, 7 dagen per week</b> beschikbaar, ook in het weekend en 's avonds</li>
+          <li>Sitehulpje <b>in je hand</b>: als app op je telefoon, altijd bij je</li>
+          <li>Meestal <b>binnen een minuut</b> klaar, je hoeft niet te wachten tot iemand tijd heeft</li>
+          <li>Typen, inspreken of een foto sturen: <b>geen technische kennis</b> nodig</li>
+          <li>Elke aanpassing met <b>één tik</b> terug te draaien</li>
+        </ul>
+        <div class="rij" style="margin-top:16px">
+          <a class="knop groot-knop" href="#contact" data-keuze="Ik wil Sitehulpje bestellen">Bestel Sitehulpje</a>
+          <a class="knop rand groot-knop" href="#los">Werkt het met mijn site?</a>
+        </div>
+      </div>
+      <a class="prijs-combi" href="vindbaarheid#pakketten">
+        <span class="lint-inline mono">voordeel</span>
+        <b>Samen met Vindbaarheid</b>
+        <span class="prijs-combi-bedrag mono">€75<small>/mnd</small> <s>€125</s></span>
+        <span class="zacht">Beter gevonden worden in Google én AI-diensten zoals ChatGPT. Neem je een Vindbaarheid-pakket (vanaf €99), dan kost Sitehulpje nog maar €75 per maand.</span>
+        <span class="prijs-combi-link">Bekijk de Vindbaarheid-pakketten →</span>
+      </a>
+    </div>
+  </section>
+
   <!-- NOG GEEN SITE -->
   <section id="aanbod" class="wrap breed blok">
     <h2 class="sectie"><span class="tag">01</span>Nog geen site? Die maken we ook.</h2>
@@ -234,6 +274,7 @@
       <form id="cform">
         <label>Waar ben je naar op zoek?</label>
         <div class="keuzes" role="radiogroup">
+          <label class="keuze"><input type="radio" name="c_keuze" value="Ik wil Sitehulpje bestellen"><span>🛒 Sitehulpje bestellen</span></label>
           <label class="keuze"><input type="radio" name="c_keuze" value="Ik heb al een website en wil Sitehulpje koppelen" checked><span>🤖 Sitehulpje koppelen</span></label>
           <label class="keuze"><input type="radio" name="c_keuze" value="Werkt Sitehulpje met mijn site? Graag even nakijken"><span>🔎 Werkt het met mijn site?</span></label>
           <label class="keuze"><input type="radio" name="c_keuze" value="Ik wil een nieuwe website of webshop"><span>🌐 Nieuwe site of shop</span></label>
