@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vindbaarheid – beter gevonden in Google én AI | Sitehulpje</title>
+<meta name="description" content="Sitehulpje Vindbaarheid: elke week een website-check, verbeteringen die we voor je doorvoeren en een helder dashboard met je cijfers uit Google en Bing. Vanaf €99 per maand.">
+<link rel="icon" type="image/png" href="assets/icoon-192.png">
+<link rel="stylesheet" href="assets/stijl.css">
+<link rel="stylesheet" href="assets/home.css">
+<style>
+.vb-held{padding-top:56px;padding-bottom:30px}
+.vb-held h1{font-size:clamp(36px,6vw,62px);line-height:1.04;margin:10px 0 16px;letter-spacing:-1px}
+.vb-held .groot{font-size:19px;color:var(--zacht);max-width:640px}
+.vier{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.vier .kaart h3{margin:6px 0 4px;font-size:17px}.vier .kaart p{color:var(--zacht);margin:0;font-size:15px}
+.ai-blok{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;align-items:center}
+.ai-vb{font-size:14.5px}.ai-vb .vraagb{background:var(--accent2);border-radius:12px 12px 12px 4px;padding:10px 12px;margin-bottom:8px}
+.ai-vb .antw{background:var(--veld);border:1px solid var(--lijn);border-radius:12px 12px 4px 12px;padding:10px 12px}
+.ai-vb mark{background:rgba(34,227,196,.25);color:inherit;border-radius:4px;padding:0 3px}
+.pakket-tabel{width:100%;border-collapse:separate;border-spacing:0;font-size:15px}
+.pakket-tabel tbody td{color:var(--tekst)}.pakket-tabel th,.pakket-tabel td{padding:11px 12px;border-bottom:1px solid var(--lijn);vertical-align:top;text-align:left}
+.pakket-tabel thead th{font-size:16px;border-bottom:2px solid var(--lijn);color:var(--tekst);text-transform:none;letter-spacing:0;font-family:"Space Grotesk",sans-serif;font-weight:700}
+.pakket-tabel thead th .prijs{display:block;font-size:28px;font-family:"JetBrains Mono",monospace;margin-top:4px}
+.pakket-tabel thead th .prijs small{font-size:13px;color:var(--zacht);font-family:"Space Grotesk",sans-serif}
+.pakket-tabel .uit{background:linear-gradient(180deg,rgba(34,227,196,.10),transparent)}
+.pakket-tabel td:first-child{color:var(--zacht);width:30%}
+.binnenkort{font-size:11px;font-family:"JetBrains Mono",monospace;text-transform:uppercase;color:var(--paarstekst);background:var(--paarsbg);padding:1px 6px;border-radius:999px;margin-left:4px;white-space:nowrap}
+.stappen3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;counter-reset:s}
+.stappen3 .kaart{position:relative;padding-top:44px}
+.stappen3 .kaart::before{counter-increment:s;content:counter(s);position:absolute;top:12px;left:16px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#04111a;font-weight:700;display:flex;align-items:center;justify-content:center}
+.eerlijk{border-left:4px solid var(--accent)}
+@media (max-width:900px){.vier{grid-template-columns:1fr 1fr}.ai-blok{grid-template-columns:1fr}.stappen3{grid-template-columns:1fr}}
+.pakketten3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:stretch;margin:14px 0}
+.pk{position:relative;display:flex;flex-direction:column;gap:8px;min-width:0}
+.pk.uit{border-color:rgba(34,227,196,.55);box-shadow:var(--glow)}
+.pk-lint{position:absolute;top:-11px;right:16px}
+.pk-naam{margin:0;font-family:"JetBrains Mono",monospace;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--zacht)}
+.pk h3{margin:0;font-size:22px;text-wrap:balance}
+.pk-prijs{margin:0;font-family:"JetBrains Mono",monospace;font-size:30px}.pk-prijs small{font-size:13px;color:var(--zacht);font-family:"Space Grotesk",sans-serif}
+.pk-voor{margin:0;color:var(--zacht);font-size:15px}
+.pk .vb-goed{flex:1;font-size:15px}
+.pk-klein{margin:4px 0 6px;font-size:13px;color:var(--zacht);border-top:1px solid var(--lijn);padding-top:8px}
+.pk .knop{align-self:flex-start}
+@media (max-width:900px){.pakketten3{grid-template-columns:1fr}}
+.keuze{position:relative}.pakket-mobiel{display:none}
+.pakket-mobiel .kaart{position:relative}.pakket-mobiel h3{margin:0;display:flex;justify-content:space-between;align-items:baseline;font-size:20px}
+.prijs-m{font-family:"JetBrains Mono",monospace;font-size:24px}.prijs-m small{font-size:12px;color:var(--zacht);font-family:"Space Grotesk",sans-serif}
+.pakket-mobiel .vb-goed{margin:6px 0 4px}.pakket-mobiel .lint-inline{position:absolute;top:-10px;right:14px}
+.uitgelicht-m{border-color:rgba(34,227,196,.55);box-shadow:var(--glow)}
+@media (max-width:640px){.pakket-scroll{display:none}.pakket-mobiel{display:block}.vier{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="home">
+<header class="kop">
+  <a href="./" class="bot-klein" id="kopbot" aria-label="Sitehulpje"></a>
+  <a href="./" class="merk" style="text-decoration:none;color:inherit">Site<b>hulpje</b></a>
+  <nav class="rechts">
+    <a class="navlink verberg-mobiel" href="#wat">Wat je krijgt</a>
+    <a class="navlink verberg-mobiel" href="#pakketten">Pakketten</a>
+    <a class="navlink verberg-mobiel" href="#vragen">Vragen</a>
+    <button class="knop rand klein thema" type="button"></button>
+    <a class="knop klein" href="#contact" data-keuze="Ik wil een gratis website-check voor Vindbaarheid">Gratis check</a>
+  </nav>
+</header>
+<main>
+  <section class="wrap breed vb-held">
+    <p class="label mono"><span class="knipper">●</span> Sitehulpje Vindbaarheid</p>
+    <h1>Gevonden worden.<br><span class="glans">In Google én in AI.</span></h1>
+    <p class="groot">Steeds meer klanten zoeken via Google, maar ook via ChatGPT en andere AI-diensten. Sitehulpje controleert je website elke week, voert verbeteringen voor je door en laat in een helder dashboard zien hoe vaak je gevonden wordt.</p>
+    <div class="rij" style="margin-top:18px">
+      <a class="knop groot-knop" href="#contact" data-keuze="Ik wil een gratis website-check voor Vindbaarheid">Vraag een gratis website-check aan</a>
+      <a class="knop rand groot-knop" href="#pakketten">Bekijk de pakketten</a>
+    </div>
+    <p class="zacht vb-klein" style="margin-top:12px">Voor elke website of webshop · vanaf €99 per maand · geen technische kennis nodig</p>
+  </section>
+
+  <section id="wat" class="wrap breed blok">
+    <h2 class="sectie"><span class="tag">01</span>Wat je krijgt</h2>
+    <div class="vier">
+      <div class="kaart"><div class="pad-icoon">📊</div><h3>Je cijfers, helder</h3><p>Hoe vaak je in Google en Bing staat, hoeveel mensen doorklikken en op welke zoekwoorden. Elke nacht bijgewerkt, in gewone taal.</p></div>
+      <div class="kaart"><div class="pad-icoon">🩺</div><h3>Elke week een check</h3><p>Ruim 30 punten: kapotte links, trage pagina's, ontbrekende titels, snelheid op mobiel en of AI-diensten je site mogen lezen.</p></div>
+      <div class="kaart"><div class="pad-icoon">🛠️</div><h3>Wij verbeteren het</h3><p>Sitehulpje schrijft betere titels, omschrijvingen en bedrijfsgegevens. Jij keurt goed met één klik, wij zetten het op je site.</p></div>
+      <div class="kaart"><div class="pad-icoon">📄</div><h3>Elke maand een rapport</h3><p>Wat er beter ging, wat we hebben gedaan en wat de volgende stappen zijn. Ook als PDF.</p></div>
+    </div>
+  </section>
+
+  <section class="wrap breed blok">
+    <h2 class="sectie"><span class="tag">02</span>Waarom AI-vindbaarheid telt</h2>
+    <div class="ai-blok">
+      <div>
+        <p>Mensen vragen steeds vaker aan ChatGPT, Gemini of Perplexity: "Wie kan mijn dak reinigen in Hengelo?" of "Waar koop ik een goed overhemd met lange mouwen?". Die diensten noemen een paar bedrijven, en de rest bestaat even niet.</p>
+        <p>Of jij genoemd wordt, hangt onder meer af van hoe duidelijk je website is: begrijpelijke teksten, je adres en openingstijden in een vorm die AI begrijpt, en toestemming voor AI-diensten om je site te lezen. Precies dat controleren en verbeteren we.</p>
+        <p class="zacht vb-klein">Binnenkort meten we ook maandelijks met vaste vragen hoe vaak AI-diensten jouw bedrijf noemen, naast je concurrenten.</p>
+      </div>
+      <div class="kaart ai-vb" aria-label="Voorbeeld van een AI-antwoord">
+        <div class="vraagb">Welke bedrijven reinigen daken in Twente?</div>
+        <div class="antw">In Twente kun je onder meer terecht bij <mark>Dakglans Hengelo</mark>, gespecialiseerd in reinigen op lage druk, en …</div>
+        <p class="zacht vb-klein" style="margin:8px 0 0">Voorbeeld ter illustratie, met een verzonnen bedrijf.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="pakketten" class="wrap breed blok">
+    <h2 class="sectie"><span class="tag">03</span>Pakketten</h2>
+    <p class="zacht" style="margin-top:-6px">Kies op wat je wilt bereiken. Prijzen per maand, exclusief btw. Minimaal 3 maanden, daarna per maand opzegbaar. Werkt naast Sitehulpje webbeheer of los.</p>
+    <div class="pakketten3">
+      <div class="kaart pk">
+        <p class="pk-naam">Basis</p>
+        <h3>Gezond &amp; gevonden</h3>
+        <p class="pk-prijs">€99<small> /mnd</small></p>
+        <p class="pk-voor">Voor de lokale ondernemer die gewoon goed gevonden wil worden, zonder er zelf naar om te kijken.</p>
+        <ul class="vb-goed">
+          <li>Elke week een website-check op ruim 30 punten</li>
+          <li>Je site wordt dag en nacht in de gaten gehouden; bij storing krijg je bericht</li>
+          <li>Dashboard met je cijfers uit Google en Bing, elke nacht bijgewerkt</li>
+          <li>Betere titels en omschrijvingen voor Google, jij keurt goed met één klik</li>
+          <li>Je bedrijfsgegevens in een vorm die Google en AI-diensten begrijpen</li>
+          <li>Maandrapport in gewone taal: wat ging beter, wat hebben we gedaan</li>
+        </ul>
+        <p class="pk-klein">Tot 5 pagina's per maand verbeterd · 1 website</p>
+        <a class="knop rand" href="#contact" data-keuze="Ik heb interesse in Vindbaarheid Basis">Kies Basis</a>
+      </div>
+      <div class="kaart pk uit">
+        <span class="lint-inline pk-lint">aanrader</span>
+        <p class="pk-naam">Plus</p>
+        <h3>Lokaal groeien</h3>
+        <p class="pk-prijs">€179<small> /mnd</small></p>
+        <p class="pk-voor">Voor het bedrijf dat meer klanten uit de eigen regio wil, via Google, Google Maps en AI.</p>
+        <ul class="vb-goed">
+          <li><b>Alles uit Basis</b></li>
+          <li>Meer pagina's per maand verbeterd, ook afbeeldingen</li>
+          <li>Rapport met uitleg waarom cijfers stijgen of dalen, en de volgende stappen</li>
+          <li>Openingstijden, diensten en veelgestelde vragen voor Google en AI <span class="binnenkort">binnenkort</span></li>
+          <li>Review-verzoeken aan je klanten <span class="binnenkort">binnenkort</span></li>
+          <li>Je Google Bedrijfsprofiel: cijfers en conceptantwoorden op reviews <span class="binnenkort">binnenkort</span></li>
+          <li>Elke maand een nieuwe pagina of artikel <span class="binnenkort">binnenkort</span></li>
+        </ul>
+        <p class="pk-klein">Tot 15 pagina's per maand verbeterd · 1 website</p>
+        <a class="knop" href="#contact" data-keuze="Ik heb interesse in Vindbaarheid Plus">Kies Plus</a>
+      </div>
+      <div class="kaart pk">
+        <p class="pk-naam">Pro</p>
+        <h3>Voorsprong</h3>
+        <p class="pk-prijs">€249<small> /mnd</small></p>
+        <p class="pk-voor">Voor de webshop of het bedrijf met veel concurrentie, dat wil weten waar het staat en verder wil komen.</p>
+        <ul class="vb-goed">
+          <li><b>Alles uit Plus</b></li>
+          <li>De meeste pagina's per maand verbeterd</li>
+          <li>Elk kwartaal een gesprek van 30 minuten met Jan</li>
+          <li>Tot 3 websites of webshops</li>
+          <li>Je concurrenten gevolgd: waar staan zij, waar sta jij <span class="binnenkort">binnenkort</span></li>
+          <li>Elke week gemeten hoe vaak ChatGPT en andere AI-diensten je noemen <span class="binnenkort">binnenkort</span></li>
+          <li>Producten en reviews vindbaar in Google en AI <span class="binnenkort">binnenkort</span></li>
+          <li>Drie nieuwe pagina's of artikelen per maand <span class="binnenkort">binnenkort</span></li>
+        </ul>
+        <p class="pk-klein">Tot 30 pagina's per maand verbeterd · tot 3 websites</p>
+        <a class="knop rand" href="#contact" data-keuze="Ik heb interesse in Vindbaarheid Pro">Kies Pro</a>
+      </div>
+    </div>
+    <p class="zacht vb-klein">Onderdelen met "binnenkort" komen er zonder extra kosten bij zodra ze klaar zijn. Google Ads en andere betaalde advertenties vallen er niet onder; dit gaat over gratis, gewone vindbaarheid.</p>
+  </section>
+
+  <section class="wrap breed blok">
+    <h2 class="sectie"><span class="tag">04</span>Zo begin je</h2>
+    <div class="stappen3">
+      <div class="kaart"><h3 style="margin:0 0 4px">Gratis check</h3><p class="zacht" style="margin:0">We controleren je website en laten zien wat er beter kan. Vrijblijvend.</p></div>
+      <div class="kaart"><h3 style="margin:0 0 4px">Koppelen</h3><p class="zacht" style="margin:0">Je koppelt Google met één klik. Wij krijgen nooit je wachtwoord en kunnen alleen meekijken.</p></div>
+      <div class="kaart"><h3 style="margin:0 0 4px">Wij gaan aan de slag</h3><p class="zacht" style="margin:0">Elke week een check, verbeteringen ter goedkeuring en elke maand een rapport.</p></div>
+    </div>
+    <div class="kaart eerlijk" style="margin-top:14px"><b>Eerlijk is eerlijk.</b> Niemand kan een plek bovenaan in Google of een vermelding in ChatGPT garanderen; zij bepalen zelf wat ze tonen. Wat we wél doen: je site zo goed mogelijk maken en je precies laten zien wat er verandert. Resultaat zie je meestal na 2 tot 6 maanden.</div>
+  </section>
+
+  <section id="vragen" class="wrap blok">
+    <h2 class="sectie"><span class="tag">05</span>Veelgestelde vragen</h2>
+    <details class="kaart vraag"><summary>Werkt het met mijn website?</summary><p>Ja. De check en het dashboard werken met elke website of webshop. Verbeteringen voeren we automatisch door op WordPress en WooCommerce; bij andere systemen doet Jan het voor je.</p></details>
+    <details class="kaart vraag"><summary>Heb ik Sitehulpje webbeheer nodig?</summary><p>Nee, Vindbaarheid kan los. Heb je Sitehulpje al, dan zit het in hetzelfde account als een extra tab.</p></details>
+    <details class="kaart vraag"><summary>Hoe betaal ik?</summary><p>Na je akkoord betaal je de eerste (gedeeltelijke) maand via iDEAL. Daarna schrijven we elke maand automatisch af. Je krijgt de factuur een dag van tevoren, samen met je maandrapport.</p></details>
+    <details class="kaart vraag"><summary>Moet ik zelf iets doen?</summary><p>Alleen Google koppelen (één minuut) en voorstellen goedkeuren als je dat wilt. De rest doen wij.</p></details>
+    <details class="kaart vraag"><summary>Wat gebeurt er met mijn gegevens?</summary><p>We kijken alleen mee, slaan sleutels versleuteld op en gebruiken je cijfers nergens anders voor. Stoppen kan altijd. Lees ons <a href="privacy">privacybeleid</a>.</p></details>
+    <details class="kaart vraag"><summary>Kan ik opzeggen?</summary><p>Ja. Vindbaarheid loopt minimaal 3 maanden, omdat resultaat in Google tijd nodig heeft. Daarna kun je per maand opzeggen. Je cijfers blijven tot 90 dagen bewaard, daarna verwijderen we ze.</p></details>
+  </section>
+
+  <section class="wrap blok" style="text-align:center;padding-bottom:60px">
+    <h2 style="font-size:26px">Benieuwd hoe vindbaar jij bent?</h2>
+    <p class="zacht">We doen de check gratis en laten je de uitkomst zien. Daarna beslis je zelf.</p>
+    <a class="knop groot-knop" href="#contact" data-keuze="Ik wil een gratis website-check voor Vindbaarheid">Vraag een gratis website-check aan</a>
+  </section>
+  <section id="contact" class="wrap blok">
+    <div class="kaart contact">
+      <div class="rij" style="align-items:center;gap:14px;margin-bottom:6px"><span class="bot-mid" id="contactbot"></span>
+        <div><h2 style="margin:0">Gratis website-check</h2><p class="zacht" style="margin:2px 0 0">Laat je gegevens achter. Jan stuurt je de uitkomst en neemt contact met je op.</p></div></div>
+      <form id="cform">
+        <label>Waar ben je naar op zoek?</label>
+        <div class="keuzes" role="radiogroup">
+          <label class="keuze"><input type="radio" name="c_keuze" value="Ik wil een gratis website-check voor Vindbaarheid" checked><span>🩺 Gratis check</span></label>
+          <label class="keuze"><input type="radio" name="c_keuze" value="Ik heb interesse in Vindbaarheid Basis"><span>Basis</span></label>
+          <label class="keuze"><input type="radio" name="c_keuze" value="Ik heb interesse in Vindbaarheid Plus"><span>Plus</span></label>
+          <label class="keuze"><input type="radio" name="c_keuze" value="Ik heb interesse in Vindbaarheid Pro"><span>Pro</span></label>
+        </div>
+        <div class="grid2">
+          <div><label for="c_naam">Je naam *</label><input id="c_naam" autocomplete="name" required></div>
+          <div><label for="c_bedrijf">Bedrijf</label><input id="c_bedrijf" autocomplete="organization"></div>
+          <div><label for="c_contact">E-mail of telefoon *</label><input id="c_contact" autocomplete="email" required></div>
+          <div><label for="c_site">Adres van je website *</label><input id="c_site" inputmode="url" placeholder="www.…" required></div>
+        </div>
+        <label for="c_bericht">Iets wat we moeten weten? (mag leeg)</label>
+        <textarea id="c_bericht" placeholder="Bijvoorbeeld: we willen beter gevonden worden in Enschede en Hengelo."></textarea>
+        <input id="c_website2" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+        <div id="cmeld" class="verborgen"></div>
+        <button class="knop groot-knop" id="cknop" style="margin-top:12px">Vraag de gratis check aan</button>
+      </form>
+    </div>
+  </section>
+</main>
+<footer class="wrap zacht vb-klein" style="padding:20px 16px 40px;text-align:center">Sitehulpje is een dienst van Siteregelaar · Markt 9, 7551 CG Hengelo · KvK 55667147 · <a href="mailto:info@sitehulpje.nl">info@sitehulpje.nl</a> · <a href="tel:+31627254383">06 27 25 43 83</a> · <a href="privacy">Privacy</a> · <a href="voorwaarden">Voorwaarden</a></footer>
+<script src="assets/basis.js"></script>
+<script>
+try { document.getElementById("kopbot").innerHTML = robotSvg("rust"); document.getElementById("contactbot").innerHTML = robotSvg("rust"); } catch {}
+document.querySelectorAll("[data-keuze]").forEach((a) => a.addEventListener("click", () => {
+  const r = document.querySelector(`input[name=c_keuze][value="${a.dataset.keuze}"]`); if (r) r.checked = true;
+}));
+$("#cform").onsubmit = async (e) => {
+  e.preventDefault(); toonMelding($("#cmeld"), ""); $("#cknop").disabled = true;
+  try {
+    await api("contact", { naam: $("#c_naam").value, bedrijf: $("#c_bedrijf").value, contact: $("#c_contact").value, site: $("#c_site").value,
+      bericht: "Vindbaarheid – keuze: " + (document.querySelector("input[name=c_keuze]:checked")?.value || "-") + "\n\n" + $("#c_bericht").value,
+      website2: $("#c_website2").value, bron: location.hostname });
+    $("#cform").reset();
+    toonMelding($("#cmeld"), "Bedankt! Je aanvraag is verstuurd. Jan stuurt je de uitkomst van de check en neemt snel contact met je op.", "ok");
+  } catch (err) { toonMelding($("#cmeld"), err.message); }
+  $("#cknop").disabled = false;
+};
+</script>
+</body>
+</html>
