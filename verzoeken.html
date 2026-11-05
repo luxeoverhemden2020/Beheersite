@@ -35,7 +35,9 @@
   </div>
   <div id="lijst"><p class="zacht">Laden…</p></div>
   </div>
+  <div id="abonnement" style="margin-top:28px"></div>
 </div>
+<style>details.abonnement{opacity:.85}details.abonnement>summary{cursor:pointer;color:var(--zacht);font-size:14px}details.abonnement[open]{opacity:1}</style>
 <script src="assets/basis.js"></script>
 <script src="assets/vindbaarheid.js"></script>
 <script src="assets/vb-start.js"></script>
@@ -179,7 +181,7 @@ api("ik").then((d) => {
   laad();
   appTip($("#appTip"));
   // Vindbaarheid: alleen als de klant dit pakket heeft
-  if (d.klant) vbfPauzeMelding($("#vbpauze"));
+  if (d.klant) { vbfPauzeMelding($("#vbpauze")); vbfOpzegKlant($("#abonnement")); }
   // Geen Vindbaarheid (en niet op pauze)? Laat dan een tab zien met uitleg en een link naar de pakketten.
   const vbPromo = () => vbfApi("status").then((p) => {
     if (p.pauze || !d.klant) return;

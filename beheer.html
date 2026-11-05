@@ -82,6 +82,7 @@
     <div id="vbstart"></div>
     <div id="vbfacturen"></div>
     <div id="vbkosten"></div>
+    <div id="vbabon"></div>
     <div class="kaart tabel-scroll"><h2>Vindbaarheid – alle klanten</h2>
       <p class="zacht vb-klein" style="margin-top:-4px">Alleen klanten met een pakket zien de tab Vindbaarheid. Cijfers: laatste 28 dagen, bijgewerkt elke nacht.</p>
       <div id="vbmeldingen"></div><div id="vbtabel"><p class="zacht">Laden…</p></div></div>
@@ -181,6 +182,7 @@ async function vbBeheerLaad() {
     vbcBeheer($("#vbchecks"), new URLSearchParams(location.search).get("check"));
     vbKosten($("#vbkosten"));
     vbbBestellingen($("#vbbestel"));
+    vbfAbonnement($("#vbabon"), klanten);
     el.innerHTML = `<table><thead><tr><th>Klant</th><th>Pakket</th><th>Google</th><th class="r">Klikken</th><th class="r">Bezoeken via Google</th><th class="r">Acties</th><th>Bijgewerkt</th><th></th></tr></thead><tbody>
       ${klanten.map((k) => {
         const pct = k.klikken_vorige ? Math.round(((k.klikken_28 - k.klikken_vorige) / k.klikken_vorige) * 100) : null;

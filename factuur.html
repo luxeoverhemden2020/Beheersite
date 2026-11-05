@@ -84,7 +84,8 @@ document.getElementById("pdf").onclick = () => window.print();
         <div><h3>Datum</h3>${dat(f.datum)}</div>
         <div><h3>Periode</h3>${esc(new Date(f.periode + "-15").toLocaleDateString("nl-NL", { month: "long", year: "numeric" }))}</div></div>
       <table><thead><tr><th>Omschrijving</th><th class="r">Bedrag</th></tr></thead>
-        <tbody><tr><td>${esc(f.omschrijving)}</td><td class="r mono">${euro(f.bedrag_excl)}</td></tr></tbody></table>
+        <tbody>${(f.gegevens.regels && f.gegevens.regels.length ? f.gegevens.regels : [{ omschrijving: f.omschrijving, bedrag: f.bedrag_excl }])
+          .map((r) => `<tr><td>${esc(r.omschrijving)}</td><td class="r mono">${euro(r.bedrag)}</td></tr>`).join("")}</tbody></table>
       <div class="som mono"><div><span>Subtotaal</span><span>${euro(f.bedrag_excl)}</span></div><div><span>Btw 21%</span><span>${euro(f.btw)}</span></div>
         <div class="tot"><span>Totaal</span><span>${euro(f.totaal)}</span></div></div>
       <div class="betaal">${betaaltekst}</div>

@@ -88,3 +88,73 @@ async function vbfBeheer(el) {
     } catch (e) { uit.innerHTML = `<div class="melding fout">${esc(e.message)}</div>`; }
   };
 }
+
+// Beheer: abonnement van een klant bekijken, persoonlijke korting instellen, opzegging zien of terugdraaien
+async function vbfAbonnement(el, klanten) {
+  const lijst = (klanten || []).filter((k) => k.vb_pakket || k.vindbaarheid || k.sh_prijs);
+  const opties = (klanten || []).map((k) => `<option value="${esc(k.id)}">${esc(k.naam)}</option>`).join("");
+  el.innerHTML = `<div class="kaart"><h2 style="font-size:16px"><span class="tag">%</span>Abonnement en korting</h2>
+    <p class="zacht vb-klein" style="margin-top:-4px">Kies een klant. Een korting staat als aparte regel op de factuur, en de incasso schrijft het lagere bedrag af.</p>
+    <select id="vbfab_klant" style="width:auto;min-width:220px"><option value="">Kies een klant…</option>${opties}</select>
+    <div id="vbfab_uit" style="margin-top:12px"></div></div>`;
+  const uit = $("#vbfab_uit");
+  $("#vbfab_klant").onchange = async (e) => {
+    const id = e.target.value; uit.innerHTML = "";
+    if (!id) return;
+    let d; try { d = await vbfApi("abonnement", { klant_id: id }); } catch (err) { uit.innerHTML = `<div class="melding fout">${esc(err.message)}</div>`; return; }
+    if (!d.delen.length) { uit.innerHTML = '<p class="zacht">Deze klant heeft geen abonnement via het factuursysteem.</p>'; return; }
+    const soort = d.korting_pct ? "procent" : d.korting_eur ? "bedrag" : "geen";
+    uit.innerHTML = `<table><tbody>${d.delen.map((x) => `<tr><td>${esc(x.naam)}</td><td class="r mono">${vbfEuro(x.prijs)}</td><td class="zacht vb-klein">${x.minEind ? "minimaal t/m " + new Date(x.minEind).toLocaleDateString("nl-NL") : "per maand opzegbaar"}</td></tr>`).join("")}
+      ${d.korting ? `<tr><td>Persoonlijke korting</td><td class="r mono vb-op">–${vbfEuro(d.korting)}</td><td></td></tr>` : ""}
+      <tr><td><b>Per maand excl. btw</b></td><td class="r mono"><b>${vbfEuro(d.netto)}</b></td><td></td></tr></tbody></table>
+      ${d.opzeg_per ? `<div class="melding fout" style="margin-top:10px">Opgezegd per ${new Date(d.opzeg_per).toLocaleDateString("nl-NL")} (${esc((d.opzeg_wat || []).join(", "))}). <button class="knop rand klein" id="vbfab_terug">Opzegging terugdraaien</button></div>` : ""}
+      <form id="vbfab_form" class="rij" style="gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:12px">
+        <div><label class="vb-klein">Korting</label><select id="vbfab_soort" style="width:auto">
+          <option value="geen"${soort === "geen" ? " selected" : ""}>Geen</option><option value="bedrag"${soort === "bedrag" ? " selected" : ""}>Vast bedrag per maand (€)</option><option value="procent"${soort === "procent" ? " selected" : ""}>Percentage (%)</option></select></div>
+        <div><label class="vb-klein">Hoeveel</label><input id="vbfab_w" inputmode="decimal" style="width:110px" value="${esc(d.korting_pct || d.korting_eur || "")}"></div>
+        <div><label class="vb-klein">Tot en met (mag leeg)</label><input id="vbfab_tot" type="date" style="width:auto" value="${esc(d.korting_tot ? String(d.korting_tot).slice(0, 10) : "")}"></div>
+        <div style="flex:1;min-width:160px"><label class="vb-klein">Reden (komt op de factuur, mag leeg)</label><input id="vbfab_reden" maxlength="80" value="${esc(d.korting_reden || "")}" placeholder="bijv. vaste klant"></div>
+        <button class="knop klein">Opslaan</button></form><div id="vbfab_meld"></div>`;
+    $("#vbfab_form").onsubmit = async (ev) => {
+      ev.preventDefault();
+      try {
+        const r = await vbfApi("korting", { klant_id: id, soort: $("#vbfab_soort").value, waarde: $("#vbfab_w").value, tot: $("#vbfab_tot").value, reden: $("#vbfab_reden").value });
+        toonMelding($("#vbfab_meld"), r.korting ? `Opgeslagen. Nieuw maandbedrag: ${vbfEuro(r.netto)} excl. btw (was ${vbfEuro(r.bruto)}).` : `Opgeslagen. Geen korting: ${vbfEuro(r.netto)} per maand excl. btw.`, "ok");
+        setTimeout(() => $("#vbfab_klant").onchange({ target: { value: id } }), 1800);
+      } catch (err) { toonMelding($("#vbfab_meld"), err.message); }
+    };
+    const t = $("#vbfab_terug"); if (t) t.onclick = async () => { try { await vbfApi("opzeg_terug", { klant_id: id }); $("#vbfab_klant").onchange({ target: { value: id } }); } catch (err) { toonMelding($("#vbfab_meld"), err.message); } };
+  };
+}
+
+// Klant: abonnement bekijken en opzeggen (onopvallend onder het account)
+async function vbfOpzegKlant(el) {
+  let d; try { d = await vbfApi("abonnement"); } catch { el.innerHTML = ""; return; }
+  if (!d.delen.length) { el.innerHTML = ""; return; }
+  const datum = (s) => new Date(s).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" });
+  el.innerHTML = `<details class="kaart abonnement"><summary>Abonnement</summary>
+    <table style="margin-top:8px"><tbody>${d.delen.map((x) => `<tr><td>${esc(x.naam)}</td><td class="r mono">${vbfEuro(x.prijs)} /mnd</td></tr>`).join("")}
+    ${d.korting ? `<tr><td>Persoonlijke korting</td><td class="r mono">–${vbfEuro(d.korting)}</td></tr>` : ""}</tbody></table>
+    <p class="zacht vb-klein">Prijzen exclusief btw. De factuur krijg je elke maand per mail.</p>
+    ${d.opzeg_per ? `<p>Je hebt opgezegd per <b>${datum(d.opzeg_per)}</b>. Tot die dag loopt alles gewoon door.</p><button class="knop rand klein" id="vbo_terug">Toch niet opzeggen</button>`
+      : `<details style="margin-top:8px"><summary class="zacht vb-klein">Opzeggen</summary>
+        <p class="vb-klein">Opzeggen kan per het einde van de maand. Vindbaarheid heeft een minimale looptijd van 3 maanden.</p>
+        ${d.delen.map((x) => `<label class="vb-klein" style="display:flex;gap:6px;align-items:center;font-weight:400"><input type="checkbox" value="${x.id}" class="vbo_wat" style="width:auto"${d.delen.length === 1 ? " checked" : ""}> ${esc(x.naam)}</label>`).join("")}
+        <label class="vb-klein" for="vbo_reden">Waarom stop je? (mag leeg, helpt ons beter te worden)</label><textarea id="vbo_reden" rows="2"></textarea>
+        <button class="knop rand klein" id="vbo_knop" style="margin-top:6px">Opzeggen</button></details>`}
+    <div id="vbo_meld"></div></details>`;
+  const k = $("#vbo_knop");
+  if (k) k.onclick = async () => {
+    const wat = [...el.querySelectorAll(".vbo_wat:checked")].map((x) => x.value);
+    if (!wat.length) { toonMelding($("#vbo_meld"), "Kies wat je wilt opzeggen."); return; }
+    k.disabled = true;
+    try {
+      const r = await vbfApi("opzeggen", { wat, reden: $("#vbo_reden").value });
+      if (r.te_vroeg) toonMelding($("#vbo_meld"), `${r.naam} loopt minimaal 3 maanden. Vanaf ${datum(r.vanaf)} kun je opzeggen; het stopt dan op ${datum(r.eind)}. We hebben je dit ook gemaild.`);
+      else { toonMelding($("#vbo_meld"), `Opgezegd per ${datum(r.per)}. Je krijgt een bevestiging per mail.`, "ok"); setTimeout(() => vbfOpzegKlant(el), 2500); }
+    } catch (e) { toonMelding($("#vbo_meld"), e.message); }
+    k.disabled = false;
+  };
+  const t = $("#vbo_terug");
+  if (t) t.onclick = async () => { try { await vbfApi("opzeg_terug"); vbfOpzegKlant(el); } catch (e) { toonMelding($("#vbo_meld"), e.message); } };
+}
