@@ -89,8 +89,6 @@ function vbsStapInhoud(s, d, admin) {
       <textarea id="vbs_concurrenten" name="concurrenten" rows="2" placeholder="Websites, één per regel (mag ook leeg)">${esc((o.concurrenten || []).join("\n"))}</textarea>
       <label>Wat moet een bezoeker op je site doen?</label>
       <div class="vbs-vinkjes">${Object.entries(VBS_DOEL).map(([w, n]) => `<label class="vbs-vink"><input type="checkbox" name="doel" value="${w}" ${(o.doel || []).includes(w) ? "checked" : ""}> ${n}</label>`).join("")}</div>
-      <label for="vbs_niet">Is er iets wat we níet mogen aanpassen?</label>
-      <input id="vbs_niet" name="niet_aanpassen" value="${esc(o.niet_aanpassen || "")}" placeholder="Bijv. de teksten op de pagina Over ons">
       <label for="vbs_eerder">Heb je eerder iemand aan je vindbaarheid laten werken?</label>
       <input id="vbs_eerder" name="eerder_seo" value="${esc(o.eerder_seo || "")}" placeholder="Bijv. nee, of: ja, bureau X tot 2025">
       <label for="vbs_extra">Nog iets wat we moeten weten?</label>
