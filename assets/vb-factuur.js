@@ -143,6 +143,7 @@ async function vbfOpzegKlant(el) {
   el.innerHTML = `<details class="kaart abonnement"><summary>Abonnement</summary>
     <table style="margin-top:8px"><tbody>${d.delen.map((x) => `<tr><td>${esc(x.naam)}</td><td class="r mono">${vbfEuro(x.prijs)} /mnd</td></tr>`).join("")}
     ${d.korting ? `<tr><td>Persoonlijke korting</td><td class="r mono">–${vbfEuro(d.korting)}</td></tr>` : ""}</tbody></table>
+    ${d.komend ? `<p class="vb-klein" style="margin:6px 0 0">Volgende maand: ${d.komend.korting ? `<b>${esc(d.komend.reden || "korting")}</b>, je betaalt ${vbfEuro(d.komend.netto)}` : `weer ${vbfEuro(d.komend.netto)}`}.</p>` : ""}
     <p class="zacht vb-klein">Prijzen exclusief btw. De factuur krijg je elke maand per mail.</p>
     ${wissel.length && !d.opzeg_per ? `<details style="margin-top:8px"><summary class="zacht vb-klein">Abonnement aanpassen</summary>
       <p class="vb-klein">Een ander pakket gaat meteen in. Vanaf de volgende factuur betaal je het nieuwe bedrag.</p><div style="display:flex;flex-wrap:wrap;gap:8px">${wissel.join("")}</div>
