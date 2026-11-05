@@ -90,6 +90,28 @@ async function vbSiteToon(el, klantId, opties = {}) {
     return d;
   }
 
+  // 4s. Shopify: één klik op Installeren in de eigen Shopify
+  if (d.systeem === "shopify") {
+    const fout = t?.status === "fout" && t.melding ? `<div class="melding fout" style="margin-bottom:10px">${esc(t.melding)}</div>` : "";
+    el.innerHTML = kader(`<div class="vbsite-gevonden${opties.gescand ? " pling" : ""}"><span class="vbsite-vink">✓</span><div>Je webshop is gemaakt met <b>Shopify</b><br><button class="vbsite-link zacht vbs-klein" type="button" data-site-wissel>Klopt niet?</button></div></div>
+      ${fout}<p style="margin:0 0 10px">Klik op de knop, log in bij Shopify en klik op <b>Installeren</b>. Je deelt geen wachtwoord.</p>
+      <button class="knop" type="button" data-sh-start>Koppel mijn webshop</button>
+      <div data-sh-adres hidden style="margin-top:12px"><label for="vbsite_sh">Je Shopify-adres</label><input id="vbsite_sh" class="vul" placeholder="jouwwinkel.myshopify.com"><p class="zacht vbs-klein" style="margin:6px 0 0">Dit adres zie je in je Shopify-beheer onder Instellingen → Domeinen. Vul het in en klik nog een keer op de knop.</p></div>
+      <div data-site-meld></div>`);
+    el.querySelector("[data-site-wissel]").onclick = () => opnieuw({ kies: true });
+    el.querySelector("[data-sh-start]").onclick = async (e) => {
+      const b = e.currentTarget; b.disabled = true; vbSiteMeld(el, "");
+      try {
+        const r = await fetch(VBSITE_API.replace("vb-site", "vb-shopify"), { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "start", klant_id: klantId, winkel: el.querySelector("#vbsite_sh").value.trim() }) });
+        const x = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(x.fout || "Er ging iets mis.");
+        if (x.kan) { location.href = x.url; return; }
+        el.querySelector("[data-sh-adres]").hidden = false; vbSiteMeld(el, x.melding); b.disabled = false;
+      } catch (err) { vbSiteMeld(el, err.message); b.disabled = false; }
+    };
+    return d;
+  }
+
   // 4a. Magento: integratie met kopieerknoppen; Magento stuurt de sleutels zelf naar ons
   if (d.systeem === "magento") {
     const fout = t?.status === "fout" && t.melding ? `<div class="melding fout" style="margin-bottom:10px">${esc(t.melding)}</div>` : "";
