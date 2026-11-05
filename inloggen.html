@@ -31,6 +31,7 @@
       <div id="meld" class="verborgen"></div>
       <button class="knop" style="width:100%;margin-top:14px" id="knop">Inloggen</button>
     </form>
+    <p style="text-align:center;margin:12px 0 0" id="vergetenrij"><a href="#" id="vergeten" class="zacht">Wachtwoord vergeten?</a></p>
   </div>
 </div>
 <script src="assets/basis.js"></script>
@@ -43,6 +44,32 @@ if (code) {
   $("#wwlabel").textContent = "Nieuw wachtwoord"; $("#ww").autocomplete = "new-password"; $("#ww").minLength = 8;
   $("#ww2veld").classList.remove("verborgen"); $("#knop").textContent = "Wachtwoord opslaan";
 }
+// Wachtwoord vergeten
+const WW_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-wachtwoord";
+const wwApi = async (data) => {
+  const r = await fetch(WW_API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) }).catch(() => { throw new Error("Geen verbinding. Probeer het opnieuw."); });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.fout || "Er ging iets mis.");
+  return d;
+};
+const herstel = new URLSearchParams(location.search).get("herstel");
+let vergeten = false;
+if (herstel) {
+  history.replaceState(null, "", location.pathname);
+  $("#uitleg").textContent = "Kies een nieuw wachtwoord (minimaal 8 tekens).";
+  $("#emailveld").classList.add("verborgen"); $("#email").required = false;
+  $("#wwlabel").textContent = "Nieuw wachtwoord"; $("#ww").autocomplete = "new-password"; $("#ww").minLength = 8;
+  $("#ww2veld").classList.remove("verborgen"); $("#knop").textContent = "Wachtwoord opslaan";
+  $("#vergetenrij").classList.add("verborgen");
+}
+$("#vergeten").onclick = (e) => {
+  e.preventDefault();
+  vergeten = true;
+  $("#uitleg").textContent = "Vul je e-mailadres in. Je krijgt een mail met een link om een nieuw wachtwoord te kiezen.";
+  $("#wwlabel").classList.add("verborgen"); $("#ww").classList.add("verborgen"); $("#ww").required = false;
+  $("#knop").textContent = "Stuur de link"; $("#vergetenrij").classList.add("verborgen"); toonMelding($("#meld"), "");
+  $("#email").focus();
+};
 const voorBeheer = new URLSearchParams(location.search).get("voor") === "beheer";
 if (voorBeheer) $("#uitleg").textContent = "Log in op het beheerscherm.";
 // Bewaar de sessie in het juiste vakje: beheerder en klant staan los van elkaar.
@@ -65,12 +92,24 @@ if (link) {
   $("#uitleg").textContent = "Even inloggen…";
   api("link_inloggen", { link }).then((d) => { zetSessieVan("klant", d.token); try { localStorage.setItem("bs_link", link); } catch {} location.href = "verzoeken"; })
     .catch((e) => { $("#uitleg").textContent = "Log in om aanpassingen aan je website door te geven."; toonMelding($("#meld"), e.message); });
-} else if (!code) naarScherm();
+} else if (!code && !herstel) naarScherm();
 $("#inlog").onsubmit = async (e) => {
   e.preventDefault();
   toonMelding($("#meld"), "");
   $("#knop").disabled = true;
   try {
+    if (vergeten) {
+      await wwApi({ actie: "vraag", email: $("#email").value });
+      $("#uitleg").textContent = "Als dit adres bij ons bekend is, staat de mail er zo. Kijk ook even in je spam. De link werkt 1 uur.";
+      $("#inlog").classList.add("verborgen");
+      return;
+    }
+    if (herstel) {
+      if ($("#ww").value !== $("#ww2").value) throw new Error("De wachtwoorden zijn niet gelijk.");
+      await wwApi({ actie: "zet", token: herstel, wachtwoord: $("#ww").value });
+      location.href = "inloggen";
+      return;
+    }
     let d;
     if (code) {
       if ($("#ww").value !== $("#ww2").value) throw new Error("De wachtwoorden zijn niet gelijk.");
