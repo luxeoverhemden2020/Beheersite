@@ -326,8 +326,9 @@ $("#cform").onsubmit = async (e) => {
       website2: $("#c_website2").value, bron: location.hostname }) });
     const d = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(d.fout || "Versturen lukte niet. Probeer het zo nog eens.");
+    const naar = $("#c_email").value.trim();
     $("#cform").reset(); woorden.length = 0; tekenLabels(); $("#c_plaatsrij").hidden = true;
-    toonMelding($("#cmeld"), "Bedankt! We controleren je website nu. Je krijgt het rapport binnen een werkdag per mail.", "ok");
+    toonMelding($("#cmeld"), `Bedankt! We controleren je website nu. Binnen een paar uur krijg je het rapport per mail op ${naar}. Niets gezien? Kijk even bij je reclame of spam.`, "ok");
   } catch (err) { toonMelding($("#cmeld"), err.message); }
   $("#cknop").disabled = false;
 };

@@ -60,7 +60,9 @@ document.getElementById("pdf").onclick = () => window.print();
 (async () => {
   const el = document.getElementById("vel");
   try {
-    const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": token }, body: JSON.stringify({ actie: "toon", id: p.get("id") }) });
+    const publiek = !!p.get("t"); // link uit de factuurmail: bekijken zonder inloggen
+    if (publiek) document.getElementById("terug").href = "./";
+    const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": publiek ? "" : token }, body: JSON.stringify(publiek ? { actie: "toon_publiek", id: p.get("id"), t: p.get("t") } : { actie: "toon", id: p.get("id") }) });
     const d = await r.json().catch(() => ({}));
     if (r.status === 401) { location.href = BEHEER ? "inloggen?voor=beheer" : "inloggen"; return; }
     if (!r.ok) throw new Error(d.fout || "Er ging iets mis.");

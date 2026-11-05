@@ -78,6 +78,7 @@
 
   <section id="t-vindbaarheid" class="verborgen">
     <div id="vbchecks"></div>
+    <div id="vbbestel"></div>
     <div id="vbstart"></div>
     <div id="vbfacturen"></div>
     <div id="vbkosten"></div>
@@ -179,6 +180,7 @@ async function vbBeheerLaad() {
     vbfBeheer($("#vbfacturen"));
     vbcBeheer($("#vbchecks"), new URLSearchParams(location.search).get("check"));
     vbKosten($("#vbkosten"));
+    vbbBestellingen($("#vbbestel"));
     el.innerHTML = `<table><thead><tr><th>Klant</th><th>Pakket</th><th>Google</th><th class="r">Klikken</th><th class="r">Bezoeken via Google</th><th class="r">Acties</th><th>Bijgewerkt</th><th></th></tr></thead><tbody>
       ${klanten.map((k) => {
         const pct = k.klikken_vorige ? Math.round(((k.klikken_28 - k.klikken_vorige) / k.klikken_vorige) * 100) : null;

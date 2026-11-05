@@ -174,7 +174,7 @@ function opbouw(d) {
       <p class="zacht" style="margin:4px 0 0;font-size:14.5px">Gerekend met de ${a.werk} pagina's met verbeterpunten uit deze check. Daarna gaan we verder met de rest van je site.</p>
       <div class="rp-balken">${["basis", "plus", "pro"].map(balk).join("")}</div>` : ""}
     <p style="margin:12px 0 0"><b>Vindbaarheid ${p[0]}: €${p[2]} per maand</b> <span class="zacht">· met Sitehulpje webbeheer erbij €75 per maand in plaats van €125. Prijzen exclusief btw, minimaal 3 maanden.</span></p>
-    <div class="rp-cta"><a class="knop groot-knop" href="vindbaarheid#pakketten">Start met ${p[0]}</a><a class="knop rand groot-knop" href="vindbaarheid#pakketten">Bekijk alle pakketten</a></div>
+    <div class="rp-cta"><a class="knop groot-knop" href="bestellen?pakket=${encodeURIComponent(PAKKET[a.pakket] ? a.pakket : "plus")}${d.sitehulpje ? "&sh=1" : ""}">Start met ${p[0]} &rarr;</a><a class="knop rand groot-knop" href="vindbaarheid#pakketten">Bekijk alle pakketten</a></div>
   </section>
   <p class="rp-voet">Vragen? Bel of app Jan: 06 27 25 43 83 · info@sitehulpje.nl<br>Sitehulpje is een dienst van Siteregelaar · Markt 9, 7551 CG Hengelo · KvK 55667147<br>Niemand kan een plek bovenaan in Google garanderen. Resultaat zie je meestal na 2 tot 6 maanden.</p>`;
 }
