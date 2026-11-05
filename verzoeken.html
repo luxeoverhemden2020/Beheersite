@@ -36,9 +36,17 @@
   </div>
   <div id="lijst"><p class="zacht">Laden…</p></div>
   </div>
+  <div id="klussen" style="margin-top:28px"></div>
+  <div id="vriend" style="margin-top:16px"></div>
   <div id="abonnement" style="margin-top:28px"></div>
 </div>
-<style>details.abonnement{opacity:.85}details.abonnement>summary{cursor:pointer;color:var(--zacht);font-size:14px}details.abonnement[open]{opacity:1}</style>
+<style>details.abonnement{opacity:.85}details.abonnement>summary{cursor:pointer;color:var(--zacht);font-size:14px}details.abonnement[open]{opacity:1}
+.klus-lijst{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:10px}
+.klus{border:1px solid var(--lijn);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.klus b{font-size:16px}.klus .prijs{font-family:var(--mono,monospace);font-weight:700}
+.vb-aanbod{margin-top:10px;padding:14px;border-radius:14px;border:1px solid var(--lijn);background:var(--bg2)}
+.vb-aanbod .rij{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.vriend-link{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}.vriend-link input{flex:1 1 220px;min-width:0;font-family:var(--mono,monospace);font-size:13px}</style>
 <script src="assets/basis.js"></script>
 <script src="assets/vindbaarheid.js"></script>
 <script src="assets/vb-start.js"></script>
@@ -212,7 +220,7 @@ api("ik").then((d) => {
   laad();
   appTip($("#appTip"));
   // Vindbaarheid: alleen als de klant dit pakket heeft
-  if (d.klant) { vbfPauzeMelding($("#vbpauze")); vbfOpzegKlant($("#abonnement")); shStart($("#shstart")); }
+  if (d.klant) { vbfPauzeMelding($("#vbpauze")); vbfOpzegKlant($("#abonnement")); shStart($("#shstart")); vbfKlussen($("#klussen")); vbfVriend($("#vriend")); }
   // Geen Vindbaarheid (en niet op pauze)? Laat dan een tab zien met uitleg en een link naar de pakketten.
   const vbPromo = () => vbfApi("status").then((p) => {
     if (p.pauze || !d.klant) return;

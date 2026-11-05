@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gratis website-check | Sitehulpje</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<style>
+:root{--bg:#ffffff;--tekst:#0b1a2e;--zacht:#5a6b82;--lijn:#dfe7f1;--veld:#f5f8fc;--accent:#0b9f8a;--knoptekst:#04111a;--fout:#b42318;--foutbg:#fdecea;--okbg:#e6f7f3;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0c1a36;--tekst:#eef4fb;--zacht:#a9bdd8;--lijn:#24365a;--veld:#12244a;--accent:#22e3c4;--fout:#ffb4a9;--foutbg:#3a1a1a;--okbg:#0f3a3a;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tekst);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.w{max-width:520px;margin:auto;padding:20px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px))}
+.kop{display:flex;align-items:center;gap:10px}
+.kop img{width:36px;height:36px;border-radius:10px}
+.kop b{font-size:18px}.kop span{color:var(--accent);font-family:Menlo,Consolas,monospace}
+h1{font-size:22px;line-height:1.2;margin:14px 0 6px;text-wrap:balance}
+p{margin:0 0 12px;color:var(--zacht)}
+label{display:block;font-size:14px;font-weight:600;margin:10px 0 4px}
+input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--lijn);background:var(--veld);color:var(--tekst);font:inherit}
+input:focus{outline:2px solid var(--accent);outline-offset:1px}
+button{margin-top:14px;width:100%;padding:14px 18px;border:0;border-radius:12px;font-family:inherit;font-size:16px;font-weight:700;line-height:1;color:var(--knoptekst);background:linear-gradient(135deg,#22e3c4,#3b82f6);cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
+.meld{margin-top:12px;padding:12px 14px;border-radius:12px;font-size:15px}
+.meld.fout{background:var(--foutbg);color:var(--fout)}.meld.ok{background:var(--okbg);color:var(--tekst)}
+.klein{font-size:12px;color:var(--zacht);margin-top:12px;text-align:center}
+.klein a{color:inherit}
+.val{position:absolute;left:-9999px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="w">
+  <div class="kop"><img src="assets/icoon-192.png" alt=""><b>Site<span>hulpje</span></b></div>
+  <form id="f" novalidate>
+    <h1>Gratis check: hoe goed wordt jouw website gevonden?</h1>
+    <p>We controleren je website op ruim 30 punten en meten de snelheid op mobiel. Binnen een paar uur heb je het rapport in je mail.</p>
+    <label for="site">Adres van je website</label><input id="site" inputmode="url" autocomplete="url" placeholder="www.jouwbedrijf.nl" required>
+    <label for="email">Je e-mailadres</label><input id="email" type="email" autocomplete="email" placeholder="Hier sturen we het rapport naartoe" required>
+    <input id="website2" class="val" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <button id="knop" type="submit">Check mijn website &rarr;</button>
+    <div id="meld" class="meld" hidden></div>
+  </form>
+  <p class="klein">Gratis en vrijblijvend · door <a href="https://sitehulpje.nl/vindbaarheid" target="_blank" rel="noopener">Sitehulpje.nl</a> · <a href="https://sitehulpje.nl/privacy" target="_blank" rel="noopener">privacy</a></p>
+</div>
+<script>
+const partner = (new URLSearchParams(location.search).get("partner") || "").toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 30);
+const $ = (s) => document.querySelector(s);
+const meld = (t, soort = "fout") => { const m = $("#meld"); m.hidden = !t; m.className = "meld " + soort; m.textContent = t; };
+$("#f").onsubmit = async (e) => {
+  e.preventDefault(); meld("");
+  const site = $("#site").value.trim(), email = $("#email").value.trim();
+  if (!site) { meld("Vul het adres van je website in."); $("#site").focus(); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { meld("Vul een geldig e-mailadres in."); $("#email").focus(); return; }
+  $("#knop").disabled = true; $("#knop").textContent = "Even geduld…";
+  try {
+    const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-check", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ actie: "aanvraag", site, email, website2: $("#website2").value, bron: partner ? "partner:" + partner : "widget" }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.fout || "Versturen lukte niet. Probeer het zo nog eens.");
+    $("#f").reset();
+    meld(`Bedankt! We controleren je website nu. Binnen een paar uur krijg je het rapport op ${email}. Niets gezien? Kijk even bij je reclame of spam.`, "ok");
+  } catch (err) { meld(err.message); }
+  $("#knop").disabled = false; $("#knop").innerHTML = "Check mijn website &rarr;";
+};
+</script>
+</body>
+</html>

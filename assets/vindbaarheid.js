@@ -429,6 +429,7 @@ const VB_VS_SOORT = { titel_omschrijving: "Titel en omschrijving in Google", alt
 const VB_VS_STATUS = { nieuw: ["Wacht op jou", "vb-let"], goedgekeurd: ["Wordt uitgevoerd", "vb-op"], uitgevoerd: ["Uitgevoerd", "vb-op"], handmatig: ["Goedgekeurd · Jan zet het erop", "vb-op"], geweigerd: ["Niet gedaan", "vb-gelijk"] };
 function vbTeller(n, max) { return `<span class="${n > max ? "vb-af" : "vb-gelijk"} vb-klein">${n} tekens</span>`; }
 
+const VB_VOLGEND = { basis: ["Plus", 30, 179, "plus"], plus: ["Pro", 75, 249, "pro"] };
 async function vbVoorstellen(houder, klantId, el) {
   if (!houder) return;
   let d;
@@ -469,9 +470,18 @@ async function vbVoorstellen(houder, klantId, el) {
       <button class="knop ${d.voorstellen.length ? "rand " : ""}klein" data-vs-maak>${d.voorstellen.length ? "Nieuwe voorstellen maken" : "Maak voorstellen"}</button></div>
     <p class="zacht vb-klein" style="margin:6px 0 0">Sitehulpje stelt betere teksten voor op basis van de website-check. Er verandert niets op je site zonder jouw goedkeuring.${d.automatisch ? " Na goedkeuren voert Sitehulpje het meteen uit; terugdraaien kan altijd via Verzoeken." : ""}</p>
     <p class="zacht vb-klein" style="margin:4px 0 0">Deze maand: ${d.deze_maand} van ${d.per_maand} pagina's (pakket ${vbPakket(d.pakket).naam}).</p>
+    ${!IS_BEHEER && d.deze_maand >= d.per_maand && VB_VOLGEND[d.pakket] ? `<div class="vb-aanbod" style="margin-top:10px;padding:12px 14px;border-radius:14px;border:1px solid var(--lijn);background:var(--bg2)">
+      <b>Je maand zit vol.</b> <span class="vb-klein">Met ${VB_VOLGEND[d.pakket][0]} verbetert Sitehulpje elke maand ${VB_VOLGEND[d.pakket][1]} pagina's in plaats van ${d.per_maand}, voor €${VB_VOLGEND[d.pakket][2]} per maand. Het gaat meteen in.</span>
+      <div style="margin-top:8px"><button class="knop klein" data-vs-upgrade="${VB_VOLGEND[d.pakket][3]}">Overstappen naar ${VB_VOLGEND[d.pakket][0]}</button></div><div data-vs-upmeld></div></div>` : ""}
     <div data-vs-maakmeld></div></div>
     ${d.voorstellen.length ? `<div class="kaart">${d.voorstellen.map(kaart).join("")}</div>` : ""}`;
 
+  const up = houder.querySelector("[data-vs-upgrade]");
+  if (up) up.onclick = async () => {
+    up.disabled = true;
+    try { await vbfApi("wissel", { pakket: up.dataset.vsUpgrade }); toonMelding(houder.querySelector("[data-vs-upmeld]"), "Gelukt! Je pakket is aangepast. Je kunt meteen nieuwe voorstellen maken.", "ok"); setTimeout(() => vbVoorstellen(houder, klantId, el), 1800); }
+    catch (e) { toonMelding(houder.querySelector("[data-vs-upmeld]"), e.message); up.disabled = false; }
+  };
   const tekst = (v) => v.soort === "llms" ? v.voorstel.tekst : v.soort === "schema" ? `<script type="application/ld+json">\n${JSON.stringify(v.voorstel.jsonld, null, 2)}\n</script>` :
     v.soort === "alt" ? v.voorstel.afbeeldingen.map((a) => `${a.src}\t${a.alt}`).join("\n") : `Titel: ${v.voorstel.titel}\nOmschrijving: ${v.voorstel.omschrijving}`;
   houder.querySelectorAll("[data-vs]").forEach((blok) => {

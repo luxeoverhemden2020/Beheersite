@@ -132,29 +132,181 @@ async function vbfOpzegKlant(el) {
   let d; try { d = await vbfApi("abonnement"); } catch { el.innerHTML = ""; return; }
   if (!d.delen.length) { el.innerHTML = ""; return; }
   const datum = (s) => new Date(s).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" });
+  const PK = { basis: ["Basis", 99], plus: ["Plus", 179], pro: ["Pro", 249] };
+  const vb = d.delen.find((x) => x.id === "vindbaarheid"), sh = d.delen.find((x) => x.id === "sitehulpje");
+  const huidig = vb ? Object.keys(PK).find((p) => vb.naam.endsWith(PK[p][0])) : null;
+  const kleiner = huidig === "pro" ? "plus" : huidig === "plus" ? "basis" : null;
+  const wissel = [
+    ...(huidig ? Object.keys(PK).filter((p) => p !== huidig).map((p) => `<button class="knop rand klein vbo_pk" data-pk="${p}">Naar ${PK[p][0]} (€${PK[p][1]})</button>`) : []),
+    ...(!sh ? [`<button class="knop klein" id="vbo_sh">Sitehulpje webbeheer erbij (€${vb ? 75 : 125})</button>`] : []),
+  ];
   el.innerHTML = `<details class="kaart abonnement"><summary>Abonnement</summary>
     <table style="margin-top:8px"><tbody>${d.delen.map((x) => `<tr><td>${esc(x.naam)}</td><td class="r mono">${vbfEuro(x.prijs)} /mnd</td></tr>`).join("")}
     ${d.korting ? `<tr><td>Persoonlijke korting</td><td class="r mono">–${vbfEuro(d.korting)}</td></tr>` : ""}</tbody></table>
     <p class="zacht vb-klein">Prijzen exclusief btw. De factuur krijg je elke maand per mail.</p>
+    ${wissel.length && !d.opzeg_per ? `<details style="margin-top:8px"><summary class="zacht vb-klein">Abonnement aanpassen</summary>
+      <p class="vb-klein">Een ander pakket gaat meteen in. Vanaf de volgende factuur betaal je het nieuwe bedrag.</p><div style="display:flex;flex-wrap:wrap;gap:8px">${wissel.join("")}</div>
+      ${!sh ? `<p class="zacht vb-klein">Sitehulpje webbeheer: je website aanpassen door het gewoon te vragen. Minimaal 3 maanden.</p>` : ""}</details>` : ""}
     ${d.opzeg_per ? `<p>Je hebt opgezegd per <b>${datum(d.opzeg_per)}</b>. Tot die dag loopt alles gewoon door.</p><button class="knop rand klein" id="vbo_terug">Toch niet opzeggen</button>`
       : `<details style="margin-top:8px"><summary class="zacht vb-klein">Opzeggen</summary>
         <p class="vb-klein">Opzeggen kan per het einde van de maand, na een minimale looptijd van 3 maanden.</p>
         ${d.delen.map((x) => `<label class="vb-klein" style="display:flex;gap:6px;align-items:center;font-weight:400"><input type="checkbox" value="${x.id}" class="vbo_wat" style="width:auto"${d.delen.length === 1 ? " checked" : ""}> ${esc(x.naam)}</label>`).join("")}
         <label class="vb-klein" for="vbo_reden">Waarom stop je? (mag leeg, helpt ons beter te worden)</label><textarea id="vbo_reden" rows="2"></textarea>
+        <div class="vb-aanbod" id="vbo_aanbod" hidden><b>Voordat je gaat…</b>
+          <p class="vb-klein" style="margin:6px 0 0">Even geen budget of tijd? Kies dan een <b>pauzemaand</b>: volgende maand betaal je niets en blijft alles werken.${kleiner ? ` Of stap over naar <b>${PK[kleiner][0]}</b> voor €${PK[kleiner][1]} per maand.` : ""}</p>
+          <div class="rij"><button class="knop klein" id="vbo_pauze">Pauzemaand nemen</button>${kleiner ? `<button class="knop rand klein vbo_pk" data-pk="${kleiner}">Naar ${PK[kleiner][0]}</button>` : ""}<button class="knop rand klein" id="vbo_toch">Nee, toch opzeggen</button></div></div>
         <button class="knop rand klein" id="vbo_knop" style="margin-top:6px">Opzeggen</button></details>`}
     <div id="vbo_meld"></div></details>`;
-  const k = $("#vbo_knop");
-  if (k) k.onclick = async () => {
+  const meld = (t, soort) => toonMelding($("#vbo_meld"), t, soort);
+  const herlaad = () => setTimeout(() => vbfOpzegKlant(el).then(() => { const dd = el.querySelector("details.abonnement"); if (dd) dd.open = true; }), 2500);
+  const opzeg = async (k) => {
     const wat = [...el.querySelectorAll(".vbo_wat:checked")].map((x) => x.value);
-    if (!wat.length) { toonMelding($("#vbo_meld"), "Kies wat je wilt opzeggen."); return; }
+    if (!wat.length) { meld("Kies wat je wilt opzeggen."); return; }
     k.disabled = true;
     try {
       const r = await vbfApi("opzeggen", { wat, reden: $("#vbo_reden").value });
-      if (r.te_vroeg) toonMelding($("#vbo_meld"), `${r.naam} loopt minimaal 3 maanden. Vanaf ${datum(r.vanaf)} kun je opzeggen; het stopt dan op ${datum(r.eind)}. We hebben je dit ook gemaild.`);
-      else { toonMelding($("#vbo_meld"), `Opgezegd per ${datum(r.per)}. Je krijgt een bevestiging per mail.`, "ok"); setTimeout(() => vbfOpzegKlant(el), 2500); }
-    } catch (e) { toonMelding($("#vbo_meld"), e.message); }
+      if (r.te_vroeg) meld(`${r.naam} loopt minimaal 3 maanden. Vanaf ${datum(r.vanaf)} kun je opzeggen; het stopt dan op ${datum(r.eind)}. We hebben je dit ook gemaild.`);
+      else { meld(`Opgezegd per ${datum(r.per)}. Je krijgt een bevestiging per mail.`, "ok"); herlaad(); }
+    } catch (e) { meld(e.message); }
     k.disabled = false;
   };
+  const k = $("#vbo_knop");
+  if (k) k.onclick = () => {
+    const wat = [...el.querySelectorAll(".vbo_wat:checked")].map((x) => x.value);
+    if (!wat.length) { meld("Kies wat je wilt opzeggen."); return; }
+    // eerst een aanbod laten zien (pauzemaand of kleiner pakket); daarna pas echt opzeggen
+    if (!d.korting && $("#vbo_aanbod").hidden) { $("#vbo_aanbod").hidden = false; k.hidden = true; return; }
+    opzeg(k);
+  };
+  const toch = $("#vbo_toch"); if (toch) toch.onclick = () => opzeg(toch);
+  const pauze = $("#vbo_pauze");
+  if (pauze) pauze.onclick = async () => {
+    pauze.disabled = true;
+    try { const r = await vbfApi("pauzemaand"); meld(`Geregeld! In ${r.maand} betaal je niets. Je krijgt een bevestiging per mail.`, "ok"); herlaad(); }
+    catch (e) { meld(e.message); pauze.disabled = false; }
+  };
+  el.querySelectorAll(".vbo_pk").forEach((b) => b.onclick = async () => {
+    b.disabled = true;
+    try { const r = await vbfApi("wissel", { pakket: b.dataset.pk }); meld(`Aangepast naar ${r.naam}. Je krijgt een bevestiging per mail.`, "ok"); herlaad(); }
+    catch (e) { meld(e.message); b.disabled = false; }
+  });
+  const shk = $("#vbo_sh");
+  if (shk) shk.onclick = async () => {
+    shk.disabled = true;
+    try { await vbfApi("wissel", { sitehulpje: true }); meld("Sitehulpje webbeheer staat aan. We sturen je een mail; daarna zetten we samen de koppeling met je website klaar.", "ok"); setTimeout(() => location.reload(), 2500); }
+    catch (e) { meld(e.message); shk.disabled = false; }
+  };
   const t = $("#vbo_terug");
-  if (t) t.onclick = async () => { try { await vbfApi("opzeg_terug"); vbfOpzegKlant(el); } catch (e) { toonMelding($("#vbo_meld"), e.message); } };
+  if (t) t.onclick = async () => { try { await vbfApi("opzeg_terug"); vbfOpzegKlant(el); } catch (e) { meld(e.message); } };
+}
+
+// ---------- losse klussen (vaste prijs, meteen betalen) ----------
+const VBG_API = VBF_API.replace(/vb-factuur$/, "vb-groei");
+async function vbgApi(actie, data = {}) {
+  const r = await fetch(VBG_API, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, ...data }) })
+    .catch(() => { throw new Error("Geen verbinding. Controleer je internet en probeer het opnieuw."); });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.fout || "Er ging iets mis.");
+  return d;
+}
+async function vbfKlussen(el) {
+  let d; try { d = await vbgApi("klussen"); } catch { el.innerHTML = ""; return; }
+  if (!d.klussen?.length) { el.innerHTML = ""; return; }
+  const betaald = new URLSearchParams(location.search).get("klus") === "betaald";
+  el.innerHTML = `<div class="kaart"><h2><span class="tag">+</span>Losse klussen</h2>
+    ${betaald ? `<div class="melding ok" style="margin-bottom:10px">Bedankt! Je betaling is binnen. Jan neemt binnen één werkdag contact met je op.</div>` : ""}
+    <p class="zacht" style="margin-top:0">Iets groters dan een gewone aanpassing? Deze klussen doen we voor een vaste prijs. Je betaalt meteen met iDEAL en Jan belt je om het af te stemmen.</p>
+    <div class="klus-lijst">${d.klussen.map((x) => `<div class="klus"><b>${esc(x.naam)}</b>${x.uitleg ? `<span class="zacht vb-klein">${esc(x.uitleg)}</span>` : ""}
+      <span class="prijs">€${Number(x.prijs).toLocaleString("nl-NL")} <span class="zacht vb-klein" style="font-weight:400">excl. btw</span></span>
+      <button class="knop rand klein vbk_kies" data-id="${esc(x.id)}" style="margin-top:auto">Bestellen</button>
+      <div class="vbk_form" hidden><label class="vb-klein">Wat wil je precies? (mag kort)</label><textarea rows="2" class="vbk_tekst"></textarea>
+        <button class="knop klein vbk_betaal" style="margin-top:6px">Betaal €${(Number(x.prijs) * 1.21).toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} incl. btw &rarr;</button><div class="vbk_meld"></div></div></div>`).join("")}</div></div>`;
+  if (betaald) history.replaceState(null, "", location.pathname + location.hash);
+  el.querySelectorAll(".klus").forEach((kaart) => {
+    const kies = kaart.querySelector(".vbk_kies"), form = kaart.querySelector(".vbk_form"), betaal = kaart.querySelector(".vbk_betaal");
+    kies.onclick = () => { form.hidden = false; kies.hidden = true; kaart.querySelector(".vbk_tekst").focus(); };
+    betaal.onclick = async () => {
+      betaal.disabled = true;
+      try { const r = await vbfApi("klus", { klus: kies.dataset.id, toelichting: kaart.querySelector(".vbk_tekst").value }); if (r.url) location.href = r.url; else throw new Error("Betalen kon niet starten."); }
+      catch (e) { toonMelding(kaart.querySelector(".vbk_meld"), e.message); betaal.disabled = false; }
+    };
+  });
+}
+
+// ---------- vriend-voordeel: link om te delen ----------
+async function vbfVriend(el) {
+  let d; try { d = await vbgApi("vriend"); } catch { el.innerHTML = ""; return; }
+  if (!d.pct) { el.innerHTML = ""; return; }
+  el.innerHTML = `<div class="kaart"><h2><span class="tag">🎁</span>Tip een ondernemer</h2>
+    <p class="zacht" style="margin-top:0">Ken je iemand die ook meer uit zijn website wil halen? Deel je eigen link. Bestelt diegene, dan krijgen jullie <b>allebei ${d.pct}% korting</b> op de volgende maand.</p>
+    <div class="vriend-link"><input readonly value="${esc(d.link)}" id="vbv_link" aria-label="Jouw link"><button class="knop klein" id="vbv_kopie">Kopieer</button></div>
+    ${d.vrienden ? `<p class="vb-klein" style="margin:8px 0 0">Al <b>${d.vrienden}</b> ${d.vrienden === 1 ? "ondernemer" : "ondernemers"} via jouw link. Dank je wel!</p>` : ""}</div>`;
+  $("#vbv_kopie").onclick = async () => {
+    const b = $("#vbv_kopie");
+    try { await navigator.clipboard.writeText(d.link); b.textContent = "Gekopieerd"; }
+    catch { $("#vbv_link").select(); b.textContent = "Selecteer en kopieer"; }
+    setTimeout(() => (b.textContent = "Kopieer"), 1800);
+  };
+}
+
+// ---------- beheer: omzet in één oogopslag ----------
+async function vbgOmzet(el) {
+  let d; try { d = await vbgApi("omzet"); } catch (e) { el.innerHTML = `<div class="kaart"><h2>Omzet</h2><p class="zacht">${esc(e.message)}</p></div>`; return; }
+  const tegel = (k, w, s = "") => `<div style="min-width:0"><div class="zacht vb-klein">${k}</div><div style="font-size:24px;font-weight:700" class="mono">${w}</div>${s ? `<div class="zacht vb-klein">${s}</div>` : ""}</div>`;
+  const pp = d.per_pakket || {};
+  el.innerHTML = `<div class="kaart"><h2><span class="tag">€</span>Omzet</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">
+      ${tegel("Per maand (excl. btw)", vbfEuro(d.mrr), d.korting ? `na ${vbfEuro(d.korting)} korting` : "")}
+      ${tegel("Binnen deze maand", vbfEuro(d.binnen_deze_maand), "incl. btw")}
+      ${tegel("Betalende klanten", d.klanten.totaal, `${d.klanten.vindbaarheid} Vindbaarheid · ${d.klanten.sitehulpje} Sitehulpje`)}
+      ${tegel("Pakketten", `${pp.basis || 0} / ${pp.plus || 0} / ${pp.pro || 0}`, "Basis / Plus / Pro")}
+      ${tegel("AI-kosten deze maand", "$" + Number(d.ai_kosten_usd).toFixed(2), "alleen voor jou")}
+    </div>
+    ${d.opzeggingen.length ? `<h3 style="margin-top:18px">Opzeggingen</h3><ul>${d.opzeggingen.map((o) => `<li><b>${esc(o.naam)}</b> per ${esc(String(o.per).slice(0, 10))} (${esc((o.wat || []).join(", "))})${o.reden ? ` – “${esc(o.reden)}”` : ""}</li>`).join("")}</ul>` : ""}
+    ${d.kortingen.length ? `<h3 style="margin-top:18px">Kortingen</h3><ul>${d.kortingen.map((o) => `<li><b>${esc(o.naam)}</b> –${vbfEuro(o.korting)}/mnd${o.tot ? ` tot ${esc(String(o.tot).slice(0, 10))}` : ""}${o.reden ? ` (${esc(o.reden)})` : ""}</li>`).join("")}</ul>` : ""}
+    ${d.partners.length ? `<h3 style="margin-top:18px">Partners (check-widget)</h3><div style="overflow-x:auto"><table><thead><tr><th>Partner</th><th class="r">Checks</th><th class="r">Bestellingen</th></tr></thead>
+      <tbody>${d.partners.map((p) => `<tr><td>${esc(p.partner)}</td><td class="r">${p.checks}</td><td class="r">${p.bestellingen}</td></tr>`).join("")}</tbody></table></div>` : ""}</div>`;
+}
+
+// ---------- beheer: instellingen voor groei (vriendenkorting, review, maandbericht, klussen, widget) ----------
+async function vbgInstellingen(el) {
+  let d; try { d = await vbgApi("instellingen"); } catch (e) { el.innerHTML = ""; return; }
+  const rij = (x = {}) => `<div class="vbi_klus" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center">
+    <input class="vbi_naam" placeholder="Naam" value="${esc(x.naam || "")}" style="flex:1 1 150px;min-width:0;width:auto"><input class="vbi_prijs" inputmode="decimal" placeholder="€" value="${x.prijs ?? ""}" style="flex:0 0 80px;width:80px">
+    <input class="vbi_uitleg" placeholder="Korte uitleg (mag leeg)" value="${esc(x.uitleg || "")}" style="flex:2 1 200px;min-width:0;width:auto"><button class="knop rand klein vbi_weg" type="button" aria-label="Weghalen">×</button>
+    <input type="hidden" class="vbi_id" value="${esc(x.id || "")}"></div>`;
+  el.innerHTML = `<details class="kaart"><summary><b>Instellingen groei</b> <span class="zacht vb-klein">vriendenkorting, review, maandbericht, losse klussen, check-widget</span></summary>
+    <div class="grid2" style="margin-top:12px">
+      <div><label for="vbi_pct">Vriendenkorting (% op de eerste volle maand, voor allebei)</label><input id="vbi_pct" inputmode="numeric" value="${esc(d.vriend_korting_pct ?? 50)}"></div>
+      <div><label for="vbi_review">Link naar je Google-review (na 60 dagen gemaild)</label><input id="vbi_review" placeholder="https://g.page/r/..." value="${esc(d.review_link || "")}"></div>
+    </div>
+    <label class="vinkje" style="margin-top:8px"><input type="checkbox" id="vbi_mb"${d.maandbericht_alle === "aan" ? " checked" : ""}><span>Maandbericht (“dit hebben we vorige maand voor je gedaan”) ook naar klanten met Vindbaarheid sturen</span></label>
+    <h3 style="margin-top:16px">Losse klussen</h3><p class="zacht vb-klein" style="margin:0">Prijzen excl. btw. Klanten zien deze lijst in hun app en betalen meteen met iDEAL.</p>
+    <div id="vbi_klussen">${(d.klussen || []).map(rij).join("")}</div>
+    <button class="knop rand klein" type="button" id="vbi_plus" style="margin-top:8px">+ Klus toevoegen</button>
+    <div style="margin-top:14px"><button class="knop" id="vbi_bewaar">Bewaren</button></div><div id="vbi_meld"></div>
+    <h3 style="margin-top:20px">Check-widget voor partners</h3>
+    <p class="zacht vb-klein" style="margin:0">Geef een partner (boekhouder, drukker, netwerkclub) deze code voor op zijn website. Aanvragen komen bij jou binnen met de naam van de partner; in het omzetblok zie je hoeveel het oplevert.</p>
+    <div class="grid2" style="margin-top:8px"><div><label for="vbi_partner">Naam van de partner (kort, zonder spaties)</label><input id="vbi_partner" placeholder="bijv. boekhouderjansen"></div></div>
+    <textarea id="vbi_code" rows="3" readonly class="mono" style="font-size:12px;margin-top:6px"></textarea>
+    <button class="knop rand klein" type="button" id="vbi_kopie">Kopieer code</button> <a class="knop rand klein" id="vbi_voorbeeld" target="_blank" rel="noopener">Voorbeeld bekijken</a></details>`;
+  const lijst = $("#vbi_klussen");
+  const koppel = () => lijst.querySelectorAll(".vbi_weg").forEach((b) => (b.onclick = () => b.closest(".vbi_klus").remove()));
+  koppel();
+  $("#vbi_plus").onclick = () => { lijst.insertAdjacentHTML("beforeend", rij()); koppel(); };
+  $("#vbi_bewaar").onclick = async () => {
+    const klussen = [...lijst.querySelectorAll(".vbi_klus")].map((r) => ({ id: r.querySelector(".vbi_id").value || r.querySelector(".vbi_naam").value.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 20),
+      naam: r.querySelector(".vbi_naam").value, prijs: Number(r.querySelector(".vbi_prijs").value.replace(",", ".")), uitleg: r.querySelector(".vbi_uitleg").value }));
+    try { await vbgApi("instellingen_zet", { vriend_korting_pct: $("#vbi_pct").value, review_link: $("#vbi_review").value, maandbericht_alle: $("#vbi_mb").checked, klussen });
+      toonMelding($("#vbi_meld"), "Bewaard.", "ok"); }
+    catch (e) { toonMelding($("#vbi_meld"), e.message); }
+  };
+  const code = () => {
+    const p = $("#vbi_partner").value.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 30);
+    const src = `https://sitehulpje.nl/check-widget${p ? "?partner=" + p : ""}`;
+    $("#vbi_code").value = `<iframe src="${src}" title="Gratis website-check" style="width:100%;max-width:520px;height:440px;border:0;border-radius:16px" loading="lazy"></iframe>`;
+    $("#vbi_voorbeeld").href = src;
+  };
+  $("#vbi_partner").oninput = code; code();
+  $("#vbi_kopie").onclick = async () => { try { await navigator.clipboard.writeText($("#vbi_code").value); $("#vbi_kopie").textContent = "Gekopieerd"; } catch { $("#vbi_code").select(); } setTimeout(() => ($("#vbi_kopie").textContent = "Kopieer code"), 1500); };
 }

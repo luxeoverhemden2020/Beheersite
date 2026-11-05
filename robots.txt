@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /beheer
+Disallow: /verzoeken
+Disallow: /factuur
+Disallow: /check
+Disallow: /rapport
+Disallow: /check-widget
+Sitemap: https://sitehulpje.nl/sitemap.xml

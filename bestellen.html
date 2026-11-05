@@ -43,6 +43,7 @@ details.extra summary{cursor:pointer;color:var(--zacht);font-size:15px;margin:14
 .samen ul{margin:12px 0 0;padding-left:18px;font-size:14px;color:var(--zacht)}
 .betaal{width:100%;margin-top:14px;justify-content:center}
 .slot{display:flex;gap:6px;align-items:center;justify-content:center;font-size:13px;color:var(--zacht);margin-top:8px}
+.vriend-band{margin-top:14px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--accent,#22e3c4) 14%,transparent);border:1px solid color-mix(in srgb,var(--accent,#22e3c4) 40%,transparent);font-size:15px}
 .klaar-kaart{max-width:640px;margin:50px auto;text-align:center}
 .klaar-kaart h1{font-size:clamp(28px,5vw,40px);margin:12px 0 8px}
 @media (max-width:900px){.samen{position:static}}
@@ -75,6 +76,7 @@ details.extra summary{cursor:pointer;color:var(--zacht);font-size:15px;margin:14
       <p class="label mono"><span class="knipper">●</span> Bestellen</p>
       <h1>In twee minuten geregeld.</h1>
       <p class="zacht" style="margin:0">Kies wat je wilt, vul je gegevens in en betaal de eerste maand met iDEAL. Daarna gaat het vanzelf.</p>
+      <div class="vriend-band" id="vriendband" hidden></div>
 
       <div class="bs-stap"><b>1</b>Wat wil je?</div>
       <label>Vindbaarheid-pakket</label>
@@ -149,7 +151,32 @@ const bapi = async (data) => {
 
 // ---------- terug van de betaling ----------
 const q = new URLSearchParams(location.search);
-if (q.get("klaar")) {
+// herkomst (gratis check, partner) en vriend-link onthouden, ook als de pagina later opnieuw geladen wordt
+const herkomst = (() => {
+  let h = {}; try { h = JSON.parse(localStorage.getItem("sh_herkomst") || "{}"); } catch {}
+  if (/^(check:[0-9a-f-]{36}|partner:[a-z0-9-]{1,30})$/i.test(q.get("ref") || "")) h.ref = q.get("ref");
+  if (q.get("vriend")) h.vriend = q.get("vriend").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 20);
+  try { localStorage.setItem("sh_herkomst", JSON.stringify(h)); } catch {}
+  return h;
+})();
+if (herkomst.vriend && !q.get("klaar")) {
+  fetch(API.replace(/beheersite$/, "vb-groei"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actie: "vriend_check", code: herkomst.vriend }) })
+    .then((r) => r.json()).then((d) => {
+      if (!d.geldig) { delete herkomst.vriend; try { localStorage.setItem("sh_herkomst", JSON.stringify(herkomst)); } catch {} return; }
+      $("#vriendband").innerHTML = `🎁 Je komt via <b>${esc(d.naam)}</b>. Jullie krijgen allebei <b>${d.pct}% korting</b> op de eerste volle maand.`;
+      $("#vriendband").hidden = false;
+    }).catch(() => {});
+}
+if (q.get("hervat")) {
+  // link uit de herinneringsmail: meteen door naar een nieuwe betaling
+  $("#bform").hidden = true; $("#klaarblok").hidden = false;
+  $("#klaarkop").textContent = "Even geduld…"; $("#klaartekst").textContent = "We maken je betaling klaar.";
+  bapi({ actie: "hervat", id: q.get("hervat"), t: q.get("t") }).then((d) => {
+    if (d.betaald) { $("#klaarkop").textContent = "Je bestelling is al betaald"; $("#klaartekst").textContent = "Je hebt een mail gekregen met een knop om in te loggen. Kijk ook even bij je reclame of spam."; return; }
+    location.href = d.url;
+  }).catch((e) => { $("#klaarkop").textContent = "Dat ging niet goed"; $("#klaartekst").textContent = e.message; $("#klaarknop").innerHTML = `<a class="knop groot-knop" href="bestellen" style="margin-top:14px">Opnieuw bestellen</a>`; });
+} else if (q.get("klaar")) {
+  try { localStorage.removeItem("sh_herkomst"); } catch {}
   $("#bform").hidden = true; $("#klaarblok").hidden = false;
   let keer = 0;
   const kijk = async () => {
@@ -240,7 +267,7 @@ $("#bform").onsubmit = async (e) => {
     const d = await bapi({ actie: "plaats", pakket: pakket || null, sitehulpje: sh, bedrijf: $("#b_bedrijf").value, naam: $("#b_naam").value, email: $("#b_email").value,
       telefoon: $("#b_tel").value, site: $("#b_site").value, postcode: $("#b_pc").value, huisnummer: $("#b_nr").value, straat: $("#b_straat").value, plaats: $("#b_plaats").value,
       kvk: $("#b_kvk").value, btw: $("#b_btw").value, bericht: $("#b_bericht").value, voorwaarden: $("#b_vw").checked, verwerker: $("#b_vk").checked,
-      handtekening: $("#b_hand").value, website2: $("#b_website2").value });
+      handtekening: $("#b_hand").value, website2: $("#b_website2").value, ref: herkomst.ref || null, vriend: herkomst.vriend || null });
     if (d.url) { location.href = d.url; return; }
     throw new Error("Betalen kon niet starten. Probeer het zo nog eens.");
   } catch (err) { toonMelding($("#bmeld"), err.message); $("#bknop").disabled = false; $("#bknop").innerHTML = "Betaal veilig met iDEAL &rarr;"; }
