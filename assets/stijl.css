@@ -263,3 +263,9 @@ td.r,th.r{text-align:right}
 .vbsite-gevonden.pling .vbsite-vink{animation:vbsitePling .55s cubic-bezier(.2,1.6,.4,1)}
 @keyframes vbsitePling{0%{transform:scale(0);opacity:0}60%{transform:scale(1.25);opacity:1}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.vbsite-draai,.vbsite-gevonden.pling .vbsite-vink{animation:none}}
+.vbsite-img{display:block;width:100%;max-width:640px;height:auto;margin:10px 0 4px;border-radius:10px;border:1px solid var(--lijn);background:#fff}
+.vbsite-stappen>li{margin-bottom:14px}
+.vbsite-velden{display:grid;gap:6px;margin:8px 0}
+.vbsite-velden>div{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-width:0}
+.vbsite-velden span{font-size:13px;color:var(--zacht);min-width:130px}
+.vbsite-velden code{word-break:break-all}

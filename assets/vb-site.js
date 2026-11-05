@@ -109,15 +109,16 @@ async function vbSiteToon(el, klantId, opties = {}) {
       try {
         const w = await vbSiteApi("mg_start", { klant_id: klantId });
         const box = el.querySelector("[data-mg-stappen]");
-        box.innerHTML = `<ol class="vbs-ol">
-          <li>Log in op het beheer van je webshop (vaak ${vbsKopie(w.beheer)}).</li>
-          <li>Ga naar <b>Systeem</b> → <b>Integraties</b> en klik op <b>Nieuwe integratie toevoegen</b>.</li>
-          <li>Vul in: naam ${vbsKopie("Sitehulpje")} en e-mail ${vbsKopie("info@sitehulpje.nl")}</li>
-          <li>Callback-URL: ${vbsKopie(w.callback)}</li>
-          <li>Identity link URL: ${vbsKopie(w.identiteit)}</li>
-          <li>Bij "Je wachtwoord" vul je je eigen Magento-wachtwoord in. Dat blijft in Magento.</li>
-          <li>Kies links <b>API</b>, zet Resource Access op <b>Alles</b> en klik op <b>Opslaan</b>.</li>
-          <li>Klik in de lijst bij Sitehulpje op <b>Activeren</b> en daarna op <b>Toestaan</b>. Klaar!</li></ol>
+        const plaatje = (n, alt) => `<a href="assets/uitleg/magento-${n}.webp" target="_blank" rel="noopener"><img class="vbsite-img" src="assets/uitleg/magento-${n}.webp" alt="${alt}" loading="lazy"></a>`;
+        box.innerHTML = `<ol class="vbs-ol vbsite-stappen">
+          <li>Log in op het beheer van je webshop (vaak ${vbsKopie(w.beheer)}). Klik links op <b>Systeem</b> en dan op <b>Integraties</b>.${plaatje(1, "Menu Systeem, Integraties")}</li>
+          <li>Klik rechtsboven op <b>Nieuwe integratie toevoegen</b>.${plaatje(2, "Knop Nieuwe integratie toevoegen")}</li>
+          <li>Vul de vier velden in. Gebruik de kopieerknoppen:
+            <div class="vbsite-velden"><div><span>Naam</span>${vbsKopie("Sitehulpje")}</div><div><span>E-mail</span>${vbsKopie("info@sitehulpje.nl")}</div>
+            <div><span>Callback URL</span>${vbsKopie(w.callback)}</div><div><span>Identiteits link URL</span>${vbsKopie(w.identiteit)}</div></div>
+            Bij <b>Je wachtwoord</b> typ je je eigen Magento-wachtwoord. Dat blijft in Magento.${plaatje(3, "Formulier Nieuwe integratie ingevuld")}</li>
+          <li>Klik links op <b>API</b>, kies bij <b>Brontoegang</b> voor <b>Alles</b> en klik op <b>Opslaan</b>.${plaatje(4, "Tab API, Brontoegang Alles")}</li>
+          <li>Klik in de lijst bij Sitehulpje op <b>Activeren</b> en daarna op <b>Toestaan</b>. Klaar!${plaatje(5, "Activeren in de lijst")}</li></ol>
           <div class="vbsite-bezig"><span class="vbsite-draai" aria-hidden="true"></span>We wachten tot je op Toestaan klikt…</div>`;
         box.hidden = false; b.hidden = true;
         box.querySelectorAll("[data-kopie]").forEach((k) => (k.onclick = async () => { try { await navigator.clipboard.writeText(k.dataset.kopie); k.textContent = "Gekopieerd"; setTimeout(() => (k.textContent = "Kopieer"), 1500); } catch { /* mag mislukken */ } }));
