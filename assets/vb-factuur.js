@@ -211,16 +211,19 @@ async function vbgApi(actie, data = {}) {
   return d;
 }
 async function vbfKlussen(el) {
-  let d; try { d = await vbgApi("klussen"); } catch { el.innerHTML = ""; return; }
-  if (!d.klussen?.length) { el.innerHTML = ""; return; }
+  // alleen voor klanten met Vindbaarheid zonder webbeheer; met webbeheer vraag je dit gewoon als verzoek
+  let d, ab; try { [d, ab] = await Promise.all([vbgApi("klussen"), vbfApi("abonnement")]); } catch { el.innerHTML = ""; return; }
+  const ids = (ab.delen || []).map((x) => x.id);
+  if (!d.klussen?.length || !ids.includes("vindbaarheid") || ids.includes("sitehulpje")) { el.innerHTML = ""; return; }
   const betaald = new URLSearchParams(location.search).get("klus") === "betaald";
   el.innerHTML = `<div class="kaart"><h2><span class="tag">+</span>Losse klussen</h2>
     ${betaald ? `<div class="melding ok" style="margin-bottom:10px">Bedankt! Je betaling is binnen. Jan neemt binnen één werkdag contact met je op.</div>` : ""}
-    <p class="zacht" style="margin-top:0">Iets groters dan een gewone aanpassing? Deze klussen doen we voor een vaste prijs. Je betaalt meteen met iDEAL en Jan belt je om het af te stemmen.</p>
+    <p class="zacht" style="margin-top:0">Iets extra's op je website? Kies een klus, vertel kort wat je wilt en betaal met iDEAL. Sitehulpje gaat er meteen mee aan de slag.</p>
+    <p class="zacht vb-klein" style="margin-top:0">Vaker iets nodig? Met <b>Sitehulpje webbeheer</b> (€75 per maand) vraag je dit soort dingen gewoon, zonder losse kosten. Dat zet je aan bij Abonnement hieronder.</p>
     <div class="klus-lijst">${d.klussen.map((x) => `<div class="klus"><b>${esc(x.naam)}</b>${x.uitleg ? `<span class="zacht vb-klein">${esc(x.uitleg)}</span>` : ""}
       <span class="prijs">€${Number(x.prijs).toLocaleString("nl-NL")} <span class="zacht vb-klein" style="font-weight:400">excl. btw</span></span>
       <button class="knop rand klein vbk_kies" data-id="${esc(x.id)}" style="margin-top:auto">Bestellen</button>
-      <div class="vbk_form" hidden><label class="vb-klein">Wat wil je precies? (mag kort)</label><textarea rows="2" class="vbk_tekst"></textarea>
+      <div class="vbk_form" hidden><label class="vb-klein">Wat wil je precies? Waar gaat het over?</label><textarea rows="2" class="vbk_tekst"></textarea>
         <button class="knop klein vbk_betaal" style="margin-top:6px">Betaal €${(Number(x.prijs) * 1.21).toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} incl. btw &rarr;</button><div class="vbk_meld"></div></div></div>`).join("")}</div></div>`;
   if (betaald) history.replaceState(null, "", location.pathname + location.hash);
   el.querySelectorAll(".klus").forEach((kaart) => {
@@ -282,7 +285,7 @@ async function vbgInstellingen(el) {
       <div><label for="vbi_review">Link naar je Google-review (na 60 dagen gemaild)</label><input id="vbi_review" placeholder="https://g.page/r/..." value="${esc(d.review_link || "")}"></div>
     </div>
     <label class="vinkje" style="margin-top:8px"><input type="checkbox" id="vbi_mb"${d.maandbericht_alle === "aan" ? " checked" : ""}><span>Maandbericht (“dit hebben we vorige maand voor je gedaan”) ook naar klanten met Vindbaarheid sturen</span></label>
-    <h3 style="margin-top:16px">Losse klussen</h3><p class="zacht vb-klein" style="margin:0">Prijzen excl. btw. Klanten zien deze lijst in hun app en betalen meteen met iDEAL.</p>
+    <h3 style="margin-top:16px">Losse klussen</h3><p class="zacht vb-klein" style="margin:0">Prijzen excl. btw. Alleen klanten met Vindbaarheid zonder webbeheer zien deze lijst en betalen meteen met iDEAL. Een nieuwe pagina en een blogartikel voert Sitehulpje automatisch uit (als de site gekoppeld is); andere klussen doe je zelf.</p>
     <div id="vbi_klussen">${(d.klussen || []).map(rij).join("")}</div>
     <button class="knop rand klein" type="button" id="vbi_plus" style="margin-top:8px">+ Klus toevoegen</button>
     <div style="margin-top:14px"><button class="knop" id="vbi_bewaar">Bewaren</button></div><div id="vbi_meld"></div>
