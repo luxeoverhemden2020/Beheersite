@@ -114,6 +114,33 @@ function vbTabel(rijen, soort, n) {
 }
 
 // Hoofdfunctie: teken het dashboard in `el`. klantId alleen nodig voor Jan (beheer).
+// Google Bedrijfsprofiel: hoe vaak gevonden in Zoeken en Maps, en wat mensen daarna deden; plus reviews
+function vbGbpKaart(d) {
+  const k = d.koppeling;
+  if (!k?.gbp_locatie || !(d.gbp || []).length) return "";
+  const eind = d.gbp[d.gbp.length - 1][0], start = vbDag(eind, -27), vEind = vbDag(eind, -28), vStart = vbDag(eind, -55);
+  const heeftVorig = d.gbp.some((r) => r[0] <= vEind);
+  const t = (kol) => [vbSom(d.gbp, kol, start, eind), vbSom(d.gbp, kol, vStart, vEind)];
+  const v = ([nu, vorig]) => (heeftVorig ? vbVerschil(nu, vorig) : `<span class="vb-gelijk">vergelijking volgt</span>`);
+  const [zk, mp, bl, rt, ws] = [1, 2, 3, 4, 5].map(t);
+  const ster = (n) => `<span aria-label="${n} van 5 sterren" style="color:#f5b301;letter-spacing:1px">${"★".repeat(n || 0)}<span style="opacity:.3">${"★".repeat(5 - (n || 0))}</span></span>`;
+  const reviews = (d.reviews || []).slice(0, 5);
+  return `<div class="kaart"><h2><span class="tag">&gt;_</span>Google Bedrijfsprofiel</h2>
+    <p class="zacht vb-klein" style="margin-top:-4px">${esc(k.gbp_naam || "")} · ${vbDatum(start)} t/m ${vbDatum(eind, { day: "numeric", month: "short", year: "numeric" })}</p>
+    <div class="vb-tegels">
+      ${vbTegel("Gevonden in Google Zoeken", vbGetal(zk[0]), v(zk), "Hoe vaak je bedrijfsprofiel verscheen als iemand in Google zocht.")}
+      ${vbTegel("Gevonden in Google Maps", vbGetal(mp[0]), v(mp), "Hoe vaak je bedrijfsprofiel verscheen in Google Maps.")}
+      ${vbTegel("Gebeld", vbGetal(bl[0]), v(bl), "Hoe vaak iemand vanuit je profiel op Bellen tikte.")}
+      ${vbTegel("Route gevraagd", vbGetal(rt[0]), v(rt), "Hoe vaak iemand een route naar je zaak opvroeg.")}
+      ${vbTegel("Naar je website", vbGetal(ws[0]), v(ws), "Hoe vaak iemand vanuit je profiel naar je website ging.")}
+    </div>
+    ${k.gbp_aantal ? `<h3 style="font-size:16px;margin:16px 0 6px">Reviews: ${ster(Math.round(k.gbp_score || 0))} <b>${Number(k.gbp_score || 0).toLocaleString("nl-NL", { maximumFractionDigits: 1 })}</b> <span class="zacht vb-klein">uit ${vbGetal(k.gbp_aantal)} reviews</span></h3>
+      ${reviews.map((r) => `<div style="padding:8px 0;border-top:1px solid var(--lijn)"><div class="rij" style="gap:8px">${ster(r.sterren)} <b>${esc(r.naam)}</b> <span class="zacht vb-klein">${r.datum ? vbDatum(String(r.datum).slice(0, 10), { day: "numeric", month: "short", year: "numeric" }) : ""}</span></div>
+        ${r.tekst ? `<p style="margin:4px 0 0">${esc(r.tekst.length > 280 ? r.tekst.slice(0, 280) + "…" : r.tekst)}</p>` : ""}
+        ${r.antwoord ? `<p class="zacht vb-klein" style="margin:4px 0 0">↳ Jouw antwoord: ${esc(r.antwoord.slice(0, 160))}${r.antwoord.length > 160 ? "…" : ""}</p>` : `<p class="vb-klein vb-let" style="margin:4px 0 0">Nog niet beantwoord</p>`}</div>`).join("")}` : ""}
+    <p class="zacht vb-klein" style="margin-bottom:0">Bron: Google Bedrijfsprofiel. Google geeft deze cijfers met een paar dagen vertraging door.</p></div>`;
+}
+
 async function vbToon(el, klantId) {
   el.innerHTML = `<div class="kaart"><p class="zacht">Laden…</p></div>`;
   let d;
@@ -135,7 +162,7 @@ async function vbToon(el, klantId) {
     <ul class="vb-bronnen">
       <li><span class="vb-stip ${k?.gsc_site && k.status !== "ingetrokken" ? "aan" : ""}"></span>Google Search Console${k?.gsc_site ? ` · <span class="zacht">${esc(k.gsc_site.replace(/^sc-domain:/, ""))}</span>` : ""}</li>
       <li><span class="vb-stip ${k?.ga4_property && k.status !== "ingetrokken" ? "aan" : ""}"></span>Google Analytics${k?.ga4_naam ? ` · <span class="zacht">${esc(k.ga4_naam)}</span>` : ""}</li>
-      <li><span class="vb-stip later"></span>Google Bedrijfsprofiel · <span class="zacht">binnenkort</span></li>
+      <li><span class="vb-stip ${k?.gbp_locatie && !k.gbp_fout && k.status !== "ingetrokken" ? "aan" : k?.gbp_locatie ? "" : "later"}"></span>Google Bedrijfsprofiel · <span class="zacht">${k?.gbp_naam ? esc(k.gbp_naam) : !k ? "" : !k.gbp_toestemming ? "koppel Google opnieuw en geef ook toestemming voor je Bedrijfsprofiel" : "kies je profiel via \"Website kiezen\""}</span></li>
       <li><span class="vb-stip later"></span>Bing · <span class="zacht">binnenkort</span></li>
     </ul>
     ${k ? `<p class="zacht vb-klein">Gekoppeld met ${esc(k.google_email || "je Google-account")}${k.laatst_opgehaald ? ` · bijgewerkt ${datum(k.laatst_opgehaald)}` : ""}.
@@ -200,6 +227,7 @@ async function vbToon(el, klantId) {
         ${d.ga4.length ? vbTegel("Acties op je site", vbGetal(ac), v(ac, acV), VB_UITLEG.acties) : ""}
       </div>
     </div>
+    ${vbGbpKaart(d)}
     ${d.gsc.length ? `<div class="kaart"><h2><span class="tag">&gt;_</span>Klikken uit Google per week</h2><div data-vb-grafiek></div>
       <p class="zacht vb-klein">Bron: Google Search Console. De laatste twee dagen kunnen nog iets veranderen.</p></div>` : ""}
     <div data-vb-gz-kort></div>
@@ -405,7 +433,21 @@ async function vbKiezer(el, klantId) {
       ${!b.gsc.length ? `<p class="zacht vb-klein">Dit Google-account heeft geen websites in Search Console. Koppel het account dat de website beheert.</p>` : ""}
       <label>Gegevens in Google Analytics</label>
       <select data-vb-ga4><option value="">– geen –</option>${b.ga4.map((x) => `<option value="${esc(x.id)}" ${x.id === k.ga4_property ? "selected" : ""}>${esc(x.naam)}</option>`).join("")}</select>
-      <div class="rij" style="margin-top:10px"><button class="knop" data-vb-opslaan>Opslaan en cijfers ophalen</button></div>`;
+      <div class="rij" style="margin-top:10px"><button class="knop" data-vb-opslaan>Opslaan en cijfers ophalen</button></div>
+      ${b.gbp?.length ? `<label style="margin-top:14px">Google Bedrijfsprofiel</label>
+      <select data-vb-gbp><option value="">– geen –</option>${b.gbp.map((x) => `<option value="${esc(x.id)}" ${x.id === k.gbp_locatie ? "selected" : ""}>${esc(x.naam)}</option>`).join("")}</select>
+      <div class="rij" style="margin-top:10px"><button class="knop rand" data-vb-gbpopslaan>Bedrijfsprofiel opslaan</button></div>` :
+      `<p class="zacht vb-klein" style="margin-top:12px">${k.gbp_toestemming ? "Bij dit Google-account vonden we geen Bedrijfsprofiel." : "Wil je ook de cijfers van je Google Bedrijfsprofiel zien? Koppel Google dan opnieuw en vink ook het Bedrijfsprofiel aan."}</p>`}`;
+    const gbpKnop = houder.querySelector("[data-vb-gbpopslaan]");
+    if (gbpKnop) gbpKnop.onclick = async () => {
+      gbpKnop.disabled = true; gbpKnop.textContent = "Ophalen…";
+      try {
+        const r = await vbApi("gbp_kies", { klant_id: klantId, gbp: houder.querySelector("[data-vb-gbp]").value });
+        if (r.fout) houder.insertAdjacentHTML("beforeend", `<div class="melding let">Opgeslagen, maar nog niet alles kon worden opgehaald: ${esc(r.fout)}</div>`);
+        else vbToon(el, klantId);
+      } catch (err) { houder.insertAdjacentHTML("beforeend", `<div class="melding fout">${esc(err.message)}</div>`); }
+      gbpKnop.disabled = false; gbpKnop.textContent = "Bedrijfsprofiel opslaan";
+    };
     houder.querySelector("[data-vb-opslaan]").onclick = async (e) => {
       e.target.disabled = true; e.target.textContent = "Cijfers ophalen… (kan een minuut duren)";
       try {
