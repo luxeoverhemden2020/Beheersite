@@ -230,8 +230,8 @@ async function vbToon(el, klantId, beginTab) {
       <li><span class="vb-stip later"></span>Bing · <span class="zacht">binnenkort</span></li>
     </ul>
     ${k ? `<p class="zacht vb-klein">Gekoppeld met ${esc(k.google_email || "je Google-account")}${k.laatst_opgehaald ? ` · bijgewerkt ${datum(k.laatst_opgehaald)}` : ""}.
-      Wij kunnen alleen meekijken, niets aanpassen. Je kunt de koppeling altijd stoppen.</p>` :
-      `<p class="zacht">Koppel je Google-account, dan zie je hier hoe vaak je gevonden wordt. Je logt in bij Google zelf; wij krijgen geen wachtwoord en kunnen alleen meekijken.</p>`}
+      Wij lezen je cijfers en plaatsen alleen iets op Google (zoals een antwoord op een review) als jij op Plaatsen klikt. Je kunt de koppeling altijd stoppen.</p>` :
+      `<p class="zacht">Koppel je Google-account, dan zie je hier hoe vaak je gevonden wordt. Je logt in bij Google zelf; wij krijgen geen wachtwoord. We lezen je cijfers en plaatsen alleen iets op Google als jij dat goedkeurt.</p>`}
     ${k?.fout ? `<div class="melding ${k.status === "ingetrokken" ? "fout" : "let"}">${esc(k.status === "ingetrokken" ? k.fout : "Niet alles kon worden opgehaald. Jan is op de hoogte.")}</div>` : ""}
     <div class="rij">
       <button class="knop ${k ? "rand klein" : ""}" data-vb="koppel">${k ? (k.status === "ingetrokken" ? "Google opnieuw koppelen" : "Ander Google-account koppelen") : "Koppel Google"}</button>
