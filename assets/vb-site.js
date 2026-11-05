@@ -95,7 +95,7 @@ async function vbSiteToon(el, klantId, opties = {}) {
     const fout = t?.status === "fout" && t.melding ? `<div class="melding fout" style="margin-bottom:10px">${esc(t.melding)}</div>` : "";
     el.innerHTML = kader(`<div class="vbsite-gevonden${opties.gescand ? " pling" : ""}"><span class="vbsite-vink">✓</span><div>Je webshop is gemaakt met <b>Magento</b><br><button class="vbsite-link zacht vbs-klein" type="button" data-site-wissel>Klopt niet?</button></div></div>
       ${fout}<p style="margin:0 0 10px">Bij Magento koppel je Sitehulpje met een <b>integratie</b> in je eigen beheer. Dat kost een paar minuten en je deelt geen wachtwoord.</p>
-      <div class="rij" style="flex-wrap:wrap;gap:8px"><button class="knop" type="button" data-mg-start>Zelf koppelen</button>
+      <div class="rij" style="flex-wrap:wrap;gap:8px"><button class="knop" type="button" data-mg-start>Zelf snel en simpel koppelen</button>
         <button class="knop rand" type="button" data-site-wb>Mijn webbouwer regelt het</button></div>
       <div data-mg-stappen hidden style="margin-top:12px"></div>
       <div data-site-paneel="webbouwer" hidden style="margin-top:12px"><label for="vbsite_wb">E-mailadres van je webbouwer</label>
