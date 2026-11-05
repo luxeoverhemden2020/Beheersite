@@ -17,8 +17,10 @@
 <script>
 // Magento opent deze pagina na "Toestaan". Wij wisselen de sleutels om en sturen Magento daarna terug.
 (async () => {
-  const q = new URLSearchParams(location.search);
-  const k = q.get("k") || "", terug = q.get("success_call_back") || "";
+  // Magento plakt zijn eigen velden er soms met een tweede "?" achter; daarom zelf uit het adres halen
+  const adres = decodeURIComponent(location.href);
+  const k = (adres.match(/[?&]k=([A-Za-z0-9_-]+)/) || [])[1] || "";
+  const terug = (location.href.match(/[?&]success_call_back=([^&]+)/) || [])[1] ? decodeURIComponent(location.href.match(/[?&]success_call_back=([^&]+)/)[1]) : "";
   const $ = (id) => document.getElementById(id);
   let d = {};
   for (let poging = 0; poging < 10; poging++) {
