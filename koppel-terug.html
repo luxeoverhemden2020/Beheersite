@@ -36,7 +36,6 @@
   $("tekst").textContent = d.melding || "";
   const terug = d.terug || "verzoeken";
   $("terug").href = terug; $("terug").hidden = false;
-  if (d.ok) setTimeout(() => { location.href = terug; }, 2500);
 })();
 </script>
 </body>

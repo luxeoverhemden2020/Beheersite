@@ -31,7 +31,7 @@
       <div id="meld" class="verborgen"></div>
       <button class="knop" style="width:100%;margin-top:14px" id="knop">Inloggen</button>
     </form>
-    <p style="text-align:center;margin:12px 0 0" id="vergetenrij"><a href="#" id="vergeten" class="zacht">Wachtwoord vergeten?</a></p>
+    <p style="text-align:center;margin:12px 0 0" id="vergetenrij"><a href="#" id="vergeten" class="zacht">Inloglink of wachtwoord kwijt?</a></p>
   </div>
 </div>
 <script src="assets/basis.js"></script>
@@ -62,10 +62,20 @@ if (herstel) {
   $("#ww2veld").classList.remove("verborgen"); $("#knop").textContent = "Wachtwoord opslaan";
   $("#vergetenrij").classList.add("verborgen");
 }
+const direct = new URLSearchParams(location.search).get("direct");
+if (direct) {
+  history.replaceState(null, "", location.pathname);
+  $("#uitleg").textContent = "Even inloggen…";
+  wwApi({ actie: "direct", token: direct }).then((d) => {
+    bewaar(d.rol, d.token);
+    if (d.link) { try { localStorage.setItem("bs_link", d.link); } catch {} }
+    location.href = d.rol === "admin" ? "beheer" : "verzoeken";
+  }).catch((e) => { $("#uitleg").textContent = "Log in om aanpassingen aan je website door te geven."; toonMelding($("#meld"), e.message); });
+}
 $("#vergeten").onclick = (e) => {
   e.preventDefault();
   vergeten = true;
-  $("#uitleg").textContent = "Vul je e-mailadres in. Je krijgt een mail met een link om een nieuw wachtwoord te kiezen.";
+  $("#uitleg").textContent = "Vul je e-mailadres in. Je krijgt een mail waarmee je direct kunt inloggen of een nieuw wachtwoord kunt kiezen.";
   $("#wwlabel").classList.add("verborgen"); $("#ww").classList.add("verborgen"); $("#ww").required = false;
   $("#knop").textContent = "Stuur de link"; $("#vergetenrij").classList.add("verborgen"); toonMelding($("#meld"), "");
   $("#email").focus();
@@ -92,7 +102,7 @@ if (link) {
   $("#uitleg").textContent = "Even inloggen…";
   api("link_inloggen", { link }).then((d) => { zetSessieVan("klant", d.token); try { localStorage.setItem("bs_link", link); } catch {} location.href = "verzoeken"; })
     .catch((e) => { $("#uitleg").textContent = "Log in om aanpassingen aan je website door te geven."; toonMelding($("#meld"), e.message); });
-} else if (!code && !herstel) naarScherm();
+} else if (!code && !herstel && !direct) naarScherm();
 $("#inlog").onsubmit = async (e) => {
   e.preventDefault();
   toonMelding($("#meld"), "");
@@ -100,7 +110,7 @@ $("#inlog").onsubmit = async (e) => {
   try {
     if (vergeten) {
       await wwApi({ actie: "vraag", email: $("#email").value });
-      $("#uitleg").textContent = "Als dit adres bij ons bekend is, staat de mail er zo. Kijk ook even in je spam. De link werkt 1 uur.";
+      $("#uitleg").textContent = "Als dit adres bij ons bekend is, staat de mail er zo. Kijk ook even in je spam. De knoppen werken 1 uur.";
       $("#inlog").classList.add("verborgen");
       return;
     }

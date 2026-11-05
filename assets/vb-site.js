@@ -37,7 +37,7 @@ async function vbSiteToon(el, klantId, opties = {}) {
 
   // 2. Doorgegeven, wacht op ons
   if (t?.status === "wacht" && !opties.kies) {
-    const w = { uitnodiging: "Dank je! We accepteren je uitnodiging en zetten de koppeling op. Je krijgt bericht als het klaar is.", webbouwer: "Dank je! We nemen contact op met je webbouwer.",
+    const w = { sh_app: "Dank je! We zetten de koppeling voor je klaar. Je krijgt een mail met een knop om te installeren.", uitnodiging: "Dank je! We accepteren je uitnodiging en zetten de koppeling op. Je krijgt bericht als het klaar is.", webbouwer: "Dank je! We nemen contact op met je webbouwer.",
       anders: "Dank je! We kijken hoe we je website het beste kunnen koppelen en laten het je weten.", weet_niet: "Geen probleem! We zoeken het voor je uit en laten het je weten." };
     el.innerHTML = kader(`<div class="melding ok">${w[t.methode] || w.uitnodiging}</div>
       <p class="zacht vbs-klein" style="margin-top:8px"><button class="vbsite-link" type="button" data-site-anders>Toch een andere manier kiezen</button></p>`);
@@ -106,6 +106,7 @@ async function vbSiteToon(el, klantId, opties = {}) {
         const x = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(x.fout || "Er ging iets mis.");
         if (x.kan) { location.href = x.url; return; }
+        if (x.wacht) { opnieuw({ kies: false }); return; }
         el.querySelector("[data-sh-adres]").hidden = false; vbSiteMeld(el, x.melding); b.disabled = false;
       } catch (err) { vbSiteMeld(el, err.message); b.disabled = false; }
     };

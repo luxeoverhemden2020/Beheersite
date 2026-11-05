@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Website koppelen – Sitehulpje</title>
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<link rel="stylesheet" href="assets/stijl.css">
+<style>.midden{max-width:520px;margin:0 auto;padding:48px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px));text-align:center}.midden h1{font-size:24px;margin:14px 0 8px;text-wrap:balance}.groot{font-size:44px;line-height:1}</style>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+</head>
+<body>
+<div class="kop"><span class="merk">Site<b>hulpje</b></span></div>
+<main class="midden">
+  <div class="groot" id="ico">✅</div>
+  <h1 id="kop">Gelukt! Je website is gekoppeld.</h1>
+  <p class="zacht" id="tekst">Je hoeft verder niets te doen. Je kunt dit venster sluiten.</p>
+</main>
+<script>
+if (new URLSearchParams(location.search).get("ok") !== "1") {
+  document.getElementById("ico").textContent = "⚠️";
+  document.getElementById("kop").textContent = "Dat lukte niet helemaal";
+  document.getElementById("tekst").textContent = "Probeer het nog eens via de knop in de mail. Lukt het niet? Mail ons op info@sitehulpje.nl.";
+}
+</script>
+</body>
+</html>
