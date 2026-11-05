@@ -113,19 +113,8 @@ function vbsStapInhoud(s, d, admin) {
       </details>${s.status === "wacht" ? `<div class="melding ok">Dank je! We accepteren de uitnodiging en koppelen het verder zelf.</div>` : ""}<div class="vbs-meld"></div>`;
   }
   if (s.id === "website") {
-    const p = d.platform || "onbekend";
-    const wacht = s.status === "wacht", klaar = s.status === "klaar";
-    if (klaar) return `<p>We hebben toegang tot je website en alles werkt. Wij veranderen nooit iets zonder dat je het in Sitehulpje kunt zien.</p>`;
-    return `<p>Om je website te verbeteren hebben we een <b>eigen account</b> nodig. Zo hoef je nooit je eigen wachtwoord te delen en kun je ons altijd weer verwijderen.</p>
-      <p class="zacht">Je website draait op <b>${esc(VBS_PLATFORM[p] || p)}</b>${d.platform_info?.zeker ? "" : " (denken we)"}. Zo voeg je ons toe:</p>
-      ${vbsWebsiteUitleg(p, d.klant.site)}
-      ${wacht ? `<div class="melding ok">${s.info?.status === "webbouwer" ? "Dank je! We nemen contact op met je webbouwer." : "Dank je! We controleren of het werkt en melden ons als er iets niet lukt."}</div>` : ""}
-      <label for="vbs_wnot">Opmerking (mag leeg)</label><input id="vbs_wnot" data-notitie="website" placeholder="Bijv. andere inlogpagina, of extra uitleg">
-      <div class="rij" style="margin-top:10px">
-        <button class="knop" type="button" data-vbs-gedaan="website" data-keuze="gedaan">Gedaan, ik heb jullie toegevoegd</button>
-        <button class="knop rand" type="button" data-vbs-webbouwer>Mijn webbouwer regelt het</button></div>
-      <div class="vbs-webbouwer verborgen"><label for="vbs_wb">E-mail of telefoon van je webbouwer</label><div class="rij"><input id="vbs_wb" class="vul"><button class="knop klein" type="button" data-vbs-gedaan="website" data-keuze="webbouwer">Doorgeven</button></div></div>
-      <div class="vbs-meld"></div>`;
+    if (s.status === "klaar") return `<p>Je website is gekoppeld. Wij veranderen nooit iets zonder dat je het in Sitehulpje kunt zien.</p>`;
+    return `<p style="margin:0 0 10px">Om je website te verbeteren moet Sitehulpje erbij kunnen. Je eigen wachtwoord hoef je nooit te delen.</p><div data-vbsite></div>`;
   }
   if (s.id === "profiel") {
     if (s.status === "klaar") return `<p>${s.info?.status === "geen_nodig" ? "Je hebt geen Bedrijfsprofiel nodig. Prima!" : "We beheren je Google Bedrijfsprofiel mee."}</p>`;
@@ -217,6 +206,7 @@ async function vbStartToon(el, klantId, opties = {}) {
       opnieuw(volgendeNa(stap));
     } catch (err) { toonMelding(vak.querySelector(".vbs-meld"), err.message); b.disabled = false; }
   }));
+  if (typeof vbSiteToon === "function") el.querySelectorAll("[data-vbsite]").forEach((c) => vbSiteToon(c, klantId, { klaar: () => opnieuw(volgendeNa("website")) }));
   el.querySelectorAll('[data-vbs="google"]').forEach((b) => (b.onclick = async () => {
     b.disabled = true;
     try { const r = await vbApi("google_start", { klant_id: klantId }); location.href = r.url; }

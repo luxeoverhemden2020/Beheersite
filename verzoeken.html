@@ -50,6 +50,7 @@
 <script src="assets/basis.js"></script>
 <script src="assets/vindbaarheid.js"></script>
 <script src="assets/vb-start.js"></script>
+<script src="assets/vb-site.js"></script>
 <script src="assets/vb-factuur.js"></script>
 <script>
 let open = new Set(), cache = {}, timer = null;
@@ -191,28 +192,11 @@ async function shStart(el) {
     const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d; };
   let d; try { d = await vraag("sh_status"); } catch { return; }
   if (!d.nodig) { el.innerHTML = ""; return; }
-  const w = d.website?.status;
-  if (w === "gedaan" || w === "webbouwer") {
-    el.innerHTML = `<div class="kaart" style="border-left:4px solid var(--accent)"><b>Bijna klaar!</b> <span class="zacht">${w === "gedaan" ? "Je hebt ons toegevoegd aan je website. Jan zet de koppeling nu op; je krijgt bericht als je je eerste verzoek kunt doen." : "Je webbouwer regelt de toegang. Wij nemen contact met hem op."}</span></div>`;
-    return;
-  }
   el.innerHTML = `<div class="kaart" style="border-left:4px solid var(--accent)">
-    <h2 style="margin:0 0 6px"><span class="tag">1</span>Geef ons toegang tot je website</h2>
-    <p style="margin:0 0 8px">Om je website te kunnen aanpassen hebben we een <b>eigen account</b> nodig. Zo hoef je nooit je wachtwoord te delen en kun je ons altijd weer verwijderen.</p>
-    <p class="zacht" style="margin:0 0 6px">Je website draait op <b>${esc((typeof VBS_PLATFORM !== "undefined" && VBS_PLATFORM[d.platform]) || d.platform)}</b> (denken we). Zo voeg je ons toe:</p>
-    ${typeof vbsWebsiteUitleg === "function" ? vbsWebsiteUitleg(d.platform, d.site) : ""}
-    <label for="sh_not">Opmerking (mag leeg)</label><input id="sh_not" placeholder="Bijv. andere inlogpagina, of extra uitleg">
-    <div class="rij" style="margin-top:10px;flex-wrap:wrap;gap:8px"><button class="knop" type="button" data-sh="gedaan">Gedaan, ik heb jullie toegevoegd</button>
-      <button class="knop rand" type="button" id="sh_wbknop">Mijn webbouwer regelt het</button></div>
-    <div id="sh_wb" class="verborgen" style="margin-top:8px"><label for="sh_wbv">E-mail of telefoon van je webbouwer</label><div class="rij"><input id="sh_wbv" class="vul"><button class="knop klein" type="button" data-sh="webbouwer">Doorgeven</button></div></div>
-    <div id="sh_meld" class="verborgen"></div></div>`;
-  el.querySelectorAll("[data-kopie]").forEach((b) => (b.onclick = async () => { try { await navigator.clipboard.writeText(b.dataset.kopie); b.textContent = "Gekopieerd"; } catch { /* */ } }));
-  $("#sh_wbknop").onclick = () => $("#sh_wb").classList.remove("verborgen");
-  el.querySelectorAll("[data-sh]").forEach((b) => (b.onclick = async () => {
-    b.disabled = true;
-    try { await vraag("sh_gedaan", { keuze: b.dataset.sh, notitie: $("#sh_not").value, webbouwer: $("#sh_wbv").value }); shStart(el); }
-    catch (e) { toonMelding($("#sh_meld"), e.message); b.disabled = false; }
-  }));
+    <h2 style="margin:0 0 6px"><span class="tag">1</span>Koppel je website</h2>
+    <p style="margin:0 0 10px">Om je website te kunnen aanpassen moet Sitehulpje erbij kunnen. Je eigen wachtwoord hoef je nooit te delen.</p>
+    <div data-vbsite></div></div>`;
+  vbSiteToon(el.querySelector("[data-vbsite]"), undefined, {});
 }
 api("ik").then((d) => {
   if (d.gebruiker.rol === "admin" && !d.klant) { location.href = "beheer"; return; }

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Website koppelen – Sitehulpje</title>
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<link rel="stylesheet" href="assets/stijl.css">
+<style>.midden{max-width:520px;margin:0 auto;padding:48px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px));text-align:center}.midden h1{font-size:24px;margin:14px 0 8px;text-wrap:balance}.groot{font-size:44px;line-height:1}</style>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+</head>
+<body>
+<div class="kop"><span class="merk">Site<b>hulpje</b></span></div>
+<main class="midden">
+  <div class="groot" id="ico">⏳</div>
+  <h1 id="kop">Je website wordt gekoppeld…</h1>
+  <p class="zacht" id="tekst">Een moment geduld.</p>
+  <p style="margin-top:22px"><a class="knop" id="terug" href="verzoeken" hidden>Terug naar Sitehulpje</a></p>
+</main>
+<script>
+// WordPress stuurt de toegangscode mee in het adres. Direct uit het adres (en de geschiedenis) halen en doorgeven.
+(async () => {
+  const q = new URLSearchParams(location.search);
+  const data = { actie: "wp_terug", s: q.get("s") || "", site_url: q.get("site_url") || "", user_login: q.get("user_login") || "", password: q.get("password") || "",
+    geweigerd: q.get("geweigerd") === "1" || q.get("success") === "false" };
+  history.replaceState(null, "", location.pathname);
+  const $ = (id) => document.getElementById(id);
+  let d = {};
+  try {
+    const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-site", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+    d = await r.json().catch(() => ({}));
+    if (!r.ok) d = { ok: false, melding: d.fout || "Er ging iets mis. Probeer het opnieuw." };
+  } catch { d = { ok: false, melding: "Geen verbinding. Controleer je internet en probeer het opnieuw." }; }
+  $("ico").textContent = d.ok ? "✅" : data.geweigerd ? "👋" : "⚠️";
+  $("kop").textContent = d.ok ? "Je website is gekoppeld!" : data.geweigerd ? "Niet gekoppeld" : "Dat lukte niet helemaal";
+  $("tekst").textContent = d.melding || "";
+  const terug = d.terug || "verzoeken";
+  $("terug").href = terug; $("terug").hidden = false;
+  if (d.ok) setTimeout(() => { location.href = terug; }, 2500);
+})();
+</script>
+</body>
+</html>

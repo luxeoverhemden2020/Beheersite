@@ -239,3 +239,27 @@ td.r,th.r{text-align:right}
 .testpaneel .knop.groot{padding:13px 12px;font-size:15px;width:100%;text-align:center}
 .testpaneel .knop.rand{background:var(--veld)}
 @media (max-width:420px){.testpaneel .tp-knoppen{grid-template-columns:1fr}}
+/* website koppelen */
+.vbsite-tegels{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin:0 0 8px}
+.vbsite-tegels-2{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.vbsite-tegel{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:48px;padding:11px 13px;border-radius:12px;border:1px solid var(--lijn);background:var(--veld);color:var(--tekst);font:inherit;font-size:15px;font-weight:600;text-align:left;cursor:pointer;transition:border-color .15s,background .15s}
+.vbsite-tegel:hover,.vbsite-tegel:focus-visible{border-color:var(--accent);background:var(--accent2);outline:none}
+.vbsite-tegel[data-herkend]{border-color:var(--accent)}
+.vbsite-tegel span{font-size:12px;font-weight:400;color:var(--accent)}
+.vbsite-tegel:disabled{opacity:.6;cursor:wait}
+.vbsite-link{background:none;border:0;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}
+.vbsite-ok{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:var(--accent2)}
+.vbsite-vink{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--bg);font-weight:700}
+.vbsite [data-site-paneel]{margin-top:10px}
+.vbsite .vbsite-meld:empty{display:none}
+[hidden]{display:none!important}
+.vbsite-scan{gap:8px;margin-top:6px}
+.vbsite-scan .knop{flex:none;min-width:96px}
+.vbsite-bezig{display:flex;align-items:center;gap:10px;margin-top:12px;color:var(--zacht)}
+.vbsite-draai{width:18px;height:18px;border-radius:50%;border:2px solid var(--lijn);border-top-color:var(--accent);animation:vbsiteDraai .8s linear infinite}
+@keyframes vbsiteDraai{to{transform:rotate(360deg)}}
+.vbsite-gevonden{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:12px;background:var(--accent2);margin:0 0 12px}
+.vbsite-gevonden .vbsite-link{font-size:13px}
+.vbsite-gevonden.pling .vbsite-vink{animation:vbsitePling .55s cubic-bezier(.2,1.6,.4,1)}
+@keyframes vbsitePling{0%{transform:scale(0);opacity:0}60%{transform:scale(1.25);opacity:1}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.vbsite-draai,.vbsite-gevonden.pling .vbsite-vink{animation:none}}
