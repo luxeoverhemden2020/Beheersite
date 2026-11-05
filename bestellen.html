@@ -189,8 +189,8 @@ function teken() {
   const maand = nu.toLocaleDateString("nl-NL", { month: "long" });
   $("#vandaag").innerHTML = tot ? `Vandaag betaal je <b>${eur(incl, 2)}</b> incl. btw voor de rest van ${maand} (${rest} van ${dagen} dagen). Daarna elke maand automatisch.` : "";
   $("#vandaag").hidden = !tot;
-  $("#looptijd").textContent = p ? ", met een minimale looptijd van 3 maanden voor Vindbaarheid" : "";
-  $("#punten").innerHTML = [p ? "Vindbaarheid loopt minimaal 3 maanden" : "", "Elke maand een factuur per mail", "Prijzen exclusief 21% btw"].filter(Boolean).map((x) => `<li>${x}</li>`).join("");
+  $("#looptijd").textContent = ", met een minimale looptijd van 3 maanden";
+  $("#punten").innerHTML = ["Minimaal 3 maanden, daarna per maand opzegbaar", "Elke maand een factuur per mail", "Prijzen exclusief 21% btw"].map((x) => `<li>${x}</li>`).join("");
   try { localStorage.setItem("sh_bestel", JSON.stringify({ pakket, sh: shAan })); } catch {}
 }
 // voorkeuze uit de link (bestellen?pakket=plus&sh=1) of van vorige keer

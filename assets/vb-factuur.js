@@ -138,7 +138,7 @@ async function vbfOpzegKlant(el) {
     <p class="zacht vb-klein">Prijzen exclusief btw. De factuur krijg je elke maand per mail.</p>
     ${d.opzeg_per ? `<p>Je hebt opgezegd per <b>${datum(d.opzeg_per)}</b>. Tot die dag loopt alles gewoon door.</p><button class="knop rand klein" id="vbo_terug">Toch niet opzeggen</button>`
       : `<details style="margin-top:8px"><summary class="zacht vb-klein">Opzeggen</summary>
-        <p class="vb-klein">Opzeggen kan per het einde van de maand. Vindbaarheid heeft een minimale looptijd van 3 maanden.</p>
+        <p class="vb-klein">Opzeggen kan per het einde van de maand, na een minimale looptijd van 3 maanden.</p>
         ${d.delen.map((x) => `<label class="vb-klein" style="display:flex;gap:6px;align-items:center;font-weight:400"><input type="checkbox" value="${x.id}" class="vbo_wat" style="width:auto"${d.delen.length === 1 ? " checked" : ""}> ${esc(x.naam)}</label>`).join("")}
         <label class="vb-klein" for="vbo_reden">Waarom stop je? (mag leeg, helpt ons beter te worden)</label><textarea id="vbo_reden" rows="2"></textarea>
         <button class="knop rand klein" id="vbo_knop" style="margin-top:6px">Opzeggen</button></details>`}
