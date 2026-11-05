@@ -99,7 +99,7 @@ function vbsStapInhoud(s, d, admin) {
   }
   if (s.id === "google") {
     if (s.status === "klaar") return `<p>Google is gekoppeld${d.google?.email ? ` met <b>${esc(d.google.email)}</b>` : ""}. De cijfers worden elke nacht opgehaald.</p>`;
-    return `<p>Met één klik geef je ons <b>alleen leesrechten</b> op je cijfers in Google Search Console en Google Analytics. Je logt in bij Google zelf; wij zien je wachtwoord nooit.</p>
+    return `<p>Met één klik koppel je Google Search Console, Google Analytics en je Google Bedrijfsprofiel. Je logt in bij Google zelf; wij zien je wachtwoord nooit. Kies het account waarop ook je Bedrijfsprofiel staat, dan is stap 5 meteen klaar.</p>
       <div class="rij"><button class="knop" type="button" data-vbs="google">Koppel Google</button></div>
       <details class="vbs-alt"><summary>Lukt het niet, of beheert iemand anders je Google-account?</summary>
         <p>Je kunt ons ook uitnodigen. Doe dit in allebei:</p>
@@ -117,18 +117,25 @@ function vbsStapInhoud(s, d, admin) {
     return `<p style="margin:0 0 10px">Om je website te verbeteren moet Sitehulpje erbij kunnen. Je eigen wachtwoord hoef je nooit te delen.</p><div data-vbsite></div>`;
   }
   if (s.id === "profiel") {
-    if (s.status === "klaar") return `<p>${s.info?.status === "geen_nodig" ? "Je hebt geen Bedrijfsprofiel nodig. Prima!" : "We beheren je Google Bedrijfsprofiel mee."}</p>`;
-    return `<p>Je <b>Google Bedrijfsprofiel</b> is het blokje met je bedrijf in Google en Google Maps (met reviews, openingstijden en foto's). Voor lokaal gevonden worden is dit het belangrijkste wat er is.</p>
-      <p><b>Heb je al een Bedrijfsprofiel?</b></p>
-      <details class="vbs-alt" open><summary>Ja: voeg ons toe als beheerder</summary>
-        <ol class="vbs-ol">
-          <li>Zoek in Google op je bedrijfsnaam terwijl je bent ingelogd, of ga naar business.google.com.</li>
-          <li>Klik bij je profiel op <b>⋮</b> (drie puntjes) → <b>Bedrijfsprofielinstellingen</b> → <b>Mensen en toegang</b>.</li>
-          <li>Klik op <b>Toevoegen</b>, vul ${vbsKopie(VBS_ADRES)} in en kies de rol <b>Beheerder</b>. Klik op <b>Uitnodigen</b>.</li></ol>
-        <div class="rij"><button class="knop" type="button" data-vbs-gedaan="profiel" data-keuze="gedaan">Gedaan</button></div></details>
-      <div class="rij" style="margin-top:10px">
-        <button class="knop rand" type="button" data-vbs-gedaan="profiel" data-keuze="aanmaken">Nee, maak er een voor mij</button>
+    if (s.status === "klaar") return d.gbp
+      ? `<p>We hebben je Bedrijfsprofiel <b>${esc(d.gbp.naam || "")}</b> gevonden via je Google-koppeling. Je hoeft verder niets te doen.</p>`
+      : `<p>${s.info?.status === "geen_nodig" ? "Je hebt geen Bedrijfsprofiel nodig. Prima!" : "We beheren je Google Bedrijfsprofiel mee."}</p>`;
+    const googleKlaar = d.stappen.find((x) => x.id === "google")?.status === "klaar";
+    return `<p>Je <b>Google Bedrijfsprofiel</b> is het blokje met je bedrijf in Google en Google Maps, met reviews, openingstijden en foto's. Voor lokaal gevonden worden is dit het belangrijkste wat er is.</p>
+      ${googleKlaar
+        ? `<p>We vonden nog geen Bedrijfsprofiel bij het Google-account waarmee je hebt gekoppeld${d.google?.email ? ` (<b>${esc(d.google.email)}</b>)` : ""}.</p>
+           <div class="rij" style="flex-wrap:wrap;gap:8px"><button class="knop" type="button" data-vbs="google">Koppel het account van mijn profiel</button></div>
+           <p class="zacht vbs-klein" style="margin:6px 0 0">Staat je profiel op een ander Google-account? Kies dat account bij Google, dan vinden we het vanzelf.</p>`
+        : `<p><b>Dit gaat vanzelf mee met stap 3.</b> Koppel je Google met het account waarop ook je Bedrijfsprofiel staat, dan vinden we het automatisch.</p>`}
+      <div class="rij" style="margin-top:10px;flex-wrap:wrap;gap:8px">
+        <button class="knop rand" type="button" data-vbs-gedaan="profiel" data-keuze="aanmaken">Ik heb er nog geen, maak er een voor mij</button>
         <button class="knop rand" type="button" data-vbs-gedaan="profiel" data-keuze="geen_nodig">Niet nodig (alleen online, geen werkgebied)</button></div>
+      <details class="vbs-alt"><summary>Lukt het niet? Voeg ons dan toe als beheerder</summary>
+        <ol class="vbs-ol">
+          <li>Open <a href="https://business.google.com/locations" target="_blank" rel="noopener">je Bedrijfsprofielen</a> en kies je bedrijf.</li>
+          <li>Klik op <b>⋮</b> → <b>Bedrijfsprofielinstellingen</b> → <b>Mensen en toegang</b> → <b>Toevoegen</b>.</li>
+          <li>Vul ${vbsKopie(VBS_ADRES)} in, kies <b>Beheerder</b> en klik op <b>Uitnodigen</b>.</li></ol>
+        <div class="rij"><button class="knop rand klein" type="button" data-vbs-gedaan="profiel" data-keuze="gedaan">Gedaan</button></div></details>
       ${s.status === "wacht" ? `<div class="melding ok">${s.info?.status === "aanmaken" ? "We maken je profiel aan. Google stuurt soms een code per post of vraagt een korte video; we laten je weten wat er nodig is." : "Dank je! We accepteren de uitnodiging."}</div>` : ""}
       <div class="vbs-meld"></div>`;
   }
