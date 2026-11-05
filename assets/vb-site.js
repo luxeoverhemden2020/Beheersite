@@ -118,7 +118,10 @@ async function vbSiteToon(el, klantId, opties = {}) {
             <div><span>Callback URL</span>${vbsKopie(w.callback)}</div><div><span>Identiteits link URL</span>${vbsKopie(w.identiteit)}</div></div>
             Bij <b>Je wachtwoord</b> typ je je eigen Magento-wachtwoord. Dat blijft in Magento.${plaatje(3, "Formulier Nieuwe integratie ingevuld")}</li>
           <li>Klik links op <b>API</b>, kies bij <b>Brontoegang</b> voor <b>Alles</b> en klik op <b>Opslaan</b>.${plaatje(4, "Tab API, Brontoegang Alles")}</li>
-          <li>Klik in de lijst bij Sitehulpje op <b>Activeren</b> en daarna op <b>Toestaan</b>. Klaar!${plaatje(5, "Activeren in de lijst")}</li></ol>
+          <li>Je komt terug in de lijst met integraties. Klik bij Sitehulpje op <b>Activeren</b>.${plaatje(5, "Activeren in de lijst")}</li>
+          <li>Er opent een venster. Klik rechtsboven op <b>Toestaan</b>.${plaatje(6, "Venster met knop Toestaan")}</li>
+          <li>Er opent nog een klein venster met een groen vinkje. Dat sluit vanzelf. Klaar! Hier verschijnt dan ook een groen vinkje.
+            <span class="zacht" style="display:block;margin-top:4px">Gebeurt er niets? Je browser blokkeert dan misschien een pop-upvenster. Sta pop-ups toe voor je webshop en klik opnieuw op Activeren.</span>${plaatje(7, "Venster: Je webshop is gekoppeld")}</li></ol>
           <div class="vbsite-bezig"><span class="vbsite-draai" aria-hidden="true"></span>We wachten tot je op Toestaan klikt…</div>`;
         box.hidden = false; b.hidden = true;
         box.querySelectorAll("[data-kopie]").forEach((k) => (k.onclick = async () => { try { await navigator.clipboard.writeText(k.dataset.kopie); k.textContent = "Gekopieerd"; setTimeout(() => (k.textContent = "Kopieer"), 1500); } catch { /* mag mislukken */ } }));
