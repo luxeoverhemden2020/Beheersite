@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Webshop koppelen – Sitehulpje</title>
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<link rel="stylesheet" href="assets/stijl.css">
+<style>.midden{max-width:480px;margin:0 auto;padding:40px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px));text-align:center}.midden h1{font-size:22px;margin:12px 0 8px;text-wrap:balance}.groot{font-size:42px;line-height:1}</style>
+</head>
+<body>
+<main class="midden">
+  <div class="groot" id="ico">⏳</div>
+  <h1 id="kop">Sitehulpje wordt gekoppeld…</h1>
+  <p class="zacht" id="tekst">Een moment geduld, dit venster sluit vanzelf.</p>
+</main>
+<script>
+// Magento opent deze pagina na "Toestaan". Wij wisselen de sleutels om en sturen Magento daarna terug.
+(async () => {
+  const q = new URLSearchParams(location.search);
+  const k = q.get("k") || "", terug = q.get("success_call_back") || "";
+  const $ = (id) => document.getElementById(id);
+  let d = {};
+  for (let poging = 0; poging < 10; poging++) {
+    try {
+      const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-site", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actie: "mg_afronden", k }) });
+      d = await r.json().catch(() => ({}));
+      if (!r.ok) d = { ok: false, melding: d.fout || "Er ging iets mis." };
+    } catch { d = { ok: false, melding: "Geen verbinding. Probeer het opnieuw." }; }
+    if (!d.wacht) break;
+    await new Promise((ok) => setTimeout(ok, 1500));
+  }
+  if (d.wacht) d = { ok: false, melding: "We kregen de sleutels niet van je webshop. Klik in Magento nog een keer op Activeren." };
+  $("ico").textContent = d.ok ? "✅" : "⚠️";
+  $("kop").textContent = d.ok ? "Je webshop is gekoppeld!" : "Dat lukte niet helemaal";
+  $("tekst").textContent = d.melding || "";
+  // Magento wil hierna terug naar zijn eigen adres om de integratie op "Actief" te zetten
+  if (d.ok && /^https?:\/\//.test(terug)) setTimeout(() => { location.href = terug; }, 1500);
+})();
+</script>
+</body>
+</html>

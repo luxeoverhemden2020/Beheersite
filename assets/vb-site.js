@@ -90,6 +90,50 @@ async function vbSiteToon(el, klantId, opties = {}) {
     return d;
   }
 
+  // 4a. Magento: integratie met kopieerknoppen; Magento stuurt de sleutels zelf naar ons
+  if (d.systeem === "magento") {
+    const fout = t?.status === "fout" && t.melding ? `<div class="melding fout" style="margin-bottom:10px">${esc(t.melding)}</div>` : "";
+    el.innerHTML = kader(`<div class="vbsite-gevonden${opties.gescand ? " pling" : ""}"><span class="vbsite-vink">✓</span><div>Je webshop is gemaakt met <b>Magento</b><br><button class="vbsite-link zacht vbs-klein" type="button" data-site-wissel>Klopt niet?</button></div></div>
+      ${fout}<p style="margin:0 0 10px">Bij Magento koppel je Sitehulpje met een <b>integratie</b> in je eigen beheer. Dat kost een paar minuten en je deelt geen wachtwoord.</p>
+      <div class="rij" style="flex-wrap:wrap;gap:8px"><button class="knop" type="button" data-mg-start>Zelf koppelen</button>
+        <button class="knop rand" type="button" data-site-wb>Mijn webbouwer regelt het</button></div>
+      <div data-mg-stappen hidden style="margin-top:12px"></div>
+      <div data-site-paneel="webbouwer" hidden style="margin-top:12px"><label for="vbsite_wb">E-mailadres van je webbouwer</label>
+        <div class="rij"><input id="vbsite_wb" class="vul" type="email" placeholder="naam@webbouwer.nl"><button class="knop klein" type="button" data-site-door="webbouwer">Stuur hem de uitleg</button></div>
+        <p class="zacht vbs-klein" style="margin:6px 0 0">Sitehulpje mailt je webbouwer een kant-en-klare uitleg. Jij hoeft verder niets te doen.</p></div>
+      <div data-site-meld></div>`);
+    el.querySelector("[data-site-wissel]").onclick = () => opnieuw({ kies: true });
+    el.querySelector("[data-site-wb]").onclick = () => { el.querySelector('[data-site-paneel="webbouwer"]').hidden = false; el.querySelector("#vbsite_wb").focus(); };
+    el.querySelector("[data-mg-start]").onclick = async (e) => {
+      const b = e.currentTarget; b.disabled = true;
+      try {
+        const w = await vbSiteApi("mg_start", { klant_id: klantId });
+        const box = el.querySelector("[data-mg-stappen]");
+        box.innerHTML = `<ol class="vbs-ol">
+          <li>Log in op het beheer van je webshop (vaak ${vbsKopie(w.beheer)}).</li>
+          <li>Ga naar <b>Systeem</b> → <b>Integraties</b> en klik op <b>Nieuwe integratie toevoegen</b>.</li>
+          <li>Vul in: naam ${vbsKopie("Sitehulpje")} en e-mail ${vbsKopie("info@sitehulpje.nl")}</li>
+          <li>Callback-URL: ${vbsKopie(w.callback)}</li>
+          <li>Identity link URL: ${vbsKopie(w.identiteit)}</li>
+          <li>Bij "Je wachtwoord" vul je je eigen Magento-wachtwoord in. Dat blijft in Magento.</li>
+          <li>Kies links <b>API</b>, zet Resource Access op <b>Alles</b> en klik op <b>Opslaan</b>.</li>
+          <li>Klik in de lijst bij Sitehulpje op <b>Activeren</b> en daarna op <b>Toestaan</b>. Klaar!</li></ol>
+          <div class="vbsite-bezig"><span class="vbsite-draai" aria-hidden="true"></span>We wachten tot je op Toestaan klikt…</div>`;
+        box.hidden = false; b.hidden = true;
+        box.querySelectorAll("[data-kopie]").forEach((k) => (k.onclick = async () => { try { await navigator.clipboard.writeText(k.dataset.kopie); k.textContent = "Gekopieerd"; setTimeout(() => (k.textContent = "Kopieer"), 1500); } catch { /* mag mislukken */ } }));
+        // kijken of de koppeling rond is
+        const kijk = async () => {
+          if (!el.isConnected) return;
+          try { const s = await vbSiteApi("status", { klant_id: klantId }); if (s.toegang?.getest && s.toegang.getest !== t?.getest && ["gekoppeld", "fout"].includes(s.toegang.status)) { vbSitePling(); opnieuw({ kies: false }); if (s.toegang.status === "gekoppeld" && opties.klaar) setTimeout(opties.klaar, 1800); return; } } catch { /* opnieuw proberen */ }
+          setTimeout(kijk, 5000);
+        };
+        setTimeout(kijk, 5000);
+      } catch (err) { vbSiteMeld(el, err.message); b.disabled = false; }
+    };
+    vbSiteDoorgeven(el, klantId, opties);
+    return d;
+  }
+
   // 4. Automatisch koppelen (WordPress / WooCommerce)
   const fout = t?.status === "fout" && t.melding ? `<div class="melding fout">${esc(t.melding)}</div>` : "";
   const handmatig = `<div class="vbsite-hand"${auto ? " hidden" : ""}>
