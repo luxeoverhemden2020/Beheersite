@@ -90,41 +90,32 @@ async function vbfBeheer(el) {
 }
 
 // Beheer: abonnement van een klant bekijken, persoonlijke korting instellen, opzegging zien of terugdraaien
-async function vbfAbonnement(el, klanten) {
-  const lijst = (klanten || []).filter((k) => k.vb_pakket || k.vindbaarheid || k.sh_prijs);
-  const opties = (klanten || []).map((k) => `<option value="${esc(k.id)}">${esc(k.naam)}</option>`).join("");
-  el.innerHTML = `<div class="kaart"><h2 style="font-size:16px"><span class="tag">%</span>Abonnement en korting</h2>
-    <p class="zacht vb-klein" style="margin-top:-4px">Kies een klant. Een korting staat als aparte regel op de factuur, en de incasso schrijft het lagere bedrag af.</p>
-    <select id="vbfab_klant" style="width:auto;min-width:220px"><option value="">Kies een klant…</option>${opties}</select>
-    <div id="vbfab_uit" style="margin-top:12px"></div></div>`;
-  const uit = $("#vbfab_uit");
-  $("#vbfab_klant").onchange = async (e) => {
-    const id = e.target.value; uit.innerHTML = "";
-    if (!id) return;
-    let d; try { d = await vbfApi("abonnement", { klant_id: id }); } catch (err) { uit.innerHTML = `<div class="melding fout">${esc(err.message)}</div>`; return; }
-    if (!d.delen.length) { uit.innerHTML = '<p class="zacht">Deze klant heeft geen abonnement via het factuursysteem.</p>'; return; }
-    const soort = d.korting_pct ? "procent" : d.korting_eur ? "bedrag" : "geen";
-    uit.innerHTML = `<table><tbody>${d.delen.map((x) => `<tr><td>${esc(x.naam)}</td><td class="r mono">${vbfEuro(x.prijs)}</td><td class="zacht vb-klein">${x.minEind ? "minimaal t/m " + new Date(x.minEind).toLocaleDateString("nl-NL") : "per maand opzegbaar"}</td></tr>`).join("")}
-      ${d.korting ? `<tr><td>Persoonlijke korting</td><td class="r mono vb-op">–${vbfEuro(d.korting)}</td><td></td></tr>` : ""}
-      <tr><td><b>Per maand excl. btw</b></td><td class="r mono"><b>${vbfEuro(d.netto)}</b></td><td></td></tr></tbody></table>
-      ${d.opzeg_per ? `<div class="melding fout" style="margin-top:10px">Opgezegd per ${new Date(d.opzeg_per).toLocaleDateString("nl-NL")} (${esc((d.opzeg_wat || []).join(", "))}). <button class="knop rand klein" id="vbfab_terug">Opzegging terugdraaien</button></div>` : ""}
-      <form id="vbfab_form" class="rij" style="gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:12px">
-        <div><label class="vb-klein">Korting</label><select id="vbfab_soort" style="width:auto">
-          <option value="geen"${soort === "geen" ? " selected" : ""}>Geen</option><option value="bedrag"${soort === "bedrag" ? " selected" : ""}>Vast bedrag per maand (€)</option><option value="procent"${soort === "procent" ? " selected" : ""}>Percentage (%)</option></select></div>
-        <div><label class="vb-klein">Hoeveel</label><input id="vbfab_w" inputmode="decimal" style="width:110px" value="${esc(d.korting_pct || d.korting_eur || "")}"></div>
-        <div><label class="vb-klein">Tot en met (mag leeg)</label><input id="vbfab_tot" type="date" style="width:auto" value="${esc(d.korting_tot ? String(d.korting_tot).slice(0, 10) : "")}"></div>
-        <div style="flex:1;min-width:160px"><label class="vb-klein">Reden (komt op de factuur, mag leeg)</label><input id="vbfab_reden" maxlength="80" value="${esc(d.korting_reden || "")}" placeholder="bijv. vaste klant"></div>
-        <button class="knop klein">Opslaan</button></form><div id="vbfab_meld"></div>`;
-    $("#vbfab_form").onsubmit = async (ev) => {
-      ev.preventDefault();
-      try {
-        const r = await vbfApi("korting", { klant_id: id, soort: $("#vbfab_soort").value, waarde: $("#vbfab_w").value, tot: $("#vbfab_tot").value, reden: $("#vbfab_reden").value });
-        toonMelding($("#vbfab_meld"), r.korting ? `Opgeslagen. Nieuw maandbedrag: ${vbfEuro(r.netto)} excl. btw (was ${vbfEuro(r.bruto)}).` : `Opgeslagen. Geen korting: ${vbfEuro(r.netto)} per maand excl. btw.`, "ok");
-        setTimeout(() => $("#vbfab_klant").onchange({ target: { value: id } }), 1800);
-      } catch (err) { toonMelding($("#vbfab_meld"), err.message); }
-    };
-    const t = $("#vbfab_terug"); if (t) t.onclick = async () => { try { await vbfApi("opzeg_terug", { klant_id: id }); $("#vbfab_klant").onchange({ target: { value: id } }); } catch (err) { toonMelding($("#vbfab_meld"), err.message); } };
+// abonnement en persoonlijke korting van één klant (in de klantpagina van beheer)
+async function vbfAbonnementVoor(uit, id) {
+  uit.innerHTML = '<p class="zacht">Laden…</p>';
+  let d; try { d = await vbfApi("abonnement", { klant_id: id }); } catch (err) { uit.innerHTML = `<div class="melding fout">${esc(err.message)}</div>`; return; }
+  if (!d.delen.length) { uit.innerHTML = '<p class="zacht">Deze klant heeft geen abonnement via het factuursysteem.</p>'; return; }
+  const soort = d.korting_pct ? "procent" : d.korting_eur ? "bedrag" : "geen";
+  uit.innerHTML = `<table><tbody>${d.delen.map((x) => `<tr><td>${esc(x.naam)}</td><td class="r mono">${vbfEuro(x.prijs)}</td><td class="zacht vb-klein">${x.minEind ? "minimaal t/m " + new Date(x.minEind).toLocaleDateString("nl-NL") : "per maand opzegbaar"}</td></tr>`).join("")}
+    ${d.korting ? `<tr><td>Persoonlijke korting</td><td class="r mono vb-op">–${vbfEuro(d.korting)}</td><td></td></tr>` : ""}
+    <tr><td><b>Per maand excl. btw</b></td><td class="r mono"><b>${vbfEuro(d.netto)}</b></td><td></td></tr></tbody></table>
+    ${d.opzeg_per ? `<div class="melding fout" style="margin-top:10px">Opgezegd per ${new Date(d.opzeg_per).toLocaleDateString("nl-NL")} (${esc((d.opzeg_wat || []).join(", "))}). <button class="knop rand klein" id="vbfab_terug">Opzegging terugdraaien</button></div>` : ""}
+    <form id="vbfab_form" class="rij" style="gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:12px">
+      <div><label class="vb-klein">Korting</label><select id="vbfab_soort" style="width:auto">
+        <option value="geen"${soort === "geen" ? " selected" : ""}>Geen</option><option value="bedrag"${soort === "bedrag" ? " selected" : ""}>Vast bedrag per maand (€)</option><option value="procent"${soort === "procent" ? " selected" : ""}>Percentage (%)</option></select></div>
+      <div><label class="vb-klein">Hoeveel</label><input id="vbfab_w" inputmode="decimal" style="width:110px" value="${esc(d.korting_pct || d.korting_eur || "")}"></div>
+      <div><label class="vb-klein">Tot en met (mag leeg)</label><input id="vbfab_tot" type="date" style="width:auto" value="${esc(d.korting_tot ? String(d.korting_tot).slice(0, 10) : "")}"></div>
+      <div style="flex:1;min-width:160px"><label class="vb-klein">Reden (komt op de factuur, mag leeg)</label><input id="vbfab_reden" maxlength="80" value="${esc(d.korting_reden || "")}" placeholder="bijv. vaste klant"></div>
+      <button class="knop klein">Opslaan</button></form><div id="vbfab_meld"></div>`;
+  $("#vbfab_form").onsubmit = async (ev) => {
+    ev.preventDefault();
+    try {
+      const r = await vbfApi("korting", { klant_id: id, soort: $("#vbfab_soort").value, waarde: $("#vbfab_w").value, tot: $("#vbfab_tot").value, reden: $("#vbfab_reden").value });
+      toonMelding($("#vbfab_meld"), r.korting ? `Opgeslagen. Nieuw maandbedrag: ${vbfEuro(r.netto)} excl. btw (was ${vbfEuro(r.bruto)}).` : `Opgeslagen. Geen korting: ${vbfEuro(r.netto)} per maand excl. btw.`, "ok");
+      setTimeout(() => vbfAbonnementVoor(uit, id), 1800);
+    } catch (err) { toonMelding($("#vbfab_meld"), err.message); }
   };
+  const t = $("#vbfab_terug"); if (t) t.onclick = async () => { try { await vbfApi("opzeg_terug", { klant_id: id }); vbfAbonnementVoor(uit, id); } catch (err) { toonMelding($("#vbfab_meld"), err.message); } };
 }
 
 // Klant: abonnement bekijken en opzeggen (onopvallend onder het account)
@@ -254,10 +245,22 @@ async function vbfVriend(el) {
 }
 
 // ---------- beheer: omzet in één oogopslag ----------
-async function vbgOmzet(el) {
+async function vbgOmzet(el, modus = "alles") {
   let d; try { d = await vbgApi("omzet"); } catch (e) { el.innerHTML = `<div class="kaart"><h2>Omzet</h2><p class="zacht">${esc(e.message)}</p></div>`; return; }
   const tegel = (k, w, s = "") => `<div style="min-width:0"><div class="zacht vb-klein">${k}</div><div style="font-size:24px;font-weight:700" class="mono">${w}</div>${s ? `<div class="zacht vb-klein">${s}</div>` : ""}</div>`;
   const pp = d.per_pakket || {};
+  if (modus === "lijsten") {
+    el.innerHTML = `<div class="kaart"><h2 style="font-size:16px"><span class="tag">%</span>Kortingen en opzeggingen</h2>
+      ${d.kortingen.length ? `<h3 style="font-size:15px;margin:6px 0">Kortingen nu</h3><ul>${d.kortingen.map((o) => `<li><b>${esc(o.naam)}</b> –${vbfEuro(o.korting)}/mnd${o.tot ? ` tot ${new Date(o.tot).toLocaleDateString("nl-NL")}` : ""}${o.reden ? ` (${esc(o.reden)})` : ""}</li>`).join("")}</ul>` : `<p class="zacht vb-klein" style="margin:0">Op dit moment geen kortingen.</p>`}
+      ${d.opzeggingen.length ? `<h3 style="font-size:15px;margin:12px 0 6px">Opzeggingen</h3><ul>${d.opzeggingen.map((o) => `<li><b>${esc(o.naam)}</b> per ${new Date(o.per).toLocaleDateString("nl-NL")} (${esc((o.wat || []).join(", "))})${o.reden ? ` – “${esc(o.reden)}”` : ""}</li>`).join("")}</ul>` : ""}
+      <p class="zacht vb-klein" style="margin:10px 0 0">Een korting geven doe je bij de klant zelf: Klanten → klant → Abonnement.</p></div>`;
+    return d;
+  }
+  if (modus === "partners") {
+    el.innerHTML = d.partners.length ? `<div style="overflow-x:auto;margin-top:10px"><table><thead><tr><th>Partner</th><th class="r">Checks</th><th class="r">Bestellingen</th></tr></thead>
+      <tbody>${d.partners.map((p) => `<tr><td>${esc(p.partner)}</td><td class="r">${p.checks}</td><td class="r">${p.bestellingen}</td></tr>`).join("")}</tbody></table></div>` : `<p class="zacht vb-klein">Nog geen aanvragen via partners.</p>`;
+    return d;
+  }
   el.innerHTML = `<div class="kaart"><h2><span class="tag">€</span>Omzet</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">
       ${tegel("Per maand (excl. btw)", vbfEuro(d.mrr), d.korting ? `na ${vbfEuro(d.korting)} korting` : "")}
@@ -266,10 +269,11 @@ async function vbgOmzet(el) {
       ${tegel("Pakketten", `${pp.basis || 0} / ${pp.plus || 0} / ${pp.pro || 0}`, "Basis / Plus / Pro")}
       ${tegel("AI-kosten deze maand", "$" + Number(d.ai_kosten_usd).toFixed(2), "alleen voor jou")}
     </div>
-    ${d.opzeggingen.length ? `<h3 style="margin-top:18px">Opzeggingen</h3><ul>${d.opzeggingen.map((o) => `<li><b>${esc(o.naam)}</b> per ${esc(String(o.per).slice(0, 10))} (${esc((o.wat || []).join(", "))})${o.reden ? ` – “${esc(o.reden)}”` : ""}</li>`).join("")}</ul>` : ""}
+    ${modus === "tegels" ? "" : `${d.opzeggingen.length ? `<h3 style="margin-top:18px">Opzeggingen</h3><ul>${d.opzeggingen.map((o) => `<li><b>${esc(o.naam)}</b> per ${esc(String(o.per).slice(0, 10))} (${esc((o.wat || []).join(", "))})${o.reden ? ` – “${esc(o.reden)}”` : ""}</li>`).join("")}</ul>` : ""}
     ${d.kortingen.length ? `<h3 style="margin-top:18px">Kortingen</h3><ul>${d.kortingen.map((o) => `<li><b>${esc(o.naam)}</b> –${vbfEuro(o.korting)}/mnd${o.tot ? ` tot ${esc(String(o.tot).slice(0, 10))}` : ""}${o.reden ? ` (${esc(o.reden)})` : ""}</li>`).join("")}</ul>` : ""}
     ${d.partners.length ? `<h3 style="margin-top:18px">Partners (check-widget)</h3><div style="overflow-x:auto"><table><thead><tr><th>Partner</th><th class="r">Checks</th><th class="r">Bestellingen</th></tr></thead>
-      <tbody>${d.partners.map((p) => `<tr><td>${esc(p.partner)}</td><td class="r">${p.checks}</td><td class="r">${p.bestellingen}</td></tr>`).join("")}</tbody></table></div>` : ""}</div>`;
+      <tbody>${d.partners.map((p) => `<tr><td>${esc(p.partner)}</td><td class="r">${p.checks}</td><td class="r">${p.bestellingen}</td></tr>`).join("")}</tbody></table></div>` : ""}`}</div>`;
+  return d;
 }
 
 // ---------- beheer: instellingen voor groei (vriendenkorting, review, maandbericht, klussen, widget) ----------
@@ -279,7 +283,7 @@ async function vbgInstellingen(el) {
     <input class="vbi_naam" placeholder="Naam" value="${esc(x.naam || "")}" style="flex:1 1 150px;min-width:0;width:auto"><input class="vbi_prijs" inputmode="decimal" placeholder="€" value="${x.prijs ?? ""}" style="flex:0 0 80px;width:80px">
     <input class="vbi_uitleg" placeholder="Korte uitleg (mag leeg)" value="${esc(x.uitleg || "")}" style="flex:2 1 200px;min-width:0;width:auto"><button class="knop rand klein vbi_weg" type="button" aria-label="Weghalen">×</button>
     <input type="hidden" class="vbi_id" value="${esc(x.id || "")}"></div>`;
-  el.innerHTML = `<details class="kaart"><summary><b>Instellingen groei</b> <span class="zacht vb-klein">vriendenkorting, review, maandbericht, losse klussen, check-widget</span></summary>
+  el.innerHTML = `<div class="kaart"><h2 style="font-size:16px"><span class="tag">%</span>Groei en klussen</h2><p class="zacht vb-klein" style="margin-top:-4px">Vriendenkorting, review-link, maandbericht en losse klussen.</p>
     <div class="grid2" style="margin-top:12px">
       <div><label for="vbi_pct">Vriendenkorting (% op de eerste volle maand, voor allebei)</label><input id="vbi_pct" inputmode="numeric" value="${esc(d.vriend_korting_pct ?? 50)}"></div>
       <div><label for="vbi_review">Link naar je Google-review (na 60 dagen gemaild)</label><input id="vbi_review" placeholder="https://g.page/r/..." value="${esc(d.review_link || "")}"></div>
@@ -288,12 +292,7 @@ async function vbgInstellingen(el) {
     <h3 style="margin-top:16px">Losse klussen</h3><p class="zacht vb-klein" style="margin:0">Prijzen excl. btw. Alleen klanten met Vindbaarheid zonder webbeheer zien deze lijst en betalen meteen met iDEAL. Een nieuwe pagina en een blogartikel voert Sitehulpje automatisch uit (als de site gekoppeld is); andere klussen doe je zelf.</p>
     <div id="vbi_klussen">${(d.klussen || []).map(rij).join("")}</div>
     <button class="knop rand klein" type="button" id="vbi_plus" style="margin-top:8px">+ Klus toevoegen</button>
-    <div style="margin-top:14px"><button class="knop" id="vbi_bewaar">Bewaren</button></div><div id="vbi_meld"></div>
-    <h3 style="margin-top:20px">Check-widget voor partners</h3>
-    <p class="zacht vb-klein" style="margin:0">Geef een partner (boekhouder, drukker, netwerkclub) deze code voor op zijn website. Aanvragen komen bij jou binnen met de naam van de partner; in het omzetblok zie je hoeveel het oplevert.</p>
-    <div class="grid2" style="margin-top:8px"><div><label for="vbi_partner">Naam van de partner (kort, zonder spaties)</label><input id="vbi_partner" placeholder="bijv. boekhouderjansen"></div></div>
-    <textarea id="vbi_code" rows="3" readonly class="mono" style="font-size:12px;margin-top:6px"></textarea>
-    <button class="knop rand klein" type="button" id="vbi_kopie">Kopieer code</button> <a class="knop rand klein" id="vbi_voorbeeld" target="_blank" rel="noopener">Voorbeeld bekijken</a></details>`;
+    <div style="margin-top:14px"><button class="knop" id="vbi_bewaar">Bewaren</button></div><div id="vbi_meld"></div></div>`;
   const lijst = $("#vbi_klussen");
   const koppel = () => lijst.querySelectorAll(".vbi_weg").forEach((b) => (b.onclick = () => b.closest(".vbi_klus").remove()));
   koppel();
@@ -305,6 +304,17 @@ async function vbgInstellingen(el) {
       toonMelding($("#vbi_meld"), "Bewaard.", "ok"); }
     catch (e) { toonMelding($("#vbi_meld"), e.message); }
   };
+
+}
+
+// ---------- beheer: check-widget voor partners (code om op hun site te zetten) + resultaat per partner ----------
+async function vbgWidget(el) {
+  el.innerHTML = `<div class="kaart"><h2 style="font-size:16px"><span class="tag">&lt;/&gt;</span>Partners en check-widget</h2>
+    <p class="zacht vb-klein" style="margin-top:-4px">Geef een partner (boekhouder, drukker, netwerkclub) deze code voor op zijn website. Aanvragen komen bij jou binnen met de naam van de partner.</p>
+    <div class="grid2"><div><label for="vbi_partner">Naam van de partner (kort, zonder spaties)</label><input id="vbi_partner" placeholder="bijv. boekhouderjansen"></div></div>
+    <textarea id="vbi_code" rows="3" readonly class="mono" style="font-size:12px;margin-top:6px"></textarea>
+    <div class="rij" style="margin-top:6px"><button class="knop rand klein" type="button" id="vbi_kopie">Kopieer code</button><a class="knop rand klein" id="vbi_voorbeeld" target="_blank" rel="noopener">Voorbeeld bekijken</a></div>
+    <h3 style="font-size:15px;margin:16px 0 0">Wat partners opleveren</h3><div id="vbi_partners"><p class="zacht vb-klein">Laden…</p></div></div>`;
   const code = () => {
     const p = $("#vbi_partner").value.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 30);
     const src = `https://sitehulpje.nl/check-widget${p ? "?partner=" + p : ""}`;
@@ -313,4 +323,24 @@ async function vbgInstellingen(el) {
   };
   $("#vbi_partner").oninput = code; code();
   $("#vbi_kopie").onclick = async () => { try { await navigator.clipboard.writeText($("#vbi_code").value); $("#vbi_kopie").textContent = "Gekopieerd"; } catch { $("#vbi_code").select(); } setTimeout(() => ($("#vbi_kopie").textContent = "Kopieer code"), 1500); };
+  vbgOmzet($("#vbi_partners"), "partners").catch(() => {});
+}
+
+// ---------- beheer: wat er op Jan wacht ----------
+const VBG_TAAK = { koppeling: "🔌", factuur: "💶", rapport: "📄", bestelling: "🛒", opzegging: "👋", korting: "%", stil: "📞", instelling: "⚙️" };
+async function vbgTaken(el, { opKlant, opCheck, extra = [] } = {}) {
+  let t = [];
+  try { t = (await vbgApi("taken")).taken; } catch (e) { el.innerHTML = `<div class="melding fout">${esc(e.message)}</div>`; return 0; }
+  const alle = [...extra, ...t.filter((x) => x.belangrijk), ...t.filter((x) => !x.belangrijk)];
+  el.innerHTML = `<div class="kaart"><h2>Wacht op jou${alle.length ? ` (${alle.length})` : ""}</h2>
+    ${alle.length ? `<div class="taken">${alle.map((x, n) => `<div class="taak${x.belangrijk ? " belangrijk" : ""}"><span class="taak-ico" aria-hidden="true">${x.ico || VBG_TAAK[x.soort] || "•"}</span>
+      <span class="vul">${x.tekst}</span>${x.klant || x.check || x.verzoek ? `<button class="knop rand klein" data-taak="${n}">Open</button>` : ""}</div>`).join("")}</div>`
+    : `<div class="melding ok">Er ligt niets voor je klaar. Alles loopt vanzelf.</div>`}</div>`;
+  el.querySelectorAll("[data-taak]").forEach((b) => (b.onclick = () => {
+    const x = alle[+b.dataset.taak];
+    if (x.verzoek && typeof toonVerzoek === "function") toonVerzoek(x.verzoek);
+    else if (x.check && opCheck) opCheck(x.check);
+    else if (x.klant && opKlant) opKlant(x.klant, x.soort);
+  }));
+  return alle.length;
 }
