@@ -24,10 +24,19 @@ async function vbGzApi(actie, data = {}) {
   return d;
 }
 
+async function vbRvApi(actie, data = {}) {
+  const r = await fetch(VB_API.replace(/vindbaarheid$/, "vb-reviews"), {
+    method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, ...data }),
+  }).catch(() => { throw new Error("Geen verbinding. Controleer je internet en probeer het opnieuw."); });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.fout || "Er ging iets mis.");
+  return d;
+}
+
 // Wat er per pakket bij hoort (zie plan). "later" = komt nog.
 const VB_PAKKETTEN = {
-  basis: { naam: "Basis", zoekwoorden: 25, voorstellen: 5, punten: ["Dashboard met Google- en Bing-cijfers, dagelijks bijgewerkt", "Website-check elke week", "5 pagina's per maand verbeterd (titels, omschrijvingen)", "Bedrijfsgegevens voor Google en AI (structured data)", "Maandrapport met cijfers en uitgevoerd werk"], later: ["15 vaste vragen aan AI-diensten, maandelijks", "3 concurrenten gevolgd", "Bedrijfsprofiel: cijfers en melding bij nieuwe review"] },
-  plus: { naam: "Plus", zoekwoorden: 75, voorstellen: 15, punten: ["Alles uit Basis", "15 pagina's per maand verbeterd", "75 zoekwoorden gevolgd", "Maandrapport met verbeterpunten en uitleg", "Openingstijden, diensten en veelgestelde vragen als structured data"], later: ["30 vaste vragen aan AI-diensten, elke 2 weken", "5 concurrenten gevolgd", "1 nieuwe pagina of artikel per maand", "Conceptantwoorden op reviews"] },
+  basis: { naam: "Basis", zoekwoorden: 25, voorstellen: 5, punten: ["Dashboard met Google- en Bing-cijfers, dagelijks bijgewerkt", "Website-check elke week", "5 pagina's per maand verbeterd (titels, omschrijvingen)", "Bedrijfsgegevens voor Google en AI (structured data)", "Maandrapport met cijfers en uitgevoerd werk", "Bedrijfsprofiel: cijfers en reviews", "Kansen: zoekwoorden waarop je bijna bovenaan staat", "Bezoekers uit AI-diensten zoals ChatGPT"], later: ["15 vaste vragen aan AI-diensten, maandelijks", "3 concurrenten gevolgd"] },
+  plus: { naam: "Plus", zoekwoorden: 75, voorstellen: 15, punten: ["Alles uit Basis", "15 pagina's per maand verbeterd", "75 zoekwoorden gevolgd", "Maandrapport met verbeterpunten en uitleg", "Kant-en-klare antwoorden op nieuwe reviews", "Openingstijden, diensten en veelgestelde vragen als structured data"], later: ["30 vaste vragen aan AI-diensten, elke 2 weken", "5 concurrenten gevolgd", "1 nieuwe pagina of artikel per maand"] },
   pro: { naam: "Pro", zoekwoorden: 200, voorstellen: 30, punten: ["Alles uit Plus", "30 pagina's per maand verbeterd", "200 zoekwoorden gevolgd", "Melding binnen een dag bij problemen", "Kwartaalgesprek van 30 minuten met Jan"], later: ["50 vaste vragen aan AI-diensten, wekelijks", "10 concurrenten gevolgd", "3 nieuwe pagina's of artikelen per maand", "2 Bedrijfsprofiel-berichten per maand en foto-advies", "Tot 3 websites"] },
 };
 const vbPakket = (p) => VB_PAKKETTEN[p] || VB_PAKKETTEN.basis;
@@ -124,7 +133,7 @@ function vbGbpKaart(d) {
   const v = ([nu, vorig]) => (heeftVorig ? vbVerschil(nu, vorig) : `<span class="vb-gelijk">vergelijking volgt</span>`);
   const [zk, mp, bl, rt, ws] = [1, 2, 3, 4, 5].map(t);
   const ster = (n) => `<span aria-label="${n} van 5 sterren" style="color:#f5b301;letter-spacing:1px">${"★".repeat(n || 0)}<span style="opacity:.3">${"★".repeat(5 - (n || 0))}</span></span>`;
-  const reviews = (d.reviews || []).slice(0, 5);
+  const open = (d.reviews || []).filter((r) => !r.antwoord && r.status !== "overgeslagen").length;
   return `<div class="kaart"><h2><span class="tag">&gt;_</span>Google Bedrijfsprofiel</h2>
     <p class="zacht vb-klein" style="margin-top:-4px">${esc(k.gbp_naam || "")} · ${vbDatum(start)} t/m ${vbDatum(eind, { day: "numeric", month: "short", year: "numeric" })}</p>
     <div class="vb-tegels">
@@ -134,14 +143,69 @@ function vbGbpKaart(d) {
       ${vbTegel("Route gevraagd", vbGetal(rt[0]), v(rt), "Hoe vaak iemand een route naar je zaak opvroeg.")}
       ${vbTegel("Naar je website", vbGetal(ws[0]), v(ws), "Hoe vaak iemand vanuit je profiel naar je website ging.")}
     </div>
-    ${k.gbp_aantal ? `<h3 style="font-size:16px;margin:16px 0 6px">Reviews: ${ster(Math.round(k.gbp_score || 0))} <b>${Number(k.gbp_score || 0).toLocaleString("nl-NL", { maximumFractionDigits: 1 })}</b> <span class="zacht vb-klein">uit ${vbGetal(k.gbp_aantal)} reviews</span></h3>
-      ${reviews.map((r) => `<div style="padding:8px 0;border-top:1px solid var(--lijn)"><div class="rij" style="gap:8px">${ster(r.sterren)} <b>${esc(r.naam)}</b> <span class="zacht vb-klein">${r.datum ? vbDatum(String(r.datum).slice(0, 10), { day: "numeric", month: "short", year: "numeric" }) : ""}</span></div>
-        ${r.tekst ? `<p style="margin:4px 0 0">${esc(r.tekst.length > 280 ? r.tekst.slice(0, 280) + "…" : r.tekst)}</p>` : ""}
-        ${r.antwoord ? `<p class="zacht vb-klein" style="margin:4px 0 0">↳ Jouw antwoord: ${esc(r.antwoord.slice(0, 160))}${r.antwoord.length > 160 ? "…" : ""}</p>` : `<p class="vb-klein vb-let" style="margin:4px 0 0">Nog niet beantwoord</p>`}</div>`).join("")}` : ""}
+    ${k.gbp_aantal ? `<div class="rij" style="margin-top:14px;gap:10px"><span>${ster(Math.round(k.gbp_score || 0))} <b>${Number(k.gbp_score || 0).toLocaleString("nl-NL", { maximumFractionDigits: 1 })}</b> <span class="zacht vb-klein">uit ${vbGetal(k.gbp_aantal)} reviews</span></span>
+      ${open ? `<span class="vb-let vb-klein">${open} ${open === 1 ? "review wacht" : "reviews wachten"} op een antwoord</span>` : ""}<button class="knop rand klein" data-vb-naar="reviews">Reviews bekijken</button></div>` : ""}
     <p class="zacht vb-klein" style="margin-bottom:0">Bron: Google Bedrijfsprofiel. Google geeft deze cijfers met een paar dagen vertraging door.</p></div>`;
 }
 
-async function vbToon(el, klantId) {
+// Bezoekers die via een AI-dienst (ChatGPT, Perplexity, Copilot…) op de site kwamen
+function vbAiKaart(d) {
+  if (!d.koppeling?.ga4_property || !(d.ga4 || []).length) return "";
+  const rijen = d.ai || [], eind = d.ga4[d.ga4.length - 1][0], start = vbDag(eind, -27), vEind = vbDag(eind, -28), vStart = vbDag(eind, -55);
+  const som = (s, e, bron) => rijen.filter((r) => r[0] >= s && r[0] <= e && (!bron || r[1] === bron)).reduce((t, r) => t + r[2], 0);
+  const nu = som(start, eind), vorig = som(vStart, vEind), jaar = som(vbDag(eind, -364), eind);
+  const bronnen = [...new Set(rijen.map((r) => r[1]))].map((b) => [b, som(start, eind, b)]).filter((x) => x[1]).sort((a, b) => b[1] - a[1]);
+  return `<div class="kaart"><h2><span class="tag">&gt;_</span>Bezoekers uit AI-diensten</h2>
+    <p class="zacht vb-klein" style="margin-top:-4px">Mensen die via ChatGPT, Perplexity, Copilot, Gemini of een andere AI-dienst op je site kwamen. Laatste 28 dagen.</p>
+    <div class="vb-tegels">${vbTegel("Bezoeken via AI", vbGetal(nu), rijen.some((r) => r[0] <= vEind) ? vbVerschil(nu, vorig) : `<span class="vb-gelijk">vergelijking volgt</span>`, "Bezoeken waarbij iemand vanuit een AI-antwoord doorklikte naar je website.")}
+      ${vbTegel("Afgelopen jaar", vbGetal(jaar), `<span class="vb-gelijk">totaal</span>`, "Alle bezoeken via AI-diensten in de laatste 12 maanden.")}</div>
+    ${bronnen.length ? `<ul class="lijst vb-klein" style="margin:10px 0 0;padding-left:18px">${bronnen.map(([b, n]) => `<li><b>${esc(b)}</b>: ${vbGetal(n)} ${n === 1 ? "bezoek" : "bezoeken"}</li>`).join("")}</ul>` :
+      `<p class="zacht vb-klein" style="margin:10px 0 0">Nog geen bezoekers via AI deze maand. Dat is nu nog normaal; het groeit snel. Sitehulpje zorgt dat AI-diensten je bedrijf goed kunnen begrijpen.</p>`}</div>`;
+}
+// Zoekwoorden waarop je bijna op de eerste pagina van Google staat, met een schatting van wat een betere plek oplevert
+const VB_CTR = [0, 0.28, 0.15, 0.10, 0.07, 0.05, 0.04, 0.03, 0.025, 0.02, 0.018];
+const vbCtr = (p) => p <= 10 ? VB_CTR[Math.max(1, Math.round(p))] : 0.008;
+function vbKansen(d, n = 8) {
+  const k = (d.kansen || []).map((r) => ({ ...r, extra: Math.max(0, Math.round(r.vertoningen * (VB_CTR[3] - vbCtr(r.positie)))) }))
+    .filter((r) => r.extra >= 2).sort((a, b) => b.extra - a.extra).slice(0, n);
+  if (!k.length) return "";
+  return `<div class="kaart"><h2><span class="tag">&gt;_</span>Kansen: bijna bovenaan in Google</h2>
+    <p class="zacht vb-klein" style="margin-top:-4px">Op deze zoekwoorden sta je net buiten de top. Met een betere tekst op die pagina kun je flink meer klikken krijgen. Laatste 28 dagen.</p>
+    <div class="tabel-scroll"><table><thead><tr><th>Zoekwoord</th><th>Pagina</th><th class="r">Nu op plek</th><th class="r">Vertoningen</th><th class="r">Op plek 3</th></tr></thead><tbody>
+    ${k.map((r) => `<tr><td><b>${esc(r.zoekwoord)}</b></td><td class="vb-klein"><a href="${esc(r.pagina)}" target="_blank" rel="noopener">${esc(vbKort(r.pagina))}</a></td>
+      <td class="r mono">${r.positie.toLocaleString("nl-NL", { maximumFractionDigits: 1 })}</td><td class="r mono">${vbGetal(r.vertoningen)}</td><td class="r mono vb-op">+${vbGetal(r.extra)} klikken</td></tr>`).join("")}</tbody></table></div>
+    <p class="zacht vb-klein" style="margin-bottom:0">"Op plek 3" is een schatting van de extra klikken per maand als je naar plek 3 stijgt. Sitehulpje neemt deze pagina's mee in de verbetervoorstellen.</p></div>`;
+}
+// Reviews: concept-antwoorden nakijken en plaatsen
+// Google zet bij vertaalde reviews "(Translated by Google) … (Original) …" in de tekst: toon alleen het origineel
+const vbRvTekst = (t) => { t = String(t || ""); const o = t.split(/\(Original\)/i); return (o.length > 1 ? o[o.length - 1] : t.replace(/\(Translated by Google\)/i, "")).trim(); };
+function vbReviewsHtml(d) {
+  const ster = (n) => `<span aria-label="${n} van 5 sterren" style="color:#f5b301;letter-spacing:1px">${"★".repeat(n || 0)}<span style="opacity:.3">${"★".repeat(5 - (n || 0))}</span></span>`;
+  const lijst = [...(d.reviews || [])].sort((a, b) => (!!a.antwoord - !!b.antwoord) || String(b.datum).localeCompare(String(a.datum)));
+  if (!lijst.length) return `<div class="kaart"><p class="zacht">Nog geen reviews opgehaald.</p></div>`;
+  return `<div class="kaart"><h2><span class="tag">&gt;_</span>Reviews op Google</h2>
+    <p class="zacht vb-klein" style="margin-top:-4px">${d.klant.pakket === "basis" ? "Bij een nieuwe review krijg je een seintje. Typ je antwoord en klik op Plaatsen; dan staat het meteen op Google. Met Plus of Pro zet Sitehulpje het antwoord alvast voor je klaar." : "Bij een nieuwe review zet Sitehulpje een antwoord voor je klaar."} ${d.klant.pakket === "basis" ? "" : " Pas het aan als je wilt en klik op Plaatsen; dan staat het meteen op Google."} Er gaat nooit iets online zonder jouw klik.</p>
+    ${lijst.map((r) => `<div class="vb-review" data-rv="${esc(r.review_id)}" style="padding:12px 0;border-top:1px solid var(--lijn)">
+      <div class="rij" style="gap:8px">${ster(r.sterren)} <b>${esc(r.naam)}</b> <span class="zacht vb-klein">${r.datum ? vbDatum(String(r.datum).slice(0, 10), { day: "numeric", month: "short", year: "numeric" }) : ""}</span></div>
+      ${r.tekst ? `<p style="margin:6px 0 0">${esc(vbRvTekst(r.tekst))}</p>` : `<p class="zacht vb-klein" style="margin:6px 0 0">Alleen sterren, geen tekst.</p>`}
+      ${r.antwoord ? `<p class="zacht vb-klein" style="margin:6px 0 0">↳ <b>Jouw antwoord:</b> ${esc(r.antwoord)}</p>` : r.status === "overgeslagen" ? `<p class="zacht vb-klein" style="margin:6px 0 0">Overgeslagen · <button class="knop rand klein" data-rv-terug>Toch beantwoorden</button></p>` :
+        `<div data-rv-vak style="margin-top:8px">${r.concept ? `<label class="vb-klein">Voorstel voor je antwoord</label><textarea rows="3" data-rv-tekst>${esc(r.concept)}</textarea>` : `<textarea rows="3" data-rv-tekst placeholder="${d.klant.pakket !== "basis" ? "Typ een antwoord, of laat Sitehulpje een voorstel maken" : "Typ je antwoord"}"></textarea>`}
+          <div class="rij" style="margin-top:6px;gap:6px"><button class="knop klein" data-rv-plaats>Plaatsen op Google</button>${d.klant.pakket !== "basis" ? `<button class="knop rand klein" data-rv-concept>${r.concept ? "Ander voorstel" : "Maak voorstel"}</button>` : ""}<button class="knop rand klein" data-rv-over>Overslaan</button></div>
+          <div data-rv-meld></div></div>`}</div>`).join("")}</div>`;
+}
+function vbReviewsKoppel(el, klantId) {
+  el.querySelectorAll("[data-rv]").forEach((blok) => {
+    const id = blok.dataset.rv, meld = (t, s = "fout") => { const m = blok.querySelector("[data-rv-meld]"); if (m) toonMelding(m, t, s); };
+    const tekst = () => blok.querySelector("[data-rv-tekst]")?.value || "";
+    const knop = (sel, fn) => { const b = blok.querySelector(sel); if (b) b.onclick = async () => { b.disabled = true; try { await fn(b); } catch (e) { meld(e.message); } b.disabled = false; }; };
+    knop("[data-rv-plaats]", async () => { await vbRvApi("plaats", { klant_id: klantId, review_id: id, tekst: tekst() }); vbToon(el, klantId, "reviews"); });
+    knop("[data-rv-concept]", async (b) => { b.textContent = "Even denken…"; const r = await vbRvApi("concept", { klant_id: klantId, review_id: id }); blok.querySelector("[data-rv-tekst]").value = r.concept; b.textContent = "Ander voorstel"; });
+    knop("[data-rv-over]", async () => { await vbRvApi("overslaan", { klant_id: klantId, review_id: id }); vbToon(el, klantId, "reviews"); });
+    knop("[data-rv-terug]", async () => { await vbRvApi("concept", { klant_id: klantId, review_id: id }); vbToon(el, klantId, "reviews"); });
+  });
+}
+
+async function vbToon(el, klantId, beginTab) {
   el.innerHTML = `<div class="kaart"><p class="zacht">Laden…</p></div>`;
   let d;
   try { d = await vbApi("dashboard", { klant_id: klantId }); }
@@ -211,6 +275,7 @@ async function vbToon(el, klantId) {
     <button class="vb-tab aan" data-vb-tab="overzicht">Overzicht</button>
     <button class="vb-tab" data-vb-tab="zoekwoorden">Zoekwoorden</button>
     <button class="vb-tab" data-vb-tab="paginas">Pagina's</button>
+    ${d.koppeling?.gbp_locatie ? `<button class="vb-tab" data-vb-tab="reviews">Reviews${(d.reviews || []).some((r) => !r.antwoord && r.status !== "overgeslagen") ? ` (${(d.reviews || []).filter((r) => !r.antwoord && r.status !== "overgeslagen").length})` : ""}</button>` : ""}
     <button class="vb-tab" data-vb-tab="voorstellen">Voorstellen</button>
     <button class="vb-tab" data-vb-tab="gezondheid">Website-gezondheid</button>
     <button class="vb-tab" data-vb-tab="rapporten">Rapporten</button>
@@ -228,12 +293,14 @@ async function vbToon(el, klantId) {
       </div>
     </div>
     ${vbGbpKaart(d)}
+    ${vbAiKaart(d)}
     ${d.gsc.length ? `<div class="kaart"><h2><span class="tag">&gt;_</span>Klikken uit Google per week</h2><div data-vb-grafiek></div>
       <p class="zacht vb-klein">Bron: Google Search Console. De laatste twee dagen kunnen nog iets veranderen.</p></div>` : ""}
     <div data-vb-gz-kort></div>
     ${d.zoekwoorden.length ? `<div class="kaart"><h2><span class="tag">&gt;_</span>Beste zoekwoorden</h2>${vbTabel(d.zoekwoorden, "zoekwoord", 10)}
       <div class="rij" style="margin-top:10px"><button class="knop rand klein" data-vb-naar="zoekwoorden">Alle zoekwoorden</button></div>
       <p class="zacht vb-klein">${VB_UITLEG.positie} "Verschil" vergelijkt met de 28 dagen ervoor.</p></div>` : ""}
+    ${vbKansen(d)}
   </div>
   <div data-vb-paneel="zoekwoorden" class="verborgen"><div class="kaart">
     <h2><span class="tag">&gt;_</span>Alle zoekwoorden</h2>
@@ -248,6 +315,7 @@ async function vbToon(el, klantId) {
     <input type="search" placeholder="Zoek een pagina…" data-vb-filter="pagina" style="margin-bottom:10px">
     <div data-vb-lijst="pagina">${vbTabel(d.paginas, "pagina", 200)}</div>
   </div></div>
+  <div data-vb-paneel="reviews" class="verborgen">${d.koppeling?.gbp_locatie ? vbReviewsHtml(d) : ""}</div>
   <div data-vb-paneel="voorstellen" class="verborgen" data-vb-vs></div>
   <div data-vb-paneel="gezondheid" class="verborgen" data-vb-gz></div>
   <div data-vb-paneel="rapporten" class="verborgen" data-vb-rap></div>
@@ -274,6 +342,8 @@ async function vbToon(el, klantId) {
     };
   });
   if (params.get("google") === "kies") { toonTab("koppelingen"); vbKiezer(el, klantId); }
+  else if (beginTab) toonTab(beginTab);
+  vbReviewsKoppel(el, klantId);
   vbKnoppen(el, klantId, d);
   vbGezondheid(el, klantId, toonTab);
   vbRapporten(el.querySelector("[data-vb-rap]"), klantId);
