@@ -122,6 +122,7 @@ tr.klik{cursor:pointer}
   <section id="t-verkoop" class="verborgen">
     <div id="vbchecks"></div>
     <div id="vbbestel"></div>
+    <div id="vbcodes"></div>
     <div id="vbwidget"></div>
   </section>
 
@@ -203,7 +204,7 @@ function laadTab(tab, opnieuw) {
   geladen[tab] = true;
   if (tab === "vandaag") { vbgOmzet($("#vdtegels"), "tegels"); tekenTaken(); vbMeldingen(); vbStartOverzicht($("#vbstart"), (id) => openKlantPagina(id, "cijfers")); }
   if (tab === "klanten") laadKlanten();
-  if (tab === "verkoop") { vbcBeheer($("#vbchecks"), new URLSearchParams(location.search).get("check")); vbbBestellingen($("#vbbestel")); vbgWidget($("#vbwidget")); }
+  if (tab === "verkoop") { vbcBeheer($("#vbchecks"), new URLSearchParams(location.search).get("check")); vbbBestellingen($("#vbbestel")); vbkCodes($("#vbcodes")); vbgWidget($("#vbwidget")); }
   if (tab === "geld") { vbfBeheer($("#vbfacturen")); vbgOmzet($("#geldlijsten"), "lijsten"); vbKosten($("#vbkosten")); }
   if (tab === "instellingen") vbgInstellingen($("#vbinst"));
 }

@@ -43,6 +43,7 @@ details.extra summary{cursor:pointer;color:var(--zacht);font-size:15px;margin:14
 .samen ul{margin:12px 0 0;padding-left:18px;font-size:14px;color:var(--zacht)}
 .betaal{width:100%;margin-top:14px;justify-content:center}
 .slot{display:flex;gap:6px;align-items:center;justify-content:center;font-size:13px;color:var(--zacht);margin-top:8px}
+.bs-code{margin:8px 0 2px}.bs-code .vbsite-link{background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;color:inherit}
 .vriend-band{margin-top:14px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--accent,#22e3c4) 14%,transparent);border:1px solid color-mix(in srgb,var(--accent,#22e3c4) 40%,transparent);font-size:15px}
 .klaar-kaart{max-width:640px;margin:50px auto;text-align:center}
 .klaar-kaart h1{font-size:clamp(28px,5vw,40px);margin:12px 0 8px}
@@ -125,6 +126,9 @@ details.extra summary{cursor:pointer;color:var(--zacht);font-size:15px;margin:14
     <aside class="kaart samen" aria-live="polite">
       <h2>Je bestelling</h2>
       <div id="regels"></div>
+      <div class="bs-code"><button type="button" class="vbsite-link zacht vb-klein" id="codeopen">Heb je een kortingscode?</button>
+        <div id="codevak" hidden><div class="rij" style="gap:8px;margin-top:6px"><input id="b_code" class="vul" placeholder="Kortingscode" autocomplete="off" style="text-transform:uppercase"><button type="button" class="knop rand klein" id="codeknop">Toepassen</button></div>
+        <div id="codemeld" class="vb-klein" style="margin-top:6px"></div></div></div>
       <div class="totaal"><span>Per maand<br><span class="zacht vb-klein">excl. btw</span></span><b id="tot">€0</b></div>
       <div class="vandaag" id="vandaag"></div>
       <ul id="punten"></ul>
@@ -197,6 +201,24 @@ if (q.get("hervat")) {
   kijk();
 }
 
+// ---------- kortingscode ----------
+let korting = null;
+const codeUitLink = new URLSearchParams(location.search).get("code");
+async function codeToepassen(stil) {
+  const c = $("#b_code").value.trim().toUpperCase();
+  if (!c) { korting = null; $("#codemeld").textContent = ""; teken(); return; }
+  try {
+    const d = await bapi({ actie: "code_check", code: c });
+    if (d.geldig) { korting = d; $("#b_code").value = d.code; $("#codemeld").innerHTML = `<span style="color:#0b9f8a">✓ ${esc(d.tekst)}</span>`; }
+    else { korting = null; $("#codemeld").innerHTML = stil ? "" : `<span style="color:#d6336c">Deze code kennen we niet, of hij is verlopen.</span>`; }
+  } catch (e) { korting = null; $("#codemeld").textContent = e.message; }
+  teken();
+}
+$("#codeopen").onclick = () => { $("#codevak").hidden = false; $("#codeopen").hidden = true; $("#b_code").focus(); };
+$("#codeknop").onclick = () => codeToepassen(false);
+$("#b_code").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); codeToepassen(false); } });
+if (codeUitLink) { $("#codevak").hidden = false; $("#codeopen").hidden = true; $("#b_code").value = codeUitLink; setTimeout(() => codeToepassen(true), 0); }
+
 // ---------- keuze en prijs ----------
 const keuze = () => ({ pakket: document.querySelector("input[name=pakket]:checked")?.value ?? null, sh: $("#b_sh").checked });
 function teken() {
@@ -208,13 +230,16 @@ function teken() {
   if (p) regels.push([p.naam, eur(p.prijs)]);
   if (shAan) regels.push(["Sitehulpje webbeheer", eur(shPrijs)]);
   if (!regels.length) regels.push(["Kies een pakket", "–"]);
+  const bruto = (p ? p.prijs : 0) + shPrijs;
+  const af = !korting || !bruto ? 0 : korting.soort === "pct" ? Math.round(bruto * korting.waarde) / 100 : Math.min(bruto, korting.waarde);
+  if (af) regels.push([`Kortingscode ${korting.code}${korting.maanden ? ` (${korting.maanden === 1 ? "eerste maand" : korting.maanden + " maanden"})` : ""}`, "−" + eur(af, af % 1 ? 2 : 0)]);
   $("#regels").innerHTML = regels.map(([a, b]) => `<div class="regel"><span>${esc(a)}</span><span>${b}</span></div>`).join("");
-  const tot = (p ? p.prijs : 0) + shPrijs;
-  $("#tot").textContent = eur(tot);
+  const tot = Math.round((bruto - af) * 100) / 100;
+  $("#tot").textContent = eur(tot, tot % 1 ? 2 : 0);
   const nu = new Date(), dagen = new Date(nu.getFullYear(), nu.getMonth() + 1, 0).getDate(), rest = dagen - nu.getDate() + 1;
-  const excl = Math.round((tot * rest / dagen) * 100) / 100, incl = Math.round((excl + Math.round(excl * 21) / 100) * 100) / 100;
+  const excl = af ? Math.round((Math.round(bruto * rest / dagen * 100) - Math.round(af * rest / dagen * 100))) / 100 : Math.round((tot * rest / dagen) * 100) / 100, incl = Math.round((excl + Math.round(excl * 21) / 100) * 100) / 100;
   const maand = nu.toLocaleDateString("nl-NL", { month: "long" });
-  $("#vandaag").innerHTML = tot ? `Vandaag betaal je <b>${eur(incl, 2)}</b> incl. btw voor de rest van ${maand} (${rest} van ${dagen} dagen). Daarna elke maand automatisch.` : "";
+  $("#vandaag").innerHTML = tot ? `Vandaag betaal je <b>${eur(incl, 2)}</b> incl. btw voor de rest van ${maand} (${rest} van ${dagen} dagen). Daarna elke maand automatisch.${af && korting.maanden ? ` Na de korting wordt het ${eur(bruto)} per maand.` : ""}` : "";
   $("#vandaag").hidden = !tot;
   $("#looptijd").textContent = ", met een minimale looptijd van 3 maanden";
   $("#punten").innerHTML = ["Minimaal 3 maanden, daarna per maand opzegbaar", "Elke maand een factuur per mail", "Prijzen exclusief 21% btw"].map((x) => `<li>${x}</li>`).join("");
@@ -267,7 +292,7 @@ $("#bform").onsubmit = async (e) => {
     const d = await bapi({ actie: "plaats", pakket: pakket || null, sitehulpje: sh, bedrijf: $("#b_bedrijf").value, naam: $("#b_naam").value, email: $("#b_email").value,
       telefoon: $("#b_tel").value, site: $("#b_site").value, postcode: $("#b_pc").value, huisnummer: $("#b_nr").value, straat: $("#b_straat").value, plaats: $("#b_plaats").value,
       kvk: $("#b_kvk").value, btw: $("#b_btw").value, bericht: $("#b_bericht").value, voorwaarden: $("#b_vw").checked, verwerker: $("#b_vk").checked,
-      handtekening: $("#b_hand").value, website2: $("#b_website2").value, ref: herkomst.ref || null, vriend: herkomst.vriend || null });
+      handtekening: $("#b_hand").value, website2: $("#b_website2").value, ref: herkomst.ref || null, vriend: herkomst.vriend || null, kortingscode: korting ? korting.code : ($("#b_code").value.trim() || null) });
     if (d.url) { location.href = d.url; return; }
     throw new Error("Betalen kon niet starten. Probeer het zo nog eens.");
   } catch (err) { toonMelding($("#bmeld"), err.message); $("#bknop").disabled = false; $("#bknop").innerHTML = "Betaal veilig met iDEAL &rarr;"; }

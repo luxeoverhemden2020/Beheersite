@@ -79,3 +79,43 @@ async function vbcBeheer(el, open) {
   });
   if (open) el.querySelector(`tr[data-id="${open}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" });
 }
+
+// kortingscodes (bestelpagina)
+async function vbkCodes(el, data) {
+  const api = async (actie, x = {}) => {
+    const r = await fetch(VBC_API.replace("vb-check", "vb-bestel"), { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, ...x }) })
+      .catch(() => { throw new Error("Geen verbinding."); });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.fout || "Er ging iets mis.");
+    return d;
+  };
+  let d;
+  try { d = data || await api("codes"); } catch (e) { el.innerHTML = `<div class="kaart"><div class="melding fout">${esc(e.message)}</div></div>`; return; }
+  const dat = (x) => x ? new Date(x).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" }) : "–";
+  el.innerHTML = `<div class="kaart tabel-scroll"><h2><span class="tag">%</span>Kortingscodes</h2>
+    <p class="zacht vb-klein" style="margin-top:-4px">De klant vult de code in op de bestelpagina, of gebruikt de link <span class="mono">sitehulpje.nl/bestellen?code=JOUWCODE</span>. De korting geldt meteen, ook voor de eerste betaling.</p>
+    ${d.codes.length ? `<table><thead><tr><th>Code</th><th>Korting</th><th>Geldig tot</th><th>Gebruikt</th><th></th></tr></thead><tbody>
+      ${d.codes.map((c) => `<tr${c.actief ? "" : ' class="zacht"'}><td><b class="mono">${esc(c.code)}</b>${c.omschrijving ? `<br><span class="zacht vb-klein">${esc(c.omschrijving)}</span>` : ""}</td>
+        <td class="vb-klein">${esc(c.tekst)}</td><td class="vb-klein">${dat(c.geldig_tot)}</td><td class="vb-klein">${c.gebruikt}${c.max_gebruik ? " van " + c.max_gebruik : ""}</td>
+        <td><button class="knop rand klein" type="button" data-kc="${esc(c.code)}" data-aan="${c.actief ? 0 : 1}">${c.actief ? "Uitzetten" : "Aanzetten"}</button></td></tr>`).join("")}</tbody></table>` : `<p class="zacht">Nog geen codes.</p>`}
+    <h2 style="font-size:16px;margin-top:16px">Nieuwe code</h2>
+    <div class="rij" style="flex-wrap:wrap;gap:8px;align-items:flex-end">
+      <div><label for="kc_code">Code</label><input id="kc_code" placeholder="BIJV. JKS2026" style="text-transform:uppercase;width:150px"></div>
+      <div><label for="kc_soort">Soort</label><select id="kc_soort"><option value="pct">Procent</option><option value="eur">Euro per maand</option></select></div>
+      <div><label for="kc_waarde">Korting</label><input id="kc_waarde" type="number" min="1" step="0.01" placeholder="20" style="width:90px"></div>
+      <div><label for="kc_mnd">Aantal maanden</label><input id="kc_mnd" type="number" min="1" max="60" placeholder="leeg = altijd" style="width:120px"></div>
+      <div><label for="kc_tot">Geldig tot</label><input id="kc_tot" type="date"></div>
+      <div><label for="kc_max">Max. keer</label><input id="kc_max" type="number" min="1" placeholder="leeg = onbeperkt" style="width:130px"></div>
+    </div>
+    <label for="kc_oms">Notitie voor jezelf (mag leeg)</label><input id="kc_oms" placeholder="Bijv. voor JKS Schoonmaakgroep">
+    <p class="zacht vb-klein" style="margin:6px 0 0">Aantal maanden telt de eerste (deel)maand mee. 1 = alleen de eerste betaling.</p>
+    <button class="knop" type="button" id="kc_opslaan" style="margin-top:10px">Code opslaan</button><div id="kc_meld"></div></div>`;
+  const meld = (t) => { el.querySelector("#kc_meld").className = t ? "melding fout" : ""; el.querySelector("#kc_meld").textContent = t; };
+  el.querySelector("#kc_opslaan").onclick = async (e) => {
+    e.target.disabled = true; meld("");
+    try { vbkCodes(el, await api("code_zet", { code: el.querySelector("#kc_code").value, soort: el.querySelector("#kc_soort").value, waarde: el.querySelector("#kc_waarde").value,
+      maanden: el.querySelector("#kc_mnd").value || null, geldig_tot: el.querySelector("#kc_tot").value || null, max_gebruik: el.querySelector("#kc_max").value || null, omschrijving: el.querySelector("#kc_oms").value })); }
+    catch (err) { meld(err.message); e.target.disabled = false; }
+  };
+  el.querySelectorAll("[data-kc]").forEach((b) => b.onclick = async () => { b.disabled = true; try { vbkCodes(el, await api("code_aan", { code: b.dataset.kc, aan: b.dataset.aan === "1" })); } catch (err) { meld(err.message); b.disabled = false; } });
+}
