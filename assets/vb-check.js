@@ -101,8 +101,10 @@ async function vbkCodes(el, data) {
     <h2 style="font-size:16px;margin-top:16px">Nieuwe code</h2>
     <div class="rij" style="flex-wrap:wrap;gap:8px;align-items:flex-end">
       <div><label for="kc_code">Code</label><input id="kc_code" placeholder="BIJV. JKS2026" style="text-transform:uppercase;width:150px"></div>
-      <div><label for="kc_soort">Soort</label><select id="kc_soort"><option value="pct">Procent</option><option value="eur">Euro per maand</option></select></div>
-      <div><label for="kc_waarde">Korting</label><input id="kc_waarde" type="number" min="1" step="0.01" placeholder="20" style="width:90px"></div>
+      <div><label for="kc_soort">Soort</label><select id="kc_soort"><option value="pct">Procent</option><option value="eur">Euro per maand</option><option value="deel">Per onderdeel</option></select></div>
+      <div data-kc-een><label for="kc_waarde">Korting</label><input id="kc_waarde" type="number" min="1" step="0.01" placeholder="20" style="width:90px"></div>
+      <div data-kc-deel hidden><label for="kc_psh">% op Sitehulpje</label><input id="kc_psh" type="number" min="0" max="100" placeholder="70" style="width:110px"></div>
+      <div data-kc-deel hidden><label for="kc_pvb">% op Vindbaarheid</label><input id="kc_pvb" type="number" min="0" max="100" placeholder="50" style="width:120px"></div>
       <div><label for="kc_mnd">Aantal maanden</label><input id="kc_mnd" type="number" min="1" max="60" placeholder="leeg = altijd" style="width:120px"></div>
       <div><label for="kc_tot">Geldig tot</label><input id="kc_tot" type="date"></div>
       <div><label for="kc_max">Max. keer</label><input id="kc_max" type="number" min="1" placeholder="leeg = onbeperkt" style="width:130px"></div>
@@ -110,10 +112,12 @@ async function vbkCodes(el, data) {
     <label for="kc_oms">Notitie voor jezelf (mag leeg)</label><input id="kc_oms" placeholder="Bijv. voor JKS Schoonmaakgroep">
     <p class="zacht vb-klein" style="margin:6px 0 0">Aantal maanden telt de eerste (deel)maand mee. 1 = alleen de eerste betaling.</p>
     <button class="knop" type="button" id="kc_opslaan" style="margin-top:10px">Code opslaan</button><div id="kc_meld"></div></div>`;
+  el.querySelector("#kc_soort").onchange = (e) => { const deel = e.target.value === "deel";
+    el.querySelectorAll("[data-kc-deel]").forEach((x) => x.hidden = !deel); el.querySelector("[data-kc-een]").hidden = deel; };
   const meld = (t) => { el.querySelector("#kc_meld").className = t ? "melding fout" : ""; el.querySelector("#kc_meld").textContent = t; };
   el.querySelector("#kc_opslaan").onclick = async (e) => {
     e.target.disabled = true; meld("");
-    try { vbkCodes(el, await api("code_zet", { code: el.querySelector("#kc_code").value, soort: el.querySelector("#kc_soort").value, waarde: el.querySelector("#kc_waarde").value,
+    try { vbkCodes(el, await api("code_zet", { code: el.querySelector("#kc_code").value, soort: el.querySelector("#kc_soort").value, waarde: el.querySelector("#kc_waarde").value, pct_sh: el.querySelector("#kc_psh").value || 0, pct_vb: el.querySelector("#kc_pvb").value || 0,
       maanden: el.querySelector("#kc_mnd").value || null, geldig_tot: el.querySelector("#kc_tot").value || null, max_gebruik: el.querySelector("#kc_max").value || null, omschrijving: el.querySelector("#kc_oms").value })); }
     catch (err) { meld(err.message); e.target.disabled = false; }
   };

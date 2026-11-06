@@ -231,7 +231,7 @@ function teken() {
   if (shAan) regels.push(["Sitehulpje webbeheer", eur(shPrijs)]);
   if (!regels.length) regels.push(["Kies een pakket", "–"]);
   const bruto = (p ? p.prijs : 0) + shPrijs;
-  const af = !korting || !bruto ? 0 : korting.soort === "pct" ? Math.round(bruto * korting.waarde) / 100 : Math.min(bruto, korting.waarde);
+  const af = !korting || !bruto ? 0 : korting.soort === "deel" ? Math.min(bruto, Math.round((p ? p.prijs : 0) * korting.pct_vb + shPrijs * korting.pct_sh) / 100) : korting.soort === "pct" ? Math.round(bruto * korting.waarde) / 100 : Math.min(bruto, korting.waarde);
   if (af) regels.push([`Kortingscode ${korting.code}${korting.maanden ? ` (${korting.maanden === 1 ? "eerste maand" : korting.maanden + " maanden"})` : ""}`, "−" + eur(af, af % 1 ? 2 : 0)]);
   $("#regels").innerHTML = regels.map(([a, b]) => `<div class="regel"><span>${esc(a)}</span><span>${b}</span></div>`).join("");
   const tot = Math.round((bruto - af) * 100) / 100;
