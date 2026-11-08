@@ -1,0 +1,51 @@
+name: IndexNow
+# Meldt nieuwe en gewijzigde pagina's automatisch bij Bing (en daarmee ChatGPT/Copilot) via IndexNow.
+on:
+  push:
+    branches: [main]
+    paths: ['**.html', 'sitemap.xml']
+  workflow_dispatch:
+    inputs:
+      alles:
+        description: 'Alle URLs uit de sitemap melden'
+        type: boolean
+        default: true
+jobs:
+  melden:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Wachten tot GitHub Pages bijgewerkt is
+        run: sleep 120
+      - name: URLs bepalen en melden
+        env:
+          HOST: sitehulpje.nl
+          KEY: a73ee37d0c3aae7153b449189a3e6144
+          ALLES: ${{ github.event_name == 'workflow_dispatch' && inputs.alles }}
+          VOOR: ${{ github.event.before }}
+        run: |
+          python3 - <<'PY'
+          import os, re, json, subprocess, urllib.request
+          host, key = os.environ["HOST"], os.environ["KEY"]
+          if os.environ.get("ALLES") == "true" or not os.environ.get("VOOR") or set(os.environ["VOOR"]) == {"0"}:
+              urls = re.findall(r"<loc>([^<]+)</loc>", open("sitemap.xml").read())
+          else:
+              uit = subprocess.run(["git", "diff", "--name-only", os.environ["VOOR"], "HEAD"], capture_output=True, text=True).stdout.split()
+              urls = []
+              for f in uit:
+                  if not f.endswith(".html") or "/" in f or not os.path.exists(f) or f == "404.html":
+                      continue
+                  if re.search(r'name="robots" content="[^"]*noindex', open(f, encoding="utf-8").read()):
+                      continue
+                  urls.append(f"https://{host}/" + ("" if f == "index.html" else f[:-5]))
+          if not urls:
+              print("Niets te melden"); raise SystemExit
+          body = json.dumps({"host": host, "key": key, "keyLocation": f"https://{host}/{key}.txt", "urlList": urls[:10000]}).encode()
+          req = urllib.request.Request("https://api.indexnow.org/indexnow", data=body, headers={"Content-Type": "application/json; charset=utf-8"})
+          try:
+              r = urllib.request.urlopen(req, timeout=30); print("IndexNow", r.status, "voor", len(urls), "URLs:", *urls, sep="\n")
+          except urllib.error.HTTPError as e:
+              print("IndexNow fout", e.code, e.read()[:300]); raise SystemExit(1)
+          PY
