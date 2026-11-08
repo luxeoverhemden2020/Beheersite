@@ -76,6 +76,7 @@ tr.klik{cursor:pointer}
         <div><label>Soort site</label><select id="k_soort"><option value="wordpress">WordPress</option><option value="magento">Magento</option><option value="shopify">Shopify</option><option value="vercel">Vercel / GitHub</option><option value="anders">Anders</option></select></div>
         <div hidden><label>Verzoeken per maand</label><input id="k_limiet" type="number" min="0" value="999"></div>
         <div><label>Actief</label><select id="k_actief"><option value="1">Ja</option><option value="0">Nee</option></select></div>
+        <div><label>WhatsApp-optie (€30 p/m)</label><select id="k_whatsapp"><option value="0">Uit</option><option value="1">Aan</option></select></div>
         <div><label>Budget snelle webbeheerder (€ per maand)</label><input id="k_budget" type="number" min="0" step="0.5" value="5"></div>
       </div>
       <div id="shblok" class="verborgen" style="margin:12px 0;padding:12px;border:1px solid var(--rand,#3336);border-radius:10px">
@@ -140,6 +141,7 @@ tr.klik{cursor:pointer}
       <div class="grid2">
         <div><label>E-mailadres</label><input id="g_email" type="email"></div>
         <div><label>Naam</label><input id="g_naam"></div>
+        <div><label>WhatsApp-nummer (bijv. 0612345678)</label><input id="g_tel" type="tel" autocomplete="off"></div>
         <div><label>Klant / site</label><select id="g_klant"></select></div>
         <div><label>Rol</label><select id="g_rol"><option value="klant">Klant</option><option value="admin">Beheerder (Jan)</option></select></div>
         <div><label>Wachtwoord (leeg = niet wijzigen)</label><input id="g_ww" type="password" autocomplete="new-password"></div>
@@ -164,6 +166,17 @@ tr.klik{cursor:pointer}
       <p class="zacht" style="margin-top:0" id="apistatus"></p>
       <label>Claude API-sleutel (begint met sk-ant-)</label><input id="a_api" type="password" autocomplete="off" placeholder="Plak hier je API-sleutel">
       <button class="knop" id="apiopslaan" style="margin-top:12px">Opslaan</button>
+    </div>
+    <div class="kaart" style="max-width:520px">
+      <h2>WhatsApp-koppeling</h2>
+      <p class="zacht" style="margin-top:0" id="wastatus"></p>
+      <label>Webhook-adres (plakken bij Meta)</label><input id="wa_hook" readonly onclick="this.select()">
+      <label>Verify token (plakken bij Meta)</label><input id="wa_verify" readonly onclick="this.select()">
+      <label>Permanent access token</label><input id="wa_token" type="password" autocomplete="off" placeholder="Plak hier zelf de token van Meta">
+      <label>App secret</label><input id="wa_secret" type="password" autocomplete="off" placeholder="Plak hier zelf het app secret">
+      <label>Phone number ID</label><input id="wa_phone" autocomplete="off" placeholder="Het ID van je WhatsApp-nummer">
+      <label>OpenAI API-sleutel (voor spraakberichten)</label><input id="wa_openai" type="password" autocomplete="off" placeholder="Begint met sk-">
+      <button class="knop" id="waopslaan" style="margin-top:12px">Opslaan</button>
     </div>
     <div class="kaart" style="max-width:420px">
       <h2>Mijn wachtwoord wijzigen</h2>
@@ -375,6 +388,9 @@ async function laad() {
     $("#apistatus").textContent = data.api_sleutel_ingesteld
       ? "✓ API-sleutel is ingesteld. WordPress-verzoeken worden nu snel afgehandeld (Haiku), binnen het budget per klant. Daarboven neemt de gewone routine het over."
       : "Nog geen API-sleutel. Verzoeken gaan via de gewone (tragere) routine.";
+    const w = data.whatsapp || {};
+    $("#wastatus").textContent = (w.gekoppeld ? "✓ WhatsApp is gekoppeld." : "Nog niet gekoppeld: vul de codes van Meta in.") + (w.spraak ? " ✓ Spraakberichten staan aan." : " Spraakberichten nog uit (OpenAI-sleutel ontbreekt).");
+    $("#wa_hook").value = w.webhook || ""; $("#wa_verify").value = w.verify_token || "";
   } catch (e) { meld(e.message); }
 }
 const klantNaam = (id) => data.klanten.find((k) => k.id === id)?.naam || id;
@@ -436,7 +452,7 @@ function klantForm(k) {
   $("#k_id").value = k?.id || ""; $("#k_id").disabled = !!k;
   $("#k_naam").value = k?.naam || ""; $("#k_site").value = k?.site || ""; $("#k_soort").value = k?.soort || "wordpress";
   $("#k_limiet").value = k?.limiet ?? 999; $("#k_actief").value = k?.actief === false ? "0" : "1";
-  $("#k_url").value = k?.deurbel_url || ""; $("#k_token").value = ""; $("#k_budget").value = k?.ai_budget_eur ?? 5;
+  $("#k_url").value = k?.deurbel_url || ""; $("#k_token").value = ""; $("#k_budget").value = k?.ai_budget_eur ?? 5; $("#k_whatsapp").value = k?.whatsapp ? "1" : "0";
   $("#wpblok").classList.toggle("verborgen", (k?.soort || "wordpress") !== "wordpress");
   shBlok();
 }
@@ -488,7 +504,7 @@ $("#nieuweklant").onclick = () => {
 $("#kopslaan").onclick = async () => {
   try {
     await api("klant_opslaan", { id: $("#k_id").value, naam: $("#k_naam").value, site: $("#k_site").value, soort: $("#k_soort").value,
-      limiet: $("#k_limiet").value, actief: $("#k_actief").value === "1", deurbel_url: $("#k_url").value.trim(), deurbel_token: $("#k_token").value.trim(), ai_budget_eur: $("#k_budget").value });
+      limiet: $("#k_limiet").value, actief: $("#k_actief").value === "1", deurbel_url: $("#k_url").value.trim(), deurbel_token: $("#k_token").value.trim(), ai_budget_eur: $("#k_budget").value, whatsapp: $("#k_whatsapp").value === "1" });
     $("#k_token").value = ""; meld("Klant opgeslagen.", "ok"); await laad(); await laadKlanten(); openKlantPagina($("#k_id").value.trim().toLowerCase(), "website");
   } catch (e) { meld(e.message); }
 };
@@ -508,7 +524,7 @@ function tekenGebruikers() {
 function gebruikerForm(g) {
   $("#gform").classList.remove("verborgen");
   $("#g_email").value = g?.email || ""; $("#g_email").disabled = !!g;
-  $("#g_naam").value = g?.naam || ""; $("#g_klant").value = g?.klant_id || ""; $("#g_rol").value = g?.rol || "klant";
+  $("#g_naam").value = g?.naam || ""; $("#g_tel").value = g?.telefoon ? "0" + String(g.telefoon).replace(/^31/, "") : ""; $("#g_klant").value = g?.klant_id || ""; $("#g_rol").value = g?.rol || "klant";
   $("#g_actief").value = g?.actief === false ? "0" : "1"; $("#g_ww").value = "";
   $("#linkblok").classList.toggle("verborgen", !g || g.rol !== "klant");
   $("#g_link").value = ""; $("#g_link").placeholder = g?.heeft_link ? "Link is actief – tik op 'Link tonen'" : "Nog geen link";
@@ -521,8 +537,15 @@ $("#gopslaan").onclick = async () => {
     if ($("#g_email").value.trim().toLowerCase() === ik.email && ($("#g_rol").value !== "admin" || $("#g_actief").value === "0"))
       throw new Error("Je kunt je eigen beheerdersaccount niet uitzetten.");
     await api("gebruiker_opslaan", { email: $("#g_email").value, naam: $("#g_naam").value, klant_id: $("#g_klant").value,
-      rol: $("#g_rol").value, wachtwoord: $("#g_ww").value, actief: $("#g_actief").value === "1" });
+      rol: $("#g_rol").value, wachtwoord: $("#g_ww").value, actief: $("#g_actief").value === "1", telefoon: $("#g_tel").value });
     $("#g_ww").value = ""; meld("Account opgeslagen.", "ok"); await laad();
+  } catch (e) { meld(e.message); }
+};
+$("#waopslaan").onclick = async () => {
+  try {
+    await api("whatsapp_opslaan", { token: $("#wa_token").value, app_secret: $("#wa_secret").value, phone_id: $("#wa_phone").value, openai: $("#wa_openai").value });
+    ["#wa_token", "#wa_secret", "#wa_phone", "#wa_openai"].forEach((x) => ($(x).value = ""));
+    meld("WhatsApp-gegevens opgeslagen.", "ok"); await laad();
   } catch (e) { meld(e.message); }
 };
 $("#apiopslaan").onclick = async () => {
