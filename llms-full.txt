@@ -624,7 +624,7 @@ Google laat om privacyredenen zoekopdrachten weg die maar door een paar mensen z
 Een kort bestand op je site dat in gewone taal uitlegt wat je bedrijf doet, speciaal voor AI-diensten zoals ChatGPT en Perplexity. Sitehulpje kan er een voor je schrijven; Jan zet hem op je site.
 
 #### Kost het extra als Sitehulpje iets aanpast?
-Nee. Goedgekeurde voorstellen zijn onderdeel van je pakket en tellen niet mee voor je maandlimiet van verzoeken.
+Nee. Goedgekeurde voorstellen zijn onderdeel van je pakket. Daar betaal je niets extra voor.
 
 Nog een vraag? Stuur een verzoek in je dashboard of mail naar info@sitehulpje.nl.
 
@@ -702,7 +702,7 @@ Vul je adres in, Sitehulpje herkent WordPress en je klikt in je eigen beheer op 
 
 ### Vergelijk het met de andere manieren
 ManierWat het kostGoed om te weten
-Webbouwer of freelancerVaak €60 tot €125 per uurGoed voor maatwerk, duur voor kleine klussenOnderhoudsabonnement€50 tot €250 per maandVooral updates en back-ups, wijzigingen meestal niet onbeperktSitehulpje webbeheer€125 per maand, of €75 met een pakketWijzigingen in gewone taal, binnen de limiet. Geen updates of serverbeheer
+Webbouwer of freelancerVaak €60 tot €125 per uurGoed voor maatwerk, duur voor kleine klussenOnderhoudsabonnement€50 tot €250 per maandVooral updates en back-ups, wijzigingen meestal niet onbeperktSitehulpje webbeheer€125 per maand, of €75 met een pakketWijzigingen in gewone taal, 24/7 en meestal binnen een minuut. Geen updates of serverbeheer
 Alles zelf doenJe eigen tijdGoedkoop, zolang je er tijd voor hebt en weet hoe het werkt
 
 Bedragen van anderen zijn richtprijzen uit openbare overzichten; de echte prijs verschilt per aanbieder.
@@ -763,7 +763,7 @@ Net als bij WordPress: adres invullen, op Scan klikken en in je eigen beheer op 
 
 ### Vergelijk het met de andere manieren
 ManierWat het kostGoed om te weten
-Webbouwer of freelancerVaak €60 tot €125 per uurGoed voor maatwerk, duur voor kleine klussenBeheer uitbesteden€75 tot €300 per maandVaak updates en techniek, kleine wijzigingen niet altijd inbegrepenSitehulpje webbeheer€125 per maand, of €75 met een pakketWijzigingen in gewone taal, binnen de limiet. Geen updates of serverbeheer
+Webbouwer of freelancerVaak €60 tot €125 per uurGoed voor maatwerk, duur voor kleine klussenBeheer uitbesteden€75 tot €300 per maandVaak updates en techniek, kleine wijzigingen niet altijd inbegrepenSitehulpje webbeheer€125 per maand, of €75 met een pakketWijzigingen in gewone taal, 24/7 en meestal binnen een minuut. Geen updates of serverbeheer
 Alles zelf doenJe eigen tijdGoedkoop, zolang je er tijd voor hebt en weet hoe het werkt
 
 Bedragen van anderen zijn richtprijzen uit openbare overzichten; de echte prijs verschilt per aanbieder.
@@ -825,7 +825,7 @@ Na je bestelling zetten wij een eigen koppeling voor je winkel klaar. Je krijgt 
 
 ### Vergelijk het met de andere manieren
 ManierWat het kostGoed om te weten
-Webbouwer of freelancerVaak €60 tot €125 per uurGoed voor maatwerk, duur voor kleine klussenHulp via een expertVaak per uurHandig bij thema-werk, duur voor kleine wijzigingenSitehulpje webbeheer€125 per maand, of €75 met een pakketWijzigingen in gewone taal, binnen de limiet. Geen updates of serverbeheer
+Webbouwer of freelancerVaak €60 tot €125 per uurGoed voor maatwerk, duur voor kleine klussenHulp via een expertVaak per uurHandig bij thema-werk, duur voor kleine wijzigingenSitehulpje webbeheer€125 per maand, of €75 met een pakketWijzigingen in gewone taal, 24/7 en meestal binnen een minuut. Geen updates of serverbeheer
 Alles zelf doenJe eigen tijdGoedkoop, zolang je er tijd voor hebt en weet hoe het werkt
 
 Bedragen van anderen zijn richtprijzen uit openbare overzichten; de echte prijs verschilt per aanbieder.
@@ -888,7 +888,7 @@ Jij of je webbouwer maakt in Magento een integratie aan. Sitehulpje geeft de sta
 
 ### Vergelijk het met de andere manieren
 ManierWat het kostGoed om te weten
-Webbouwer of freelancerVaak €60 tot €125 per uurGoed voor maatwerk, duur voor kleine klussenOnderhoudscontract€200 tot €500+ per maandVoor updates en techniek, dus iets anders dan SEO-tekstenSitehulpje webbeheer€125 per maand, of €75 met een pakketWijzigingen in gewone taal, binnen de limiet. Geen updates of serverbeheer
+Webbouwer of freelancerVaak €60 tot €125 per uurGoed voor maatwerk, duur voor kleine klussenOnderhoudscontract€200 tot €500+ per maandVoor updates en techniek, dus iets anders dan SEO-tekstenSitehulpje webbeheer€125 per maand, of €75 met een pakketWijzigingen in gewone taal, 24/7 en meestal binnen een minuut. Geen updates of serverbeheer
 Alles zelf doenJe eigen tijdGoedkoop, zolang je er tijd voor hebt en weet hoe het werkt
 
 Bedragen van anderen zijn richtprijzen uit openbare overzichten; de echte prijs verschilt per aanbieder.
