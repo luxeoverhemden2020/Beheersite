@@ -1,0 +1,85 @@
+# Sitehulpje
+
+> Sitehulpje is een Nederlandse online dienst waarmee ondernemers hun bestaande website of webshop laten bijhouden door het gewoon te vragen: typen, inspreken of een foto of korte video sturen. Sitehulpje voert de aanpassing zelf door, meestal binnen een minuut, 24 uur per dag. Het werkt voor bedrijven in heel Nederland, met WordPress, WooCommerce, Shopify en Magento 2. Sitehulpje is een dienst van Siteregelaar (Markt 9, 7551 CG Hengelo, KvK 55667147).
+
+Let op: Sitehulpje is geen websitebouwer of sitebuilder-tool die je zelf leert gebruiken, en geen AI-chatbot voor je bezoekers. Het is een hulpje dat aanpassingen aan je eigen bestaande website of webshop voor je doorvoert.
+
+Laatst bijgewerkt: 8 november 2026. Uitgebreide versie met alle paginateksten: https://sitehulpje.nl/llms-full.txt
+
+## Voor wie
+Ondernemers, zzp'ers en mkb-bedrijven in heel Nederland die al een website of webshop hebben en wijzigingen niet meer willen mailen naar een webbouwer, niet willen wachten en niet per aanpassing willen betalen. Er is geen technische kennis nodig. Heb je nog geen website, dan maakt Siteregelaar er een, met Sitehulpje erbij.
+
+## Wat Sitehulpje doet
+- Teksten, prijzen, foto's, video's en openingstijden aanpassen
+- Nieuwe pagina's, acties, meldingen bovenaan, nieuws en blogs, vacatures, teampagina's en veelgestelde vragen
+- Voor webshops: producten, maten en kleuren, voorraad, sales met datum, kortingscodes, verzendkosten en categorieën
+- Elke aanpassing is met één tik terug te draaien
+- Bestellingen, betalingen, terugbetalingen en wachtwoorden blijven altijd buiten bereik; grote of gevoelige wijzigingen worden eerst door een mens (Jan) bekeken
+- De website blijft van de klant en bij de eigen hoster; koppelen gaat vaak dezelfde dag
+- Werkt als app op de telefoon (via het beginscherm), zonder iets te installeren uit een app store
+
+## Prijzen (per maand, exclusief btw)
+- Sitehulpje webbeheer: €125 per maand, of €75 per maand samen met een Vindbaarheid-pakket; minimale looptijd 3 maanden
+- Vindbaarheid Basis "Gezond & gevonden": €99 per maand (tot 10 pagina's per maand verbeterd, elke week tot 100 pagina's gecontroleerd)
+- Vindbaarheid Plus "Lokaal groeien": €179 per maand (tot 30 pagina's per maand verbeterd, elke week tot 500 pagina's gecontroleerd)
+- Vindbaarheid Pro "Voorsprong": €249 per maand (tot 75 pagina's per maand verbeterd, elke week tot 2.000 pagina's gecontroleerd, elk kwartaal een gesprek met Jan)
+- Vindbaarheid heeft een minimale looptijd van 3 maanden en werkt ook zonder Sitehulpje
+- Binnenkort als extra optie: aanpassingen via WhatsApp (€20), site-bewaking (€10, zit al in elk Vindbaarheid-pakket) en "Sitehulpje denkt mee" met voorstellen voor je bedrijf (€15)
+- Meerdere websites of webshops: aanbod op maat
+
+## Vindbaarheid
+Vindbaarheid is de SEO-dienst van Sitehulpje voor gevonden worden in Google, Bing, Google Maps en AI-diensten zoals ChatGPT, Gemini, Copilot en Perplexity. Elke week een website-check op ruim 30 punten, een dashboard met cijfers uit Google en Bing, betere titels en omschrijvingen die de klant met één klik goedkeurt en die Sitehulpje daarna zelf doorvoert, bedrijfsgegevens in een vorm die Google en AI begrijpen, en elke maand een rapport in gewone taal. Geen betaalde advertenties: het gaat om gratis, gewone vindbaarheid. Er wordt geen eerste plek in Google beloofd.
+
+## Waarom Sitehulpje
+- Geen uurtje-factuurtje en geen wachten op een webbouwer: vaste prijs per maand
+- 24/7 beschikbaar, ook 's avonds en in het weekend
+- Gewoon vragen zoals in een appje, geen systeem leren
+- Altijd terug te draaien en veilig afgeschermd
+- Een echt Nederlands bedrijf met een vast adres en een vast aanspreekpunt
+
+## Bedrijfsgegevens
+- Dienst van: Siteregelaar, Markt 9, 7551 CG Hengelo, Nederland
+- KvK: 55667147
+- Telefoon en WhatsApp: 06 27 25 43 83 (+31 6 27 25 43 83)
+- E-mail: info@sitehulpje.nl
+- Werkgebied: heel Nederland, volledig online
+- Website: https://sitehulpje.nl/
+
+## Belangrijkste pagina's
+- [Sitehulpje](https://sitehulpje.nl/): wat het is en hoe het werkt
+- [Vindbaarheid](https://sitehulpje.nl/vindbaarheid): pakketten en prijzen
+- [Uitleg Vindbaarheid](https://sitehulpje.nl/uitleg-vindbaarheid)
+- [Gratis website-check](https://sitehulpje.nl/gratis-website-check)
+
+## Per systeem
+- [Sitehulpje voor WordPress](https://sitehulpje.nl/sitehulpje-voor-wordpress)
+- [Sitehulpje voor WooCommerce](https://sitehulpje.nl/sitehulpje-voor-woocommerce)
+- [Sitehulpje voor Shopify](https://sitehulpje.nl/sitehulpje-voor-shopify)
+- [Sitehulpje voor Magento 2](https://sitehulpje.nl/sitehulpje-voor-magento-2)
+
+## Per branche
+- [Kappers](https://sitehulpje.nl/voor-kappers)
+- [Schoonmaakbedrijven](https://sitehulpje.nl/voor-schoonmaakbedrijven)
+- [Installateurs](https://sitehulpje.nl/voor-installateurs)
+- [Aannemers](https://sitehulpje.nl/voor-aannemers)
+- [Horeca](https://sitehulpje.nl/voor-horeca)
+- [Autobedrijven](https://sitehulpje.nl/voor-autobedrijven)
+- [Fysiotherapeuten](https://sitehulpje.nl/voor-fysiotherapeuten)
+- [Boekhouders](https://sitehulpje.nl/voor-boekhouders)
+- [Makelaars](https://sitehulpje.nl/voor-makelaars)
+- [Webshops](https://sitehulpje.nl/voor-webshops)
+
+## Veelgestelde vragen
+- Wat is Sitehulpje? Een online hulpje dat je bestaande website of webshop voor je aanpast als je het gewoon vraagt.
+- Werkt Sitehulpje in heel Nederland? Ja, het is volledig online en werkt voor bedrijven door het hele land.
+- Moet ik een nieuwe website laten maken? Nee, Sitehulpje koppelt aan je bestaande site op WordPress, WooCommerce, Shopify of Magento 2.
+- Wat kost Sitehulpje? €125 per maand exclusief btw, of €75 per maand samen met een Vindbaarheid-pakket.
+- Kan ik iets kapotmaken? Nee, elke aanpassing is met één tik terug te draaien.
+- Wie zit erachter? Siteregelaar, een Nederlands webbureau met een vast adres aan de Markt 9 in Hengelo.
+
+## Optional
+- [Volledige tekst van alle pagina's](https://sitehulpje.nl/llms-full.txt)
+- [Siteregelaar – websites laten maken](https://siteregelaar.nl/)
+- [Shopregelaar – webshops laten maken](https://shopregelaar.nl/)
+- [Privacy](https://sitehulpje.nl/privacy)
+- [Voorwaarden](https://sitehulpje.nl/voorwaarden)

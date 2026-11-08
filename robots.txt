@@ -5,4 +5,78 @@ Disallow: /factuur
 Disallow: /check
 Disallow: /rapport
 Disallow: /check-widget
+
+# AI-zoekmachines en -assistenten mogen de openbare pagina's lezen
+User-agent: Google-Extended
+Allow: /
+Disallow: /beheer
+Disallow: /verzoeken
+Disallow: /factuur
+Disallow: /check
+Disallow: /rapport
+Disallow: /check-widget
+
+User-agent: GPTBot
+Allow: /
+Disallow: /beheer
+Disallow: /verzoeken
+Disallow: /factuur
+Disallow: /check
+Disallow: /rapport
+Disallow: /check-widget
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /beheer
+Disallow: /verzoeken
+Disallow: /factuur
+Disallow: /check
+Disallow: /rapport
+Disallow: /check-widget
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /beheer
+Disallow: /verzoeken
+Disallow: /factuur
+Disallow: /check
+Disallow: /rapport
+Disallow: /check-widget
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /beheer
+Disallow: /verzoeken
+Disallow: /factuur
+Disallow: /check
+Disallow: /rapport
+Disallow: /check-widget
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /beheer
+Disallow: /verzoeken
+Disallow: /factuur
+Disallow: /check
+Disallow: /rapport
+Disallow: /check-widget
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /beheer
+Disallow: /verzoeken
+Disallow: /factuur
+Disallow: /check
+Disallow: /rapport
+Disallow: /check-widget
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /beheer
+Disallow: /verzoeken
+Disallow: /factuur
+Disallow: /check
+Disallow: /rapport
+Disallow: /check-widget
+
 Sitemap: https://sitehulpje.nl/sitemap.xml

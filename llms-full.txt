@@ -1,0 +1,1555 @@
+# Sitehulpje – volledige versie
+
+> Volledige tekst van de pagina's van Sitehulpje (dienst van Siteregelaar, Markt 9, 7551 CG Hengelo), voor AI-zoekmachines. Korte versie: https://sitehulpje.nl/llms.txt
+
+> Sitehulpje is een Nederlandse online dienst waarmee ondernemers hun bestaande website of webshop laten bijhouden door het gewoon te vragen: typen, inspreken of een foto of korte video sturen. Sitehulpje voert de aanpassing zelf door, meestal binnen een minuut, 24 uur per dag. Het werkt voor bedrijven in heel Nederland, met WordPress, WooCommerce, Shopify en Magento 2. Sitehulpje is een dienst van Siteregelaar (Markt 9, 7551 CG Hengelo, KvK 55667147).
+
+Let op: Sitehulpje is geen websitebouwer of sitebuilder-tool die je zelf leert gebruiken, en geen AI-chatbot voor je bezoekers. Het is een hulpje dat aanpassingen aan je eigen bestaande website of webshop voor je doorvoert.
+
+Laatst bijgewerkt: 8 november 2026. Uitgebreide versie met alle paginateksten: https://sitehulpje.nl/llms-full.txt
+
+## Voor wie
+Ondernemers, zzp'ers en mkb-bedrijven in heel Nederland die al een website of webshop hebben en wijzigingen niet meer willen mailen naar een webbouwer, niet willen wachten en niet per aanpassing willen betalen. Er is geen technische kennis nodig. Heb je nog geen website, dan maakt Siteregelaar er een, met Sitehulpje erbij.
+
+## Wat Sitehulpje doet
+- Teksten, prijzen, foto's, video's en openingstijden aanpassen
+- Nieuwe pagina's, acties, meldingen bovenaan, nieuws en blogs, vacatures, teampagina's en veelgestelde vragen
+- Voor webshops: producten, maten en kleuren, voorraad, sales met datum, kortingscodes, verzendkosten en categorieën
+- Elke aanpassing is met één tik terug te draaien
+- Bestellingen, betalingen, terugbetalingen en wachtwoorden blijven altijd buiten bereik; grote of gevoelige wijzigingen worden eerst door een mens (Jan) bekeken
+- De website blijft van de klant en bij de eigen hoster; koppelen gaat vaak dezelfde dag
+- Werkt als app op de telefoon (via het beginscherm), zonder iets te installeren uit een app store
+
+## Prijzen (per maand, exclusief btw)
+- Sitehulpje webbeheer: €125 per maand, of €75 per maand samen met een Vindbaarheid-pakket; minimale looptijd 3 maanden
+- Vindbaarheid Basis "Gezond & gevonden": €99 per maand (tot 10 pagina's per maand verbeterd, elke week tot 100 pagina's gecontroleerd)
+- Vindbaarheid Plus "Lokaal groeien": €179 per maand (tot 30 pagina's per maand verbeterd, elke week tot 500 pagina's gecontroleerd)
+- Vindbaarheid Pro "Voorsprong": €249 per maand (tot 75 pagina's per maand verbeterd, elke week tot 2.000 pagina's gecontroleerd, elk kwartaal een gesprek met Jan)
+- Vindbaarheid heeft een minimale looptijd van 3 maanden en werkt ook zonder Sitehulpje
+- Binnenkort als extra optie: aanpassingen via WhatsApp (€20), site-bewaking (€10, zit al in elk Vindbaarheid-pakket) en "Sitehulpje denkt mee" met voorstellen voor je bedrijf (€15)
+- Meerdere websites of webshops: aanbod op maat
+
+## Vindbaarheid
+Vindbaarheid is de SEO-dienst van Sitehulpje voor gevonden worden in Google, Bing, Google Maps en AI-diensten zoals ChatGPT, Gemini, Copilot en Perplexity. Elke week een website-check op ruim 30 punten, een dashboard met cijfers uit Google en Bing, betere titels en omschrijvingen die de klant met één klik goedkeurt en die Sitehulpje daarna zelf doorvoert, bedrijfsgegevens in een vorm die Google en AI begrijpen, en elke maand een rapport in gewone taal. Geen betaalde advertenties: het gaat om gratis, gewone vindbaarheid. Er wordt geen eerste plek in Google beloofd.
+
+## Waarom Sitehulpje
+- Geen uurtje-factuurtje en geen wachten op een webbouwer: vaste prijs per maand
+- 24/7 beschikbaar, ook 's avonds en in het weekend
+- Gewoon vragen zoals in een appje, geen systeem leren
+- Altijd terug te draaien en veilig afgeschermd
+- Een echt Nederlands bedrijf met een vast adres en een vast aanspreekpunt
+
+## Bedrijfsgegevens
+- Dienst van: Siteregelaar, Markt 9, 7551 CG Hengelo, Nederland
+- KvK: 55667147
+- Telefoon en WhatsApp: 06 27 25 43 83 (+31 6 27 25 43 83)
+- E-mail: info@sitehulpje.nl
+- Werkgebied: heel Nederland, volledig online
+- Website: https://sitehulpje.nl/
+
+## Belangrijkste pagina's
+- [Sitehulpje](https://sitehulpje.nl/): wat het is en hoe het werkt
+- [Vindbaarheid](https://sitehulpje.nl/vindbaarheid): pakketten en prijzen
+- [Uitleg Vindbaarheid](https://sitehulpje.nl/uitleg-vindbaarheid)
+- [Gratis website-check](https://sitehulpje.nl/gratis-website-check)
+
+## Per systeem
+- [Sitehulpje voor WordPress](https://sitehulpje.nl/sitehulpje-voor-wordpress)
+- [Sitehulpje voor WooCommerce](https://sitehulpje.nl/sitehulpje-voor-woocommerce)
+- [Sitehulpje voor Shopify](https://sitehulpje.nl/sitehulpje-voor-shopify)
+- [Sitehulpje voor Magento 2](https://sitehulpje.nl/sitehulpje-voor-magento-2)
+
+## Per branche
+- [Kappers](https://sitehulpje.nl/voor-kappers)
+- [Schoonmaakbedrijven](https://sitehulpje.nl/voor-schoonmaakbedrijven)
+- [Installateurs](https://sitehulpje.nl/voor-installateurs)
+- [Aannemers](https://sitehulpje.nl/voor-aannemers)
+- [Horeca](https://sitehulpje.nl/voor-horeca)
+- [Autobedrijven](https://sitehulpje.nl/voor-autobedrijven)
+- [Fysiotherapeuten](https://sitehulpje.nl/voor-fysiotherapeuten)
+- [Boekhouders](https://sitehulpje.nl/voor-boekhouders)
+- [Makelaars](https://sitehulpje.nl/voor-makelaars)
+- [Webshops](https://sitehulpje.nl/voor-webshops)
+
+## Veelgestelde vragen
+- Wat is Sitehulpje? Een online hulpje dat je bestaande website of webshop voor je aanpast als je het gewoon vraagt.
+- Werkt Sitehulpje in heel Nederland? Ja, het is volledig online en werkt voor bedrijven door het hele land.
+- Moet ik een nieuwe website laten maken? Nee, Sitehulpje koppelt aan je bestaande site op WordPress, WooCommerce, Shopify of Magento 2.
+- Wat kost Sitehulpje? €125 per maand exclusief btw, of €75 per maand samen met een Vindbaarheid-pakket.
+- Kan ik iets kapotmaken? Nee, elke aanpassing is met één tik terug te draaien.
+- Wie zit erachter? Siteregelaar, een Nederlands webbureau met een vast adres aan de Markt 9 in Hengelo.
+
+---
+
+# Home – sitehulpje.nl
+Bron: https://sitehulpje.nl/
+
+● Sitehulpje · voor je bestaande website of webshop
+
+## Aanpassen?
+Gewoon vragen.
+
+Je hebt al een website of webshop. Sitehulpje houdt hem voor je bij. Typ, spreek in of stuur een foto of video van wat er moet veranderen, en het staat er. Geen nieuwe site nodig, niets zelf uitzoeken.
+
+Typ, praat of stuur een foto. Sitehulpje past je site aan, meestal binnen een minuut.
+
+GEEN SITE? Nog geen website of webshop? Siteregelaar maakt hem, met Sitehulpje erbij →
+
+±1 minvoor een aanpassing
+
+1 tikom terug te draaien
+
+0technische kennis nodig
+
+SitehulpjeJouw robot voor je site of shop
+
+### Sitehulpje
+
+Het slimme hulpje dat je website of webshop voor je bijhoudt. Je vertelt wat je wilt, Sitehulpje regelt het. Meestal binnen een minuut.
+
+1
+#### Vertel wat je wilt
+Typ het, spreek het in of stuur een foto of korte video. Net als een appje.
+
+2
+#### Sitehulpje regelt het
+Je ziet het robotje aan het werk. Jij gaat verder met je dag.
+
+3
+#### Klaar!
+Je krijgt een link om het te bekijken. Niet goed? Eén tik en het staat terug.
+
+Sitehulpje● online
+
+### Dit hoef je nooit meer zelf uit te zoeken
+
+De klusjes die iedere ondernemer kent, en waar niemand zin in heeft.
+
+VROEGER
+Inloggen. Zoeken waar het zit. Knoppen proberen. Wachtwoord kwijt. Hopen dat het goed gaat. Of de webbouwer mailen en dagen wachten.
+
+→
+
+NU
+
+💶Prijzen🏷️Sale🛒Producten🎟️Kortingscodes🚚Verzending📦Voorraad🕘Openingstijden📢Meldingen✍️Teksten📸Foto's & video📰Nieuws🔎Google
+
+Prijzen aanpassenSale met datumNieuw productMaten & kleurenVoorraadKortingscodesVerzendkostenCategorieënOpeningstijdenMelding bovenaanTeksten & typfoutenFoto's vervangenVideo plaatsenNieuws & blogsPrijslijstTeampaginaVacaturesVeelgestelde vragenContactgegevensBeter in Google+ nog veel meer
+
+>_ en dit is pas het beginSitehulpje doet véél meer dan dit. Alles wat je op je website of webshop wilt veranderen: vraag het gewoon.
+
+werkt met jouw site
+
+### Je houdt je eigen site. Wij koppelen Sitehulpje.
+
+Je hoeft niet over te stappen en er komt geen nieuwe site. Wij plaatsen een klein koppelstuk op je site, en vanaf dat moment pas je alles aan door het gewoon te vragen.
+
+- Direct te koppelen met WordPress, WooCommerce, Magento 2 en Shopify. Iets anders? Vraag het ons, dan kijken we wat kan
+
+- Wij regelen de koppeling, vaak dezelfde dag nog
+
+- Je site blijft gewoon van jou, bij je eigen hoster
+
+- Je eigen inloglink op telefoon en computer
+
+- Elke aanpassing is met één tik terug te draaien
+
+Twijfel je of jouw site werkt? Vraag het ons gewoon.
+
+jouwwebsite.nl
+
++
+
+>_ altijd bij de hand
+
+### Je eigen webbouwer.
+In je broekzak.
+
+Sitehulpje staat als app op je telefoon. Midden in de nacht een actie, op zondag een nieuwe foto of tussen twee klanten door een prijs aanpassen: vraag het en het staat er.
+
+Zet de wintercollectie 20% in de sale 🧥
+
+Klaar! 24 producten staan nu in de sale ✅
+
+En een banner op de homepage?
+
+Staat erop. Bekijk hem hier 👉
+
+24/7dag en nacht
+
+±1 minen het staat er
+
+€€€bespaard op webbouwers
+
+1 tikterugdraaien
+
+### €Wat kost Sitehulpje?
+
+€125 per maand
+
+Vaste prijs per maand, exclusief btw. Geen uurtje-factuurtje.
+
+- Bespaar duizenden euro's aan webbouwers: geen rekening meer voor elke kleine aanpassing
+
+- 24 uur per dag, 7 dagen per week beschikbaar, ook in het weekend en 's avonds
+
+- Sitehulpje in je hand: als app op je telefoon, altijd bij je
+
+- Meestal binnen een minuut klaar, je hoeft niet te wachten tot iemand tijd heeft
+
+- Typen, inspreken of een foto sturen: geen technische kennis nodig
+
+- Elke aanpassing met één tik terug te draaien
+
+Bestel Sitehulpje
+Werkt het met mijn site?
+
+voordeel
+Samen met Vindbaarheid
+€75/mnd €125
+Beter gevonden worden in Google én AI-diensten zoals ChatGPT. Neem je een Vindbaarheid-pakket (vanaf €99), dan kost Sitehulpje nog maar €75 per maand.
+Bekijk de Vindbaarheid-pakketten →
+
+#### Extra opties binnenkort beschikbaar, prijzen per maand excl. btw
+
+Via WhatsApp €20
+Liever via WhatsApp communiceren? Dat kan. Stuur gewoon een appje, en je website is aangepast.
+
+Site-bewaking €10
+Je krijgt meteen een seintje als je website niet meer bereikbaar is. Zit al in elk Vindbaarheid-pakket, dus deze optie is voor wie alleen Sitehulpje heeft.
+
+Sitehulpje denkt mee €15
+Sitehulpje denkt mee in jouw bedrijf en komt met voorstellen. Jij zegt alleen ja of nee.
+
+### Nog geen site? Die maken we ook.
+
+je hebt al een site
+
+🤖
+
+#### Alleen Sitehulpje
+
+Voor je bestaande website of webshop. Wij koppelen het hulpje, jij vraagt wat er moet veranderen.
+
+🌐
+
+#### Nieuwe website
+
+Een mooie, snelle bedrijfswebsite, gemaakt door Siteregelaar. Sitehulpje zit er meteen bij.
+Naar siteregelaar.nl
+
+🛍️
+
+#### Nieuwe webshop
+
+Verkoop online met iDEAL, je eigen producten en acties. Gemaakt door Shopregelaar, met Sitehulpje erbij.
+Naar shopregelaar.nl
+
+### Zij werken al met Sitehulpje
+
+softwashkoningtwente.shop
+
+👑De Softwash KoningWebshop · Twente
+
+#### De Softwash Koning
+Webshop voor schoonmaakproducten voor professionals. Met Sitehulpje past de eigenaar zelf prijzen en teksten aan.Webshop + Sitehulpje
+
+jksschoonmaakgroep.nl
+
+✨JKS SchoonmaakgroepWebsite · Hengelo
+
+#### JKS Schoonmaakgroep
+Moderne bedrijfswebsite met offerte-aanvraag. Snel, duidelijk en makkelijk bij te houden.Website + Sitehulpje
+
+-->
+
+🚀Jouw bedrijf?Hier staat straks jouw site
+
+#### Jij bent de volgende
+Vertel ons wat je wilt, dan regelen wij de rest.Neem contact op →
+
+### Waarom ondernemers Sitehulpje gebruiken
+
+⚡ Snel
+Geen mailtjes heen en weer, geen wachten. Je vraagt het en het gebeurt.
+
+📱 Overal
+Werkt op je telefoon, tablet en computer. Ook even tussen twee klanten door.
+
+↩️ Altijd terug te draaien
+Niet tevreden? Eén tik en alles staat weer zoals het was. Je kunt niets kapot maken.
+
+🛡️ Veilig
+Bestellingen, betalingen en wachtwoorden worden nooit zomaar aangepast. Grote dingen worden eerst overlegd.
+
+🙋 Een echt aanspreekpunt
+Lukt iets niet automatisch? Dan krijgt Jan direct een seintje en lost hij het op.
+
+💡 Geen nieuwe site nodig
+Je houdt je eigen website of webshop, bij je eigen hoster. Wij koppelen alleen het hulpje.
+
+### Veelgestelde vragen
+
+#### Werkt Sitehulpje met mijn site?
+Sitehulpje werkt direct met WordPress, WooCommerce, Magento 2 en Shopify. Bij Shopify zetten we de koppeling per winkel voor je klaar. Draait jouw site op iets anders? Vraag het ons, dan kijken we wat kan. Misschien moeten we dan eerst iets bouwen of kan het nog niet.
+
+#### Moet ik overstappen of iets installeren?
+Nee. Je site blijft van jou en bij je eigen hoster. Wij plaatsen een klein koppelstuk en jij krijgt een eigen link die je op je telefoon of computer opent.
+
+#### Wat als er iets fout gaat?
+Elke aanpassing draai je met één tik terug. En lukt iets niet automatisch, dan krijgt Jan direct een melding en pakt hij het op.
+
+#### Kan Sitehulpje mijn bestellingen of betalingen aanpassen?
+Nee. Bestellingen, terugbetalingen, betaalinstellingen en wachtwoorden blijven altijd buiten bereik. Grote of gevoelige dingen worden eerst aan Jan voorgelegd.
+
+#### Wie zit er achter Sitehulpje?
+Sitehulpje is van Siteregelaar, dat ook websites en webshops maakt. Je hebt dus altijd een echt aanspreekpunt: Jan.
+
+### Sitehulpje koppelen
+Laat je gegevens achter. Jan neemt snel contact met je op.
+
+---
+
+# Vindbaarheid: pakketten en prijzen
+Bron: https://sitehulpje.nl/vindbaarheid
+
+● Sitehulpje Vindbaarheid
+
+## Gevonden worden.
+In Google én in AI.
+
+Steeds meer klanten zoeken via Google, maar ook via ChatGPT en andere AI-diensten. Sitehulpje controleert je website elke week, voert verbeteringen voor je door en laat in een helder dashboard zien hoe vaak je gevonden wordt.
+
+Vraag een gratis website-check aan
+
+Voor elke website of webshop · vanaf €99 per maand · geen technische kennis nodig
+
+Elke weekeen website-check
+
+### Wat je krijgt
+
+📊
+#### Je cijfers, helder
+Hoe vaak je in Google en Bing staat, hoeveel mensen doorklikken en op welke zoekwoorden. Elke nacht bijgewerkt, in gewone taal.
+
+🩺
+#### Elke week een check
+Ruim 30 punten: kapotte links, trage pagina's, ontbrekende titels, snelheid op mobiel en of AI-diensten je site mogen lezen.
+
+🛠️
+#### Wij verbeteren het
+Sitehulpje schrijft betere titels, omschrijvingen en bedrijfsgegevens. Jij keurt goed met één klik, wij zetten het op je site.
+
+📄
+#### Elke maand een rapport
+Wat er beter ging, wat we hebben gedaan en wat de volgende stappen zijn. Ook als PDF.
+
+### Waarom AI-vindbaarheid telt
+
+Mensen vragen steeds vaker aan ChatGPT, Gemini of Perplexity: "Wie kan mijn dak reinigen in Hengelo?" of "Waar koop ik een goed overhemd met lange mouwen?". Die diensten noemen een paar bedrijven, en de rest bestaat even niet.
+
+Of jij genoemd wordt, hangt onder meer af van hoe duidelijk je website is: begrijpelijke teksten, je adres en openingstijden in een vorm die AI begrijpt, en toestemming voor AI-diensten om je site te lezen. Precies dat controleren en verbeteren we.
+
+Binnenkort meten we ook maandelijks met vaste vragen hoe vaak AI-diensten jouw bedrijf noemen, naast je concurrenten.
+
+### Pakketten
+
+Kies op wat je wilt bereiken. Prijzen per maand, exclusief btw. Looptijd minimaal 3 maanden. Werkt naast Sitehulpje webbeheer of los.
+
+Basis
+
+#### Gezond & gevonden
+
+€99 /mnd
+
+Voor de lokale ondernemer die gewoon goed gevonden wil worden, zonder er zelf naar om te kijken.
+
+- Elke week een website-check op ruim 30 punten
+
+- Je site wordt dag en nacht in de gaten gehouden; bij storing krijg je bericht
+
+- Dashboard met je cijfers uit Google en Bing, elke nacht bijgewerkt
+
+- Betere titels en omschrijvingen voor Google, jij keurt goed met één klik
+
+- Je bedrijfsgegevens in een vorm die Google en AI-diensten begrijpen
+
+- Maandrapport in gewone taal: wat ging beter, wat hebben we gedaan
+
+- Je Google Bedrijfsprofiel in je dashboard: gevonden in Maps, gebeld, route gevraagd
+
+- Kansen: zoekwoorden waarop je bijna bovenaan staat
+
+- Hoeveel bezoekers via ChatGPT en andere AI-diensten komen
+
+Wij verbeteren tot 10 pagina's per maand · elke week tot 100 pagina's gecontroleerd
+
++ Sitehulpje webbeheer €75/mnd €125
+Je site aanpassen door het gewoon te vragen.
+
+aanrader
+
+Plus
+
+#### Lokaal groeien
+
+€179 /mnd
+
+Voor het bedrijf dat meer klanten uit de eigen regio wil, via Google, Google Maps en AI.
+
+- Alles uit Basis
+
+- Meer pagina's per maand verbeterd, ook afbeeldingen
+
+- Rapport met uitleg waarom cijfers stijgen of dalen, en de volgende stappen
+
+- Openingstijden, diensten en veelgestelde vragen voor Google en AI binnenkort
+
+- Review-verzoeken aan je klanten binnenkort
+
+- Bij elke nieuwe review een kant-en-klaar antwoord: nakijken en met één klik op Google
+
+- Elke maand een nieuwe pagina of artikel binnenkort
+
+Wij verbeteren tot 30 pagina's per maand · elke week tot 500 pagina's gecontroleerd
+
++ Sitehulpje webbeheer €75/mnd €125
+Je site aanpassen door het gewoon te vragen.
+
+Pro
+
+#### Voorsprong
+
+€249 /mnd
+
+Voor de webshop of het bedrijf met veel concurrentie, dat wil weten waar het staat en verder wil komen.
+
+- Alles uit Plus
+
+- De meeste pagina's per maand verbeterd
+
+- Elk kwartaal een gesprek van 30 minuten met Jan
+
+- Je concurrenten gevolgd: waar staan zij, waar sta jij binnenkort
+
+- Elke week gemeten hoe vaak ChatGPT en andere AI-diensten je noemen binnenkort
+
+- Producten en reviews vindbaar in Google en AI binnenkort
+
+- Drie nieuwe pagina's of artikelen per maand binnenkort
+
+Wij verbeteren tot 75 pagina's per maand · elke week tot 2.000 pagina's gecontroleerd
+
++ Sitehulpje webbeheer €75/mnd €125
+Je site aanpassen door het gewoon te vragen.
+
+Meerdere websites of webshops? Zet het in je aanvraag, dan maken we een passend aanbod.
+
+Onderdelen met "binnenkort" komen er zonder extra kosten bij zodra ze klaar zijn. Google Ads en andere betaalde advertenties vallen er niet onder; dit gaat over gratis, gewone vindbaarheid.
+
+Alleen Sitehulpje
+#### Sitehulpje webbeheer, los
+
+Wil je geen Vindbaarheid, maar wel je website of webshop laten bijhouden? Vraag gewoon wat je wilt veranderen: teksten, foto's, prijzen, producten of een nieuwe pagina. Sitehulpje regelt het.
+
+€125 /mnd
+Met een Vindbaarheid-pakket erbij: €75 per maand
+Kies Sitehulpje
+
+### Zo begin je
+
+#### Gratis check
+We controleren tot 100 pagina's van je website en laten zien wat er beter kan. Vrijblijvend.
+
+#### Koppelen
+Je koppelt Google met één klik. Wij krijgen nooit je wachtwoord, en op Google komt alleen iets te staan als jij het goedkeurt.
+
+#### Wij gaan aan de slag
+Elke week een check, verbeteringen ter goedkeuring en elke maand een rapport.
+
+Eerlijk is eerlijk. Niemand kan een plek bovenaan in Google of een vermelding in ChatGPT garanderen; zij bepalen zelf wat ze tonen. Wat we wél doen: je site zo goed mogelijk maken en je precies laten zien wat er verandert. Resultaat zie je meestal na 2 tot 6 maanden.
+
+### Veelgestelde vragen
+
+#### Werkt het met mijn website?
+Ja. De check en het dashboard werken met elke website of webshop. Verbeteringen voeren we automatisch door op WordPress en WooCommerce; bij andere systemen doet Jan het voor je.
+
+#### Heb ik Sitehulpje webbeheer nodig?
+Nee, Vindbaarheid kan los. Neem je het samen met een Vindbaarheid-pakket, dan kost Sitehulpje webbeheer €75 per maand in plaats van €125. Alles staat dan in hetzelfde account.
+
+#### Hoe betaal ik?
+Na je akkoord betaal je de eerste (gedeeltelijke) maand via iDEAL. Daarna schrijven we elke maand automatisch af. Je krijgt de factuur een dag van tevoren, samen met je maandrapport.
+
+#### Moet ik zelf iets doen?
+Alleen Google koppelen (één minuut) en voorstellen goedkeuren als je dat wilt. De rest doen wij.
+
+#### Wat gebeurt er met mijn gegevens?
+We kijken alleen mee, slaan sleutels versleuteld op en gebruiken je cijfers nergens anders voor. Stoppen kan altijd. Lees ons privacybeleid.
+
+#### Kan ik opzeggen?
+Ja. Vindbaarheid en Sitehulpje webbeheer lopen minimaal 3 maanden; bij Vindbaarheid omdat resultaat in Google tijd nodig heeft. Daarna kun je per maand opzeggen, gewoon in de app. Je cijfers blijven tot 90 dagen bewaard, daarna verwijderen we ze.
+
+### Benieuwd hoe vindbaar jij bent?
+
+We doen de check gratis en laten je de uitkomst zien. Daarna beslis je zelf.
+Vraag een gratis website-check aan
+
+### Gratis website-check
+Laat je gegevens achter. Jan stuurt je de uitkomst en neemt contact met je op.
+
+---
+
+# Uitleg Vindbaarheid
+Bron: https://sitehulpje.nl/uitleg-vindbaarheid
+
+## Zo werkt Vindbaarheid
+
+Met Vindbaarheid zie je hoe goed je bedrijf gevonden wordt in Google, Bing en AI-diensten zoals ChatGPT. Sitehulpje controleert je website elke week en stelt verbeteringen voor. Hieronder lees je hoe je begint en wat alle cijfers betekenen.
+
+Op deze pagina
+
+- Google koppelen
+
+- Bing koppelen
+
+- Wat betekenen de cijfers?
+
+- Website-gezondheid
+
+- Verbetervoorstellen
+
+- Het maandrapport
+
+- Privacy en veiligheid
+
+- Veelgestelde vragen
+
+### 1. Google koppelen
+
+Hiermee haalt Sitehulpje je cijfers op uit Google Search Console (hoe vaak je in Google staat) en Google Analytics (wie je site bezoekt). Het duurt ongeveer een minuut.
+
+1
+Open je dashboard, kies de tab Vindbaarheid en dan Koppelingen. Klik op Koppel Google.
+
+2
+Log in met het Google-account waarmee je Search Console en/of Analytics van je website beheert. Weet je niet welk account dat is? Kies het account dat je voor je bedrijf gebruikt; je kunt het later altijd wijzigen.
+
+3
+Google vraagt of Sitehulpje mag meekijken. Vink alle vakjes aan en klik op Doorgaan. Sitehulpje kan alleen lezen, niets aanpassen of verwijderen.
+
+4
+Je komt terug in je dashboard. Meestal herkent Sitehulpje je website meteen. Zo niet, kies dan zelf welke website en welke Analytics-gegevens bij je bedrijf horen en klik op Opslaan en cijfers ophalen.
+
+5
+Na een minuut staan de cijfers van de afgelopen maanden in je dashboard. Daarna worden ze elke nacht vanzelf bijgewerkt.
+
+Heb je nog geen Search Console of Analytics? Geen probleem: laat het Jan weten via een verzoek, dan zet hij het voor je op.
+
+### 2. Bing koppelen
+
+Bing is de zoekmachine van Microsoft. Hij wordt ook gebruikt door ChatGPT-zoeken, Copilot en DuckDuckGo, dus hij telt steeds meer mee. Bing koppelen regelt Jan voor je. Hij voegt je website toe aan Bing Webmaster Tools; als je Google al gekoppeld hebt, kan dat met één klik. Daarna verschijnt er een extra tegel Klikken uit Bing in je dashboard.
+
+### 3. Wat betekenen de cijfers?
+
+Alle cijfers gaan over de laatste 28 dagen, vergeleken met de 28 dagen daarvoor. Bij elk cijfer staat Gemeten: dat zijn echte cijfers van Google of Bing, geen schattingen.
+
+Klikken uit GoogleHoe vaak iemand in Google op jouw website klikte. Dit is het belangrijkste cijfer: het zijn echte bezoekers die je via Google vonden.
+Vertoningen in GoogleHoe vaak jouw website in de zoekresultaten verscheen, ook als er niet op geklikt werd. Stijgen de vertoningen, dan word je vaker gevonden; de klikken volgen meestal later.
+PositieDe gemiddelde plek waarop je in Google staat. 1 is bovenaan. Lager is dus beter. Op plek 1 tot 3 klikt het grootste deel van de mensen; vanaf plek 11 sta je op de tweede pagina.
+Bezoeken via GoogleBezoeken die via de gewone (niet betaalde) zoekresultaten binnenkwamen. Dit cijfer komt uit Google Analytics.
+Acties op je siteBelangrijke dingen die bezoekers deden, zoals een bestelling, offerteaanvraag of contactformulier. Welke acties meetellen, staat ingesteld in je Google Analytics.
+ZoekwoordenWaar mensen op zochten toen jouw site in Google verscheen. Bij "Verschil" zie je of je hoger (▲) of lager (▼) bent komen te staan.
+KansenZoekwoorden waarop je vaak gezien wordt maar net niet bovenaan staat (plek 4 tot 20). Een paar plekken hoger levert daar vaak veel extra klikken op.
+
+### 4. Website-gezondheid
+
+Elke week controleert Sitehulpje je website op ruim 30 punten, verdeeld over vier onderdelen:
+
+- Techniek: werken alle pagina's en links, is de site beveiligd (https), is er een sitemap, mag Google alles zien?
+
+- Inhoud: hebben pagina's een goede titel en omschrijving voor Google, één duidelijke kop, genoeg tekst en beschrijvingen bij afbeeldingen?
+
+- Snelheid: hoe snel laadt je site op een telefoon, en hoe ervaren echte bezoekers dat?
+
+- AI-vindbaarheid: mogen AI-diensten je site lezen en staan je bedrijfsgegevens (adres, openingstijden) er in een vorm die ze begrijpen?
+
+Je krijgt een score van 0 tot 100. Boven de 80 is goed, tussen 55 en 80 kan beter, onder de 55 verdient aandacht. Bij elk punt staat in gewone taal hoe je het oplost. Ook zie je hoe vaak je site bereikbaar was: Sitehulpje kijkt elk half uur.
+
+### 5. Verbetervoorstellen
+
+Op basis van de website-check schrijft Sitehulpje betere teksten voor je pagina's, bijvoorbeeld een titel en omschrijving die beter gevonden worden in Google. Bij elk voorstel zie je de huidige tekst naast de nieuwe.
+
+- Goedkeuren: Sitehulpje zet het meteen op je site (bij WordPress) of Jan doet het voor je. Je ziet het terug bij Verzoeken.
+
+- Aanpassen: wijzig de tekst eerst zelf; de teller laat zien of hij niet te lang is.
+
+- Niet doen: dan gebeurt er niets.
+
+Er verandert nooit iets op je site zonder jouw goedkeuring, en elke aanpassing kun je terugdraaien via Verzoeken. Hoeveel pagina's per maand verbeterd worden, hangt af van je pakket.
+
+### 6. Het maandrapport
+
+Begin elke maand staat er een rapport voor je klaar onder Rapporten. Wil je het ook per mail ontvangen? Laat het Jan weten. Daarin staan je cijfers van de vorige maand, de beste zoekwoorden, de gezondheid van je site, wat Sitehulpje voor je heeft gedaan en wat de volgende stappen zijn. Met Download als PDF bewaar of print je het.
+
+### 7. Privacy en veiligheid
+
+- Sitehulpje krijgt nooit je wachtwoord. Je logt in bij Google zelf en geeft alleen toestemming om mee te kijken.
+
+- De sleutel die Google ons geeft, staat versleuteld opgeslagen en wordt alleen gebruikt om jouw cijfers op te halen.
+
+- Alleen jij en Jan zien jouw cijfers. We gebruiken ze niet voor advertenties en verkopen ze nooit.
+
+- Stoppen kan altijd: klik in je dashboard op Koppeling stoppen, of trek de toegang in via myaccount.google.com/permissions.
+
+Lees ook ons privacybeleid en de voorwaarden.
+
+### 8. Veelgestelde vragen
+
+#### Hoe snel zie ik resultaat?
+Technische verbeteringen en nieuwe titels pikt Google meestal binnen 1 tot 4 weken op. Hoger komen in de zoekresultaten duurt vaak 2 tot 6 maanden. Kijk daarom vooral naar de lijn over meerdere maanden, niet naar één week.
+
+#### Kunnen jullie garanderen dat ik bovenaan kom?
+Nee. Dat kan niemand eerlijk beloven: Google en AI-diensten bepalen zelf wat ze tonen. Wat we wel doen, is je site zo goed mogelijk maken en precies laten zien wat er verandert.
+
+#### Waarom veranderen de cijfers van de laatste dagen nog?
+Google rondt zijn cijfers pas na 2 tot 3 dagen af. Daarom worden de laatste dagen elke nacht opnieuw opgehaald.
+
+#### Waarom zijn de klikken anders dan de bezoeken in Analytics?
+Search Console telt klikken in Google; Analytics telt bezoeken op je site. Niet iedereen accepteert cookies, en sommige bezoekers komen via andere zoekmachines. Een verschil van 10 tot 30 procent is normaal.
+
+#### Ik zie niet alle zoekwoorden. Hoe kan dat?
+Google laat om privacyredenen zoekopdrachten weg die maar door een paar mensen zijn gedaan. Daarnaast toont je dashboard het aantal zoekwoorden dat bij je pakket hoort.
+
+#### Wat is een llms.txt?
+Een kort bestand op je site dat in gewone taal uitlegt wat je bedrijf doet, speciaal voor AI-diensten zoals ChatGPT en Perplexity. Sitehulpje kan er een voor je schrijven; Jan zet hem op je site.
+
+#### Kost het extra als Sitehulpje iets aanpast?
+Nee. Goedgekeurde voorstellen zijn onderdeel van je pakket en tellen niet mee voor je maandlimiet van verzoeken.
+
+Nog een vraag? Stuur een verzoek in je dashboard of mail naar info@sitehulpje.nl.
+
+---
+
+# Gratis website-check
+Bron: https://sitehulpje.nl/gratis-website-check
+
+● Gratis · binnen een paar uur in je mail
+
+## Gratis website-check: hoe goed word jij gevonden?
+
+Vul je website en e-mailadres in. We controleren je site op ruim 30 punten, meten de snelheid op mobiel en kijken hoe goed Google en AI-zoekmachines je begrijpen. Je krijgt een helder rapport met wat goed gaat en wat beter kan, zonder vaktaal.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+### Wat we controleren
+
+⚙ Techniek
+Titels, beschrijvingen, kapotte links, dubbele pagina's en de gegevens die Google van je bedrijf wil zien.
+⚡ Snelheid op mobiel
+Gemeten met de methode die Google zelf gebruikt. Een trage site kost bezoekers én plekken in Google.
+✍ Inhoud
+Staan de woorden waarop klanten zoeken op je site? Hebben je afbeeldingen een beschrijving?
+✦ AI-vindbaarheid
+Kunnen ChatGPT, Copilot en Google AI je site goed lezen en jou noemen als iemand een vraag stelt?
+
+### Veelgestelde vragen
+
+#### Is de website-check echt gratis?
+Ja. Je krijgt het rapport gratis en zonder verplichtingen. Wil je daarna hulp bij de verbeteringen, dan kan dat, maar het hoeft niet.
+#### Wat wordt er gecontroleerd?
+We controleren je pagina's op ruim 30 punten, zoals titels, beschrijvingen, kapotte links, afbeeldingen zonder beschrijving en de gegevens die Google nodig heeft. Ook meten we de snelheid op mobiel en kijken we hoe goed AI-zoekmachines je site begrijpen.
+#### Hoe snel krijg ik het rapport?
+Meestal binnen een paar uur, per mail. Niets ontvangen? Kijk dan even bij je reclame of spam.
+#### Werkt de check voor elke website?
+Ja, voor elke openbare website: WordPress, WooCommerce, Shopify, Magento, Wix of iets anders.
+
+Na de check verder? Met Vindbaarheid voeren we de verbeteringen elke maand voor je door, en met Sitehulpje pas je je site zelf aan door het te vragen. Een nieuwe site nodig? Kijk op siteregelaar.nl.
+
+---
+
+# WordPress-website aanpassen zonder gedoe
+Bron: https://sitehulpje.nl/sitehulpje-voor-wordpress
+
+● Sitehulpje voor WordPress
+
+## WordPress is overal. Maar wie past het voor je aan?
+Blokken, thema's, paginabouwers en plugins: een kleine wijziging kan een half uur zoeken zijn. Met Sitehulpje vraag je het in gewone taal, en het staat er meestal binnen een minuut op.
+
+Gratis website-checkWelk pakket past?
+
+Waarom het lastig is
+- Elk thema en elke paginabouwer werkt weer anders.
+- Eén verkeerde klik kan je opmaak in de war gooien.
+- SEO-titels zitten in een aparte plugin die niet iedereen kent.
+- Voor een kleine klus betaal je een webbouwer vaak per uur.
+
+### Wat Sitehulpje op WordPress voor je doet
+
+Dit kan
+- Teksten, foto's, pagina's, menu's en formulieren aanpassen op verzoek.
+- Eerst een momentopname, zodat je met één tik terug kunt.
+- SEO-titels en -omschrijvingen verbeteren via Vindbaarheid.
+- Koppelen met één klik op Goedkeuren, zonder je wachtwoord te delen.
+Dit doen we niet, of nog niet
+- Plugins installeren of bijwerken en de server beheren: dit is geen onderhoudscontract.
+- Grote ombouw in een paginabouwer kan lastig zijn. Dan kijkt Jan eerst mee.
+
+### Zo koppel je WordPress
+
+Vul je adres in, Sitehulpje herkent WordPress en je klikt in je eigen beheer op Goedkeuren. Bij sommige beveiligingsplugins staat die functie uit; dan kiezen we samen een andere manier.
+
+### Vergelijk het met de andere manieren
+ManierWat het kostGoed om te weten
+Webbouwer of freelancerVaak €60 tot €125 per uurGoed voor maatwerk, duur voor kleine klussenOnderhoudsabonnement€50 tot €250 per maandVooral updates en back-ups, wijzigingen meestal niet onbeperktSitehulpje webbeheer€125 per maand, of €75 met een pakketWijzigingen in gewone taal, binnen de limiet. Geen updates of serverbeheer
+Alles zelf doenJe eigen tijdGoedkoop, zolang je er tijd voor hebt en weet hoe het werkt
+
+Bedragen van anderen zijn richtprijzen uit openbare overzichten; de echte prijs verschilt per aanbieder.
+
+### Welk pakket past hierbij?
+Ons advies: Plus (Lokaal groeien) €179 per maand
+Voor de meeste bedrijven op WordPress is de eigen regio het belangrijkst. Dan past Plus. Heb je vooral een eenvoudige site, dan is Basis ook een goede start.
+Met Sitehulpje webbeheer erbij betaal je €75 in plaats van €125, dus samen €254 per maand. Dan past Sitehulpje je site aan en zorgt Vindbaarheid dat je gevonden wordt.
+Prijzen excl. btw · minimaal 3 maanden. Eerst kijken? De website-check hieronder is gratis.
+
+### Veelgestelde vragen over WordPress
+#### Moet ik mijn WordPress-site verhuizen?
+Nee. Je site blijft waar hij staat. Sitehulpje koppelt eraan.
+#### Blijft mijn onderhoud nodig?
+Ja, updates van WordPress en plugins blijven belangrijk. Die doet je hoster, webbouwer of jijzelf.
+#### Kan ik alles terugdraaien?
+Wijzigingen via een verzoek krijgen een momentopname. Daarmee zet je ze terug.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+Per beroep: Kappers · Schoonmaak · Installateurs · Webshops · Horeca · Bouw · Autobedrijven · Fysiotherapie · Boekhouders · Makelaars
+Per systeem: Magento 2 · WordPress · WooCommerce · Shopify
+
+---
+
+# WooCommerce-webshop beheren zonder webbouwer
+Bron: https://sitehulpje.nl/sitehulpje-voor-woocommerce
+
+● Sitehulpje voor WooCommerce
+
+## Je WooCommerce-shop bijhouden, zonder door menu's te klikken
+Elke prijs, actie of nieuwe maat betekent weer inloggen en zoeken. Met Sitehulpje stuur je een bericht, en je shop is bij. Vindbaarheid verbetert ondertussen je product- en categoriepagina's.
+
+Gratis website-checkWelk pakket past?
+
+Waarom het lastig is
+- Producten met varianten vragen veel klikken per maat of kleur.
+- Acties met begin- en einddatum vergeet je makkelijk terug te zetten.
+- Een bulkwijziging kost vaak tijd of een extra plugin.
+- SEO-velden staan weer in een andere plugin.
+
+### Wat Sitehulpje op WooCommerce voor je doet
+
+Dit kan
+- Producten, prijzen, omschrijvingen en categorieën aanpassen op verzoek.
+- Teksten en foto's van je shop bijwerken.
+- Momentopname bij elke wijziging, zodat terugzetten kan.
+- Betere SEO-titels en -omschrijvingen via Vindbaarheid.
+Dit doen we niet, of nog niet
+- Bestellingen, terugbetalingen en klantgegevens: daar blijft Sitehulpje af.
+- Plugins, betaalkoppelingen en de server: dat blijft bij je beheerder.
+
+### Zo koppel je WooCommerce
+
+Net als bij WordPress: adres invullen, op Scan klikken en in je eigen beheer op Goedkeuren. Je deelt geen wachtwoord.
+
+### Vergelijk het met de andere manieren
+ManierWat het kostGoed om te weten
+Webbouwer of freelancerVaak €60 tot €125 per uurGoed voor maatwerk, duur voor kleine klussenBeheer uitbesteden€75 tot €300 per maandVaak updates en techniek, kleine wijzigingen niet altijd inbegrepenSitehulpje webbeheer€125 per maand, of €75 met een pakketWijzigingen in gewone taal, binnen de limiet. Geen updates of serverbeheer
+Alles zelf doenJe eigen tijdGoedkoop, zolang je er tijd voor hebt en weet hoe het werkt
+
+Bedragen van anderen zijn richtprijzen uit openbare overzichten; de echte prijs verschilt per aanbieder.
+
+### Welk pakket past hierbij?
+Ons advies: Plus (Lokaal groeien) €179 per maand
+De meeste kleinere shops beginnen goed met Plus: meer pagina's per maand, ook je afbeeldingen. Concurreer je landelijk op veel producten, kies dan Pro.
+Met Sitehulpje webbeheer erbij betaal je €75 in plaats van €125, dus samen €254 per maand. Dan past Sitehulpje je site aan en zorgt Vindbaarheid dat je gevonden wordt.
+Prijzen excl. btw · minimaal 3 maanden. Eerst kijken? De website-check hieronder is gratis.
+
+### Veelgestelde vragen over WooCommerce
+#### Kan Sitehulpje al mijn prijzen tegelijk aanpassen?
+Kleine groepen wel. Een hele grote wijziging kan meer tijd vragen; dan kijkt Jan mee of wordt het opgedeeld.
+#### Blijft mijn voorraadsysteem werken?
+Sitehulpje raakt je voorraad niet aan, tenzij je daar een gerichte vraag over stelt. Is je voorraad gekoppeld aan een ander systeem, overleg het dan eerst.
+#### Mag Sitehulpje bij mijn bestellingen?
+Nee, die blijven buiten bereik.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+Per beroep: Kappers · Schoonmaak · Installateurs · Webshops · Horeca · Bouw · Autobedrijven · Fysiotherapie · Boekhouders · Makelaars
+Per systeem: Magento 2 · WordPress · WooCommerce · Shopify
+
+---
+
+# Shopify-winkel bijhouden met Sitehulpje
+Bron: https://sitehulpje.nl/sitehulpje-voor-shopify
+
+● Sitehulpje voor Shopify
+
+## Shopify is makkelijk. Tot je het er elke week bij moet doen
+Updates regelt Shopify zelf, maar de teksten, prijzen, collecties en SEO blijven jouw werk. Geef het in gewone taal door aan Sitehulpje. Hij voert het uit en je kunt het terugdraaien.
+
+Gratis website-checkWelk pakket past?
+
+Waarom het lastig is
+- SEO-teksten staan per product onderaan, en worden daardoor vaak vergeten.
+- Prijsacties op varianten zijn veel klikwerk.
+- Voor elke extra functie lijkt weer een nieuwe app nodig.
+- Een Shopify-expert voor kleine klussen is prijzig.
+
+### Wat Sitehulpje op Shopify voor je doet
+
+Dit kan
+- Producten, prijzen en omschrijvingen aanpassen op verzoek.
+- Collecties, pagina's en blogartikelen aanpassen.
+- Betere SEO-teksten via Vindbaarheid, met terugdraaien.
+- Geen wachtwoord delen: je installeert onze koppeling zelf.
+Dit doen we niet, of nog niet
+- Foto's plaatsen en je thema aanpassen: nu nog niet automatisch.
+- Bestellingen, klanten en betalingen: daar komt Sitehulpje niet bij.
+- De titel van je homepage: die pas je nu nog zelf aan.
+
+### Zo koppel je Shopify
+
+Na je bestelling zetten wij een eigen koppeling voor je winkel klaar. Je krijgt een mail, logt in bij Shopify en klikt op Installeren. Reken op wat wachttijd, want we doen dit per winkel. Tot nu toe is dit getest op een testwinkel.
+
+### Vergelijk het met de andere manieren
+ManierWat het kostGoed om te weten
+Webbouwer of freelancerVaak €60 tot €125 per uurGoed voor maatwerk, duur voor kleine klussenHulp via een expertVaak per uurHandig bij thema-werk, duur voor kleine wijzigingenSitehulpje webbeheer€125 per maand, of €75 met een pakketWijzigingen in gewone taal, binnen de limiet. Geen updates of serverbeheer
+Alles zelf doenJe eigen tijdGoedkoop, zolang je er tijd voor hebt en weet hoe het werkt
+
+Bedragen van anderen zijn richtprijzen uit openbare overzichten; de echte prijs verschilt per aanbieder.
+
+### Welk pakket past hierbij?
+Ons advies: Plus (Lokaal groeien) €179 per maand
+Plus past bij de meeste kleinere Shopify-winkels. Werk je met veel producten en landelijke concurrentie, dan is Pro logischer.
+Met Sitehulpje webbeheer erbij betaal je €75 in plaats van €125, dus samen €254 per maand. Dan past Sitehulpje je site aan en zorgt Vindbaarheid dat je gevonden wordt.
+Prijzen excl. btw · minimaal 3 maanden. Eerst kijken? De website-check hieronder is gratis.
+
+### Veelgestelde vragen over Shopify
+#### Moet ik een app uit de Shopify App Store installeren?
+Nee. Je krijgt van ons een eigen installatielink. Daarom kan het even duren voor hij klaarstaat.
+#### Kost dit iets extra's bij Shopify?
+Sitehulpje rekent geen extra koppelkosten. Je eigen Shopify-abonnement blijft hetzelfde.
+#### Mag ik de koppeling stoppen?
+Ja, dat kan in je account. De minimale looptijd van je abonnement blijft wel gelden.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+Per beroep: Kappers · Schoonmaak · Installateurs · Webshops · Horeca · Bouw · Autobedrijven · Fysiotherapie · Boekhouders · Makelaars
+Per systeem: Magento 2 · WordPress · WooCommerce · Shopify
+
+---
+
+# Magento 2 beheren zonder ontwikkelaar? Dit kan Sitehulpje
+Bron: https://sitehulpje.nl/sitehulpje-voor-magento-2
+
+● Sitehulpje voor Magento 2
+
+## Magento 2 is krachtig. Maar voor elke kleine wijziging?
+Magento kan veel, maar is niet gemaakt om er even snel iets in te veranderen. Veel winkeliers bellen daarom hun ontwikkelaar, ook voor dingen die eenvoudig lijken. Met Sitehulpje vraag je het gewoon, en je SEO-teksten worden ook uit handen genomen.
+
+Gratis website-checkWelk pakket past?
+
+Waarom het lastig is
+- Het beheer heeft veel menu's, en een instelling kan per winkelweergave verschillen.
+- Na een wijziging moet soms eerst de cache of index bijwerken voor je het ziet.
+- Een eigen thema en extensies maken kleine aanpassingen lastiger.
+- Je betaalt al snel per uur, ook voor kleine klussen.
+
+### Wat Sitehulpje op Magento 2 voor je doet
+
+Dit kan
+- Prijzen, aanbiedingen, productteksten, categorieën en CMS-pagina's aanpassen op verzoek, met terugdraaien.
+- Elke week je shop controleren op techniek en snelheid.
+- Betere SEO-titels en -omschrijvingen voorstellen voor producten, categorieën en pagina's.
+- Goedgekeurde teksten automatisch in je shop zetten, met een momentopname en terugdraaien.
+- Geen winkelnaam dubbel: je eigen titelinstelling blijft werken.
+Dit doen we niet, of nog niet
+- Foto's plaatsen: nu nog niet automatisch.
+- Magento-updates, extensies, serverwerk en maatwerkcode: daar blijf je een ontwikkelaar voor nodig hebben.
+- Bestellingen en betalingen: daar komt Sitehulpje niet bij.
+
+### Zo koppel je Magento 2
+
+Jij of je webbouwer maakt in Magento een integratie aan. Sitehulpje geeft de stappen met kopieerknoppen, en je deelt geen wachtwoord. Doet je webbouwer het, dan krijgt hij de uitleg per mail. Het koppelen hebben we getest op een echte Magento-shop.
+
+### Vergelijk het met de andere manieren
+ManierWat het kostGoed om te weten
+Webbouwer of freelancerVaak €60 tot €125 per uurGoed voor maatwerk, duur voor kleine klussenOnderhoudscontract€200 tot €500+ per maandVoor updates en techniek, dus iets anders dan SEO-tekstenSitehulpje webbeheer€125 per maand, of €75 met een pakketWijzigingen in gewone taal, binnen de limiet. Geen updates of serverbeheer
+Alles zelf doenJe eigen tijdGoedkoop, zolang je er tijd voor hebt en weet hoe het werkt
+
+Bedragen van anderen zijn richtprijzen uit openbare overzichten; de echte prijs verschilt per aanbieder.
+
+### Welk pakket past hierbij?
+Ons advies: Pro (Voorsprong) €249 per maand
+Een Magento-shop heeft veel pagina's en concurreert vaak landelijk. Pro verbetert de meeste pagina's per maand en geeft je elk kwartaal een gesprek met Jan.
+Met Sitehulpje webbeheer erbij betaal je €75 in plaats van €125, dus samen €324 per maand.
+Prijzen excl. btw · minimaal 3 maanden. Eerst kijken? De website-check hieronder is gratis.
+
+### Veelgestelde vragen over Magento 2
+#### Vervangt dit mijn Magento-ontwikkelaar?
+Nee. Updates, extensies en maatwerk blijven bij je ontwikkelaar. Sitehulpje neemt de vindbaarheid en SEO-teksten over, en daarna ook de kleine wijzigingen.
+#### Werkt het met Magento 1?
+Nee, alleen Magento 2. Getest is het op één echte Magento 2-shop; een heel oude Magento 2-versie kan afwijken, dan kijken we eerst samen.
+#### Ook met een Hyvä- of eigen thema?
+Ja. Sitehulpje werkt via Magento zelf, niet via het thema. Bij Hyvä en Page Builder blijft hij bij het aanpassen van tekst en links binnen de bestaande opmaak. Een nieuw ontwerp blijft werk voor je ontwikkelaar.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+Per beroep: Kappers · Schoonmaak · Installateurs · Webshops · Horeca · Bouw · Autobedrijven · Fysiotherapie · Boekhouders · Makelaars
+Per systeem: Magento 2 · WordPress · WooCommerce · Shopify
+
+---
+
+# Website en vindbaarheid voor kappers
+Bron: https://sitehulpje.nl/voor-kappers
+
+● Sitehulpje voor kappers en kapsalons
+
+## Meer klanten in je stoel, zonder zelf aan je website te zitten
+Tussen twee knipbeurten door heb je geen tijd voor je website. Vraag het aan Sitehulpje: een nieuwe prijs, aangepaste feestdagentijden of een foto van je nieuwste balayage. En Vindbaarheid zorgt dat mensen in de buurt je salon vinden.
+
+Gratis website-checkWelk pakket past?
+
+Zo zoeken jouw klanten
+Voorbeelden van zoekopdrachten:
+- 🔍 kapper in de buurt
+- 🔍 kapper hengelo open op zaterdag
+- 🔍 balayage enschede
+- 🔍 herenkapper zonder afspraak
+
+### Waar het bij kappers en kapsalons om draait
+
+#### Prijslijst die klopt
+Behandelingen en prijzen veranderen. Een verouderde prijs geeft gedoe aan de stoel.
+
+#### Eén pagina per behandeling
+Wie balayage zoekt, wil geen algemene pagina. Eigen pagina's maken je beter vindbaar.
+
+#### Afspraakknop vooraan
+De meeste bezoekers zitten op hun telefoon. De knop moet meteen te vinden zijn.
+
+#### Foto's van je werk
+Bij een kapper beslist het resultaat. Met goede beschrijvingen vindt Google ze ook.
+Veel salons hebben alleen een homepage en een Facebook-pagina. Daardoor is er weinig om in Google op gevonden te worden.
+
+### Zo vraag je het aan Sitehulpje
+
+Bijvoorbeeld
+- "Verhoog de prijs van knippen dames naar €38."
+- "Zet erop dat we tussen kerst en oud en nieuw dicht zijn."
+- "Voeg deze foto toe aan de pagina Kleuren."
+- "Maak een actie: 20% op een föhnbeurt in januari."
+Wat er dan gebeurt
+Sitehulpje voert het uit, bewaart eerst hoe het was en meldt wanneer het klaar is. Is het niet goed, dan draai je het met één tik terug. Wat er precies kan, hangt af van het systeem van je website.
+Daarnaast controleert Vindbaarheid elke week je site en maakt het verbeteringen die jij goedkeurt.
+
+### Welk pakket past hierbij?
+Ons advies: Plus (Lokaal groeien) €179 per maand
+Bij een kapper telt vooral de eigen buurt. Plus is gericht op lokaal groeien en helpt ook met reacties op je Google-reviews.
+Met Sitehulpje webbeheer erbij betaal je €75 in plaats van €125, dus samen €254 per maand. Dan past Sitehulpje je site aan en zorgt Vindbaarheid dat je gevonden wordt.
+Prijzen excl. btw · minimaal 3 maanden. Eerst kijken? De website-check hieronder is gratis.
+
+### Veelgestelde vragen
+#### Werkt dit samen met mijn online agenda?
+Sitehulpje past je website aan en kan de knop of link naar je agenda neerzetten. Je agenda zelf blijft waar hij is.
+#### Ik heb weinig tijd. Hoeveel werk is het?
+Je typt of spreekt in wat er moet veranderen. Verbetervoorstellen keur je met één klik goed.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+Per beroep: Kappers · Schoonmaak · Installateurs · Webshops · Horeca · Bouw · Autobedrijven · Fysiotherapie · Boekhouders · Makelaars
+Per systeem: Magento 2 · WordPress · WooCommerce · Shopify
+
+---
+
+# Website en vindbaarheid voor schoonmaakbedrijven
+Bron: https://sitehulpje.nl/voor-schoonmaakbedrijven
+
+● Sitehulpje voor schoonmaakbedrijven
+
+## Meer offerte-aanvragen voor je schoonmaakbedrijf
+Je mensen staan op locatie en de offertes moeten de deur uit. Sitehulpje werkt je diensten, werkgebied en tarieven bij zodra je het vraagt. Vindbaarheid zorgt dat bedrijven in jouw regio je vinden wanneer ze een schoonmaker zoeken.
+
+Gratis website-checkWelk pakket past?
+
+Zo zoeken jouw klanten
+Voorbeelden van zoekopdrachten:
+- 🔍 kantoorschoonmaak almelo
+- 🔍 glasbewassing hengelo
+- 🔍 schoonmaakbedrijf twente offerte
+- 🔍 zonnepanelen reinigen prijs
+
+### Waar het bij schoonmaakbedrijven om draait
+
+#### Eén pagina per dienst
+Kantoren, glas en zonnepanelen worden elk apart gezocht. Eén verzamelpagina mist die zoekopdrachten.
+
+#### Werkgebied dat klopt
+Noem de plaatsen waar je echt werkt, zonder lijsten die voor Google geschreven lijken.
+
+#### Offerte in een paar stappen
+Een zakelijke klant wil snel weten wat het kost. Een kort formulier met foto's levert meer aanvragen op.
+
+#### Vertrouwen
+Keurmerken, certificaten en echte reviews horen zichtbaar te zijn, want je komt in andermans pand.
+Een bekende fout: tientallen plaatspagina's met dezelfde tekst. Dat helpt nauwelijks. Liever minder pagina's die echt iets zeggen over het werk daar.
+
+### Zo vraag je het aan Sitehulpje
+
+Bijvoorbeeld
+- "Voeg Vathorst toe aan ons werkgebied."
+- "Zet deze voor-en-na-foto's op de pagina Gevelreiniging."
+- "Maak een pagina voor het reinigen van zonnepanelen."
+- "Pas ons telefoonnummer overal aan."
+Wat er dan gebeurt
+Sitehulpje voert het uit, bewaart eerst hoe het was en meldt wanneer het klaar is. Is het niet goed, dan draai je het met één tik terug. Wat er precies kan, hangt af van het systeem van je website.
+Daarnaast controleert Vindbaarheid elke week je site en maakt het verbeteringen die jij goedkeurt.
+
+### Welk pakket past hierbij?
+Ons advies: Plus (Lokaal groeien) €179 per maand
+Je werkt in een duidelijke regio. Plus legt de nadruk op gevonden worden in je eigen gebied via Google, Maps en AI.
+Met Sitehulpje webbeheer erbij betaal je €75 in plaats van €125, dus samen €254 per maand. Dan past Sitehulpje je site aan en zorgt Vindbaarheid dat je gevonden wordt.
+Prijzen excl. btw · minimaal 3 maanden. Eerst kijken? De website-check hieronder is gratis.
+
+### Veelgestelde vragen
+#### Ik werk vooral zakelijk. Heeft dit dan zin?
+Ook een facilitair manager zoekt eerst online en bekijkt daarna je website. Die moet dan overtuigen.
+#### Kunnen jullie een offerteformulier maken?
+Op WordPress vaak wel met een verzoek. Is het groot of complex, dan kijkt Jan eerst mee.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+Per beroep: Kappers · Schoonmaak · Installateurs · Webshops · Horeca · Bouw · Autobedrijven · Fysiotherapie · Boekhouders · Makelaars
+Per systeem: Magento 2 · WordPress · WooCommerce · Shopify
+
+---
+
+# Website en vindbaarheid voor installateurs
+Bron: https://sitehulpje.nl/voor-installateurs
+
+● Sitehulpje voor installateurs
+
+## Gevonden worden op het moment dat de cv het begeeft
+Een lekkage of kapotte cv wacht niet. De klant zoekt dan op zijn telefoon en belt de eerste die betrouwbaar overkomt. Sitehulpje houdt je site actueel als jij op de bus zit, en Vindbaarheid zorgt dat je in beeld komt.
+
+Gratis website-checkWelk pakket past?
+
+Zo zoeken jouw klanten
+Voorbeelden van zoekopdrachten:
+- 🔍 loodgieter spoed hengelo
+- 🔍 cv ketel storing oldenzaal
+- 🔍 warmtepomp installateur twente
+- 🔍 elektricien in de buurt
+
+### Waar het bij installateurs om draait
+
+#### Bellen met één tik
+Bij spoed moet je nummer groot in beeld staan, vooral op een telefoon.
+
+#### Spoed apart vermelden
+Mensen met een storing zoeken anders dan mensen die een warmtepomp vergelijken. Allebei verdienen ze een eigen pagina.
+
+#### Certificeringen
+Laat erkenningen zien die je echt hebt. Dat wekt vertrouwen bij een grotere opdracht.
+
+#### Snelle site
+In de kruipruimte met één streepje bereik wacht niemand op een trage pagina.
+Bij veel installateurs staan alle diensten op één pagina. Een spoedzoeker en iemand die een warmtepomp vergelijkt, krijgen dan dezelfde tekst.
+
+### Zo vraag je het aan Sitehulpje
+
+Bijvoorbeeld
+- "Zet erop dat we dit weekend geen spoeddienst hebben."
+- "Voeg een pagina toe over hybride warmtepompen."
+- "Plaats deze foto van het project in Borne."
+- "Pas de starttarieven aan."
+Wat er dan gebeurt
+Sitehulpje voert het uit, bewaart eerst hoe het was en meldt wanneer het klaar is. Is het niet goed, dan draai je het met één tik terug. Wat er precies kan, hangt af van het systeem van je website.
+Daarnaast controleert Vindbaarheid elke week je site en maakt het verbeteringen die jij goedkeurt.
+
+### Welk pakket past hierbij?
+Ons advies: Plus (Lokaal groeien) €179 per maand
+Je klanten komen uit de regio en zoeken vaak met spoed. Daar is Plus op gericht. Werk je landelijk of in een drukke markt, kijk dan naar Pro.
+Met Sitehulpje webbeheer erbij betaal je €75 in plaats van €125, dus samen €254 per maand. Dan past Sitehulpje je site aan en zorgt Vindbaarheid dat je gevonden wordt.
+Prijzen excl. btw · minimaal 3 maanden. Eerst kijken? De website-check hieronder is gratis.
+
+### Veelgestelde vragen
+#### Kan ik vanaf de bus iets aanpassen?
+Ja, Sitehulpje werkt op je telefoon. Je kunt typen of inspreken en een foto meesturen.
+#### Beloven jullie de eerste plek in Google?
+Nee. Niemand kan dat eerlijk beloven. We verbeteren wat op je site beter kan en laten zien wat het doet.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+Per beroep: Kappers · Schoonmaak · Installateurs · Webshops · Horeca · Bouw · Autobedrijven · Fysiotherapie · Boekhouders · Makelaars
+Per systeem: Magento 2 · WordPress · WooCommerce · Shopify
+
+---
+
+# Website en vindbaarheid voor aannemers
+Bron: https://sitehulpje.nl/voor-aannemers
+
+● Sitehulpje voor aannemers en bouwbedrijven
+
+## Laat je werk zien, ook als je op de steiger staat
+Een goed project verdient een plek op je website, maar daar kom je zelden aan toe. Stuur Sitehulpje een paar foto's vanaf de bouw met een korte toelichting, en je projectpagina is bij. Vindbaarheid zorgt dat particulieren en opdrachtgevers je vinden.
+
+Gratis website-checkWelk pakket past?
+
+Zo zoeken jouw klanten
+Voorbeelden van zoekopdrachten:
+- 🔍 aannemer hengelo aanbouw
+- 🔍 dakkapel plaatsen kosten
+- 🔍 badkamer renoveren twente
+- 🔍 bouwbedrijf offerte aanvragen
+
+### Waar het bij aannemers en bouwbedrijven om draait
+
+#### Projecten met foto's
+Een aanbouw verkoop je met voorbeelden. Een projectpagina met plaats en omschrijving is ook goed vindbaar.
+
+#### Diensten per pagina
+Dakkapel, aanbouw en renovatie zoekt men apart. Geef elk een eigen pagina.
+
+#### Offerte aanvragen
+Vraag alleen wat je nodig hebt. Lange formulieren vult niemand in vanaf een telefoon.
+
+#### Betrouwbaarheid
+Laat echte reviews en lidmaatschappen zien die je daadwerkelijk hebt.
+Veel bouwbedrijven hebben prachtig werk maar een projectenpagina van jaren geleden. Daarmee laat je je sterkste verkoopargument liggen.
+
+### Zo vraag je het aan Sitehulpje
+
+Bijvoorbeeld
+- "Maak een projectpagina van deze foto's uit Delden."
+- "Voeg dakkapellen toe aan onze diensten."
+- "Zet erop dat we weer ruimte hebben vanaf maart."
+- "Verander de tekst op Over ons."
+Wat er dan gebeurt
+Sitehulpje voert het uit, bewaart eerst hoe het was en meldt wanneer het klaar is. Is het niet goed, dan draai je het met één tik terug. Wat er precies kan, hangt af van het systeem van je website.
+Daarnaast controleert Vindbaarheid elke week je site en maakt het verbeteringen die jij goedkeurt.
+
+### Welk pakket past hierbij?
+Ons advies: Plus (Lokaal groeien) €179 per maand
+De meeste opdrachten komen uit de eigen regio. Plus richt zich daarop en verbetert meer pagina's per maand, ook je afbeeldingen.
+Met Sitehulpje webbeheer erbij betaal je €75 in plaats van €125, dus samen €254 per maand. Dan past Sitehulpje je site aan en zorgt Vindbaarheid dat je gevonden wordt.
+Prijzen excl. btw · minimaal 3 maanden. Eerst kijken? De website-check hieronder is gratis.
+
+### Veelgestelde vragen
+#### Kan ik foto's via mijn telefoon sturen?
+Ja, op WordPress plaatst Sitehulpje ze op je site.
+#### Ik heb nu genoeg werk. Waarom dan toch?
+Vindbaarheid bouw je op voor de maanden waarin het rustiger is. Het werkt niet van de ene op de andere dag.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+Per beroep: Kappers · Schoonmaak · Installateurs · Webshops · Horeca · Bouw · Autobedrijven · Fysiotherapie · Boekhouders · Makelaars
+Per systeem: Magento 2 · WordPress · WooCommerce · Shopify
+
+---
+
+# Website en vindbaarheid voor horeca
+Bron: https://sitehulpje.nl/voor-horeca
+
+● Sitehulpje voor restaurants en horeca
+
+## Vandaag een nieuwe kaart, vandaag op je website
+Je kaart wisselt met het seizoen, je openingstijden met de feestdagen. Tijdens de service zit je niet achter een computer. Stuur Sitehulpje de nieuwe kaart of tijden, en je gasten zien meteen wat klopt.
+
+Gratis website-checkWelk pakket past?
+
+Zo zoeken jouw klanten
+Voorbeelden van zoekopdrachten:
+- 🔍 restaurant hengelo terras
+- 🔍 lunchen in de buurt
+- 🔍 high tea enschede reserveren
+- 🔍 groepsdiner twente
+
+### Waar het bij restaurants en horeca om draait
+
+#### Kaart die je kunt lezen
+Een kaart als losse pdf leest slecht op een telefoon en is lastiger te vinden. Tekst op de pagina werkt beter.
+
+#### Tijden overal gelijk
+Andere tijden op je site dan op Google leveren dichte deuren en slechte reviews op.
+
+#### Reserveren vooraan
+De knop moet in beeld staan zonder dat de gast hoeft te zoeken.
+
+#### Reviews beantwoorden
+Een nette reactie op een review laat zien dat je het serieus neemt. Plus maakt een kant-en-klaar antwoord.
+Een gast belt niet als je site twijfel oproept. Oude kerstmenu's in de zomer zijn een klein detail met groot effect.
+
+### Zo vraag je het aan Sitehulpje
+
+Bijvoorbeeld
+- "Vervang de wijnkaart door deze foto."
+- "Zet erop dat we tweede kerstdag open zijn vanaf 17:00."
+- "Voeg de lamsschotel toe aan de hoofdgerechten."
+- "Plaats een bericht over ons nieuwe terras."
+Wat er dan gebeurt
+Sitehulpje voert het uit, bewaart eerst hoe het was en meldt wanneer het klaar is. Is het niet goed, dan draai je het met één tik terug. Wat er precies kan, hangt af van het systeem van je website.
+Daarnaast controleert Vindbaarheid elke week je site en maakt het verbeteringen die jij goedkeurt.
+
+### Welk pakket past hierbij?
+Ons advies: Plus (Lokaal groeien) €179 per maand
+Gasten zoeken dichtbij en lezen reviews. Plus helpt je in Google en Maps en zet een antwoord op nieuwe reviews voor je klaar.
+Met Sitehulpje webbeheer erbij betaal je €75 in plaats van €125, dus samen €254 per maand. Dan past Sitehulpje je site aan en zorgt Vindbaarheid dat je gevonden wordt.
+Prijzen excl. btw · minimaal 3 maanden. Eerst kijken? De website-check hieronder is gratis.
+
+### Veelgestelde vragen
+#### Kan ik gewoon een foto van de kaart sturen?
+Ja. Op WordPress kan Sitehulpje de foto plaatsen. Met een duidelijke foto kan hij ook proberen de tekst over te nemen; controleer die dan even.
+#### Past Sitehulpje ook mijn Google-profiel aan?
+Het profiel beheer je zelf. In het dashboard zie je wel je cijfers, en Plus maakt een antwoord op reviews voor je klaar.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+Per beroep: Kappers · Schoonmaak · Installateurs · Webshops · Horeca · Bouw · Autobedrijven · Fysiotherapie · Boekhouders · Makelaars
+Per systeem: Magento 2 · WordPress · WooCommerce · Shopify
+
+---
+
+# Website en vindbaarheid voor autobedrijven en garages
+Bron: https://sitehulpje.nl/voor-autobedrijven
+
+● Sitehulpje voor autobedrijven en garages
+
+## Klanten voor je werkplaats, ook zonder grote advertenties
+Occasions staan op de grote platforms, maar voor apk en onderhoud kiezen mensen vaak een garage dichtbij. Dan moet je website kloppen. Sitehulpje werkt je tarieven en openingstijden bij, en Vindbaarheid brengt je werkplaats in beeld.
+
+Gratis website-checkWelk pakket past?
+
+Zo zoeken jouw klanten
+Voorbeelden van zoekopdrachten:
+- 🔍 apk keuring hengelo
+- 🔍 garage in de buurt
+- 🔍 airco auto bijvullen prijs
+- 🔍 grote beurt auto kosten
+
+### Waar het bij autobedrijven en garages om draait
+
+#### Werkplaats centraal
+Bij occasions is de concurrentie groot. Voor apk en onderhoud in je eigen plaats maak je veel meer kans.
+
+#### Duidelijke prijzen
+Mensen zoeken wat een apk of beurt kost. Een richtprijs op je site neemt twijfel weg.
+
+#### Afspraak maken
+Bellen of een kort formulier, goed zichtbaar op de telefoon.
+
+#### Reviews
+Bij een garage draait het om vertrouwen. Vraag tevreden klanten om een eerlijke review.
+Veel autobedrijven richten hun site vooral op occasions. Daardoor zien mensen die een garage zoeken nauwelijks wat de werkplaats doet.
+
+### Zo vraag je het aan Sitehulpje
+
+Bijvoorbeeld
+- "Pas de prijs van de apk aan naar €35."
+- "Zet erop dat de werkplaats zaterdag dicht is."
+- "Voeg een pagina over airco-service toe."
+- "Plaats de wintercheck-actie op de homepage."
+Wat er dan gebeurt
+Sitehulpje voert het uit, bewaart eerst hoe het was en meldt wanneer het klaar is. Is het niet goed, dan draai je het met één tik terug. Wat er precies kan, hangt af van het systeem van je website.
+Daarnaast controleert Vindbaarheid elke week je site en maakt het verbeteringen die jij goedkeurt.
+
+### Welk pakket past hierbij?
+Ons advies: Plus (Lokaal groeien) €179 per maand
+Je werkplaatsklanten komen uit de buurt. Plus is gericht op lokaal gevonden worden en het beantwoorden van reviews.
+Met Sitehulpje webbeheer erbij betaal je €75 in plaats van €125, dus samen €254 per maand. Dan past Sitehulpje je site aan en zorgt Vindbaarheid dat je gevonden wordt.
+Prijzen excl. btw · minimaal 3 maanden. Eerst kijken? De website-check hieronder is gratis.
+
+### Veelgestelde vragen
+#### Worden mijn occasions automatisch bijgewerkt?
+Nee. Sitehulpje koppelt niet met voorraadplatforms. Wel kun je een auto toevoegen of aanpassen met een verzoek.
+#### Heeft dit zin voor een kleine garage?
+Juist daar. Je concurreert in je eigen plaats, niet met heel Nederland.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+Per beroep: Kappers · Schoonmaak · Installateurs · Webshops · Horeca · Bouw · Autobedrijven · Fysiotherapie · Boekhouders · Makelaars
+Per systeem: Magento 2 · WordPress · WooCommerce · Shopify
+
+---
+
+# Website en vindbaarheid voor fysiotherapeuten
+Bron: https://sitehulpje.nl/voor-fysiotherapeuten
+
+● Sitehulpje voor fysiotherapeuten
+
+## Nieuwe patiënten vinden je praktijk, jij blijft bij de behandeling
+Tussen de behandelingen door komt er weinig van je website terecht. Toch zoeken mensen met klachten vaak eerst online naar een praktijk in de buurt. Sitehulpje houdt de informatie actueel, en Vindbaarheid helpt je praktijk gevonden te worden.
+
+Gratis website-checkWelk pakket past?
+
+Zo zoeken jouw klanten
+Voorbeelden van zoekopdrachten:
+- 🔍 fysiotherapeut hengelo
+- 🔍 fysio zonder verwijzing
+- 🔍 schouderklachten behandeling
+- 🔍 manueel therapeut enschede
+
+### Waar het bij fysiotherapeuten om draait
+
+#### Specialisaties
+Bekkenfysiotherapie of manuele therapie zoekt men apart. Elke specialisatie verdient uitleg.
+
+#### Praktische informatie
+Vergoeding, wachttijd, adres en parkeren: dat willen nieuwe patiënten vooraf weten.
+
+#### Betrouwbare taal
+Geen beloftes over genezing. Heldere uitleg werkt beter en past bij je vak.
+
+#### Team en locatie
+Foto's van je team en praktijk maken de eerste stap kleiner.
+Veel praktijksites noemen alle behandelingen in één opsomming. Daardoor vindt iemand met een specifieke klacht de praktijk minder snel.
+
+### Zo vraag je het aan Sitehulpje
+
+Bijvoorbeeld
+- "Voeg onze nieuwe collega Lisa toe aan het team."
+- "Pas de wachttijd aan naar één week."
+- "Zet de tarieven van 2027 op de site."
+- "Maak een pagina over knieklachten met deze tekst."
+Wat er dan gebeurt
+Sitehulpje voert het uit, bewaart eerst hoe het was en meldt wanneer het klaar is. Is het niet goed, dan draai je het met één tik terug. Wat er precies kan, hangt af van het systeem van je website.
+Daarnaast controleert Vindbaarheid elke week je site en maakt het verbeteringen die jij goedkeurt.
+
+### Welk pakket past hierbij?
+Ons advies: Basis (Gezond & gevonden) €99 per maand
+Een praktijk met een vaste plaats en beperkte capaciteit heeft vaak genoeg aan een gezonde, goed gevonden site. Wil je actief groeien, kies dan Plus.
+Met Sitehulpje webbeheer erbij betaal je €75 in plaats van €125, dus samen €174 per maand. Dan past Sitehulpje je site aan en zorgt Vindbaarheid dat je gevonden wordt.
+Prijzen excl. btw · minimaal 3 maanden. Eerst kijken? De website-check hieronder is gratis.
+
+### Veelgestelde vragen
+#### Komen patiëntgegevens in Sitehulpje terecht?
+Dat is niet de bedoeling. Sitehulpje werkt aan je website. Deel geen patiëntgegevens in een verzoek.
+#### Schrijft Sitehulpje medische teksten?
+Hij kan een opzet maken, maar de inhoud controleer jij. Jij kent het vak en bent verantwoordelijk voor wat er staat.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+Per beroep: Kappers · Schoonmaak · Installateurs · Webshops · Horeca · Bouw · Autobedrijven · Fysiotherapie · Boekhouders · Makelaars
+Per systeem: Magento 2 · WordPress · WooCommerce · Shopify
+
+---
+
+# Website en vindbaarheid voor boekhouders
+Bron: https://sitehulpje.nl/voor-boekhouders
+
+● Sitehulpje voor boekhouders en administratiekantoren
+
+## Je website op orde, net als de administratie van je klanten
+Rond de aangifte is er geen tijd voor je site, en een verouderd tarief of oud nieuwsbericht past niet bij een precies vak. Sitehulpje houdt het bij. Vindbaarheid zorgt dat ondernemers je vinden wanneer ze een boekhouder zoeken.
+
+Gratis website-checkWelk pakket past?
+
+Zo zoeken jouw klanten
+Voorbeelden van zoekopdrachten:
+- 🔍 boekhouder zzp hengelo
+- 🔍 administratiekantoor twente
+- 🔍 wat kost een boekhouder
+- 🔍 jaarrekening laten maken
+
+### Waar het bij boekhouders en administratiekantoren om draait
+
+#### Voor wie je werkt
+Zzp'er, horeca of bv: wie zich herkent, neemt eerder contact op. Een pagina per doelgroep helpt.
+
+#### Prijsindicatie
+De vraag "wat kost het" komt altijd. Een eerlijke indicatie of tariefuitleg trekt de juiste klanten.
+
+#### Actuele informatie
+Oude bedragen en regels ondermijnen je vakmanschap. Controleer ze na elke wijziging.
+
+#### Laagdrempelig contact
+Een kennismakingsknop werkt beter dan alleen een algemeen formulier.
+Een site die er al jaren hetzelfde uitziet met verouderde bedragen, kan een potentiële klant laten twijfelen over je precisie.
+
+### Zo vraag je het aan Sitehulpje
+
+Bijvoorbeeld
+- "Zet de tarieven voor 2027 op de site."
+- "Voeg een pagina voor zzp'ers toe."
+- "Haal het oude nieuwsbericht van de homepage."
+- "Pas onze kantoortijden tijdens de zomer aan."
+Wat er dan gebeurt
+Sitehulpje voert het uit, bewaart eerst hoe het was en meldt wanneer het klaar is. Is het niet goed, dan draai je het met één tik terug. Wat er precies kan, hangt af van het systeem van je website.
+Daarnaast controleert Vindbaarheid elke week je site en maakt het verbeteringen die jij goedkeurt.
+
+### Welk pakket past hierbij?
+Ons advies: Basis (Gezond & gevonden) €99 per maand
+Veel kantoren groeien via mond-tot-mondreclame en willen vooral een site die klopt en gevonden wordt. Wil je actief nieuwe klanten in de regio, neem dan Plus.
+Met Sitehulpje webbeheer erbij betaal je €75 in plaats van €125, dus samen €174 per maand. Dan past Sitehulpje je site aan en zorgt Vindbaarheid dat je gevonden wordt.
+Prijzen excl. btw · minimaal 3 maanden. Eerst kijken? De website-check hieronder is gratis.
+
+### Veelgestelde vragen
+#### Schrijft Sitehulpje fiscale artikelen?
+Hij kan helpen met een opzet, maar de inhoud moet jij controleren. Fiscale teksten moeten precies kloppen.
+#### Komen klantgegevens op de site of in Sitehulpje?
+Dat is niet de bedoeling. Deel geen klantadministratie in een verzoek.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+Per beroep: Kappers · Schoonmaak · Installateurs · Webshops · Horeca · Bouw · Autobedrijven · Fysiotherapie · Boekhouders · Makelaars
+Per systeem: Magento 2 · WordPress · WooCommerce · Shopify
+
+---
+
+# Website en vindbaarheid voor makelaars
+Bron: https://sitehulpje.nl/voor-makelaars
+
+● Sitehulpje voor makelaars
+
+## Niet alleen je huizen, maar ook jijzelf gevonden worden
+Woningzoekers vind je op de grote platforms, maar verkopers kiezen zelf een makelaar. Die zoeken online en vergelijken websites. Sitehulpje houdt je site en teksten bij. Vindbaarheid helpt je gevonden te worden door verkopers in je eigen gebied.
+
+Gratis website-checkWelk pakket past?
+
+Zo zoeken jouw klanten
+Voorbeelden van zoekopdrachten:
+- 🔍 makelaar hengelo verkopen
+- 🔍 wat is mijn huis waard
+- 🔍 aankoopmakelaar twente
+- 🔍 makelaar kosten
+
+### Waar het bij makelaars om draait
+
+#### Gericht op verkopers
+Daar zit de opdracht. Een goede pagina over je werkwijze en tarief is belangrijk.
+
+#### Kennis van de buurt
+Vertel iets echts over de wijken waar je werkt. Dat kan een platform niet.
+
+#### Waardebepaling
+Een duidelijke aanvraag voor een gratis waardebepaling is een sterke eerste stap, als je die aanbiedt.
+
+#### Reviews
+Laat echte beoordelingen zien en reageer erop. Plus zet die reactie voor je klaar.
+Veel makelaarssites tonen vooral het woningaanbod. Een verkoper die een makelaar zoekt, leest dan weinig over wat jij voor hem doet.
+
+### Zo vraag je het aan Sitehulpje
+
+Bijvoorbeeld
+- "Voeg een stuk toe over de wijk Tuindorp."
+- "Pas ons courtagetarief aan."
+- "Zet deze teamfoto op de pagina Over ons."
+- "Maak een knop voor een waardebepaling."
+Wat er dan gebeurt
+Sitehulpje voert het uit, bewaart eerst hoe het was en meldt wanneer het klaar is. Is het niet goed, dan draai je het met één tik terug. Wat er precies kan, hangt af van het systeem van je website.
+Daarnaast controleert Vindbaarheid elke week je site en maakt het verbeteringen die jij goedkeurt.
+
+### Welk pakket past hierbij?
+Ons advies: Plus (Lokaal groeien) €179 per maand
+Je werkt in een duidelijk gebied en je wordt vaak vergeleken met andere makelaars. Plus legt de nadruk op lokaal gevonden worden en reviews.
+Met Sitehulpje webbeheer erbij betaal je €75 in plaats van €125, dus samen €254 per maand. Dan past Sitehulpje je site aan en zorgt Vindbaarheid dat je gevonden wordt.
+Prijzen excl. btw · minimaal 3 maanden. Eerst kijken? De website-check hieronder is gratis.
+
+### Veelgestelde vragen
+#### Worden mijn woningen automatisch bijgewerkt?
+Nee. Dat regelt je makelaarssysteem. Sitehulpje werkt aan de rest van je website.
+#### Wat als ik in meerdere plaatsen werk?
+Maak alleen pagina's waar je echt iets over die plaats kunt vertellen.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+Per beroep: Kappers · Schoonmaak · Installateurs · Webshops · Horeca · Bouw · Autobedrijven · Fysiotherapie · Boekhouders · Makelaars
+Per systeem: Magento 2 · WordPress · WooCommerce · Shopify
+
+---
+
+# Webshop beheren en beter gevonden worden
+Bron: https://sitehulpje.nl/voor-webshops
+
+● Sitehulpje voor webshops
+
+## Je webshop bijhouden zonder telkens een webbouwer te bellen
+Een prijs, een actie, een omschrijving: kleine wijzigingen kosten bij een bouwer al snel een los factuurtje. Met Sitehulpje vraag je het gewoon. Vindbaarheid verbetert ondertussen je titels en omschrijvingen, pagina voor pagina.
+
+Gratis website-checkWelk pakket past?
+
+Zo zoeken jouw klanten
+Voorbeelden van zoekopdrachten:
+- 🔍 linnen overhemd heren
+- 🔍 hardloopschoenen brede voet
+- 🔍 duurzaam cadeau bestellen
+- 🔍 ring laten graveren
+
+### Waar het bij webshops om draait
+
+#### Unieke producttitels
+Teksten van de leverancier staan op tientallen andere shops. Eigen titels en omschrijvingen vallen meer op.
+
+#### Categoriepagina's
+Daar komen vaak de brede zoekopdrachten binnen. Ze verdienen meer aandacht dan alleen een rij producten.
+
+#### Snelheid op mobiel
+Een trage shop kost verkoop. De wekelijkse check meet dit en laat zien waar het aan ligt.
+
+#### Afbeeldingen
+Goede beschrijvingen helpen in Google Afbeeldingen en voor mensen die slecht zien.
+Een veelgemaakte fout is alleen op productpagina's letten. Vaak leveren juist categoriepagina's en goede titels het meeste op.
+
+### Zo vraag je het aan Sitehulpje
+
+Bijvoorbeeld
+- "Zet alle zomerjassen 20% lager tot 1 juni."
+- "Herschrijf de omschrijving van dit product."
+- "Maak een banner voor Black Friday."
+- "Voeg maat XXL toe aan deze polo."
+Wat er dan gebeurt
+Sitehulpje voert het uit, bewaart eerst hoe het was en meldt wanneer het klaar is. Is het niet goed, dan draai je het met één tik terug. Wat er precies kan, hangt af van het systeem van je website.
+Daarnaast controleert Vindbaarheid elke week je site en maakt het verbeteringen die jij goedkeurt.
+
+### Welk pakket past hierbij?
+Ons advies: Pro (Voorsprong) €249 per maand
+Een webshop concurreert landelijk en heeft veel pagina's. Pro verbetert de meeste pagina's per maand en geeft je elk kwartaal een gesprek met Jan.
+Met Sitehulpje webbeheer erbij betaal je €75 in plaats van €125, dus samen €324 per maand. Dan past Sitehulpje je site aan en zorgt Vindbaarheid dat je gevonden wordt.
+Prijzen excl. btw · minimaal 3 maanden. Eerst kijken? De website-check hieronder is gratis.
+
+### Veelgestelde vragen
+#### Welke systemen werken?
+Dat lees je per systeem op de pagina's over WooCommerce, Magento 2 en Shopify.
+#### Kan Sitehulpje bij mijn bestellingen?
+Nee. Bestellingen, betalingen en wachtwoorden blijven buiten bereik.
+
+### Gratis website-check
+
+Vul je website en e-mailadres in. Binnen een paar uur krijg je een rapport met wat goed gaat en wat beter kan. Gratis en vrijblijvend.
+
+Per beroep: Kappers · Schoonmaak · Installateurs · Webshops · Horeca · Bouw · Autobedrijven · Fysiotherapie · Boekhouders · Makelaars
+Per systeem: Magento 2 · WordPress · WooCommerce · Shopify
