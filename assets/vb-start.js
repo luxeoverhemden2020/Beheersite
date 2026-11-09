@@ -52,8 +52,56 @@ function vbsWebsiteUitleg(p, site) {
 
 const VBS_DOEL = { bellen: "Bellen", formulier: "Contactformulier", offerte: "Offerte aanvragen", afspraak: "Afspraak maken", kopen: "Online kopen", langskomen: "Langskomen" };
 
+// Stap 1: Sitehulpje leest de website één keer en vult alles voor; de klant controleert en past aan.
+const VBS_MIST = '<small class="vbs-mist">Niet gevonden op je website. Vul het even in.</small>';
+function vbsScanInhoud(s, d) {
+  const g = d.gegevens || {};
+  const sc = g.scan;
+  if (!sc) {
+    if (!d.klant.site) return `<p>We hebben het adres van je website nodig om te beginnen. Neem even contact op met Jan.</p>`;
+    return `<div data-vbs-scan><p><b>We lezen nu je website ${esc(d.klant.site.replace(/^https?:\/\//, ""))}</b> en vullen alles alvast voor je in.</p>
+      <p class="zacht">Wat je verkoopt, waarop je gevonden wilt worden, je concurrenten en je bedrijfsgegevens. Dit duurt ongeveer een halve minuut…</p>
+      <div class="vbs-laden"><span></span></div></div><div class="vbs-meld"></div>`;
+  }
+  const b = g.bedrijf || {}, o = g.doelen || {};
+  const mist = new Set(sc.ontbreekt || []);
+  const v = (id, label, waarde, opts = "", toonMist = true) => `<div><label for="vbs_${id}">${label}</label><input id="vbs_${id}" name="b_${id}" value="${esc(waarde || "")}" ${opts}>${toonMist && !waarde && mist.has(id) ? VBS_MIST : ""}</div>`;
+  return `<form class="vbs-form" data-stap="scan">
+    <p style="margin:0 0 6px">We hebben je website gelezen en alles alvast ingevuld. <b>Klopt het?</b> Pas aan wat niet klopt en klik onderaan op "Klopt, ga verder".</p>
+    <h3 class="vbs-kop">Wat verkoop of doe je?</h3>
+    <textarea id="vbs_diensten" name="diensten" rows="4" required placeholder="Eén per regel, het belangrijkste eerst">${esc(o.diensten || "")}</textarea>${!o.diensten ? VBS_MIST : ""}
+    <h3 class="vbs-kop">Waarop wil je gevonden worden in Google?</h3>
+    <textarea id="vbs_zoekwoorden" name="zoekwoorden" rows="5" placeholder="Eén zoekterm per regel">${esc((o.zoekwoorden || []).join("\n"))}</textarea>
+    <p class="zacht vbs-klein">Dit zijn de zoektermen waarop wij elke maand gaan werken. Voeg gerust toe wat je mist of haal weg wat niet past.</p>
+    <h3 class="vbs-kop">Je concurrenten</h3>
+    <textarea id="vbs_concurrenten" name="concurrenten" rows="3" placeholder="Eén per regel (mag leeg)">${esc((o.concurrenten || []).join("\n"))}</textarea>
+    <p class="zacht vbs-klein">${(o.concurrenten || []).length ? "Dit is een voorstel op basis van een zoekopdracht in jouw regio. Klopt er een niet? Haal hem weg of vervang hem." : "We vonden geen duidelijke concurrenten. Ken je ze zelf? Vul ze in (mag ook leeg)."}</p>
+    <h3 class="vbs-kop">Wat moet een bezoeker op je site doen?</h3>
+    <div class="vbs-vinkjes">${Object.entries(VBS_DOEL).map(([w, n]) => `<label class="vbs-vink"><input type="checkbox" name="doel" value="${w}" ${(o.doel || []).includes(w) ? "checked" : ""}> ${n}</label>`).join("")}</div>
+    <h3 class="vbs-kop">Je bedrijfsgegevens</h3>
+    <div class="vbs-raster">
+      ${v("naam", "Bedrijfsnaam *", b.naam || d.klant.naam, 'required autocomplete="organization"')}
+      ${v("plaats", "Plaats *", b.plaats, 'required autocomplete="address-level2"')}
+      ${v("straat", "Straat en huisnummer", b.straat, 'autocomplete="street-address"')}
+      ${v("postcode", "Postcode", b.postcode, 'autocomplete="postal-code" maxlength="7"')}
+      ${v("telefoon", "Telefoon", b.telefoon, 'type="tel" autocomplete="tel"')}
+      ${v("kvk", "KvK-nummer", b.kvk, 'inputmode="numeric" maxlength="8"')}
+      ${v("btw", "Btw-nummer", b.btw)}
+      ${v("branche", "Soort bedrijf", b.branche)}
+      ${v("factuur_email", "E-mail voor facturen *", b.factuur_email, 'type="email" required', false)}
+      ${v("rapport_email", "E-mail voor het maandrapport", b.rapport_email, 'type="email" placeholder="Leeg = zelfde als facturen"', false)}
+      <div><label for="vbs_bezoekadres">Kunnen klanten bij je langskomen?</label><select id="vbs_bezoekadres" name="b_bezoekadres">
+        <option value="ja" ${b.bezoekadres !== "nee" ? "selected" : ""}>Ja, op dit adres</option><option value="nee" ${b.bezoekadres === "nee" ? "selected" : ""}>Nee, ik kom bij de klant of verkoop online</option></select></div>
+    </div>
+    <label for="vbs_openingstijden">Openingstijden</label><input id="vbs_openingstijden" name="b_openingstijden" value="${esc(b.openingstijden || "")}" placeholder="Bijv. ma–vr 9:00–17:30, za 10:00–16:00">${!b.openingstijden && mist.has("openingstijden") ? VBS_MIST : ""}
+    <label for="vbs_werkgebied">Werkgebied</label><input id="vbs_werkgebied" name="b_werkgebied" value="${esc(b.werkgebied || "")}" placeholder="Bijv. Hengelo, Enschede en omgeving">${!b.werkgebied && mist.has("werkgebied") ? VBS_MIST : ""}
+    <input type="hidden" name="b_email" value="${esc(b.email || "")}">
+    <div class="rij" style="margin-top:14px"><button class="knop">Klopt, ga verder</button></div><div class="vbs-meld"></div></form>`;
+}
+
 function vbsStapInhoud(s, d, admin) {
   const g = d.gegevens || {};
+  if (s.id === "scan") return vbsScanInhoud(s, d);
   if (s.id === "bedrijf") {
     const b = g.bedrijf || {};
     const v = (id, label, waarde, opts = "") => `<div><label for="vbs_${id}">${label}</label><input id="vbs_${id}" name="${id}" value="${esc(waarde || "")}" ${opts}></div>`;
@@ -194,8 +242,13 @@ async function vbStartToon(el, klantId, opties = {}) {
         // eerste (deel)maand met iDEAL betalen; dat geeft ook toestemming voor de automatische incasso (alleen als betalen aan staat)
         if (typeof vbfApi === "function") { try { const b = await vbfApi("eerste"); if (b.url) { location.href = b.url; return; } } catch { /* betalen nog niet aan */ } }
       } else {
-        const g = Object.fromEntries(fd.entries());
+        let g = Object.fromEntries(fd.entries());
         if (f.dataset.stap === "doelen") g.doel = fd.getAll("doel");
+        if (f.dataset.stap === "scan") {
+          const bedrijf = {}, doelen = { doel: fd.getAll("doel") };
+          for (const [k2, w] of fd.entries()) { if (k2.startsWith("b_")) bedrijf[k2.slice(2)] = w; else if (k2 !== "doel") doelen[k2] = w; }
+          g = { bedrijf, doelen };
+        }
         await vbsApi("opslaan", { klant_id: klantId, stap: f.dataset.stap, gegevens: g });
       }
       opnieuw(volgendeNa(f.dataset.stap));
@@ -211,6 +264,14 @@ async function vbStartToon(el, klantId, opties = {}) {
       opnieuw(volgendeNa(stap));
     } catch (err) { toonMelding(vak.querySelector(".vbs-meld"), err.message); b.disabled = false; }
   }));
+  const scanVak = el.querySelector("[data-vbs-scan]");
+  if (scanVak) (async () => {
+    try { await vbsApi("scan", { klant_id: klantId }); opnieuw("scan"); }
+    catch (err) {
+      scanVak.innerHTML = `<div class="melding let">${esc(err.message)}</div><div class="rij"><button class="knop rand klein" type="button">Opnieuw proberen</button></div>`;
+      scanVak.querySelector("button").onclick = () => opnieuw("scan");
+    }
+  })();
   if (typeof vbSiteToon === "function") el.querySelectorAll("[data-vbsite]").forEach((c) => vbSiteToon(c, klantId, { klaar: () => opnieuw(volgendeNa("website")) }));
   el.querySelectorAll('[data-vbs="google"]').forEach((b) => (b.onclick = async () => {
     b.disabled = true;
@@ -264,8 +325,10 @@ async function vbStartBeheer(el, klantId) {
   if (s.profiel.status === "wacht") taken.push(`<li>Bedrijfsprofiel: ${s.profiel.info?.status === "aanmaken" ? "aanmaken voor de klant" : "uitnodiging accepteren"}. <button class="knop klein" data-vbsbev="profiel">Geregeld</button></li>`);
   if (s.google.status === "wacht") taken.push(`<li>Google: klant heeft ons uitgenodigd${s.google.info?.notitie ? ` (“${esc(s.google.info.notitie)}”)` : ""}. Accepteer en koppel met de knop hieronder bij Koppelingen.</li>`);
   el.innerHTML = `<div class="kaart"><div class="rij"><h2 class="vul" style="font-size:16px;margin:0"><span class="tag">&gt;_</span>Startstappen</h2>
-      <span class="zacht vb-klein">${d.stappen.filter((x) => x.status !== "open").length} van 6 · ${esc(VBS_PLATFORM[d.platform] || d.platform || "?")}</span>
-      <button class="knop rand klein" data-vbsherken>Systeem opnieuw bepalen</button></div>
+      <span class="zacht vb-klein">${d.stappen.filter((x) => x.status !== "open").length} van ${d.stappen.length} · ${esc(VBS_PLATFORM[d.platform] || d.platform || "?")}</span>
+      <button class="knop rand klein" data-vbsherken>Systeem opnieuw bepalen</button>
+      <button class="knop rand klein" data-vbsscan title="Leest de website opnieuw; wat de klant zelf invulde blijft staan">${g.scan ? "Opnieuw scannen" : "Website scannen"}</button></div>
+    ${g.scan ? `<p class="zacht vb-klein" style="margin:6px 0 0">Gescand op ${new Date(g.scan.datum).toLocaleString("nl-NL")}${g.scan.bevestigd ? " · door de klant gecontroleerd" : " · nog niet gecontroleerd door de klant"}${(g.scan.ontbreekt || []).length ? ` · niet gevonden: ${esc(g.scan.ontbreekt.join(", "))}` : ""}</p>` : ""}
     ${taken.length ? `<p style="margin:10px 0 4px"><b>Voor jou</b></p><ul class="lijst">${taken.join("")}</ul>` : ""}
     ${g.bedrijf ? `<details class="vbs-alt"><summary>Gegevens van de klant</summary><div class="vbs-gegevens">
       ${[["Naam", g.bedrijf.naam], ["KvK", g.bedrijf.kvk], ["Adres", [g.bedrijf.straat, g.bedrijf.postcode, g.bedrijf.plaats].filter(Boolean).join(", ")], ["Telefoon", g.bedrijf.telefoon], ["Contact", g.bedrijf.contact],
@@ -281,6 +344,10 @@ async function vbStartBeheer(el, klantId) {
     b.disabled = true;
     try { await vbsApi("bevestig", { klant_id: klantId, stap: b.dataset.vbsbev }); vbStartBeheer(el, klantId); } catch (e) { toonMelding(meldEl, e.message); b.disabled = false; }
   }));
+  el.querySelector("[data-vbsscan]").onclick = async (e) => {
+    e.target.disabled = true; e.target.textContent = "Scannen… (± 30 sec)";
+    try { await vbsApi("scan", { klant_id: klantId, opnieuw: true }); vbStartBeheer(el, klantId); } catch (err) { toonMelding(meldEl, err.message); e.target.disabled = false; }
+  };
   el.querySelector("[data-vbsherken]").onclick = async (e) => {
     e.target.disabled = true;
     try { await vbsApi("herken", { klant_id: klantId }); vbStartBeheer(el, klantId); } catch (err) { toonMelding(meldEl, err.message); e.target.disabled = false; }

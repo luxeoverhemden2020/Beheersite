@@ -269,3 +269,9 @@ td.r,th.r{text-align:right}
 .vbsite-velden>div{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-width:0}
 .vbsite-velden span{font-size:13px;color:var(--zacht);min-width:130px}
 .vbsite-velden code{word-break:break-all}
+
+.vbs-kop{font-size:15px;margin:16px 0 6px}
+.vbs-mist{display:block;color:#b45309;font-size:12.5px;margin-top:3px}
+.vbs-laden{height:6px;border-radius:99px;background:var(--lijn);overflow:hidden;margin:12px 0 4px}
+.vbs-laden span{display:block;height:100%;width:35%;background:var(--accent);border-radius:99px;animation:vbsLaden 1.4s ease-in-out infinite}
+@keyframes vbsLaden{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
