@@ -72,10 +72,10 @@ function vbsScanInhoud(s, d) {
     <textarea id="vbs_diensten" name="diensten" rows="4" required placeholder="Eén per regel, het belangrijkste eerst">${esc(o.diensten || "")}</textarea>${!o.diensten ? VBS_MIST : ""}
     <h3 class="vbs-kop">Waarop wil je gevonden worden in Google?</h3>
     <textarea id="vbs_zoekwoorden" name="zoekwoorden" rows="5" placeholder="Eén zoekterm per regel">${esc((o.zoekwoorden || []).join("\n"))}</textarea>
-    <p class="zacht vbs-klein">Dit zijn de zoektermen waarop wij elke maand gaan werken. Voeg gerust toe wat je mist of haal weg wat niet past.</p>
+    <p class="zacht vbs-klein">Dit zijn de zoektermen waarop wij elke maand gaan werken. Voeg gerust toe wat je mist of haal weg wat niet past. <b>Je kunt dit later altijd aanvullen of aanpassen</b> bij Vindbaarheid → "Je bedrijf en zoekwoorden".</p>
     <h3 class="vbs-kop">Je concurrenten</h3>
     <textarea id="vbs_concurrenten" name="concurrenten" rows="3" placeholder="Eén per regel (mag leeg)">${esc((o.concurrenten || []).join("\n"))}</textarea>
-    <p class="zacht vbs-klein">${(o.concurrenten || []).length ? "Dit is een voorstel op basis van een zoekopdracht in jouw regio. Klopt er een niet? Haal hem weg of vervang hem." : "We vonden geen duidelijke concurrenten. Ken je ze zelf? Vul ze in (mag ook leeg)."}</p>
+    <p class="zacht vbs-klein">${(o.concurrenten || []).length ? "Dit is een voorstel op basis van een zoekopdracht in jouw regio. Klopt er een niet? Haal hem weg of vervang hem." : "We vonden geen duidelijke concurrenten. Ken je ze zelf? Vul ze in (mag ook leeg)."} Later aanvullen kan ook altijd.</p>
     <h3 class="vbs-kop">Wat moet een bezoeker op je site doen?</h3>
     <div class="vbs-vinkjes">${Object.entries(VBS_DOEL).map(([w, n]) => `<label class="vbs-vink"><input type="checkbox" name="doel" value="${w}" ${(o.doel || []).includes(w) ? "checked" : ""}> ${n}</label>`).join("")}</div>
     <h3 class="vbs-kop">Je bedrijfsgegevens</h3>
@@ -359,6 +359,13 @@ async function vbStartBeheer(el, klantId) {
 // Klantpagina: eerst de startstappen (zolang die niet af zijn), daaronder het dashboard
 function vbMetStart(el) {
   el.innerHTML = `<div data-vbs-start></div><div data-vbs-dash></div>`;
-  vbStartToon(el.querySelector("[data-vbs-start]"), undefined, { stil: true });
+  const startEl = el.querySelector("[data-vbs-start]");
+  const aanpassenKnop = () => {
+    startEl.innerHTML = `<div class="kaart"><div class="rij"><h2 class="vul" style="margin:0;font-size:16px"><span class="tag">&gt;_</span>Je bedrijf en zoekwoorden</h2>
+      <button class="knop rand klein" type="button">Bekijken of aanpassen</button></div>
+      <p class="zacht vbs-klein" style="margin:6px 0 0">Wat je verkoopt, je zoekwoorden, concurrenten en bedrijfsgegevens. Aanvullen kan altijd.</p></div>`;
+    startEl.querySelector("button").onclick = () => vbStartToon(startEl, undefined, { altijd: true, open: "scan" });
+  };
+  vbStartToon(startEl, undefined, { stil: true, klaar: aanpassenKnop }).then((d) => { if (d?.klant_klaar) aanpassenKnop(); });
   vbToon(el.querySelector("[data-vbs-dash]"));
 }
