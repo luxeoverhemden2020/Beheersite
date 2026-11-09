@@ -30,11 +30,16 @@
     toonMelding($("#meld"), tekst, soort);
     const a = $("#terug"); a.classList.remove("verborgen"); if (href) a.href = href;
   };
+  if (p.get("accountTicketId")) { // terug van de Analytics-voorwaarden: verder met aanmaken
+    let t = null; try { t = sessionStorage.getItem("vb_ga4_terug"); sessionStorage.removeItem("vb_ga4_terug"); } catch { /* geen opslag */ }
+    location.replace(t || "verzoeken?google=ga4#vindbaarheid"); return;
+  }
   if (p.get("error")) { klaar(p.get("error") === "access_denied" ? "Je hebt de koppeling geannuleerd. Er is niets veranderd." : "Google gaf een foutmelding. Probeer het opnieuw.", "let"); return; }
   try {
     const r = await vbApi("google_terug", { code: p.get("code") || "", state: p.get("state") || "" });
-    const doel = r.beheer ? `beheer?vb=${encodeURIComponent(r.klant_id)}&google=${r.kiezen ? "kies" : "ok"}#vindbaarheid`
-                          : `verzoeken?google=${r.kiezen ? "kies" : "ok"}#vindbaarheid`;
+    const st = r.ga4 ? "ga4" : r.kiezen ? "kies" : "ok";
+    const doel = r.beheer ? `beheer?vb=${encodeURIComponent(r.klant_id)}&google=${st}#vindbaarheid`
+                          : `verzoeken?google=${st}#vindbaarheid`;
     location.replace(doel);
   } catch (e) { klaar(e.message, "fout"); }
 })();

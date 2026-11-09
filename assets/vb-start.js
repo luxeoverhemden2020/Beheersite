@@ -256,7 +256,10 @@ async function vbStartBeheer(el, klantId) {
   const s = Object.fromEntries(d.stappen.map((x) => [x.id, x]));
   const g = d.gegevens || {};
   const taken = [];
-  if (s.website.status === "wacht") taken.push(`<li>Website (${esc(VBS_PLATFORM[d.platform] || d.platform)}): ${s.website.info?.status === "webbouwer" ? `webbouwer regelt het${s.website.info.webbouwer ? ` (<b>${esc(s.website.info.webbouwer)}</b>)` : ""}` : `klant heeft ${VBS_ADRES} toegevoegd. Accepteer de uitnodiging en zet het koppelstuk erop.`}
+  if (s.website.status === "wacht") taken.push(`<li>Website (${esc(VBS_PLATFORM[d.platform] || d.platform)}): ${s.website.info?.status === "webbouwer" ? `webbouwer regelt het${s.website.info.webbouwer ? ` (<b>${esc(s.website.info.webbouwer)}</b>)` : ""}`
+    : s.website.info?.status === "anders" ? `ander systeem: <b>${esc(s.website.info.systeem_tekst || "onbekend")}</b>. Regel de toegang zelf (bij een eigen site op Vercel/GitHub: deurbel instellen bij Website &amp; koppeling).`
+    : s.website.info?.status === "weet_niet" ? `klant weet niet welk systeem de site gebruikt. Neem contact op.`
+    : `klant heeft ${VBS_ADRES} toegevoegd. Accepteer de uitnodiging en zet het koppelstuk erop.`}
     ${s.website.info?.notitie ? `<br><span class="zacht">“${esc(s.website.info.notitie)}”</span>` : ""} <button class="knop klein" data-vbsbev="website">Toegang werkt</button></li>`);
   if (s.profiel.status === "wacht") taken.push(`<li>Bedrijfsprofiel: ${s.profiel.info?.status === "aanmaken" ? "aanmaken voor de klant" : "uitnodiging accepteren"}. <button class="knop klein" data-vbsbev="profiel">Geregeld</button></li>`);
   if (s.google.status === "wacht") taken.push(`<li>Google: klant heeft ons uitgenodigd${s.google.info?.notitie ? ` (“${esc(s.google.info.notitie)}”)` : ""}. Accepteer en koppel met de knop hieronder bij Koppelingen.</li>`);

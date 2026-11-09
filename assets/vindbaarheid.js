@@ -214,6 +214,7 @@ async function vbToon(el, klantId, beginTab) {
   const params = new URLSearchParams(location.search);
   let melding = "";
   if (params.get("google") === "ok") melding = `<div class="melding ok">Google is gekoppeld. De cijfers staan hieronder; ze worden elke nacht bijgewerkt.</div>`;
+  if (params.get("google") === "ga4") melding = `<div class="melding ok">Toestemming gegeven. Kies hieronder waar Sitehulpje je Analytics aanmaakt.</div>`;
   if (params.get("google") === "kies") melding = `<div class="melding let">Google is gekoppeld. Kies hieronder welke website en welke Analytics-gegevens bij jouw bedrijf horen.</div>`;
 
   const pk = vbPakket(d.klant.pakket);
@@ -225,9 +226,9 @@ async function vbToon(el, klantId, beginTab) {
     <h2><span class="tag">&gt;_</span>Koppelingen</h2>
     <ul class="vb-bronnen">
       <li><span class="vb-stip ${k?.gsc_site && k.status !== "ingetrokken" ? "aan" : ""}"></span>Google Search Console${k?.gsc_site ? ` · <span class="zacht">${esc(k.gsc_site.replace(/^sc-domain:/, ""))}</span>` : ""}</li>
-      <li><span class="vb-stip ${k?.ga4_property && k.status !== "ingetrokken" ? "aan" : ""}"></span>Google Analytics${k?.ga4_naam ? ` · <span class="zacht">${esc(k.ga4_naam)}</span>` : ""}</li>
+      <li><span class="vb-stip ${k?.ga4_property && k.status !== "ingetrokken" ? "aan" : ""}"></span>Google Analytics${k?.ga4_naam ? ` · <span class="zacht">${esc(k.ga4_naam)}${k.ga4_meet_id ? ` (${esc(k.ga4_meet_id)})` : ""}</span>` : ""}${k && !k.ga4_property && d.ga4_aanmaken ? ` · <button class="knop klein" data-vb="ga4">Analytics voor mij instellen</button>` : ""}</li>
       <li><span class="vb-stip ${k?.gbp_locatie && !k.gbp_fout && k.status !== "ingetrokken" ? "aan" : k?.gbp_locatie ? "" : "later"}"></span>Google Bedrijfsprofiel · <span class="zacht">${k?.gbp_naam ? esc(k.gbp_naam) : !k ? "" : !k.gbp_toestemming ? "koppel Google opnieuw en geef ook toestemming voor je Bedrijfsprofiel" : "kies je profiel via \"Website kiezen\""}</span></li>
-      <li><span class="vb-stip later"></span>Bing · <span class="zacht">binnenkort</span></li>
+      <li><span class="vb-stip later"></span>Bing · <span class="zacht">nog niet gekoppeld</span></li>
     </ul>
     ${k ? `<p class="zacht vb-klein">Gekoppeld met ${esc(k.google_email || "je Google-account")}${k.laatst_opgehaald ? ` · bijgewerkt ${datum(k.laatst_opgehaald)}` : ""}.
       Wij lezen je cijfers en plaatsen alleen iets op Google (zoals een antwoord op een review) als jij op Plaatsen klikt. Je kunt de koppeling altijd stoppen.</p>` :
@@ -484,6 +485,8 @@ function vbKnoppen(el, klantId, d) {
     catch (e) { fout(e.message); b.disabled = false; }
   }));
   el.querySelectorAll('[data-vb="kies"]').forEach((b) => (b.onclick = () => vbKiezer(el, klantId)));
+  el.querySelectorAll('[data-vb="ga4"]').forEach((b) => (b.onclick = () => vbGa4(el, klantId)));
+  if (new URLSearchParams(location.search).get("google") === "ga4" && el.querySelector('[data-vb="ga4"]')) vbGa4(el, klantId);
   el.querySelectorAll('[data-vb="ontkoppel"]').forEach((b) => (b.onclick = async () => {
     if (!confirm("Koppeling met Google stoppen? Je dashboard toont dan geen nieuwe cijfers meer.")) return;
     try { await vbApi("ontkoppel", { klant_id: klantId }); vbToon(el, klantId); } catch (e) { fout(e.message); }
@@ -527,6 +530,46 @@ async function vbKiezer(el, klantId) {
       } catch (err) { houder.insertAdjacentHTML("beforeend", `<div class="melding fout">${esc(err.message)}</div>`); e.target.disabled = false; e.target.textContent = "Opslaan en cijfers ophalen"; }
     };
   } catch (e) { houder.innerHTML = `<div class="melding fout">${esc(e.message)}</div>`; }
+}
+
+// ---------- Analytics voor de klant aanmaken ----------
+async function vbGa4(el, klantId) {
+  const houders = el.querySelectorAll("[data-vb-kies]");
+  const houder = [...houders].find((h) => h.offsetParent !== null) || houders[0];
+  if (!houder) return;
+  houder.innerHTML = `<p class="zacht">Even kijken in je Google Analytics…</p>`;
+  const fout = (t) => { houder.innerHTML = `<div class="melding fout">${esc(t)}</div>`; };
+  let o;
+  try { o = await vbApi("ga4_opties", { klant_id: klantId }); } catch (e) { return fout(e.message); }
+  if (!o.toestemming) {
+    houder.innerHTML = `<div class="melding let"><b>Analytics voor je instellen</b><br>Sitehulpje maakt in jouw eigen Google Analytics een meetplek aan voor je website. Daarvoor vraagt Google je één keer om toestemming om Analytics te <b>bewerken</b>. Wij maken alleen de meetplek voor jouw website aan en wijzigen of verwijderen verder niets.</div>
+      <div class="rij"><button class="knop" data-vb-ga4-ok>Toestemming geven bij Google</button></div>`;
+    houder.querySelector("[data-vb-ga4-ok]").onclick = async (e) => {
+      e.target.disabled = true;
+      try { const r = await vbApi("google_start", { klant_id: klantId, ga4: true }); location.href = r.url; } catch (err) { fout(err.message); }
+    };
+    return;
+  }
+  const site = esc((o.site || "").replace(/^https?:\/\//, "").replace(/\/$/, ""));
+  houder.innerHTML = `<label>In welk Analytics-account maken we de meetplek voor ${site} aan?</label>
+    <select data-vb-ga4-acc>${o.accounts.map((a) => `<option value="${esc(a.id)}" ${a.id === o.voorstel ? "selected" : ""}>${esc(a.naam)}</option>`).join("")}
+      <option value="nieuw" ${!o.voorstel ? "selected" : ""}>Nieuw account: ${esc(o.naam || site)}</option></select>
+    <p class="zacht vb-klein">Tip: kies een account dat bij jouw bedrijf hoort. Bij een nieuw account vraagt Google je eerst de voorwaarden te accepteren.</p>
+    <div class="rij"><button class="knop" data-vb-ga4-maak>Analytics aanmaken</button></div>`;
+  houder.querySelector("[data-vb-ga4-maak]").onclick = async (e) => {
+    e.target.disabled = true; e.target.textContent = "Bezig…";
+    try {
+      const r = await vbApi("ga4_aanmaken", { klant_id: klantId, account: houder.querySelector("[data-vb-ga4-acc]").value });
+      if (r.voorwaarden) {
+        try { sessionStorage.setItem("vb_ga4_terug", location.pathname + "?" + new URLSearchParams({ ...Object.fromEntries(new URLSearchParams(location.search)), google: "ga4" }) + location.hash); } catch { /* geen opslag */ }
+        location.href = r.voorwaarden; return;
+      }
+      history.replaceState(null, "", location.pathname + location.hash);
+      await vbToon(el, klantId);
+      const m = el.querySelector("[data-vb-kies]");
+      if (m) m.innerHTML = `<div class="melding ok">Klaar! ${r.bestond ? "We vonden al een Analytics-meetplek voor je website en hebben die gekoppeld" : "Analytics is aangemaakt voor je website"}${r.meet_id ? ` (meet-ID <b>${esc(r.meet_id)}</b>)` : ""}. ${r.bestond ? "" : "De meetcode moet nog op je website; Sitehulpje regelt dat. Daarna verschijnen hier vanzelf je bezoekerscijfers."}</div>`;
+    } catch (err) { fout(err.message); }
+  };
 }
 
 // ---------- Verbetervoorstellen ----------
