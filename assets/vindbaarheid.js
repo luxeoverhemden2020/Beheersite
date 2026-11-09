@@ -235,6 +235,7 @@ async function vbToon(el, klantId, beginTab) {
       `<p class="zacht">Koppel je Google-account, dan zie je hier hoe vaak je gevonden wordt. Je logt in bij Google zelf; wij krijgen geen wachtwoord. We lezen je cijfers en plaatsen alleen iets op Google als jij dat goedkeurt.</p>`}
     ${k?.fout ? `<div class="melding ${k.status === "ingetrokken" ? "fout" : "let"}">${esc(k.status === "ingetrokken" ? k.fout : "Niet alles kon worden opgehaald. Jan is op de hoogte.")}</div>` : ""}
     <div class="rij">
+      ${!k && d.ga4_aanmaken ? `<button class="knop" data-vb="koppelga4">Koppel Google en stel Analytics voor me in</button>` : ""}
       <button class="knop ${k ? "rand klein" : ""}" data-vb="koppel">${k ? (k.status === "ingetrokken" ? "Google opnieuw koppelen" : "Ander Google-account koppelen") : "Koppel Google"}</button>
       ${k ? `<button class="knop rand klein" data-vb="kies">Website kiezen</button><button class="knop rand klein" data-vb="ontkoppel">Koppeling stoppen</button>` : ""}
     </div>
@@ -486,6 +487,11 @@ function vbKnoppen(el, klantId, d) {
   }));
   el.querySelectorAll('[data-vb="kies"]').forEach((b) => (b.onclick = () => vbKiezer(el, klantId)));
   el.querySelectorAll('[data-vb="ga4"]').forEach((b) => (b.onclick = () => vbGa4(el, klantId)));
+  el.querySelectorAll('[data-vb="koppelga4"]').forEach((b) => (b.onclick = async () => {
+    b.disabled = true;
+    try { const r = await vbApi("google_start", { klant_id: klantId, ga4: true }); location.href = r.url; }
+    catch (e) { fout(e.message); b.disabled = false; }
+  }));
   if (new URLSearchParams(location.search).get("google") === "ga4" && el.querySelector('[data-vb="ga4"]')) vbGa4(el, klantId);
   el.querySelectorAll('[data-vb="ontkoppel"]').forEach((b) => (b.onclick = async () => {
     if (!confirm("Koppeling met Google stoppen? Je dashboard toont dan geen nieuwe cijfers meer.")) return;
