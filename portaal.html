@@ -9,7 +9,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Sitehulpje">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="assets/stijl.css?v=20261110d">
+<link rel="stylesheet" href="assets/stijl.css?v=20261110f">
+<link rel="stylesheet" href="assets/tools.css?v=20261110v">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96.png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
@@ -100,6 +101,7 @@ body{background:var(--bg)}
   <div id="vbpauze" data-kp="verzoeken overzicht"></div>
   <div id="shstart" data-kp="verzoeken"></div>
   <div id="vbpromo" data-kp="promo"></div>
+  <div id="kprapport" data-kp="gezondheid"></div>
   <div id="vindbaarheid" data-kp="VBALLE"></div>
   <div id="verzoekenDeel" data-kp="verzoeken">
 
@@ -124,6 +126,7 @@ body{background:var(--bg)}
 .vb-aanbod .rij{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .vriend-link{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}.vriend-link input{flex:1 1 220px;min-width:0;font-family:var(--mono,monospace);font-size:13px}</style>
 <script src="assets/basis.js?v=20261110b"></script>
+<script src="assets/rapport.js?v=20261110a"></script>
 <script src="assets/vindbaarheid.js?v=20261110l"></script>
 <script src="assets/vb-start.js"></script>
 <script src="assets/vb-site.js"></script>
@@ -333,8 +336,9 @@ const KP_AUTO = {
   rapporten: "Het rapport komt elke maand op de 2e vanzelf in je mail. Je hoeft er niets voor te doen.",
   bedrijf: "Pas je iets aan, dan nemen wij het mee in je website en de verbeteringen.",
   koppelingen: "Valt een koppeling weg, dan krijg je bericht hoe je hem met één knop herstelt." };
-let KP_MENU = [], kpPagina = "", kpVbGeladen = false, kpStartOpen = false, kpBadge = {};
+let kpHeeftVb = false, kpRapportGeladen = false, KP_MENU = [], kpPagina = "", kpVbGeladen = false, kpStartOpen = false, kpBadge = {};
 function kpMenu(vb) {
+  kpHeeftVb = !!vb;
   KP_MENU = vb ? [
     ["verzoeken", "Iets laten aanpassen", []], ["-"],
     ["overzicht", "Overzicht", []],
@@ -343,7 +347,8 @@ function kpMenu(vb) {
     ["klanten", "Klanten", [["reviews", "Reviews"], ["acties", "Telefoontjes en routes"]]],
     ["rapporten", "Rapporten", []], ["-"],
     ["inst", "Instellingen", [["bedrijf", "Over je bedrijf"], ["koppelingen", "Google-account"], ["abonnement", "Abonnement"]]] ] : [
-    ["verzoeken", "Iets laten aanpassen", []], ["-"],
+    ["verzoeken", "Iets laten aanpassen", []],
+    ["gezondheid", "Werkt alles goed?", []], ["-"],
     ["promo", "Beter gevonden worden", []], ["-"],
     ["abonnement", "Abonnement", []] ];
   // CSS: per pagina alleen de blokken met die pagina laten zien
@@ -379,11 +384,44 @@ function kpNaar(p) {
   const [t, u] = KP_TITEL[p] || [p, ""];
   $("#kptitel").textContent = t; $("#kpuitleg").textContent = u; $("#kpuitleg").hidden = !u; $("#kpbovtitel").textContent = t;
   kpTekenMenu(); kpDicht();
-  const vbPagina = !["verzoeken", "abonnement", "promo"].includes(p);
+  const vbPagina = kpHeeftVb && !["verzoeken", "abonnement", "promo"].includes(p);
+  if (p === "gezondheid" && !kpRapportGeladen) { kpRapportGeladen = true; kpRapport(); }
   if (vbPagina && !kpVbGeladen) { kpVbGeladen = true; kpLaadVb(); }
   kpAutoBlok(p);
   try { history.replaceState(null, "", location.pathname + location.search + (p === "verzoeken" ? "" : "#" + p)); } catch {}
   scrollTo(0, 0);
+}
+// ---------- Werkt alles goed? 14 checks op de eigen site, elke week vers ----------
+async function kpRapport(opnieuw) {
+  const el = $("#kprapport");
+  el.innerHTML = `<div class="kaart" id="kprp"></div>`;
+  const vak = $("#kprp"), stop = rpLaden(vak, "Ik controleer je website op 14 onderdelen…");
+  let r;
+  try {
+    const x = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-tools", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify({ actie: "mijnrapport", opnieuw: !!opnieuw }) });
+    r = await x.json(); if (!x.ok) throw new Error(r.fout || "De controle lukt nu even niet.");
+    await rpLaadTools(); if (!window.SR_RENDER) throw new Error("De controle lukt nu even niet.");
+  } catch (e) { stop(); vak.innerHTML = `<p class="zacht" style="margin:0">${esc(e.message)} Probeer het later nog eens.</p>`; return; }
+  stop();
+  const T = r.tools || {};
+  if (!Object.keys(T).length) { vak.innerHTML = `<p class="zacht" style="margin:0">We weten het adres van je website nog niet. Stuur ons een berichtje via "Iets laten aanpassen", dan zetten we de controle aan.</p>`; return; }
+  const n = rpPunten(T), dat = r.datum ? new Date(r.datum).toLocaleDateString("nl-NL", { day: "numeric", month: "long" }) : "";
+  const lijst = Object.entries(T).flatMap(([t, u]) => (u.items || []).filter((i) => i.status !== "goed").map((i) => `- ${RP_NAAM[t]}: ${i.titel}`));
+  vak.innerHTML = `<div class="rij"><div class="vul"><h2 style="margin:0">${n ? n + (n === 1 ? " punt kan beter" : " punten kunnen beter") : "Alles is in orde 🎉"}</h2>
+    <p class="zacht" style="margin:4px 0 0">Gecontroleerd op ${dat}. We doen dit elke week opnieuw.</p></div>
+    <button class="knop rand klein" type="button" id="kprpnu">Nu opnieuw controleren</button></div><div id="kprpcats"></div>
+    ${n ? `<div class="kaart" style="margin-top:14px;background:var(--bg2)"><b>Wil je dat wij deze punten oplossen?</b><p class="zacht" style="margin:4px 0 10px">Met één klik sturen we alle punten naar je webbeheerder. Je hoeft niets uit te leggen. Teksten voor Google en AI krijg je eerst te zien om goed te keuren.</p>
+    <button class="knop" type="button" id="kprpfix">Laat alles oplossen</button><span id="kprpok" class="zacht" style="margin-left:10px"></span></div>` : ""}`;
+  rpCategorieen($("#kprpcats"), T, { door: false });
+  $("#kprpnu").onclick = () => kpRapport(true);
+  const fix = $("#kprpfix");
+  if (fix) fix.onclick = async () => {
+    fix.disabled = true; fix.textContent = "Even geduld…";
+    try {
+      await api("verzoek_nieuw", { tekst: `Graag de verbeterpunten uit de controle van ${dat} oplossen (${n} punten):\n${lijst.join("\n")}`, fotos: [] });
+      fix.textContent = "Verstuurd ✓"; $("#kprpok").textContent = "Je ziet het verzoek bij \"Iets laten aanpassen\".";
+    } catch (e) { fix.disabled = false; fix.textContent = "Laat alles oplossen"; $("#kprpok").textContent = e.message || "Dat lukte niet, probeer het nog eens."; }
+  };
 }
 function kpAutoBlok(p) {
   let el = $("#kpauto");
