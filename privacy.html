@@ -5,6 +5,7 @@
 <title>Privacybeleid – Sitehulpje</title>
 <meta name="description" content="Privacybeleid van Sitehulpje en Siteregelaar: welke gegevens we verwerken, waarom, en hoe we omgaan met gegevens uit Google-diensten.">
 <link rel="stylesheet" href="assets/stijl.css?v=20261110c">
+<link rel="stylesheet" href="assets/home.css?v=20261110">
 <style>.tekst{max-width:760px;margin:0 auto;padding:24px 16px 60px;line-height:1.65}.tekst h1{font-size:30px;margin:10px 0 4px}.tekst h2{font-size:20px;margin:28px 0 6px}.tekst li{margin:4px 0}.tekst .zacht{font-size:14px}</style>
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96.png">
@@ -12,7 +13,20 @@
 <link rel="canonical" href="https://sitehulpje.nl/privacy">
 </head>
 <body>
-<div class="kop"><a href="./" style="text-decoration:none;color:inherit" class="merk">Site<b>hulpje</b></a><div class="rechts"><button class="knop rand klein thema" type="button"></button></div></div>
+<header class="kop">
+  <a href="./" class="bot-klein" id="kopbot" aria-label="Sitehulpje, naar de homepage"></a>
+  <a href="./" class="merk" style="text-decoration:none;color:inherit">Site<b>hulpje</b></a>
+  <nav class="rechts" aria-label="Hoofdmenu">
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/website-laten-maken-hengelo">Website laten maken</a>
+    <a class="navlink verberg-mobiel" href="https://shopregelaar.nl">Webshop</a>
+    <a class="navlink verberg-mobiel" href="./" aria-current="page">Sitehulpje</a>
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/#portfolio">Portfolio</a>
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/vindbaarheid">Vindbaarheid</a>
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/#contact">Contact</a>
+    <button class="knop rand klein thema" type="button"></button>
+    <a class="knop klein" href="inloggen">Inloggen</a>
+  </nav>
+</header>
 <main class="tekst">
 <h1>Privacybeleid</h1>
 <p class="zacht">Laatst bijgewerkt: 3 november 2026</p>
@@ -76,5 +90,7 @@
 <p><a href="voorwaarden">Algemene voorwaarden</a> · <a href="./">Terug naar Sitehulpje</a></p>
 </main>
 <script src="assets/basis.js"></script>
+<script>try{document.getElementById("kopbot").innerHTML=robotSvg("rust")}catch(e){}</script>
+<script src="assets/zijmenu.js?v=20261110"></script>
 </body>
 </html>

@@ -6,7 +6,7 @@
 <meta name="description" content="Foto van een klus, nieuwe dienst of vacature op je site? Stuur een appje en het staat erop. Gevonden worden als klanten in de buurt zoeken. Gratis check.">
 <link rel="canonical" href="https://sitehulpje.nl/voor-installateurs">
 <link rel="stylesheet" href="assets/stijl.css?v=20261110c">
-<link rel="stylesheet" href="assets/home.css">
+<link rel="stylesheet" href="assets/home.css?v=20261110">
 <link rel="stylesheet" href="assets/wow.css">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96.png">
@@ -114,12 +114,17 @@
 </head>
 <body class="home">
 <header class="kop">
-  <a href="./" class="bot-klein" id="kopbot" aria-label="Sitehulpje"></a>
+  <a href="./" class="bot-klein" id="kopbot" aria-label="Sitehulpje, naar de homepage"></a>
   <a href="./" class="merk" style="text-decoration:none;color:inherit">Site<b>hulpje</b></a>
-  <nav class="rechts">
-    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/vindbaarheid#pakketten">Pakketten</a>
+  <nav class="rechts" aria-label="Hoofdmenu">
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/website-laten-maken-hengelo">Website laten maken</a>
+    <a class="navlink verberg-mobiel" href="https://shopregelaar.nl">Webshop</a>
+    <a class="navlink verberg-mobiel" href="./" aria-current="page">Sitehulpje</a>
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/#portfolio">Portfolio</a>
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/vindbaarheid">Vindbaarheid</a>
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/#contact">Contact</a>
     <button class="knop rand klein thema" type="button"></button>
-    <a class="knop klein" href="#check">Gratis check</a>
+    <a class="knop klein" href="inloggen">Inloggen</a>
   </nav>
 </header>
 <main>
@@ -169,5 +174,6 @@ $("#bform").onsubmit = async (e) => {
 };
 </script>
 <script src="assets/wow.js"></script>
+<script src="assets/zijmenu.js?v=20261110"></script>
 </body>
 </html>

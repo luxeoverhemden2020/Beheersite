@@ -472,3 +472,5 @@ body.zm-zicht .zm-item,body.zm-los .zm-item{animation:zmIn .5s cubic-bezier(.2,.
   .p-winkel{min-height:480px}
   .probeer-raster{align-items:stretch}
 }
+
+@media (max-width:1080px){.kop .navlink{display:none}}

@@ -8,7 +8,7 @@
   if (/[?&](link|code)=/.test(location.search)) location.replace("inloggen" + location.search);
 </script>
 <link rel="stylesheet" href="assets/stijl.css?v=20261110c">
-<link rel="stylesheet" href="assets/home.css">
+<link rel="stylesheet" href="assets/home.css?v=20261110">
 <link rel="stylesheet" href="assets/wow.css">
 <style>
 .prijs-blok{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;align-items:stretch}
@@ -160,15 +160,15 @@
 <body class="home">
 
 <header class="kop">
-  <span class="bot-klein" id="kopbot"></span>
-  <div class="merk">Site<b>hulpje</b></div>
-  <nav class="rechts">
-    <a class="navlink verberg-mobiel" href="#probeer">Probeer het</a>
-    <a class="navlink verberg-mobiel" href="#sitehulpje">Hoe werkt het</a>
-    <a class="navlink verberg-mobiel" href="#los">Werkt het met mijn site?</a>
-    <a class="navlink verberg-mobiel" href="#contact">Koppelen</a>
-    <a class="navlink verberg-mobiel" href="#prijs">Prijs</a>
+  <a href="./" class="bot-klein" id="kopbot" aria-label="Sitehulpje, naar de homepage"></a>
+  <a href="./" class="merk" style="text-decoration:none;color:inherit">Site<b>hulpje</b></a>
+  <nav class="rechts" aria-label="Hoofdmenu">
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/website-laten-maken-hengelo">Website laten maken</a>
+    <a class="navlink verberg-mobiel" href="https://shopregelaar.nl">Webshop</a>
+    <a class="navlink verberg-mobiel" href="./" aria-current="page">Sitehulpje</a>
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/#portfolio">Portfolio</a>
     <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/vindbaarheid">Vindbaarheid</a>
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/#contact">Contact</a>
     <button class="knop rand klein thema" type="button"></button>
     <a class="knop klein" href="inloggen">Inloggen</a>
   </nav>
@@ -477,7 +477,6 @@
 <script src="assets/basis.js"></script>
 <script src="assets/robot3d.js"></script>
 <script src="assets/demo.js"></script>
-<script src="assets/zijmenu.js"></script>
 <script>
 $("#kopbot").innerHTML = robotSvg("rust");
 $("#telbot").innerHTML = robotSvg("rust");
@@ -527,5 +526,6 @@ $("#cform").onsubmit = async (e) => {
 };
 </script>
 <script src="assets/wow.js"></script>
+<script src="assets/zijmenu.js?v=20261110"></script>
 </body>
 </html>

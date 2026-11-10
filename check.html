@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <link rel="stylesheet" href="assets/stijl.css?v=20261110c">
-<link rel="stylesheet" href="assets/home.css">
+<link rel="stylesheet" href="assets/home.css?v=20261110">
 <link rel="stylesheet" href="assets/wow.css">
 <style>
 .rp{max-width:900px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:18px}
@@ -94,12 +94,17 @@
 </head>
 <body class="home">
 <header class="kop">
-  <a href="./" class="bot-klein" id="kopbot" aria-label="Sitehulpje"></a>
-  <a href="./" class="merk" style="text-decoration:none;color:inherit">Site<b>hulpje</b><small>Gratis website-check</small></a>
-  <nav class="rechts">
+  <a href="./" class="bot-klein" id="kopbot" aria-label="Sitehulpje, naar de homepage"></a>
+  <a href="./" class="merk" style="text-decoration:none;color:inherit">Site<b>hulpje</b></a>
+  <nav class="rechts" aria-label="Hoofdmenu">
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/website-laten-maken-hengelo">Website laten maken</a>
+    <a class="navlink verberg-mobiel" href="https://shopregelaar.nl">Webshop</a>
+    <a class="navlink verberg-mobiel" href="./" aria-current="page">Sitehulpje</a>
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/#portfolio">Portfolio</a>
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/vindbaarheid">Vindbaarheid</a>
+    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/#contact">Contact</a>
     <button class="knop rand klein thema" type="button"></button>
-    <button class="knop rand klein verberg-mobiel" type="button" id="pdf">⬇ PDF</button>
-    <a class="knop klein" href="https://siteregelaar.nl/vindbaarheid#pakketten">Pakketten</a>
+    <a class="knop klein" href="inloggen">Inloggen</a>
   </nav>
 </header>
 <main class="rp" id="rp"><div class="kaart rp-wacht"><p class="zacht">Rapport laden…</p></div></main>
@@ -200,5 +205,6 @@ function opbouw(d) {
   } catch (e) { el.innerHTML = `<div class="kaart rp-wacht"><p>${esc(e.message)}</p></div>`; }
 })();
 </script>
+<script src="assets/zijmenu.js?v=20261110"></script>
 </body>
 </html>
