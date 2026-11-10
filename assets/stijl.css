@@ -289,3 +289,6 @@ h1,h2,h3,h4,.kop .merk,.vb-waarde,.stats b{font-family:"Space Grotesk",system-ui
 :root[data-thema=licht] .knop.licht:hover,:root[data-thema=licht] .knop.rand:hover{color:#063a33;background:linear-gradient(135deg,#e3fcf6,#e6eeff) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6) border-box;box-shadow:0 0 18px -2px rgba(34,227,196,.35),inset 0 1px 0 rgba(255,255,255,.9)}
 .knop:disabled{opacity:.5;box-shadow:none}
 .knop{border-color:transparent !important}
+/* donkere vlakken (hero) houden altijd de donkere knopvariant */
+:root .wow-tekst .knop.rand,:root .wow-tekst .knop.licht,:root[data-thema=licht] .wow-tekst .knop.rand,:root[data-thema=licht] .wow-tekst .knop.licht{color:#e6f1ff;background:linear-gradient(rgba(7,11,20,.55),rgba(7,11,20,.55)) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6) border-box;box-shadow:0 0 0 3px rgba(34,227,196,.08)}
+:root .wow-tekst .knop.rand:hover,:root .wow-tekst .knop.licht:hover,:root[data-thema=licht] .wow-tekst .knop.rand:hover,:root[data-thema=licht] .wow-tekst .knop.licht:hover{color:#e6fffa;background:linear-gradient(135deg,rgba(34,227,196,.18),rgba(59,130,246,.18)) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6) border-box;box-shadow:0 0 22px rgba(34,227,196,.45)}
