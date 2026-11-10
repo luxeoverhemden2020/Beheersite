@@ -21,7 +21,7 @@ const API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/beheersite";
 
 // Twee aparte sessies per browser: één voor het beheerscherm (Jan) en één voor de klantpagina.
 // Zo kan Jan een klant-inloglink openen zonder dat zijn beheerscherm uitlogt.
-const IS_BEHEER = /\/beheer(\.html)?$/.test(location.pathname);
+const IS_BEHEER = /\/beheer(-nieuw)?(\.html)?$/.test(location.pathname);
 const SESSIE_SLEUTEL = { beheer: "bs_sessie_beheer", klant: "bs_sessie" };
 function sessieVan(soort) { try { return localStorage.getItem(SESSIE_SLEUTEL[soort]) || ""; } catch { return ""; } }
 function zetSessieVan(soort, t) { try { t ? localStorage.setItem(SESSIE_SLEUTEL[soort], t) : localStorage.removeItem(SESSIE_SLEUTEL[soort]); } catch {} }

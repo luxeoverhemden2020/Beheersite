@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sitehulpje – Beheer</title>
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sitehulpje">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="assets/stijl.css?v=20261110c">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<style>
+.taken{display:flex;flex-direction:column;gap:8px}
+.taak{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--lijn);border-radius:12px;background:var(--veld)}
+.taak.belangrijk{border-color:color-mix(in srgb,var(--accent) 45%,var(--lijn))}
+.taak .vul{min-width:0}
+.taak-ico{width:26px;text-align:center;flex:0 0 26px}
+#kdtabs{flex-wrap:wrap}
+tr.klik{cursor:pointer}
+@media (max-width:640px){#ktabel th:nth-child(n+3),#ktabel td:nth-child(n+3){display:none}}
+
+body{background:var(--bg)}
+.bh{display:flex;min-height:100vh}
+.bh-zij{width:236px;flex:none;background:#0b1626;color:#e6f1ff;padding:18px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;box-sizing:border-box}
+.bh-merk{display:flex;align-items:center;gap:9px;padding:2px 8px 18px;font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700;font-size:17px}
+.bh-merk b,.bh-merkm b{color:#22e3c4}.bh-merk small{margin-left:auto;color:#7f93af;font:500 11px ui-monospace,monospace}
+.bh-merk .bot-klein{width:30px;height:30px}
+.bh-nav{display:flex;flex-direction:column;gap:3px}
+.bh-nav button{display:flex;align-items:center;gap:12px;padding:10px 12px;border:0;border-radius:12px;background:none;color:#9fb0c8;font:500 15px "Inter",system-ui,sans-serif;cursor:pointer;text-align:left}
+.bh-nav button:hover{background:rgba(255,255,255,.05);color:#fff}
+.bh-nav button.aan{background:rgba(34,227,196,.12);box-shadow:inset 3px 0 0 #22e3c4;color:#fff;font-weight:700}
+.bh svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.bh-nav button.aan svg{stroke:#22e3c4}
+.teller{background:#22e3c4;color:#04111a;font-size:12px;font-weight:700;border-radius:999px;padding:1px 8px;line-height:1.5}
+.bh-ik{display:flex;align-items:center;gap:8px;padding:14px 6px 0;margin-top:10px;border-top:1px solid #1f2f4a;font-weight:600;font-size:14px}
+.bh-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#22e3c4,#3b82f6);color:#04111a;display:grid;place-items:center;font-weight:700}
+.bh-uit{background:none;border:0;color:#7f93af;font:inherit;font-size:13px;cursor:pointer;padding:4px}.bh-uit:hover{color:#fff}
+.bh .thema{background:transparent!important;border:0!important;box-shadow:none!important;padding:4px 6px;font-size:16px}
+#klijst .rij>h2,#t-verzoeken .rij>h2{display:none}
+#klijst .rij>input,#t-verzoeken .rij>input{margin-right:auto}
+.bh-main{flex:1;min-width:0;padding:32px 40px 48px;max-width:1180px}
+.bh-titel{margin-bottom:20px}.bh-titel h1{margin:2px 0 0;font-size:30px;letter-spacing:-.02em}
+.bh-sub{font:500 12px ui-monospace,monospace;color:var(--zacht);text-transform:lowercase}
+.bh-boven,.bh-onder{display:none}
+.bh .kaart{border-radius:16px;box-shadow:none}
+
+@media (max-width:860px){
+  .bh{flex-direction:column}
+  .bh-zij{display:none}
+  .bh-boven{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:6;background:#0b1626;color:#fff;height:56px;padding:0 14px;font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700}
+  .bh-boven .bot-klein{width:26px;height:26px}
+  .bh-ico{background:none;border:0;color:#9fb0c8;padding:6px;cursor:pointer;display:flex}.bh-ico svg{width:22px;height:22px}
+  .bh-main{padding:18px 14px 90px}
+  .bh-titel h1{font-size:24px}
+  .bh-onder{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--bg2);border-top:1px solid var(--lijn);padding:0 4px env(safe-area-inset-bottom)}
+  .bh-onder button{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 7px;border:0;background:none;color:var(--zacht);font:500 11px "Inter",system-ui,sans-serif;cursor:pointer}
+  .bh-onder button.aan{color:var(--tekst);font-weight:700}.bh-onder button.aan svg{stroke:var(--accent)}
+  .bh-onder svg{width:22px;height:22px}
+  .bh-onder .teller{position:absolute;top:3px;left:56%;font-size:10px;padding:0 6px}
+}
+</style>
+</head>
+<body>
+<div class="bh">
+<aside class="bh-zij" aria-label="Beheermenu">
+  <div class="bh-merk"><span class="bot-klein" id="kopbot"></span><span>Site<b>hulpje</b></span><small>beheer</small></div>
+  <nav class="bh-nav"><button type="button" data-tab="vandaag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1z"/></svg><span class="vul">Vandaag</span><b class="teller" data-teller="vandaag" hidden></b></button><button type="button" data-tab="klanten"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 19c0-2.2-1.8-4-4-4s-4 1.8-4 4M12 12a3 3 0 100-6 3 3 0 000 6zM20 19c0-1.7-1-3.1-2.5-3.7M17 6.5a2.5 2.5 0 010 5"/></svg><span class="vul">Klanten</span><b class="teller" data-teller="klanten" hidden></b></button><button type="button" data-tab="verzoeken"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg><span class="vul">Verzoeken</span><b class="teller" data-teller="verzoeken" hidden></b></button><button type="button" data-tab="verkoop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg><span class="vul">Verkoop</span><b class="teller" data-teller="verkoop" hidden></b></button><button type="button" data-tab="geld"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v12H3zM3 11h18M7 15h4"/></svg><span class="vul">Geld</span><b class="teller" data-teller="geld" hidden></b></button></nav>
+  <div class="vul"></div>
+  <nav class="bh-nav"><button type="button" data-tab="instellingen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-2.7 1.1V21a2 2 0 11-4 0v-.1a1.6 1.6 0 00-2.7-1.1l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00-1.1-2.7H3a2 2 0 110-4h.1a1.6 1.6 0 001.1-2.7l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 002.7-1.1V3a2 2 0 114 0v.1a1.6 1.6 0 002.7 1.1l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 001.1 2.7H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg><span class="vul">Instellingen</span></button></nav>
+  <div class="bh-ik"><span class="bh-av">J</span><span class="vul">Jan</span><button class="knop rand klein thema" type="button"></button><button class="bh-uit" id="uit" type="button">Uitloggen</button></div>
+</aside>
+<header class="bh-boven"><span class="bot-klein" id="kopbot2"></span><span class="bh-merkm">Site<b>hulpje</b></span><span class="vul"></span>
+  <button class="knop rand klein thema" type="button"></button>
+  <button type="button" class="bh-ico" data-tab="instellingen" aria-label="Instellingen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-2.7 1.1V21a2 2 0 11-4 0v-.1a1.6 1.6 0 00-2.7-1.1l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00-1.1-2.7H3a2 2 0 110-4h.1a1.6 1.6 0 001.1-2.7l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 002.7-1.1V3a2 2 0 114 0v.1a1.6 1.6 0 002.7 1.1l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 001.1 2.7H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg></button></header>
+<main class="bh-main">
+  <div class="bh-titel"><span class="bh-sub" id="bhsub"></span><h1 id="bhkop">Vandaag</h1></div>
+  <div id="meld" class="verborgen"></div>
+
+  <section id="t-vandaag">
+    <div id="vdtegels"></div>
+    <div id="vdtaken"><div class="kaart"><p class="zacht">Laden…</p></div></div>
+    <div id="vbmeldingen"></div>
+    <div id="vbstart"></div>
+  </section>
+
+  <section id="t-klanten" class="verborgen">
+    <div id="klijst">
+      <div class="kaart tabel-scroll"><div class="rij"><h2 class="vul" style="margin:0">Klanten</h2>
+        <input id="kzoek" type="search" placeholder="Zoek klant…" style="width:auto;min-width:180px"><button class="knop licht klein" id="nieuweklant">+ Klant toevoegen</button></div>
+        <div id="ktabel" style="margin-top:10px"><p class="zacht">Laden…</p></div></div>
+    </div>
+    <div id="kdetail" hidden>
+      <div class="rij" style="margin:0 0 10px"><button class="knop rand klein" id="kterug">&larr; Alle klanten</button>
+        <h2 class="vul" style="margin:0" id="kdnaam"></h2></div>
+      <div class="hooftabs" id="kdtabs">
+        <button data-kd="cijfers" class="aan">Cijfers &amp; SEO</button><button data-kd="abonnement">Abonnement</button>
+        <button data-kd="website">Website &amp; koppeling</button><button data-kd="verzoeken">Verzoeken</button></div>
+      <div data-kdvak="cijfers"><div id="kdpakket"></div><div id="vbdetail"></div></div>
+      <div data-kdvak="abonnement" hidden><div class="kaart"><h2 style="font-size:16px"><span class="tag">%</span>Abonnement en korting</h2>
+        <p class="zacht vb-klein" style="margin-top:-4px">Een korting staat als aparte regel op de factuur, en de incasso schrijft het lagere bedrag af.</p><div id="kdabon"></div></div></div>
+      <div data-kdvak="website" hidden>
+    <div class="kaart" id="kform">
+      <h2 id="ktitel" style="font-size:16px">Website en koppeling</h2>
+      <div class="grid2">
+        <div><label>Code (vast, kleine letters)</label><input id="k_id" placeholder="softwash-koning"></div>
+        <div><label>Naam</label><input id="k_naam"></div>
+        <div><label>Website</label><input id="k_site" placeholder="https://…"></div>
+        <div><label>Soort site</label><select id="k_soort"><option value="wordpress">WordPress</option><option value="magento">Magento</option><option value="shopify">Shopify</option><option value="vercel">Vercel / GitHub</option><option value="anders">Anders</option></select></div>
+        <div hidden><label>Verzoeken per maand</label><input id="k_limiet" type="number" min="0" value="999"></div>
+        <div><label>Actief</label><select id="k_actief"><option value="1">Ja</option><option value="0">Nee</option></select></div>
+        <div><label>WhatsApp-optie (€30 p/m)</label><select id="k_whatsapp"><option value="0">Uit</option><option value="1">Aan</option></select></div>
+        <div><label>Budget snelle webbeheerder (€ per maand)</label><input id="k_budget" type="number" min="0" step="0.5" value="5"></div>
+      </div>
+      <div id="shblok" class="verborgen" style="margin:12px 0;padding:12px;border:1px solid var(--rand,#3336);border-radius:10px">
+        <h2 style="font-size:16px;margin:0 0 6px">Eigen Shopify-app</h2>
+        <ol class="zacht" style="margin:0 0 8px;padding-left:18px"><li>dev.shopify.com → Apps → Create app → Start from Dev Dashboard. Naam: Sitehulpje – klantnaam.</li>
+          <li>App-URL: <code id="sh_appurl"></code>, insluiten uit.<br>Omleidings-URL: <code id="sh_redirect" style="word-break:break-all"></code><br>Scopes: <code id="sh_scopes"></code></li>
+          <li>Uitbrengen, daarna Distribution → Custom → het adres hieronder.</li><li>Kopieer Client ID en Client secret naar hieronder en klik op Opslaan en mailen.</li></ol>
+        <label>myshopify-adres</label><input id="sh_shop" placeholder="winkel.myshopify.com">
+        <label>Client ID</label><input id="sh_cid" autocomplete="off">
+        <label>Client secret (leeg laten = niet wijzigen)</label><input id="sh_cs" type="password" autocomplete="off">
+        <div class="rij" style="margin-top:10px"><button class="knop" type="button" id="sh_opslaan">Opslaan en klant mailen</button></div><div id="sh_meld" class="zacht" style="margin-top:8px"></div>
+      </div>
+      <label>Deurbel-adres (URL van de routine)</label><input id="k_url" placeholder="https://api.anthropic.com/v1/claude_code/routines/trig_…/fire">
+      <label>Deurbel-sleutel (leeg laten = niet wijzigen)</label><input id="k_token" type="password" autocomplete="off" placeholder="sk-ant-oat01-…">
+      <div class="rij" style="margin-top:12px">
+        <button class="knop" id="kopslaan">Opslaan</button>
+        <button class="knop rand" id="ktest">Deurbel testen</button>
+        
+      </div>
+      <div id="wpblok" style="margin-top:18px;border-top:1px solid var(--lijn);padding-top:12px">
+        <h2 style="font-size:16px"><span class="tag">&gt;_</span>WordPress / WooCommerce koppelen</h2>
+        <ol class="zacht" style="margin:0 0 10px;padding-left:18px">
+          <li>Sla de klant eerst op (code en website ingevuld).</li>
+          <li>Download het koppelstuk voor deze klant.</li>
+          <li>In WordPress: <b>Plugins → Nieuwe plugin → Plugin uploaden</b> → zip kiezen → <b>Nu installeren</b> → <b>Activeren</b>.</li>
+          <li>Klik op <b>Koppeling testen</b>.</li>
+        </ol>
+        <div class="rij">
+          <button class="knop licht klein" id="kzip">⬇ Koppelstuk downloaden</button>
+          <button class="knop rand klein" id="kkoppeltest">Koppeling testen</button>
+        </div>
+        <p class="zacht" style="margin-bottom:0">Met de API-sleutel werkt de snelle webbeheerder dan meteen. De deurbel hierboven is alleen nodig als achtervang voor hele grote klussen.</p>
+      </div>
+    </div>
+      </div>
+      <div data-kdvak="verzoeken" hidden><div class="kaart tabel-scroll"><h2 style="font-size:16px">Verzoeken van deze klant</h2><div id="kdverzoeken"></div></div></div>
+    </div>
+  </section>
+
+  <section id="t-verzoeken" class="verborgen">
+    <div class="kaart tabel-scroll"><div class="rij"><h2 class="vul" style="margin:0">Verzoeken</h2><input type="month" id="maand" style="width:auto;padding:6px 8px"></div><div id="vtabel" style="margin-top:10px"></div></div>
+  </section>
+
+  <section id="t-verkoop" class="verborgen">
+    <div id="vbchecks"></div>
+    <div id="vbbestel"></div>
+    <div id="vbcodes"></div>
+    <div id="vbwidget"></div>
+  </section>
+
+  <section id="t-geld" class="verborgen">
+    <div id="vbfacturen"></div>
+    <div id="geldlijsten"></div>
+    <div id="vbkosten"></div>
+  </section>
+
+  <section id="t-instellingen" class="verborgen">
+    <div class="kaart tabel-scroll"><h2>Accounts</h2><div id="gtabel"></div>
+      <button class="knop licht klein" id="nieuwegebruiker" style="margin-top:10px">+ Account toevoegen</button></div>
+    <div class="kaart verborgen" id="gform">
+      <h2>Account</h2>
+      <div class="grid2">
+        <div><label>E-mailadres</label><input id="g_email" type="email"></div>
+        <div><label>Naam</label><input id="g_naam"></div>
+        <div><label>WhatsApp-nummer (bijv. 0612345678)</label><input id="g_tel" type="tel" autocomplete="off"></div>
+        <div><label>Klant / site</label><select id="g_klant"></select></div>
+        <div><label>Rol</label><select id="g_rol"><option value="klant">Klant</option><option value="admin">Beheerder (Jan)</option></select></div>
+        <div><label>Wachtwoord (leeg = niet wijzigen)</label><input id="g_ww" type="password" autocomplete="new-password"></div>
+        <div><label>Actief</label><select id="g_actief"><option value="1">Ja</option><option value="0">Nee</option></select></div>
+      </div>
+      <div class="rij" style="margin-top:12px"><button class="knop" id="gopslaan">Opslaan</button><button class="knop rand" id="gannuleer">Sluiten</button></div>
+      <div id="linkblok" class="verborgen" style="margin-top:18px;border-top:1px solid var(--lijn);padding-top:12px">
+        <h2 style="font-size:16px">Vaste inloglink</h2>
+        <p class="zacht" style="margin-top:0">Met deze link komt de klant direct in zijn eigen omgeving, zonder wachtwoord. Deel hem alleen met de klant zelf.</p>
+        <input id="g_link" readonly placeholder="Nog geen link">
+        <div class="rij" style="margin-top:8px">
+          <button class="knop licht klein" id="linkmaak">Link tonen / maken</button>
+          <button class="knop rand klein" id="linkkopie">Kopiëren</button>
+          <button class="knop rand klein" id="linknieuw">Nieuwe link (oude vervalt)</button>
+          <button class="knop rand klein" id="linkuit">Link uitzetten</button>
+        </div>
+      </div>
+    </div>
+    <div id="vbinst"></div>
+    <div class="kaart" style="max-width:520px">
+      <h2>Snelle webbeheerder (Claude API)</h2>
+      <p class="zacht" style="margin-top:0" id="apistatus"></p>
+      <label>Claude API-sleutel (begint met sk-ant-)</label><input id="a_api" type="password" autocomplete="off" placeholder="Plak hier je API-sleutel">
+      <button class="knop" id="apiopslaan" style="margin-top:12px">Opslaan</button>
+    </div>
+    <div class="kaart" style="max-width:520px">
+      <h2>WhatsApp-koppeling</h2>
+      <p class="zacht" style="margin-top:0" id="wastatus"></p>
+      <label>Webhook-adres (plakken bij Meta)</label><input id="wa_hook" readonly onclick="this.select()">
+      <label>Verify token (plakken bij Meta)</label><input id="wa_verify" readonly onclick="this.select()">
+      <label>Permanent access token</label><input id="wa_token" type="password" autocomplete="off" placeholder="Plak hier zelf de token van Meta">
+      <label>App secret</label><input id="wa_secret" type="password" autocomplete="off" placeholder="Plak hier zelf het app secret">
+      <label>Phone number ID</label><input id="wa_phone" autocomplete="off" placeholder="Het ID van je WhatsApp-nummer">
+      <label>OpenAI API-sleutel (voor spraakberichten)</label><input id="wa_openai" type="password" autocomplete="off" placeholder="Begint met sk-">
+      <button class="knop" id="waopslaan" style="margin-top:12px">Opslaan</button>
+    </div>
+    <div class="kaart" style="max-width:420px">
+      <h2>Mijn wachtwoord wijzigen</h2>
+      <label>Nieuw wachtwoord (min. 8 tekens)</label><input id="a_ww" type="password" autocomplete="new-password">
+      <button class="knop" id="aopslaan" style="margin-top:12px">Opslaan</button>
+    </div>
+  </section>
+</main>
+<nav class="bh-onder" aria-label="Beheermenu"><button type="button" data-tab="vandaag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1z"/></svg><span>Vandaag</span><b class="teller" data-teller="vandaag" hidden></b></button><button type="button" data-tab="klanten"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 19c0-2.2-1.8-4-4-4s-4 1.8-4 4M12 12a3 3 0 100-6 3 3 0 000 6zM20 19c0-1.7-1-3.1-2.5-3.7M17 6.5a2.5 2.5 0 010 5"/></svg><span>Klanten</span><b class="teller" data-teller="klanten" hidden></b></button><button type="button" data-tab="verzoeken"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg><span>Verzoeken</span><b class="teller" data-teller="verzoeken" hidden></b></button><button type="button" data-tab="verkoop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg><span>Verkoop</span><b class="teller" data-teller="verkoop" hidden></b></button><button type="button" data-tab="geld"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v12H3zM3 11h18M7 15h4"/></svg><span>Geld</span><b class="teller" data-teller="geld" hidden></b></button></nav>
+</div>
+
+<div class="paneel verborgen" id="paneel"><div class="in" id="paneelin"></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="assets/basis.js?v=20261110b"></script>
+<script src="assets/vindbaarheid.js"></script>
+<script src="assets/vb-start.js"></script>
+<script src="assets/vb-site.js"></script>
+<script src="assets/vb-factuur.js"></script>
+<script src="assets/vb-check.js"></script>
+<script>
+const WIEJAN = { klant: "Klant", webbeheer: "Sitehulpje", jan: "Jij (Jan)" };
+let data = null, ik = null, openVerzoek = null, paneelTimer = null;
+$("#maand").value = new Date().toISOString().slice(0, 7);
+const meld = (t, s = "fout") => { toonMelding($("#meld"), t, s); if (t) scrollTo(0, 0); };
+
+// ---------- tabbladen ----------
+const TABS = ["vandaag", "klanten", "verzoeken", "verkoop", "geld", "instellingen"];
+const geladen = {};
+const TITELS = { vandaag: "Vandaag", klanten: "Klanten", verzoeken: "Verzoeken", verkoop: "Verkoop", geld: "Geld", instellingen: "Instellingen" };
+function zetKop(tab) {
+  const nu = new Date(), u = nu.getHours();
+  $("#bhkop").textContent = tab === "vandaag" ? (u < 12 ? "Goedemorgen, Jan." : u < 18 ? "Goedemiddag, Jan." : "Goedenavond, Jan.") : TITELS[tab];
+  $("#bhsub").textContent = nu.toLocaleDateString("nl-NL", { weekday: "long", day: "numeric", month: "long" });
+}
+function naarTab(tab) {
+  document.querySelectorAll("[data-tab]").forEach((x) => x.classList.toggle("aan", x.dataset.tab === tab));
+  zetKop(tab);
+  TABS.forEach((t) => $("#t-" + t).classList.toggle("verborgen", t !== tab));
+  if (tab === "klanten" && !openKlant) { $("#klijst").hidden = false; $("#kdetail").hidden = true; }
+  laadTab(tab);
+  try { history.replaceState(null, "", "#" + tab); } catch {}
+}
+document.querySelectorAll("[data-tab]").forEach((b) => b.onclick = () => { if (b.dataset.tab === "klanten") openKlant = null; naarTab(b.dataset.tab); });
+function laadTab(tab, opnieuw) {
+  if (geladen[tab] && !opnieuw) return;
+  geladen[tab] = true;
+  if (tab === "vandaag") { vbgOmzet($("#vdtegels"), "tegels"); tekenTaken(); vbMeldingen(); vbStartOverzicht($("#vbstart"), (id) => openKlantPagina(id, "cijfers")); }
+  if (tab === "klanten") laadKlanten();
+  if (tab === "verkoop") { vbcBeheer($("#vbchecks"), new URLSearchParams(location.search).get("check")); vbbBestellingen($("#vbbestel")); vbkCodes($("#vbcodes")); vbgWidget($("#vbwidget")); }
+  if (tab === "geld") { vbfBeheer($("#vbfacturen")); vbgOmzet($("#geldlijsten"), "lijsten"); vbKosten($("#vbkosten")); }
+  if (tab === "instellingen") vbgInstellingen($("#vbinst"));
+}
+async function tekenTaken() {
+  // verzoeken die op Jan wachten komen erbij uit het gewone overzicht
+  const extra = (data?.verzoeken || []).filter((v) => ["doorgestuurd", "kan_niet"].includes(v.status))
+    .map((v) => ({ soort: "verzoek", ico: "💬", belangrijk: true, verzoek: v.id, tekst: `Verzoek #${v.nr} van <b>${esc(klantNaam(v.klant_id))}</b>: ${esc(v.onderwerp)} <span class="chip ${v.status}">${STATUS[v.status]}</span>` }));
+  const n = await vbgTaken($("#vdtaken"), { extra, opKlant: (id, soort) => openKlantPagina(id, soort === "koppeling" ? "website" : ["factuur", "korting", "opzegging"].includes(soort) ? "abonnement" : soort === "stil" ? "verzoeken" : "cijfers"),
+    opCheck: (id) => { history.replaceState(null, "", "?check=" + id + "#verkoop"); geladen.verkoop = false; naarTab("verkoop"); } });
+  document.querySelectorAll('[data-teller="vandaag"]').forEach((t) => { t.hidden = !n; t.textContent = n || ""; });
+}
+
+// ---------- klanten: één lijst, per klant één pagina ----------
+const VB_PAKKET = { basis: "Basis", plus: "Plus", pro: "Pro" };
+let vbKlanten = [], extraKlanten = {}, openKlant = null;
+async function laadKlanten() {
+  try {
+    const [a, b] = await Promise.all([vbApi("beheer_lijst"), vbgApi("klanten_extra").catch(() => ({ klanten: [] }))]);
+    vbKlanten = a.klanten; extraKlanten = Object.fromEntries(b.klanten.map((k) => [k.id, k]));
+  } catch (e) { $("#ktabel").innerHTML = `<div class="melding fout">${esc(e.message)}</div>`; return; }
+  tekenKlanten();
+}
+function tekenKlanten() {
+  if (!data) return;
+  const zoek = ($("#kzoek").value || "").toLowerCase();
+  const lijst = data.klanten.filter((k) => !zoek || (k.naam + " " + k.site).toLowerCase().includes(zoek));
+  $("#ktabel").innerHTML = lijst.length ? `<table><thead><tr><th>Klant</th><th>Diensten</th><th class="r">Per maand</th><th class="r">Klikken Google</th><th class="r">Verzoeken</th><th></th></tr></thead><tbody>
+    ${lijst.map((k) => {
+      const v = vbKlanten.find((x) => x.id === k.id) || {}, x = extraKlanten[k.id] || {};
+      const diensten = [v.vindbaarheid && v.vb_pakket ? `<span class="chip klaar">Vindbaarheid ${VB_PAKKET[v.vb_pakket]}</span>` : "",
+        x.sh_prijs > 0 || k.deurbel_ingesteld ? `<span class="chip">Sitehulpje</span>` : ""].filter(Boolean).join(" ") || '<span class="zacht">–</span>';
+      const pct = v.klikken_vorige ? Math.round(((v.klikken_28 - v.klikken_vorige) / v.klikken_vorige) * 100) : null;
+      return `<tr class="klik" data-kopen="${esc(k.id)}"><td><b>${esc(k.naam)}</b>${k.actief ? "" : ' <span class="zacht">(uit)</span>'}${x.opzeg_per ? ' <span class="vb-af vb-klein">opgezegd</span>' : ""}${x.vb_pauze ? ' <span class="vb-af vb-klein">pauze</span>' : ""}<br><span class="zacht vb-klein">${esc((k.site || "").replace(/^https?:\/\//, ""))}</span></td>
+        <td>${diensten}</td><td class="r mono">${x.netto ? vbfEuro(x.netto) : '<span class="zacht">–</span>'}</td>
+        <td class="r mono">${v.status ? vbGetal(v.klikken_28) : '<span class="zacht vb-klein">' + (v.vindbaarheid ? "niet gekoppeld" : "–") + "</span>"}${pct != null ? `<br><span class="${pct >= 0 ? "vb-op" : "vb-af"} vb-klein">${pct >= 0 ? "▲" : "▼"} ${Math.abs(pct)}%</span>` : ""}</td>
+        <td class="r mono">${k.gebruikt || 0}</td><td><button class="knop rand klein">Open</button></td></tr>`;
+    }).join("")}</tbody></table>` : `<p class="zacht">${zoek ? "Geen klant gevonden." : "Nog geen klanten."}</p>`;
+  document.querySelectorAll("[data-kopen]").forEach((tr) => tr.onclick = () => openKlantPagina(tr.dataset.kopen));
+  $("#g_klant").innerHTML = `<option value="">– geen –</option>` + data.klanten.map((k) => `<option value="${esc(k.id)}">${esc(k.naam)}</option>`).join("");
+}
+$("#kzoek").oninput = tekenKlanten;
+function kdTab(tab) {
+  document.querySelectorAll("#kdtabs button").forEach((b) => b.classList.toggle("aan", b.dataset.kd === tab));
+  document.querySelectorAll("[data-kdvak]").forEach((v) => (v.hidden = v.dataset.kdvak !== tab));
+}
+document.querySelectorAll("#kdtabs button").forEach((b) => b.onclick = () => kdTab(b.dataset.kd));
+$("#kterug").onclick = () => { openKlant = null; $("#kdetail").hidden = true; $("#klijst").hidden = false; laadKlanten(); };
+async function openKlantPagina(id, tab = "cijfers") {
+  if (!data) await laad();
+  if (!vbKlanten.length) await laadKlanten();
+  openKlant = id;
+  naarTab("klanten");
+  const k = data.klanten.find((x) => x.id === id), v = vbKlanten.find((x) => x.id === id) || {};
+  $("#klijst").hidden = true; $("#kdetail").hidden = false;
+  $("#kdnaam").innerHTML = `${esc(k?.naam || v.naam || id)} <span class="zacht" style="font-weight:400;font-size:14px">${esc((k?.site || v.site || "").replace(/^https?:\/\//, ""))}</span>`;
+  // cijfers & seo: pakket aan/uit en (als Vindbaarheid aan staat) het dashboard zoals de klant het ziet
+  $("#kdpakket").innerHTML = `<div class="kaart"><div class="rij"><b class="vul">Vindbaarheid</b>
+    <select id="kdpk" style="width:auto"><option value="">Uit</option>${Object.entries(VB_PAKKET).map(([w, n]) => `<option value="${w}" ${v.vindbaarheid && v.vb_pakket === w ? "selected" : ""}>${n}</option>`).join("")}</select></div>
+    <p class="zacht vb-klein" style="margin:6px 0 0">${v.status === "ok" ? `Google gekoppeld (${esc(v.google_email || "")}) · laatst bijgewerkt ${v.laatst_opgehaald ? datum(v.laatst_opgehaald) : "–"}` : v.vindbaarheid ? "Google is nog niet gekoppeld. Dat doet de klant in zijn startstappen." : "Zet een pakket aan om Vindbaarheid voor deze klant te starten."}</p></div>`;
+  $("#kdpk").onchange = async (e) => { try { await vbApi("beheer_zet", { klant_id: id, aan: !!e.target.value, pakket: e.target.value || null }); await laadKlanten(); openKlantPagina(id, "cijfers"); } catch (err) { meld(err.message); } };
+  if (v.vindbaarheid) vbBeheerBekijk(id, vbKlanten); else $("#vbdetail").innerHTML = "";
+  vbfAbonnementVoor($("#kdabon"), id);
+  klantForm(k);
+  const vz = (data.verzoeken || []).filter((x) => x.klant_id === id);
+  $("#kdverzoeken").innerHTML = vz.length ? `<table><thead><tr><th>Nr</th><th>Klant</th><th>Verzoek</th><th>Status</th><th>Datum</th></tr></thead><tbody>${vz.map(rijVerzoek).join("")}</tbody></table>` : `<p class="zacht">Nog geen verzoeken.</p>`;
+  document.querySelectorAll("#kdverzoeken tr.klik[data-id]").forEach((tr) => tr.onclick = () => toonVerzoek(tr.dataset.id));
+  kdTab(tab);
+  scrollTo(0, 0);
+}
+
+async function vbMeldingen() {
+  const el = $("#vbmeldingen");
+  try {
+    const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-waakhond", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "meldingen" }) });
+    const { meldingen = [] } = await r.json();
+    const open = meldingen.filter((m) => !m.opgelost);
+    el.innerHTML = !meldingen.length ? `<div class="melding ok">Geen meldingen: alle sites zijn bereikbaar en de cijfers lopen normaal.</div>` :
+      `<div style="margin-bottom:12px">${meldingen.map((m) => `<div class="melding ${m.opgelost ? "ok" : m.ernst === "hoog" ? "fout" : "let"}" style="display:flex;gap:10px;align-items:center">
+        <div class="vul"><b>${esc(m.naam)}</b>: ${esc(m.tekst)} <span class="zacht vb-klein">· ${datum(m.gemaakt)}${m.opgelost ? " · opgelost" : ""}</span></div>
+        ${m.opgelost ? "" : `<button class="knop rand klein" data-vbopgelost="${m.id}">Opgelost</button>`}</div>`).join("")}</div>`;
+    el.querySelectorAll("[data-vbopgelost]").forEach((b) => (b.onclick = async () => {
+      await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-waakhond", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "opgelost", id: b.dataset.vbopgelost }) });
+      vbMeldingen();
+    }));
+  } catch { el.innerHTML = ""; }
+}
+async function vbKosten(el) {
+  // AI-kosten van Vindbaarheid, apart van de Sitehulpje-limiet; alleen voor Jan
+  try {
+    const { kosten } = await vbVsApi("kosten");
+    if (!kosten.length) { el.innerHTML = ""; return; }
+    const eur = (n) => "€" + Number(n || 0).toFixed(2).replace(".", ",");
+    const tot = kosten.reduce((s, k) => s + k.deze, 0);
+    el.innerHTML = `<div class="kaart tabel-scroll"><h2 style="font-size:16px"><span class="tag">€</span>AI-kosten Vindbaarheid</h2>
+      <p class="zacht vb-klein" style="margin-top:-4px">Telt niet mee in de €5-limiet van Sitehulpje. Gaat van het API-tegoed af. Bij 80% van de grens krijg je een mail; bij de grens wachten nieuwe verbeteringen tot volgende maand.</p>
+      <table><thead><tr><th>Klant</th><th>Pakket</th><th class="r">Deze maand</th><th class="r">Grens</th><th class="r">Vorige maand</th></tr></thead><tbody>
+      ${kosten.map((k) => { const pct = k.grens ? Math.round((k.deze / k.grens) * 100) : 0;
+        return `<tr><td><b>${esc(k.naam)}</b></td><td>${esc(VB_PAKKET[k.vb_pakket] || k.vb_pakket || "–")}</td>
+        <td class="r mono">${eur(k.deze)}${pct >= 80 ? ` <span class="vb-af vb-klein">${pct}%</span>` : ""}</td><td class="r mono zacht">${eur(k.grens)}</td><td class="r mono zacht">${eur(k.vorige)}</td></tr>`; }).join("")}
+      <tr><td colspan="2"><b>Totaal deze maand</b></td><td class="r mono"><b>${eur(tot)}</b></td><td></td><td></td></tr></tbody></table></div>`;
+  } catch { el.innerHTML = ""; }
+}
+function vbBeheerBekijk(id, klanten) {
+  const k = (klanten || []).find((x) => x.id === id);
+  $("#vbdetail").innerHTML = `<div class="rij" style="margin:4px 0 10px"><span class="zacht vul vb-klein">Hieronder zie je wat de klant ziet. Cijfers worden elke nacht bijgewerkt.</span>
+    <button class="knop rand klein" id="vbververs">Nu bijwerken</button></div>
+    <div id="vbstartbeheer"></div>
+    <div class="kaart"><h2 style="font-size:16px"><span class="tag">&gt;_</span>Maandrapport</h2>
+      <p class="zacht vb-klein" style="margin-top:-4px">Elke maand op de 2e gemaakt, samen met de factuur. Zonder adres gaat het alleen naar jou; met adres naar de klant (jij krijgt een kopie).</p>
+      <div class="rij"><input id="vbrapmail" type="email" placeholder="E-mail klant (leeg = alleen naar jou)" class="vul" value="${esc(k?.vb_rapport_mail || "")}" style="min-width:220px">
+        <button class="knop rand klein" id="vbrapmailopslaan">Opslaan</button>
+        <button class="knop rand klein" id="vbraptest">Rapport vorige maand naar mij mailen</button>
+        <a class="knop licht klein" href="rapport?beheer=1&klant=${encodeURIComponent(id)}">Rapport bekijken</a>
+        <button class="knop rand klein" id="vbproef">Proeffactuur bekijken</button></div>
+      <div id="vbrapmeld"></div></div>
+    <div class="kaart"><h2 style="font-size:16px"><span class="tag">&gt;_</span>Bing Webmaster Tools</h2>
+      <div id="vbbing"><p class="zacht vb-klein">Laden…</p></div></div>
+    <div id="vbpaneel"></div>`;
+  vbToon($("#vbpaneel"), id);
+  if (k?.vindbaarheid) vbStartBeheer($("#vbstartbeheer"), id);
+  $("#vbproef").onclick = async (e) => { e.target.disabled = true; try { const r = await vbfApi("proef", { klant_id: id }); location.href = `factuur?beheer=1&id=${r.id}`; } catch (err) { toonMelding($("#vbrapmeld"), err.message); e.target.disabled = false; } };
+  const VBR = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-rapport";
+  const rap = async (actie, data) => { const r = await fetch(VBR, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, klant_id: id, ...data }) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d; };
+  (async () => {
+    const VBB = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-bing";
+    const bg = async (actie, data) => { const r = await fetch(VBB, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, klant_id: id, ...data }) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d; };
+    const vak = $("#vbbing");
+    try {
+      const s = await bg("sites");
+      vak.innerHTML = `<div class="rij"><select id="vbbingsite" class="vul" style="min-width:220px"><option value="">– niet koppelen –</option>${s.sites.map((u) => `<option ${u === s.gekozen ? "selected" : ""}>${esc(u)}</option>`).join("")}</select>
+        <button class="knop rand klein" id="vbbingopslaan">Opslaan en ophalen</button></div>
+        <p class="zacht vb-klein" style="margin-bottom:0">${s.sites.length ? "Kies de site van deze klant uit je Bing-account." : "Er staan nog geen sites in je Bing-account. Voeg de site toe in Bing Webmaster Tools (kan in één klik vanuit Search Console)."}</p><div id="vbbingmeld"></div>`;
+      $("#vbbingopslaan").onclick = async (e) => {
+        e.target.disabled = true;
+        try { const r = await bg("kies", { site: $("#vbbingsite").value }); toonMelding($("#vbbingmeld"), r.fout ? r.fout : "Opgeslagen.", r.fout ? "let" : "ok"); vbToon($("#vbpaneel"), id); }
+        catch (err) { toonMelding($("#vbbingmeld"), err.message); }
+        e.target.disabled = false;
+      };
+    } catch (err) { vak.innerHTML = `<p class="zacht vb-klein" style="margin:0">${esc(err.message)} Zodra de sleutel er is, kies je hier de site.</p>`; }
+  })();
+  $("#vbrapmailopslaan").onclick = async () => { try { await rap("mail_instellen", { adres: $("#vbrapmail").value }); toonMelding($("#vbrapmeld"), $("#vbrapmail").value ? "Opgeslagen. Het volgende maandrapport gaat naar de klant." : "Opgeslagen. Het rapport gaat alleen naar jou.", "ok"); } catch (e) { toonMelding($("#vbrapmeld"), e.message); } };
+  $("#vbraptest").onclick = async (e) => { e.target.disabled = true; try { const r = await rap("maak", { mail: "jan" }); toonMelding($("#vbrapmeld"), `Rapport ${r.maand} gemaakt en naar jou gemaild.`, "ok"); } catch (err) { toonMelding($("#vbrapmeld"), err.message); } e.target.disabled = false; };
+  $("#vbververs").onclick = async (e) => {
+    e.target.disabled = true; e.target.textContent = "Bezig…";
+    try { await vbApi("ververs", { klant_id: id }); vbToon($("#vbpaneel"), id); } catch (err) { meld(err.message); }
+    e.target.disabled = false; e.target.textContent = "Nu bijwerken";
+  };
+}
+{ // links uit mails en terug van Google koppelen
+  const p = new URLSearchParams(location.search);
+  const hash = location.hash.slice(1);
+  setTimeout(() => {
+    if (p.get("vb")) openKlantPagina(p.get("vb"), "cijfers");
+    else if (p.get("check")) naarTab("verkoop");
+    else naarTab(TABS.includes(hash) ? hash : "vandaag");
+    if (p.get("verzoek")) setTimeout(() => toonVerzoek(p.get("verzoek")), 400);
+  }, 0);
+}
+$("#uit").onclick = async () => { try { await api("uitloggen"); } catch {} zetSessie(""); location.href = "inloggen?voor=beheer"; };
+$("#maand").onchange = laad;
+
+async function laad() {
+  try {
+    data = await api("admin_overzicht", { maand: $("#maand").value });
+    tekenVerzoeken(); tekenKlanten(); tekenGebruikers();
+    const open = (data.verzoeken || []).filter((v) => ACTIEF.includes(v.status) || v.status === "doorgestuurd").length;
+    document.querySelectorAll('[data-teller="verzoeken"]').forEach((t) => { t.hidden = !open; t.textContent = open || ""; });
+    if (geladen.vandaag && !laad.eerst) { laad.eerst = true; tekenTaken(); }
+    $("#apistatus").textContent = data.api_sleutel_ingesteld
+      ? "✓ API-sleutel is ingesteld. WordPress-verzoeken worden nu snel afgehandeld (Haiku), binnen het budget per klant. Daarboven neemt de gewone routine het over."
+      : "Nog geen API-sleutel. Verzoeken gaan via de gewone (tragere) routine.";
+    const w = data.whatsapp || {};
+    $("#wastatus").textContent = (w.gekoppeld ? "✓ WhatsApp is gekoppeld." : "Nog niet gekoppeld: vul de codes van Meta in.") + (w.spraak ? " ✓ Spraakberichten staan aan." : " Spraakberichten nog uit (OpenAI-sleutel ontbreekt).");
+    $("#wa_hook").value = w.webhook || ""; $("#wa_verify").value = w.verify_token || "";
+  } catch (e) { meld(e.message); }
+}
+const klantNaam = (id) => data.klanten.find((k) => k.id === id)?.naam || id;
+
+function rijVerzoek(v) {
+  return `<tr class="klik" data-id="${v.id}"><td>#${v.nr}</td><td>${esc(klantNaam(v.klant_id))}</td>
+    <td>${esc(v.onderwerp)}</td><td><span class="chip ${v.status}">${STATUS[v.status]}</span>${v.telt_mee ? "" : ' <span class="zacht">(telt niet)</span>'}</td>
+    <td class="zacht">${datum(v.aangemaakt)}</td></tr>`;
+}
+function tekenVerzoeken() {
+  const maand = $("#maand").value;
+  const inMaand = data.verzoeken.filter((v) => new Date(v.aangemaakt).toISOString().slice(0, 7) === maand);
+  $("#vtabel").innerHTML = inMaand.length ? `<table><thead><tr><th>Nr</th><th>Klant</th><th>Verzoek</th><th>Status</th><th>Datum</th></tr></thead>
+    <tbody>${inMaand.map(rijVerzoek).join("")}</tbody></table>` : `<p class="zacht">Geen verzoeken in deze maand.</p>`;
+  document.querySelectorAll("#vtabel tr.klik[data-id]").forEach((tr) => tr.onclick = () => toonVerzoek(tr.dataset.id));
+}
+
+async function toonVerzoek(id) {
+  openVerzoek = id; clearTimeout(paneelTimer);
+  $("#paneel").classList.remove("verborgen");
+  let d;
+  try { d = await api("verzoek", { id }); } catch (e) { $("#paneelin").innerHTML = `<p>${esc(e.message)}</p>`; return; }
+  const v = d.verzoek, actief = ACTIEF.includes(v.status);
+  const ietsGetypt = $("#paneelin textarea")?.value?.trim();
+  if (ietsGetypt && openVerzoek === id && document.body.dataset.paneel === id) { plan(id, actief); return; }
+  document.body.dataset.paneel = id;
+  $("#paneelin").innerHTML = `
+    <div class="rij"><h2 class="vul" style="margin:0">#${v.nr} · ${esc(v.klant_naam)}</h2><button class="knop rand klein" id="sluit">Sluiten</button></div>
+    <p class="zacht">${esc(v.site)} · <span class="chip ${v.status}">${STATUS[v.status]}</span>
+      ${v.deurbel_sessie ? ` · <a href="${esc(v.deurbel_sessie)}" target="_blank" rel="noopener">sessie bekijken</a>` : ""}</p>
+    ${actief ? wachtHtml(v.status, v.bijgewerkt) : ""}
+    ${berichtenHtml(v.berichten, WIEJAN)}
+    <div class="rij" style="margin:12px 0">
+      ${v.status === "doorgestuurd" ? `<button class="knop" id="akkoord">✓ Akkoord, uitvoeren</button>` : ""}
+      <button class="knop rand klein" data-st="klaar">Markeer klaar</button>
+      <button class="knop rand klein" data-st="kan_niet">Markeer niet gelukt</button>
+      <button class="knop rand klein" id="nietmee">Telt niet mee</button>
+    </div>
+    <h2 style="font-size:16px">Bericht aan klant (als Jan)</h2>
+    <div id="janreactie"></div>
+    <label style="display:flex;gap:8px;align-items:center;color:inherit"><input type="checkbox" id="belaan" style="width:auto"> Ook webbeheer opnieuw laten starten</label>
+    <div id="pmeld" class="verborgen"></div>`;
+  $("#sluit").onclick = sluitPaneel;
+  const actie = async (fn) => { try { await fn(); await laad(); toonVerzoek(id); } catch (e) { toonMelding($("#pmeld"), e.message); } };
+  if ($("#akkoord")) $("#akkoord").onclick = () => actie(() => api("akkoord", { id }));
+  document.querySelectorAll("[data-st]").forEach((b) => b.onclick = () => actie(() => api("status_zetten", { id, status: b.dataset.st })));
+  $("#nietmee").textContent = v.telt_mee ? "Telt niet mee voor limiet" : "Telt weer mee voor limiet";
+  $("#nietmee").onclick = () => actie(() => api("telt_mee_zetten", { id, telt_mee: !v.telt_mee }));
+  maakInvoer($("#janreactie"), { plaats: "Bericht aan de klant…", knop: "Versturen",
+    opVersturen: async (tekst, fotos) => { await api("reageer", { id, tekst, fotos, bel_aan: $("#belaan").checked }); await laad(); document.body.dataset.paneel = ""; toonVerzoek(id); } });
+  plan(id, actief);
+}
+function plan(id, actief) { clearTimeout(paneelTimer); paneelTimer = setTimeout(() => { if (openVerzoek === id) toonVerzoek(id); }, actief ? 4000 : 30000); }
+function sluitPaneel() { openVerzoek = null; clearTimeout(paneelTimer); document.body.dataset.paneel = ""; $("#paneel").classList.add("verborgen"); }
+$("#paneel").onclick = (e) => { if (e.target.id === "paneel") sluitPaneel(); };
+
+// ---- klant: website en koppeling ----
+function klantForm(k) {
+  $("#k_id").value = k?.id || ""; $("#k_id").disabled = !!k;
+  $("#k_naam").value = k?.naam || ""; $("#k_site").value = k?.site || ""; $("#k_soort").value = k?.soort || "wordpress";
+  $("#k_limiet").value = k?.limiet ?? 999; $("#k_actief").value = k?.actief === false ? "0" : "1";
+  $("#k_url").value = k?.deurbel_url || ""; $("#k_token").value = ""; $("#k_budget").value = k?.ai_budget_eur ?? 5; $("#k_whatsapp").value = k?.whatsapp ? "1" : "0";
+  $("#wpblok").classList.toggle("verborgen", (k?.soort || "wordpress") !== "wordpress");
+  shBlok();
+}
+$("#k_soort").onchange = () => { $("#wpblok").classList.toggle("verborgen", $("#k_soort").value !== "wordpress"); shBlok(); };
+const SH_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-shopify";
+async function shApi(data) {
+  const r = await fetch(SH_API, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ klant_id: $("#k_id").value, ...data }) }).catch(() => { throw new Error("Geen verbinding."); });
+  const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d;
+}
+async function shBlok() {
+  const aan = $("#k_soort").value === "shopify" && $("#k_id").disabled;
+  $("#shblok").classList.toggle("verborgen", !aan);
+  if (!aan) return;
+  $("#sh_meld").textContent = ""; $("#sh_cs").value = "";
+  try { const d = await shApi({ actie: "app_info" }); $("#sh_appurl").textContent = d.app_url; $("#sh_redirect").textContent = d.redirect; $("#sh_scopes").textContent = d.scopes; $("#sh_shop").value = d.shop || ""; $("#sh_cid").value = d.app?.client_id || ""; }
+  catch (e) { $("#sh_meld").textContent = e.message; }
+}
+$("#sh_opslaan").onclick = async () => {
+  $("#sh_opslaan").disabled = true;
+  try { const d = await shApi({ actie: "app_zet", shop: $("#sh_shop").value, client_id: $("#sh_cid").value, client_secret: $("#sh_cs").value }); $("#sh_cs").value = ""; $("#sh_meld").textContent = d.gemaild ? "Opgeslagen. De klant heeft de installatiemail gekregen." : "Opgeslagen, maar er is geen mail verstuurd (geen actieve gebruiker). Installatielink: " + d.link; }
+  catch (e) { $("#sh_meld").textContent = e.message; }
+  $("#sh_opslaan").disabled = false;
+};
+$("#kzip").onclick = async () => {
+  const id = $("#k_id").value.trim().toLowerCase();
+  if (!id || !data.klanten.some((k) => k.id === id)) { meld("Sla de klant eerst op."); return; }
+  try {
+    const [mu, inst] = await Promise.all(["assets/koppelstuk.php.txt", "assets/installeer.php.txt"].map((u) => fetch(u, { cache: "no-store" }).then((r) => r.text())));
+    const zip = new JSZip(); const map = zip.folder("beheersite-koppeling");
+    map.file("beheersite-koppeling.php", inst);
+    map.file("beheersite-koppeling.php.txt", mu.replace("%%KLANT%%", id));
+    const blob = await zip.generateAsync({ type: "blob" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `webbeheer-koppeling-${id}.zip`;
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    meld("Koppelstuk gedownload. Upload het in WordPress bij Plugins → Nieuwe plugin → Plugin uploaden.", "ok");
+  } catch (e) { meld("Downloaden mislukt: " + e.message); }
+};
+$("#kkoppeltest").onclick = async () => {
+  try {
+    const r = await api("koppeling_test", { klant_id: $("#k_id").value.trim().toLowerCase() });
+    meld(r.ok ? `✓ Gekoppeld! ${r.woocommerce ? "WordPress + WooCommerce gevonden." : "WordPress gevonden (geen WooCommerce)."} De snelle webbeheerder kan aan de slag.` : r.melding, r.ok ? "ok" : "fout");
+  } catch (e) { meld(e.message); }
+};
+$("#nieuweklant").onclick = () => {
+  openKlant = null; $("#klijst").hidden = true; $("#kdetail").hidden = false;
+  $("#kdnaam").textContent = "Nieuwe klant"; $("#kdpakket").innerHTML = ""; $("#vbdetail").innerHTML = ""; $("#kdabon").innerHTML = '<p class="zacht">Sla de klant eerst op.</p>'; $("#kdverzoeken").innerHTML = "";
+  klantForm(null); kdTab("website");
+};
+$("#kopslaan").onclick = async () => {
+  try {
+    await api("klant_opslaan", { id: $("#k_id").value, naam: $("#k_naam").value, site: $("#k_site").value, soort: $("#k_soort").value,
+      limiet: $("#k_limiet").value, actief: $("#k_actief").value === "1", deurbel_url: $("#k_url").value.trim(), deurbel_token: $("#k_token").value.trim(), ai_budget_eur: $("#k_budget").value, whatsapp: $("#k_whatsapp").value === "1" });
+    $("#k_token").value = ""; meld("Klant opgeslagen.", "ok"); await laad(); await laadKlanten(); openKlantPagina($("#k_id").value.trim().toLowerCase(), "website");
+  } catch (e) { meld(e.message); }
+};
+$("#ktest").onclick = async () => {
+  try { const r = await api("deurbel_test", { klant_id: $("#k_id").value }); meld(r.ok ? "Deurbel werkt: er is een testsessie gestart." : `Deurbel gaf fout ${r.status}. Controleer adres en sleutel.`, r.ok ? "ok" : "fout"); }
+  catch (e) { meld(e.message); }
+};
+
+// ---- accounts ----
+function tekenGebruikers() {
+  $("#gtabel").innerHTML = `<table><thead><tr><th>E-mail</th><th>Naam</th><th>Klant</th><th>Rol</th><th></th></tr></thead><tbody>
+    ${data.gebruikers.map((g) => `<tr><td>${esc(g.email)}${g.actief ? "" : ' <span class="zacht">(uit)</span>'}</td><td>${esc(g.naam)}</td>
+      <td>${g.klant_id ? esc(klantNaam(g.klant_id)) : "–"}${g.heeft_link ? ' <span class="chip klaar">link</span>' : ""}</td><td>${g.rol === "admin" ? "Beheerder" : "Klant"}</td>
+      <td><button class="knop rand klein" data-g="${esc(g.email)}">Wijzigen</button></td></tr>`).join("")}</tbody></table>`;
+  document.querySelectorAll("[data-g]").forEach((b) => b.onclick = () => gebruikerForm(data.gebruikers.find((g) => g.email === b.dataset.g)));
+}
+function gebruikerForm(g) {
+  $("#gform").classList.remove("verborgen");
+  $("#g_email").value = g?.email || ""; $("#g_email").disabled = !!g;
+  $("#g_naam").value = g?.naam || ""; $("#g_tel").value = g?.telefoon ? "0" + String(g.telefoon).replace(/^31/, "") : ""; $("#g_klant").value = g?.klant_id || ""; $("#g_rol").value = g?.rol || "klant";
+  $("#g_actief").value = g?.actief === false ? "0" : "1"; $("#g_ww").value = "";
+  $("#linkblok").classList.toggle("verborgen", !g || g.rol !== "klant");
+  $("#g_link").value = ""; $("#g_link").placeholder = g?.heeft_link ? "Link is actief – tik op 'Link tonen'" : "Nog geen link";
+  $("#gform").scrollIntoView({ behavior: "smooth" });
+}
+$("#nieuwegebruiker").onclick = () => gebruikerForm(null);
+$("#gannuleer").onclick = () => $("#gform").classList.add("verborgen");
+$("#gopslaan").onclick = async () => {
+  try {
+    if ($("#g_email").value.trim().toLowerCase() === ik.email && ($("#g_rol").value !== "admin" || $("#g_actief").value === "0"))
+      throw new Error("Je kunt je eigen beheerdersaccount niet uitzetten.");
+    await api("gebruiker_opslaan", { email: $("#g_email").value, naam: $("#g_naam").value, klant_id: $("#g_klant").value,
+      rol: $("#g_rol").value, wachtwoord: $("#g_ww").value, actief: $("#g_actief").value === "1", telefoon: $("#g_tel").value });
+    $("#g_ww").value = ""; meld("Account opgeslagen.", "ok"); await laad();
+  } catch (e) { meld(e.message); }
+};
+$("#waopslaan").onclick = async () => {
+  try {
+    await api("whatsapp_opslaan", { token: $("#wa_token").value, app_secret: $("#wa_secret").value, phone_id: $("#wa_phone").value, openai: $("#wa_openai").value });
+    ["#wa_token", "#wa_secret", "#wa_phone", "#wa_openai"].forEach((x) => ($(x).value = ""));
+    meld("WhatsApp-gegevens opgeslagen.", "ok"); await laad();
+  } catch (e) { meld(e.message); }
+};
+$("#apiopslaan").onclick = async () => {
+  try { await api("api_sleutel_opslaan", { sleutel: $("#a_api").value }); $("#a_api").value = ""; meld("API-sleutel opgeslagen.", "ok"); await laad(); }
+  catch (e) { meld(e.message); }
+};
+const linkActie = async (extra) => {
+  try { const r = await api("inloglink", { email: $("#g_email").value, ...extra }); $("#g_link").value = r.link || ""; $("#g_link").placeholder = r.link ? "" : "Link uitgezet"; if (extra.nieuw) meld("Nieuwe link gemaakt. De oude werkt niet meer.", "ok"); if (extra.uitzetten) meld("Inloglink uitgezet.", "ok"); await laad(); }
+  catch (e) { meld(e.message); }
+};
+$("#linkmaak").onclick = () => linkActie({});
+$("#linknieuw").onclick = () => { if (confirm("Nieuwe link maken? De oude link werkt dan niet meer.")) linkActie({ nieuw: true }); };
+$("#linkuit").onclick = () => { if (confirm("Inloglink uitzetten?")) linkActie({ uitzetten: true }); };
+$("#linkkopie").onclick = async () => {
+  const v = $("#g_link").value; if (!v) { meld("Tik eerst op 'Link tonen / maken'."); return; }
+  try { await navigator.clipboard.writeText(v); meld("Link gekopieerd.", "ok"); } catch { $("#g_link").select(); }
+};
+$("#aopslaan").onclick = async () => {
+  try { await api("wachtwoord_wijzigen", { wachtwoord: $("#a_ww").value }); $("#a_ww").value = ""; meld("Wachtwoord gewijzigd.", "ok"); }
+  catch (e) { meld(e.message); }
+};
+
+$("#kopbot").innerHTML = $("#kopbot2").innerHTML = robotSvg("rust");
+(async () => {
+  // Overstap: vroeger stond ook Jans sessie in het klantvakje. Is dat een beheerder, verhuis hem.
+  if (!sessie() && sessieVan("klant")) {
+    try {
+      const d = await api("ik", {}, sessieVan("klant"));
+      if (d.gebruiker.rol === "admin") { zetSessie(sessieVan("klant")); zetSessieVan("klant", ""); }
+    } catch {}
+  }
+  if (!sessie()) { location.href = "inloggen?voor=beheer"; return; }
+  const d = await api("ik");
+  ik = d.gebruiker;
+  if (ik.rol !== "admin") { zetSessie(""); location.href = "inloggen?voor=beheer"; return; }
+  laad();
+  setInterval(() => { if (!openVerzoek) laad(); }, 30000);
+})();
+</script>
+</body>
+</html>
