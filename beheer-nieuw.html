@@ -204,6 +204,12 @@ body{background:var(--bg)}
       <button class="knop" id="apiopslaan" style="margin-top:12px">Opslaan</button>
     </div>
     <div class="kaart" style="max-width:520px">
+      <h2>Gratis tools op siteregelaar.nl</h2>
+      <p class="zacht" style="margin-top:0" id="psistatus">Laden…</p>
+      <label>Google API-sleutel voor de snelheidsmetingen (begint met AIza)</label><input id="psi_sleutel" type="password" autocomplete="off" placeholder="Plak hier je gratis Google-sleutel">
+      <button class="knop" id="psiopslaan" style="margin-top:12px">Opslaan en testen</button>
+    </div>
+    <div class="kaart" style="max-width:520px">
       <h2>WhatsApp-koppeling</h2>
       <p class="zacht" style="margin-top:0" id="wastatus"></p>
       <label>Webhook-adres (plakken bij Meta)</label><input id="wa_hook" readonly onclick="this.select()">
@@ -614,6 +620,17 @@ $("#aopslaan").onclick = async () => {
   catch (e) { meld(e.message); }
 };
 
+
+// ---- Google-sleutel voor de gratis tools ----
+const SRT = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-tools";
+const srt = async (d) => { const r = await fetch(SRT, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "sleutel", ...d }) }); const x = await r.json().catch(() => ({})); if (!r.ok) throw new Error(x.fout || "Er ging iets mis."); return x; };
+srt({ alleen_status: true }).then((x) => { $("#psistatus").textContent = x.ingesteld ? "✓ De Google-sleutel is ingesteld. De snelheids-, telefoon- en toegankelijkheidstest werken." : "Nog geen Google-sleutel. Zonder sleutel werken de snelheids-, telefoon- en toegankelijkheidstest niet. Maak hem gratis aan en plak hem hieronder."; }).catch(() => { $("#psistatus").textContent = ""; });
+$("#psiopslaan").onclick = async (ev) => {
+  ev.target.disabled = true; ev.target.textContent = "Bezig met testen…";
+  try { await srt({ sleutel: $("#psi_sleutel").value }); $("#psi_sleutel").value = ""; $("#psistatus").textContent = "✓ De Google-sleutel is ingesteld. De snelheids-, telefoon- en toegankelijkheidstest werken."; meld("Google-sleutel opgeslagen en getest.", "ok"); }
+  catch (e) { meld(e.message); }
+  ev.target.disabled = false; ev.target.textContent = "Opslaan en testen";
+};
 $("#kopbot").innerHTML = $("#kopbot2").innerHTML = robotSvg("rust");
 (async () => {
   // Overstap: vroeger stond ook Jans sessie in het klantvakje. Is dat een beheerder, verhuis hem.
