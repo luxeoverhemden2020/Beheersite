@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sitehulpje</title>
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sitehulpje">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="assets/stijl.css?v=20261110c">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<style>
+body{background:var(--bg)}
+.kp{display:flex;min-height:100vh}
+.kp-zij{width:252px;flex:none;background:#0b1626;color:#e6f1ff;padding:18px 12px;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh;overflow-y:auto;box-sizing:border-box;z-index:20}
+.kp-merk{display:flex;align-items:center;gap:9px;padding:2px 8px;font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700;font-size:17px}
+.kp-merk b{color:#22e3c4}.kp-merk .bot-klein{width:30px;height:30px}
+.kp-sluit{display:none;margin-left:auto;background:none;border:0;color:#9fb0c8;font-size:20px;cursor:pointer}
+.kp-site{padding:2px 8px 14px;color:#7f93af;font-size:12.5px;line-height:1.35}
+.kp-nav{display:flex;flex-direction:column;gap:2px}
+.kp-item,.kp-sub{display:flex;align-items:center;gap:12px;border:0;background:none;color:#9fb0c8;font:500 15px "Inter",system-ui,sans-serif;cursor:pointer;text-align:left;border-radius:12px;padding:10px 12px}
+.kp-item:hover,.kp-sub:hover{background:rgba(255,255,255,.05);color:#fff}
+.kp-item.open{color:#fff;font-weight:700}.kp-item.open svg{stroke:#22e3c4}
+.kp-item.aan{background:rgba(34,227,196,.12);box-shadow:inset 3px 0 0 #22e3c4;color:#fff;font-weight:700}.kp-item.aan svg{stroke:#22e3c4}
+.kp-sub{margin-left:30px;padding:8px 12px;font-size:14px;color:#8aa0bd;border-radius:10px}
+.kp-sub.aan{background:rgba(34,227,196,.12);color:#fff;font-weight:700}
+.kp-item svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.kp-pijl{font-size:11px;color:#7f93af}
+.kp-teller{background:#22e3c4;color:#04111a;font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 8px}
+.kp-streep{height:1px;background:#1f2f4a;margin:8px 6px}
+.kp-vul{flex:1;min-width:0}
+.kp-onder{display:flex;align-items:center;gap:8px;padding:14px 6px 0;margin-top:10px;border-top:1px solid #1f2f4a}
+.kp-onder .thema{background:transparent!important;border:0!important;box-shadow:none!important;padding:4px 6px;font-size:16px}
+.kp-uit{background:none;border:0;color:#9fb0c8;font:inherit;font-size:14px;cursor:pointer}.kp-uit:hover{color:#fff}
+.kp-hoofd{flex:1;min-width:0;display:flex;flex-direction:column}
+.kp-boven{display:none}
+.kp-main{padding:30px 40px 48px;max-width:1100px;width:100%;box-sizing:border-box}
+.kp-titel{margin-bottom:18px}.kp-titel h1{margin:0;font-size:30px;letter-spacing:-.02em}.kp-titel p{margin:6px 0 0;max-width:720px;line-height:1.55;font-size:15.5px}
+[data-kp]{display:none}
+.kp .vb-label-chip{display:none}
+#vindbaarheid [data-vb-paneel]{display:none!important}
+#vindbaarheid .vb-tabs{display:none}
+.kp-held{display:flex;flex-direction:column;gap:12px;background:linear-gradient(135deg,var(--kaart),var(--accent2))}
+.kp-held h2{margin:0;font-size:28px;letter-spacing:-.02em}.kp-held p{margin:0;font-size:16px;line-height:1.6;max-width:780px}
+.kp-mono{font:500 12.5px ui-monospace,monospace;color:var(--accent)}
+.kp-tegels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.kp-held .kp-tegels{margin-bottom:0}
+.kp-tegel{background:var(--bg2);border:1px solid var(--lijn);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.kp-tegel b{font:700 40px/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.02em}
+.kp-tegel span{font-size:13.5px}.kp-goed{color:var(--accent);font-weight:600}
+.kp-twee{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
+.kp-twee h3,.kaart h3{margin:0 0 10px;font-size:18px}
+.kp-taak{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:12px;background:var(--accent2);border:1px solid var(--lijn);margin-bottom:8px;flex-wrap:wrap}
+.kp-taak>span{font-size:20px}.kp-taak .kp-vul{display:flex;flex-direction:column;gap:3px;flex:1 1 200px}.kp-taak .zacht{font-size:14px}
+.kp-vinken{list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:8px}
+.kp-vinken li:before{content:"✓";display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent2);color:var(--accent);font-size:12px;font-weight:700;margin-right:10px}
+.kp-auto{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;background:#0b1626;color:#c9d6ea;margin-top:6px}
+.kp-auto .bot-klein{width:26px;height:26px;flex:none}.kp-auto div{display:flex;flex-direction:column;gap:3px;font-size:14.5px;line-height:1.5}.kp-auto b{color:#22e3c4;font-size:13px}
+.kp-dek{display:none}
+@media (max-width:860px){
+  .kp-zij{position:fixed;left:0;top:0;bottom:0;width:300px;transform:translateX(-105%);transition:transform .25s ease;background:var(--bg2);color:var(--tekst);box-shadow:12px 0 40px rgba(0,0,0,.25)}
+  .kp-menu-open .kp-zij{transform:none}
+  .kp-menu-open .kp-dek{display:block;position:fixed;inset:0;background:rgba(7,11,20,.55);z-index:15}
+  .kp-sluit{display:block}
+  .kp-item,.kp-sub{color:var(--zacht)}.kp-item.open,.kp-item.aan,.kp-sub.aan{color:var(--tekst)}
+  .kp-item:hover,.kp-sub:hover{color:var(--tekst);background:var(--accent2)}
+  .kp-item.aan,.kp-sub.aan{background:var(--accent2);box-shadow:none}
+  .kp-streep,.kp-onder{border-color:var(--lijn)}.kp-streep{background:var(--lijn)}.kp-uit{color:var(--zacht)}
+  .kp-boven{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;background:#0b1626;color:#fff;height:58px;padding:0 12px}
+  .kp-boven strong{flex:1;font-family:"Space Grotesk",system-ui,sans-serif;font-size:16px}
+  .kp-boven .bot-klein{width:28px;height:28px}
+  .kp-ham{width:42px;height:42px;border-radius:12px;border:1px solid #1f2f4a;background:none;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:0 12px;cursor:pointer}
+  .kp-ham span{height:2px;background:#e6f1ff;border-radius:2px}.kp-ham span:nth-child(1){width:18px}.kp-ham span:nth-child(2){width:12px}.kp-ham span:nth-child(3){width:16px}
+  .kp-main{padding:18px 14px 40px}
+  .kp-titel h1{display:none}
+  .kp-tegels,.kp-twee{grid-template-columns:1fr}
+  .kp-held h2{font-size:23px}.kp-tegel b{font-size:34px}
+}
+</style>
+</head>
+<body>
+<div class="kp">
+<aside class="kp-zij" id="kpzij" aria-label="Menu">
+  <div class="kp-merk"><span class="bot-klein" id="kopbot"></span><span>Site<b>hulpje</b></span><button type="button" class="kp-sluit" id="kpsluit" aria-label="Menu sluiten">✕</button></div>
+  <div class="kp-site" id="site"></div>
+  <nav class="kp-nav" id="kpnav"></nav>
+  <div class="kp-vul"></div>
+  <div class="kp-onder"><button class="knop rand klein thema" type="button"></button><span class="kp-vul"></span><button class="kp-uit" id="uit" type="button">Uitloggen</button></div>
+</aside>
+<div class="kp-dek" id="kpdek"></div>
+<div class="kp-hoofd">
+<header class="kp-boven"><button type="button" class="kp-ham" id="kpham" aria-label="Menu openen"><span></span><span></span><span></span></button><strong id="kpbovtitel">Sitehulpje</strong><span class="bot-klein" id="kopbot2"></span></header>
+<main class="kp-main">
+  <div class="kp-titel"><h1 id="kptitel"></h1><p class="zacht" id="kpuitleg"></p></div>
+  <div id="appTip" data-kp="verzoeken"></div>
+  <div id="vbpauze" data-kp="verzoeken overzicht"></div>
+  <div id="shstart" data-kp="verzoeken"></div>
+  <div id="vbpromo" data-kp="promo"></div>
+  <div id="vindbaarheid" data-kp="VBALLE"></div>
+  <div id="verzoekenDeel" data-kp="verzoeken">
+
+  <div class="kaart">
+    <h2><span class="tag">&gt;_</span>Nieuw verzoek</h2>
+    <p class="zacht" style="margin-top:0">Beschrijf wat er op je website moet veranderen. Je kunt ook inspreken, foto's toevoegen (of plakken) of een korte video sturen (max. 1 minuut).</p>
+    <div class="snel" id="snel"></div>
+    <div id="nieuw"></div>
+    <div id="meld" class="verborgen"></div>
+  </div>
+  <div id="lijst"><p class="zacht">Laden…</p></div>
+  </div>
+  <div id="klussen" style="margin-top:28px" data-kp="verzoeken"></div>
+  <div id="vriend" style="margin-top:16px" data-kp="verzoeken"></div>
+  <div id="abonnement" data-kp="abonnement"></div>
+</main></div></div>
+<style>details.abonnement{opacity:.85}details.abonnement>summary{cursor:pointer;color:var(--zacht);font-size:14px}details.abonnement[open]{opacity:1}
+.klus-lijst{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:10px}
+.klus{border:1px solid var(--lijn);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.klus b{font-size:16px}.klus .prijs{font-family:var(--mono,monospace);font-weight:700}
+.vb-aanbod{margin-top:10px;padding:14px;border-radius:14px;border:1px solid var(--lijn);background:var(--bg2)}
+.vb-aanbod .rij{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.vriend-link{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}.vriend-link input{flex:1 1 220px;min-width:0;font-family:var(--mono,monospace);font-size:13px}</style>
+<script src="assets/basis.js?v=20261110b"></script>
+<script src="assets/vindbaarheid.js?v=20261110k"></script>
+<script src="assets/vb-start.js"></script>
+<script src="assets/vb-site.js"></script>
+<script src="assets/vb-factuur.js"></script>
+<script>
+let open = new Set(), cache = {}, timer = null;
+const SNELKNOPPEN = [
+  ["💶", "Prijs aanpassen", "Pas de prijs aan van "],
+  ["🏷️", "Sale / actie", "Zet een actie op de site: "],
+  ["🛒", "Nieuw product", "Voeg dit nieuwe product toe (foto's erbij): "],
+  ["🎟️", "Kortingscode", "Maak een kortingscode: "],
+  ["🕘", "Openingstijden", "Pas de openingstijden aan: "],
+  ["📢", "Melding bovenaan", "Zet een melding bovenaan de site: "],
+  ["✍️", "Tekst aanpassen", "Pas deze tekst aan: "],
+  ["📸", "Foto's", "Zet deze foto's op de site: "],
+  ["🎬", "Video", "Zet deze video op de site: "],
+  ["📰", "Nieuwsbericht", "Schrijf en plaats een nieuwsbericht over "],
+  ["🔎", "Beter in Google", "Zorg dat deze pagina beter gevonden wordt in Google: "],
+];
+
+$("#uit").onclick = async () => { try { await api("uitloggen"); } catch {} zetSessie(""); location.href = "inloggen"; };
+
+maakInvoer($("#nieuw"), {
+  opVersturen: async (tekst, fotos) => {
+    toonMelding($("#meld"), "");
+    try {
+      const r = await api("verzoek_nieuw", { tekst, fotos });
+      open.add(r.id);
+      if (r.melding) toonMelding($("#meld"), r.melding, "let");
+      await laad();
+    } catch (e) {
+      toonMelding($("#meld"), e.message, e.message.includes("limiet") ? "let" : "fout");
+      throw new Error("");
+    }
+  },
+});
+
+$("#snel").innerHTML = SNELKNOPPEN.map(([i, t], n) => `<button type="button" class="snelknop" data-n="${n}"><span>${i}</span>${t}</button>`).join("");
+$("#snel").onclick = (e) => {
+  const k = e.target.closest(".snelknop"); if (!k) return;
+  const ta = $("#nieuw textarea"); const [, , start] = SNELKNOPPEN[k.dataset.n];
+  ta.value = start; ta.focus(); ta.setSelectionRange(start.length, start.length);
+  document.querySelectorAll(".snelknop").forEach((b) => b.classList.toggle("aan", b === k));
+};
+
+async function laadVerzoek(id) {
+  const d = await api("verzoek", { id });
+  cache[id] = d;
+  return d;
+}
+
+// Voorstel op de testsite? Dan knoppen "Bekijk de testsite" en "Akkoord" tonen
+function testLink(v, d) {
+  if (v.status !== "wacht_op_klant" || !d) return "";
+  const b = d.verzoek.berichten, laatste = b[b.length - 1];
+  if (!laatste || laatste.van !== "webbeheer") return "";
+  const m = String(laatste.tekst || "").match(/https?:\/\/[^\s)<>"']*-test\.vercel\.app[^\s)<>"']*/);
+  return m ? m[0].replace(/[.,!?]+$/, "") : "";
+}
+
+function teken(lijst) {
+  const el = $("#lijst");
+  if (!lijst.length) { el.innerHTML = `<p class="zacht">Nog geen verzoeken. Je eerste verzoek verschijnt hier.</p>`; return; }
+  el.innerHTML = lijst.map((v) => {
+    const isOpen = open.has(v.id), d = cache[v.id], actief = ACTIEF.includes(v.status);
+    return `<div class="verzoek${actief ? " actief" : ""}" data-id="${v.id}">
+      ${actief ? `<div class="balk" aria-label="Bezig"></div>` : ""}
+      <div class="hoofd"><span class="nr">#${v.nr}</span><span class="titel">${esc(v.onderwerp)}</span>
+        <span class="chip ${v.status}">${STATUS[v.status]}</span></div>
+      ${actief && !isOpen ? `<div style="padding:0 16px 4px">${wachtHtml(v.status, v.bijgewerkt)}</div>` : ""}
+      ${isOpen && !d ? `<div class="lijf"><p class="zacht">Laden…</p></div>` : ""}
+      ${isOpen && d ? `<div class="lijf">
+        ${berichtenHtml(d.verzoek.berichten)}
+        ${testLink(v, d) ? `<div class="testpaneel">
+          <div class="tp-kop">${robotSvg("rust")}<div><div class="fase">&gt;_ klaar op de testsite</div>
+            <div class="zacht">Bekijk het voorbeeld. Goed? Dan zet ik het met één klik op je echte website.</div></div></div>
+          <div class="tp-knoppen">
+            <a class="knop rand groot" href="${esc(testLink(v, d))}" target="_blank" rel="noopener">👀 Bekijk de testsite</a>
+            <button class="knop groot akkoord">✓ Akkoord, zet het live</button></div></div>` : ""}
+        ${actief ? wachtHtml(v.status, v.bijgewerkt) : ""}
+        ${!actief && d.reacties_over > 0 ? `<div class="reactie" style="margin-top:12px"></div>` : ""}
+        ${!actief && d.reacties_over === 0 ? `<p class="zacht">Dit gesprek is vol. Start hierboven een nieuw verzoek.</p>` : ""}
+        ${v.status === "klaar" ? `<div class="rij" style="margin-top:8px"><button class="knop rand klein terug">↩ Deze aanpassing terugdraaien</button></div>` : ""}
+        <div class="verborgen fout"></div>
+      </div>` : ""}
+    </div>`;
+  }).join("");
+  tikWacht();
+
+  el.querySelectorAll(".verzoek").forEach((blok) => {
+    const id = blok.dataset.id;
+    $(".hoofd", blok).onclick = () => {
+      if (open.has(id)) { open.delete(id); teken(lijst); return; }
+      open.add(id); teken(lijst);                       // direct openen
+      laadVerzoek(id).then(() => { if (open.has(id)) teken(lijst); }).catch(() => {});  // daarna verversen
+    };
+    const r = $(".reactie", blok);
+    if (r) maakInvoer(r, {
+      plaats: "Reageer of geef een aanvulling…", knop: "Reageren",
+      opVersturen: async (tekst, fotos) => { await api("reageer", { id, tekst, fotos }); await laad(); },
+    });
+    const ak = $(".akkoord", blok);
+    if (ak) ak.onclick = async () => {
+      ak.disabled = true; ak.textContent = "Bezig…";
+      try { await api("reageer", { id, tekst: "Akkoord, zet het maar live." }); await laad(); }
+      catch (e) { ak.disabled = false; ak.textContent = "✓ Akkoord, zet het live"; toonMelding($(".fout", blok), e.message); }
+    };
+    const t = $(".terug", blok);
+    if (t) t.onclick = async () => {
+      if (!confirm("Weet je zeker dat je deze aanpassing wilt terugdraaien?")) return;
+      try { await api("terugdraaien", { id }); await laad(); }
+      catch (e) { toonMelding($(".fout", blok), e.message); }
+    };
+  });
+}
+
+let laatsteLijst = [];
+async function laad(geforceerd = true) {
+  clearTimeout(timer);
+  try {
+    const { verzoeken } = await api("verzoeken_lijst");
+    // open blokken verversen
+    await Promise.all([...open].filter((id) => verzoeken.some((v) => v.id === id)).map((id) => laadVerzoek(id).catch(() => {})));
+    const veranderd = JSON.stringify(verzoeken) !== JSON.stringify(laatsteLijst);
+    const typt = [...document.querySelectorAll(".reactie textarea")].some((t) => t.value.trim()) ||
+      (document.activeElement && document.activeElement.closest(".reactie"));
+    if (geforceerd || (veranderd && !typt)) teken(verzoeken);
+    laatsteLijst = verzoeken;
+    verzoeken.slice(0, 8).filter((v) => !cache[v.id]).forEach((v) => laadVerzoek(v.id).catch(() => {}));
+    const iemandActief = verzoeken.some((v) => ACTIEF.includes(v.status));
+    timer = setTimeout(() => laad(false), iemandActief ? 4000 : 30000);
+  } catch (e) {
+    timer = setTimeout(() => laad(false), 15000);
+  }
+}
+
+$("#kopbot").innerHTML = robotSvg("rust");
+// Alleen Sitehulpje besteld? Dan eerst één stap: ons toegang geven tot de website.
+async function shStart(el) {
+  const SB = API.replace(/beheersite$/, "vb-bestel");
+  const vraag = async (actie, data = {}) => { const r = await fetch(SB, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, ...data }) });
+    const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d; };
+  let d; try { d = await vraag("sh_status"); } catch { return; }
+  if (!d.nodig) { el.innerHTML = ""; return; }
+  el.innerHTML = `<div class="kaart" style="border-left:4px solid var(--accent)">
+    <h2 style="margin:0 0 6px"><span class="tag">1</span>Koppel je website</h2>
+    <p style="margin:0 0 10px">Om je website te kunnen aanpassen moet Sitehulpje erbij kunnen. Je eigen wachtwoord hoef je nooit te delen.</p>
+    <div data-vbsite></div></div>`;
+  vbSiteToon(el.querySelector("[data-vbsite]"), undefined, {});
+}
+api("ik").then((d) => {
+  if (d.gebruiker.rol === "admin" && !d.klant) { location.href = "beheer"; return; }
+  $("#site").textContent = d.klant ? `${d.klant.naam} · ${d.klant.site.replace(/^https?:\/\//, "")}` : "";
+  laad();
+  appTip($("#appTip"));
+  if (d.klant) { vbfPauzeMelding($("#vbpauze")); vbfOpzegKlant($("#abonnement")); shStart($("#shstart")); vbfKlussen($("#klussen")); vbfVriend($("#vriend")); }
+  const vbPromo = () => vbfApi("status").then((p) => {
+    if (p.pauze || !d.klant) return;
+    kpMenu(false);
+    $("#vbpromo").innerHTML = `<div class="kaart">
+      <h2 style="margin:0 0 6px">Beter gevonden worden in Google én AI</h2>
+      <p class="zacht" style="margin:0 0 10px">Met Vindbaarheid controleren we je website elke week, verbeteren we je teksten voor Google en zie je in een helder overzicht hoe vaak je gevonden wordt. Ook in ChatGPT en andere AI.</p>
+      <ul class="vb-goed" style="margin-bottom:12px"><li>Elke week een website-check</li><li>Betere teksten voor Google, jij keurt goed met één klik</li><li>Je cijfers uit Google en Bing</li><li>Elke maand een rapport in gewone taal</li></ul>
+      <p style="margin:0 0 12px"><b>Vanaf €99 per maand.</b> <span class="zacht">Met Vindbaarheid erbij kost Sitehulpje nog maar €75 per maand.</span></p>
+      <a class="knop" href="https://siteregelaar.nl/vindbaarheid#pakketten">Bekijk de pakketten</a></div>`;
+  }).catch(() => {});
+  vbApi("status").then((s) => {
+    if (!s.klant.aan) return vbPromo();
+    kpMenu(true);
+    vbsApi("status").then((st) => { if (!st.klant_klaar) { kpStartOpen = true; kpNaar("overzicht"); } }).catch(() => {});
+  }).catch((e) => { if (/staat niet aan/.test(e.message || "")) vbPromo(); });
+});
+
+// ================= menu (zijpaneel op computer, hamburger op mobiel)
+const KP_IC = {
+  verzoeken: "M4 5h16v11H9l-5 4z", overzicht: "M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1z",
+  gevonden: "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4", website: "M3 5h18v14H3zM3 9h18M7 7h.01M10 7h.01",
+  klanten: "M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11zM12 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z",
+  rapporten: "M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5", inst: "M4 7h10M18 7h2M4 17h4M12 17h8M16 5v4M10 15v4",
+  promo: "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4", abonnement: "M3 7h18v12H3zM3 11h18M7 15h4" };
+const KP_TITEL = {
+  verzoeken: ["Iets laten aanpassen", ""],
+  overzicht: ["Overzicht", ""],
+  zoekwoorden: ["Waar zoeken mensen op?", "Dit zijn woorden die mensen in Google typten, waarna jouw website in de resultaten verscheen. Op pagina 1 zien de meeste mensen je."],
+  maps: ["Google Maps", "Hoe vaak je bedrijf in Google Maps verscheen en wat mensen daarna deden. Dit komt van je Google Bedrijfsprofiel: het kaartje met je adres, openingstijden en reviews."],
+  ai: ["ChatGPT en andere AI", "Steeds meer mensen vragen ChatGPT, Gemini of Copilot om een bedrijf aan te raden. Hier zie je hoeveel mensen zo op je website kwamen."],
+  gezondheid: ["Werkt alles goed?", "Wij controleren je website elke week: gaat hij snel open, werkt hij op de telefoon, kloppen de links en kan Google alles lezen."],
+  voorstellen: ["Klaar om goed te keuren", "Wij hebben verbeteringen voor je website klaargezet. Keur ze goed en wij zetten ze op je site. Niets gebeurt zonder jouw akkoord."],
+  paginas: ["Meest bekeken pagina's", "Welke pagina's van je website het vaakst in Google verschenen, de afgelopen 4 weken."],
+  reviews: ["Reviews", "Wat klanten over je schrijven op Google. Bij een nieuwe review kun je een antwoord laten voorstellen."],
+  acties: ["Telefoontjes en routes", "Hoe vaak mensen contact met je zochten nadat ze je in Google vonden."],
+  rapporten: ["Rapporten", "Elke maand een kort rapport: hoe het ging, wat wij deden en wat de volgende stap is. Het komt ook vanzelf in je mail."],
+  bedrijf: ["Over je bedrijf", "Deze gegevens gebruiken wij om je beter vindbaar te maken. Klopt er iets niet? Pas het hier aan."],
+  koppelingen: ["Google-account", "Om je cijfers te zien hebben wij toegang nodig tot je Google-gegevens. Alleen lezen: wij kunnen niets weghalen."],
+  abonnement: ["Abonnement", "Je pakket en je facturen."],
+  promo: ["Beter gevonden worden", ""] };
+const KP_AUTO = {
+  overzicht: "Wij controleren je website elke week, halen elke nacht de nieuwste cijfers op en zoeken waar je makkelijk hoger kunt komen.",
+  zoekwoorden: "Wij zoeken in deze lijst naar kansen en maken daar verbeteringen voor. Die vind je bij Je website › Klaar om goed te keuren.",
+  maps: "Wij halen elke nacht de cijfers op en laten het je weten als je profiel ineens minder wordt gezien.",
+  ai: "Wij zetten je bedrijfsgegevens op je website op een manier die Google én AI goed kunnen lezen, en houden ze bij.",
+  gezondheid: "Vinden wij iets belangrijks, dan lossen wij het op of krijg je een bericht. Je hoeft zelf niets te controleren.",
+  voorstellen: "Elke maand zoeken wij nieuwe verbeteringen. Na jouw akkoord zetten wij ze op je website en houden we bij of het helpt.",
+  paginas: "Pagina's die veel gezien worden maar weinig opleveren, nemen wij mee in de verbeteringen.",
+  reviews: "Komt er een nieuwe review binnen, dan zie je hem hier. Met één klik plaats je een antwoord op Google.",
+  acties: "Wij tellen dit elke nacht mee. Stijgt of daalt het flink, dan zie je dat in je maandrapport.",
+  rapporten: "Het rapport komt elke maand op de 2e vanzelf in je mail. Je hoeft er niets voor te doen.",
+  bedrijf: "Pas je iets aan, dan nemen wij het mee in je website en de verbeteringen.",
+  koppelingen: "Valt een koppeling weg, dan krijg je bericht hoe je hem met één knop herstelt." };
+let KP_MENU = [], kpPagina = "", kpVbGeladen = false, kpStartOpen = false, kpBadge = {};
+function kpMenu(vb) {
+  KP_MENU = vb ? [
+    ["verzoeken", "Iets laten aanpassen", []], ["-"],
+    ["overzicht", "Overzicht", []],
+    ["gevonden", "Gevonden worden", [["zoekwoorden", "In Google zoeken"], ["maps", "Google Maps"], ["ai", "ChatGPT en andere AI"]]],
+    ["website", "Je website", [["gezondheid", "Werkt alles goed?"], ["voorstellen", "Klaar om goed te keuren"], ["paginas", "Meest bekeken pagina's"]]],
+    ["klanten", "Klanten", [["reviews", "Reviews"], ["acties", "Telefoontjes en routes"]]],
+    ["rapporten", "Rapporten", []], ["-"],
+    ["inst", "Instellingen", [["bedrijf", "Over je bedrijf"], ["koppelingen", "Google-account"], ["abonnement", "Abonnement"]]] ] : [
+    ["verzoeken", "Iets laten aanpassen", []], ["-"],
+    ["promo", "Beter gevonden worden", []], ["-"],
+    ["abonnement", "Abonnement", []] ];
+  // CSS: per pagina alleen de blokken met die pagina laten zien
+  const alle = KP_MENU.flatMap((m) => m[2]?.length ? m[2].map((x) => x[0]) : [m[0]]).filter((x) => x !== "-");
+  document.querySelectorAll('[data-kp="VBALLE"]').forEach((x) => (x.dataset.kp = alle.filter((p) => !["verzoeken", "abonnement", "promo"].includes(p)).join(" ")));
+  let css = alle.map((p) => `body[data-pagina="${p}"] [data-kp~="${p}"]{display:block}body[data-pagina="${p}"] #vindbaarheid [data-vb-paneel][data-kp~="${p}"]{display:block!important}`).join("");
+  let st = $("#kpcss"); if (!st) { st = document.createElement("style"); st.id = "kpcss"; document.head.append(st); } st.textContent = css;
+  kpTekenMenu();
+  const h = location.hash.slice(1);
+  kpNaar(alle.includes(h) ? h : (vb && (h === "vindbaarheid" || new URLSearchParams(location.search).get("google"))) ? (new URLSearchParams(location.search).get("google") ? "koppelingen" : "overzicht") : "verzoeken");
+}
+function kpGroepVan(p) { return (KP_MENU.find((m) => m[0] === p || (m[2] || []).some((x) => x[0] === p)) || [])[0]; }
+function kpTekenMenu() {
+  const svg = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${KP_IC[k] || KP_IC.overzicht}"/></svg>`;
+  const groep = kpGroepVan(kpPagina);
+  $("#kpnav").innerHTML = KP_MENU.map((m) => {
+    if (m[0] === "-") return `<div class="kp-streep"></div>`;
+    const [k, t, subs] = m, open = k === groep, b = subs.reduce((s, x) => s + (kpBadge[x[0]] || 0), 0);
+    let h = `<button type="button" class="kp-item${open && !subs.length ? " aan" : ""}${open && subs.length ? " open" : ""}" data-kpgroep="${k}">${svg(k)}<span class="kp-vul">${t}</span>${!open && b ? `<b class="kp-teller">${b}</b>` : ""}${subs.length ? `<span class="kp-pijl">${open ? "▾" : "▸"}</span>` : ""}</button>`;
+    if (open && subs.length) h += subs.map(([sk, st]) => `<button type="button" class="kp-sub${sk === kpPagina ? " aan" : ""}" data-kpnaar="${sk}"><span class="kp-vul">${st}</span>${kpBadge[sk] ? `<b class="kp-teller">${kpBadge[sk]}</b>` : ""}</button>`).join("");
+    return h;
+  }).join("");
+  $("#kpnav").querySelectorAll("[data-kpgroep]").forEach((b) => (b.onclick = () => {
+    const m = KP_MENU.find((x) => x[0] === b.dataset.kpgroep);
+    if (!m[2].length) return kpNaar(m[0]);
+    if (kpGroepVan(kpPagina) === m[0]) { kpPagina = m[0] + ":dicht"; kpTekenMenu(); kpPagina = kpPagina.split(":")[0]; return; }
+    kpNaar(m[2][0][0]);
+  }));
+  $("#kpnav").querySelectorAll("[data-kpnaar]").forEach((b) => (b.onclick = () => kpNaar(b.dataset.kpnaar)));
+}
+function kpNaar(p) {
+  kpPagina = p; document.body.dataset.pagina = p;
+  const [t, u] = KP_TITEL[p] || [p, ""];
+  $("#kptitel").textContent = t; $("#kpuitleg").textContent = u; $("#kpuitleg").hidden = !u; $("#kpbovtitel").textContent = t;
+  kpTekenMenu(); kpDicht();
+  const vbPagina = !["verzoeken", "abonnement", "promo"].includes(p);
+  if (vbPagina && !kpVbGeladen) { kpVbGeladen = true; kpLaadVb(); }
+  kpAutoBlok(p);
+  try { history.replaceState(null, "", location.pathname + location.search + (p === "verzoeken" ? "" : "#" + p)); } catch {}
+  scrollTo(0, 0);
+}
+function kpAutoBlok(p) {
+  let el = $("#kpauto");
+  if (!el) { el = document.createElement("div"); el.id = "kpauto"; $(".kp-main").append(el); }
+  el.innerHTML = KP_AUTO[p] ? `<div class="kp-auto"><span class="bot-klein">${robotSvg("rust")}</span><div><b>Dit gaat automatisch</b><span>${KP_AUTO[p]}</span></div></div>` : "";
+}
+const kpDicht = () => document.body.classList.remove("kp-menu-open");
+$("#kpham").onclick = () => document.body.classList.add("kp-menu-open");
+$("#kpsluit").onclick = kpDicht; $("#kpdek").onclick = kpDicht;
+window.vbNaarPagina = (t) => { const p = { overzicht: "overzicht", zoekwoorden: "zoekwoorden", paginas: "paginas", reviews: "reviews", voorstellen: "voorstellen", gezondheid: "gezondheid", rapporten: "rapporten", koppelingen: "koppelingen" }[t]; if (p) { kpNaar(p); return true; } return false; };
+try { $("#kopbot2").innerHTML = robotSvg("rust"); } catch {}
+
+// ---- Vindbaarheid laden en over de pagina's verdelen
+async function kpLaadVb() {
+  const el = $("#vindbaarheid");
+  el.innerHTML = `<div id="kpstart"></div><div id="kpoverzicht" data-kp="overzicht"></div><div id="kpacties" data-kp="acties"></div><div id="vbdash"></div>`;
+  const startEl = $("#kpstart");
+  const aanpassen = () => {
+    startEl.dataset.kp = "bedrijf";
+    startEl.innerHTML = `<div class="kaart"><div class="rij"><b class="vul">Wat je doet, je zoekwoorden en je bedrijfsgegevens</b><button class="knop rand klein" type="button">Bekijken of aanpassen</button></div></div>`;
+    startEl.querySelector("button").onclick = () => vbStartToon(startEl, undefined, { altijd: true, open: "scan" });
+  };
+  startEl.dataset.kp = kpStartOpen ? "overzicht bedrijf" : "bedrijf";
+  vbStartToon(startEl, undefined, { stil: true, klaar: aanpassen }).then((s) => { if (s?.klant_klaar) aanpassen(); });
+  const dash = $("#vbdash");
+  await vbToon(dash);
+  const tag = (sel, kp) => dash.querySelectorAll(sel).forEach((x) => (x.dataset.kp = kp));
+  tag('[data-vb-blok="tegels"],[data-vb-blok="beste"]', "verborgen-blok");
+  tag('[data-vb-blok="gbp"]', "maps"); tag('[data-vb-blok="ai"]', "ai");
+  tag('[data-vb-blok="grafiek"],[data-vb-gz-kort]', "overzicht"); tag('[data-vb-blok="kansen"]', "zoekwoorden");
+  tag('[data-vb-paneel="overzicht"]', "overzicht maps ai zoekwoorden");
+  ["zoekwoorden", "paginas", "reviews", "voorstellen", "gezondheid", "rapporten", "koppelingen"].forEach((p) => tag(`[data-vb-paneel="${p}"]`, p));
+  const d = dash.vbData;
+  if (!d) return;
+  if (!d.koppeling?.gbp_locatie) kpBadge.reviews = 0;
+  kpOverzicht(d); kpZoekwoorden(d); kpActies(d); kpLeeg(d);
+  // tellers uit de (verborgen) tabjes overnemen
+  const lees = () => {
+    const n = (sel) => +(((dash.querySelector(sel)?.textContent || "").match(/\((\d+)\)/) || [])[1] || 0);
+    const nv = n('.vb-tab[data-vb-tab="voorstellen"]'), nr = n('.vb-tab[data-vb-tab="reviews"]');
+    if (nv !== kpBadge.voorstellen || nr !== kpBadge.reviews) { kpBadge.voorstellen = nv; kpBadge.reviews = nr; kpTekenMenu(); kpTodo(); }
+  };
+  lees(); const tabs = dash.querySelector(".vb-tabs"); if (tabs) new MutationObserver(lees).observe(tabs, { subtree: true, childList: true, characterData: true });
+}
+function kpCijfers(d) {
+  const eind = d.gsc.length ? d.gsc[d.gsc.length - 1][0] : d.ga4.length ? d.ga4[d.ga4.length - 1][0] : null;
+  if (!eind) return null;
+  const start = vbDag(eind, -27), vEind = vbDag(eind, -28), vStart = vbDag(eind, -55);
+  const r = { eind, start, heeftVorig: d.gsc.some((x) => x[0] <= vEind) || d.ga4.some((x) => x[0] <= vEind),
+    kl: vbSom(d.gsc, 1, start, eind), klV: vbSom(d.gsc, 1, vStart, vEind), vt: vbSom(d.gsc, 2, start, eind), vtV: vbSom(d.gsc, 2, vStart, vEind),
+    ac: vbSom(d.ga4, 4, start, eind), acV: vbSom(d.ga4, 4, vStart, vEind) };
+  if ((d.gbp || []).length) { const ge = d.gbp[d.gbp.length - 1][0], gs = vbDag(ge, -27); r.bel = vbSom(d.gbp, 3, gs, ge); r.route = vbSom(d.gbp, 4, gs, ge); }
+  return r;
+}
+const kpPag = (pos) => Math.max(1, Math.ceil((pos || 1) / 10));
+function kpTegel(label, waarde, onder, goed) { return `<div class="kp-tegel"><span class="zacht">${label}</span><b>${waarde}</b><span class="${goed ? "kp-goed" : "zacht"}">${onder}</span></div>`; }
+function kpVerschilZin(nu, vorig, heeftVorig) {
+  if (!heeftVorig) return ["Volgende maand zie je of het meer wordt", false];
+  if (!vorig) return [nu ? "Nieuw deze maand" : "Nog niet deze maand", !!nu];
+  const p = Math.round(((nu - vorig) / vorig) * 100);
+  return [p > 2 ? `${p}% meer dan de 4 weken ervoor` : p < -2 ? `${Math.abs(p)}% minder dan de 4 weken ervoor` : "Ongeveer evenveel als de 4 weken ervoor", p > 2];
+}
+function kpOverzicht(d) {
+  const c = kpCijfers(d), el = $("#kpoverzicht");
+  if (!c) { el.innerHTML = ""; return; }
+  const zw = d.zoekwoorden || [], tot = zw.reduce((s, z) => s + z.vertoningen, 0);
+  const gem = tot ? zw.reduce((s, z) => s + z.positie * z.vertoningen, 0) / tot : 0, pg = kpPag(gem);
+  let kop = "Google begint je te zien.";
+  if (c.heeftVorig && c.klV) { const p = (c.kl - c.klV) / c.klV; kop = p > 0.05 ? "Het gaat de goede kant op." : p < -0.05 ? "Iets minder dan de maand ervoor." : "Je staat stabiel in Google."; }
+  if (gem && pg <= 1) kop = "Je staat goed in Google.";
+  const waar = !gem ? "" : pg <= 1 ? " Je staat gemiddeld op pagina 1, daar kijken de meeste mensen." : pg <= 3 ? ` Je staat gemiddeld op pagina ${pg}. Je bent dicht bij pagina 1, waar de meeste mensen kijken.` : ` Meestal sta je nog ver naar achteren, gemiddeld op pagina ${pg}. Bijna niemand kijkt verder dan pagina 1. Wij werken eraan om je naar voren te krijgen.`;
+  const [vz, vg] = kpVerschilZin(c.vt, c.vtV, c.heeftVorig), [kz, kg] = kpVerschilZin(c.kl, c.klV, c.heeftVorig);
+  const derde = c.route != null ? kpTegel("Keer gebeld of route gevraagd", vbGetal(c.bel + c.route), "Via Google Maps", c.bel + c.route > 0) : kpTegel("Aanvragen via je website", vbGetal(c.ac), kpVerschilZin(c.ac, c.acV, c.heeftVorig)[0], false);
+  el.innerHTML = `<div class="kaart kp-held"><span class="kp-mono">afgelopen 4 weken · ${vbDatum(c.start)} t/m ${vbDatum(c.eind, { day: "numeric", month: "short" })}</span>
+    <h2>${kop}</h2>
+    <p>Je website stond <b>${vbGetal(c.vt)} keer</b> tussen de zoekresultaten van Google, en <b>${vbGetal(c.kl)} keer</b> klikte iemand erop door.${waar}</p>
+    <div class="kp-tegels">${kpTegel("Keer gezien in Google", vbGetal(c.vt), vz, vg)}${kpTegel("Keer doorgeklikt naar je website", vbGetal(c.kl), kz, kg)}${derde}</div></div>
+    <div class="kp-twee"><div class="kaart"><h3>Wat jij nu kunt doen</h3><div id="kptodo"></div></div>
+    <div class="kaart"><h3>Dit doen wij voor je</h3><ul class="kp-vinken"><li>Je website elke week gecontroleerd op fouten</li><li>Elke nacht de nieuwste cijfers van Google opgehaald</li><li>Gezocht waar je makkelijk hoger kunt komen</li></ul>
+    <button class="knop rand klein" type="button" onclick="kpNaar('rapporten')">Bekijk het maandrapport</button></div></div>`;
+  kpTodo();
+}
+function kpTodo() {
+  const el = $("#kptodo"); if (!el) return;
+  const t = [];
+  if (kpBadge.voorstellen) t.push(["📝", `${kpBadge.voorstellen === 1 ? "Er staat 1 verbetering" : `Er staan ${kpBadge.voorstellen} verbeteringen`} voor je klaar`, "Lees ze even door. Na jouw akkoord zetten wij ze op je website.", "voorstellen", "Bekijken"]);
+  if (kpBadge.reviews) t.push(["⭐", `${kpBadge.reviews === 1 ? "1 review wacht" : `${kpBadge.reviews} reviews wachten`} op een antwoord`, "Een antwoord laat zien dat je om je klanten geeft, en helpt in Google Maps.", "reviews", "Beantwoorden"]);
+  el.innerHTML = t.length ? t.map(([i, k, u, p, kn]) => `<div class="kp-taak"><span>${i}</span><div class="kp-vul"><b>${k}</b><span class="zacht">${u}</span></div><button class="knop klein" type="button" onclick="kpNaar('${p}')">${kn}</button></div>`).join("")
+    : `<p class="zacht" style="margin:0">Je hoeft nu niets te doen. Wij houden alles in de gaten en laten het weten als er iets is.</p>`;
+}
+function kpZoekwoorden(d) {
+  const el = $('#vbdash [data-vb-blok="zoektabel"]'); if (!el) return;
+  const max = vbPakket(d.klant.pakket).zoekwoorden;
+  const rij = (z) => `<tr><td>${esc(z.sleutel)}</td><td class="r mono">${kpPag(z.positie)}</td><td class="r mono">${vbGetal(z.vertoningen)}</td><td class="r mono">${vbGetal(z.klikken)}</td></tr>`;
+  const teken = (q) => { const l = (q ? d.zoekwoorden.filter((z) => z.sleutel.toLowerCase().includes(q)) : d.zoekwoorden).slice(0, max);
+    el.querySelector("[data-kpz]").innerHTML = l.length ? `<div class="vb-tabelwrap"><table class="vb-tabel"><thead><tr><th>Waar mensen op zochten</th><th class="r">Pagina in Google</th><th class="r">Keer gezien</th><th class="r">Doorgeklikt</th></tr></thead><tbody>${l.map(rij).join("")}</tbody></table></div>` : `<p class="zacht">Nog geen zoekwoorden in deze periode.</p>`; };
+  el.innerHTML = `<input type="search" placeholder="Zoek een woord…" style="margin-bottom:10px"><div data-kpz></div>
+    <p class="zacht vb-klein" style="margin-bottom:0">Pagina 1 is bovenaan in Google. Google laat niet álle zoekwoorden zien, om de privacy van mensen te beschermen.${d.zoekwoorden.length > max ? ` Je pakket laat de beste ${max} zien.` : ""}</p>`;
+  el.querySelector("input").oninput = (e) => teken(e.target.value.trim().toLowerCase());
+  teken("");
+}
+function kpActies(d) {
+  const c = kpCijfers(d), el = $("#kpacties");
+  if (!c) { el.innerHTML = ""; return; }
+  const t = [];
+  if (c.route != null) { t.push(kpTegel("Keer route gevraagd", vbGetal(c.route), "Via Google Maps", c.route > 0)); t.push(kpTegel("Keer gebeld via Google", vbGetal(c.bel), "Via je Google-profiel", c.bel > 0)); }
+  if (d.ga4.length) t.push(kpTegel("Aanvragen via je website", vbGetal(c.ac), kpVerschilZin(c.ac, c.acV, c.heeftVorig)[0], false));
+  el.innerHTML = t.length ? `<div class="kp-tegels">${t.join("")}</div><div class="kaart"><h3>Wat telt als aanvraag?</h3><p style="margin:0">Een ingevuld contactformulier, een offerteaanvraag of een bestelling op je website.</p></div>`
+    : `<div class="kaart"><p class="zacht" style="margin:0">Koppel eerst je Google-account, dan zie je hier hoe vaak mensen belden, een route vroegen of iets aanvroegen.</p></div>`;
+}
+function kpLeeg(d) {
+  // pagina's zonder inhoud een korte uitleg geven
+  const leeg = { maps: !d.koppeling?.gbp_locatie || !(d.gbp || []).length, ai: !d.koppeling?.ga4_property, reviews: !d.koppeling?.gbp_locatie };
+  Object.entries(leeg).forEach(([p, is]) => { if (is) $("#vindbaarheid").insertAdjacentHTML("beforeend", `<div class="kaart" data-kp="${p}"><p class="zacht" style="margin:0">Hiervoor is je Google ${p === "ai" ? "Analytics" : "Bedrijfsprofiel"} nog niet gekoppeld. <a href="#koppelingen" onclick="kpNaar('koppelingen');return false">Koppelen</a></p></div>`); });
+}
+</script>
+</body>
+</html>

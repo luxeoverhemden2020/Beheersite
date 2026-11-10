@@ -210,6 +210,7 @@ async function vbToon(el, klantId, beginTab) {
   let d;
   try { d = await vbApi("dashboard", { klant_id: klantId }); }
   catch (e) { el.innerHTML = `<div class="kaart"><div class="melding fout">${esc(e.message)}</div></div>`; return; }
+  el.vbData = d;
   const k = d.koppeling;
   const params = new URLSearchParams(location.search);
   let melding = "";
@@ -284,7 +285,7 @@ async function vbToon(el, klantId, beginTab) {
     <button class="vb-tab" data-vb-tab="koppelingen">Koppelingen</button>
   </div>
   <div data-vb-paneel="overzicht">
-    <div class="kaart">
+    <div class="kaart" data-vb-blok="tegels">
       <h2><span class="tag">&gt;_</span>Laatste 28 dagen in één oogopslag</h2>
       <p class="zacht vb-klein" style="margin-top:-4px"><a href="uitleg-vindbaarheid#cijfers" style="float:right">Wat betekenen de cijfers?</a>${vbDatum(start)} t/m ${vbDatum(eind, { day: "numeric", month: "short", year: "numeric" })}${zin ? ` · ${zin}` : ""}</p>
       <div class="vb-tegels">
@@ -294,17 +295,17 @@ async function vbToon(el, klantId, beginTab) {
         ${d.ga4.length ? vbTegel("Acties op je site", vbGetal(ac), v(ac, acV), VB_UITLEG.acties) : ""}
       </div>
     </div>
-    ${vbGbpKaart(d)}
-    ${vbAiKaart(d)}
-    ${d.gsc.length ? `<div class="kaart"><h2><span class="tag">&gt;_</span>Klikken uit Google per week</h2><div data-vb-grafiek></div>
+    <div data-vb-blok="gbp">${vbGbpKaart(d)}</div>
+    <div data-vb-blok="ai">${vbAiKaart(d)}</div>
+    ${d.gsc.length ? `<div class="kaart" data-vb-blok="grafiek"><h2><span class="tag">&gt;_</span>Klikken uit Google per week</h2><div data-vb-grafiek></div>
       <p class="zacht vb-klein">Bron: Google Search Console. De laatste twee dagen kunnen nog iets veranderen.</p></div>` : ""}
     <div data-vb-gz-kort></div>
-    ${d.zoekwoorden.length ? `<div class="kaart"><h2><span class="tag">&gt;_</span>Beste zoekwoorden</h2>${vbTabel(d.zoekwoorden, "zoekwoord", 10)}
+    ${d.zoekwoorden.length ? `<div class="kaart" data-vb-blok="beste"><h2><span class="tag">&gt;_</span>Beste zoekwoorden</h2>${vbTabel(d.zoekwoorden, "zoekwoord", 10)}
       <div class="rij" style="margin-top:10px"><button class="knop rand klein" data-vb-naar="zoekwoorden">Alle zoekwoorden</button></div>
       <p class="zacht vb-klein">${VB_UITLEG.positie} "Verschil" vergelijkt met de 28 dagen ervoor.</p></div>` : ""}
-    ${vbKansen(d)}
+    <div data-vb-blok="kansen">${vbKansen(d)}</div>
   </div>
-  <div data-vb-paneel="zoekwoorden" class="verborgen"><div class="kaart">
+  <div data-vb-paneel="zoekwoorden" class="verborgen"><div class="kaart" data-vb-blok="zoektabel">
     <h2><span class="tag">&gt;_</span>Alle zoekwoorden</h2>
     <p class="zacht vb-klein" style="margin-top:-4px">Waarop mensen zochten toen jouw site in Google verscheen, laatste 28 dagen. Google toont om privacyredenen niet elke zoekopdracht.</p>
     <input type="search" placeholder="Zoek een woord…" data-vb-filter="zoekwoord" style="margin-bottom:10px">
@@ -331,6 +332,7 @@ async function vbToon(el, klantId, beginTab) {
     if (window.ResizeObserver) new ResizeObserver(() => { if (Math.abs(gr.clientWidth - w) > 40) { w = gr.clientWidth; teken(); } }).observe(gr);
   }
   const toonTab = (t) => {
+    if (window.vbNaarPagina && window.vbNaarPagina(t)) return;
     el.querySelectorAll(".vb-tab").forEach((b) => b.classList.toggle("aan", b.dataset.vbTab === t));
     el.querySelectorAll("[data-vb-paneel]").forEach((p) => p.classList.toggle("verborgen", p.dataset.vbPaneel !== t));
   };
