@@ -125,6 +125,7 @@ tr.klik{cursor:pointer}
     <div id="vbbestel"></div>
     <div id="vbcodes"></div>
     <div id="vbwidget"></div>
+    <div id="srtgebruik"></div>
   </section>
 
   <section id="t-geld" class="verborgen">
@@ -223,7 +224,7 @@ function laadTab(tab, opnieuw) {
   geladen[tab] = true;
   if (tab === "vandaag") { vbgOmzet($("#vdtegels"), "tegels"); tekenTaken(); vbMeldingen(); vbStartOverzicht($("#vbstart"), (id) => openKlantPagina(id, "cijfers")); }
   if (tab === "klanten") laadKlanten();
-  if (tab === "verkoop") { vbcBeheer($("#vbchecks"), new URLSearchParams(location.search).get("check")); vbbBestellingen($("#vbbestel")); vbkCodes($("#vbcodes")); vbgWidget($("#vbwidget")); }
+  if (tab === "verkoop") { vbcBeheer($("#vbchecks"), new URLSearchParams(location.search).get("check")); vbbBestellingen($("#vbbestel")); vbkCodes($("#vbcodes")); vbgWidget($("#vbwidget")); srtGebruik($("#srtgebruik")); }
   if (tab === "geld") { vbfBeheer($("#vbfacturen")); vbgOmzet($("#geldlijsten"), "lijsten"); vbKosten($("#vbkosten")); }
   if (tab === "instellingen") vbgInstellingen($("#vbinst"));
 }
@@ -574,6 +575,21 @@ $("#aopslaan").onclick = async () => {
   catch (e) { meld(e.message); }
 };
 
+
+
+// ---- gebruik van de gratis tools (siteregelaar.nl) ----
+async function srtGebruik(el) {
+  if (!el) return;
+  try {
+    const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-tools", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "lijst" }) });
+    const d = await r.json(); if (!r.ok) throw new Error(d.fout);
+    const NAAM = (window.SR_NAAM = { snelheid: "Snelheid", concurrent: "Concurrent", "google-voorbeeld": "Google-voorbeeld", ai: "ChatGPT/AI", veiligheid: "Veiligheid", toegankelijkheid: "Toegankelijkheid", mobiel: "Telefoon", links: "Links", bedrijfsgegevens: "Bedrijfsgegevens", social: "Deel-voorbeeld", afbeeldingen: "Afbeeldingen", koppen: "Kopjes", leesbaarheid: "Leesbaarheid", indexeerbaar: "Google-toegang", mail: "Mail", kosten: "Kosten", omzetverlies: "Omzetverlies", qr: "QR-code" });
+    const los = d.gebruik.filter((g) => !String(g.bron || "").startsWith("check:"));
+    el.innerHTML = `<div class="kaart tabel-scroll"><h2 style="font-size:16px"><span class="tag">⚡</span>Gratis tools op siteregelaar.nl</h2>
+      <p class="zacht vb-klein" style="margin-top:-4px">Wie een tool gebruikte, met de score. Lage score = kans om even te bellen of te mailen. Groen = later klant geworden.</p>
+      ${los.length ? `<table><thead><tr><th>Wanneer</th><th>Website</th><th>Tool</th><th>Waar</th><th class="r">Score</th><th class="r">Punten</th></tr></thead><tbody>${los.slice(0, 60).map((g) => `<tr${g.klant_id ? ' style="background:var(--accent2)"' : ""}><td class="zacht">${datum(g.aangemaakt)}</td><td>${g.site ? `<a href="${esc(g.site)}" target="_blank" rel="noopener">${esc(g.site.replace(/^https?:\/\/(www\.)?/, ""))}</a>` : "–"}${g.site2 ? ` <span class="zacht">vs ${esc(g.site2.replace(/^https?:\/\/(www\.)?/, ""))}</span>` : ""}</td><td>${esc(NAAM[g.tool] || g.tool)}</td><td class="zacht">${esc(g.plaats || (g.bron || "").replace(/^tool:/, "").replace(/^plaats:/, ""))}</td><td class="r mono">${g.score ?? "–"}</td><td class="r mono">${g.punten}</td></tr>`).join("")}</tbody></table>` : `<p class="zacht">Nog niemand heeft een tool gebruikt.</p>`}</div>`;
+  } catch { el.innerHTML = ""; }
+}
 
 // ---- Google-sleutel voor de gratis tools ----
 const SRT = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-tools";

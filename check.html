@@ -102,15 +102,69 @@
     <a class="navlink verberg-mobiel" href="./" aria-current="page">Sitehulpje</a>
     <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/#portfolio">Portfolio</a>
     <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/vindbaarheid">Vindbaarheid</a>
-    <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/tools">Gratis tools</a>
     <a class="navlink verberg-mobiel" href="https://siteregelaar.nl/#contact">Contact</a>
     <button class="knop rand klein thema" type="button"></button>
     <a class="knop klein" href="inloggen">Inloggen</a>
   </nav>
 </header>
+<link rel="stylesheet" href="assets/tools.css?v=20261110u">
+<style>.rp-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:14px 0}.rp-cat{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 10px;border-radius:16px;border:1px solid var(--lijn);background:var(--bg2);color:var(--tekst);font:inherit;cursor:pointer}.rp-cat.aan{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent2)}.rp-cat span{font-size:13px;color:var(--zacht)}.rp-cat .srt-getal{font-size:22px}.rp-catvak h3{margin:6px 0 10px}.rp-tool{padding:12px 0;border-top:1px solid var(--lijn)}.rp-toolkop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}.rp-door{font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px}.rp-door.vb{background:rgba(59,130,246,.15);color:#3b82f6}.rp-door.sh{background:var(--accent2);color:var(--accent)}.rp-wie-rij{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}.rp-wie-rij>div{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:14px;background:var(--bg2);border:1px solid var(--lijn)}.rp-wie-rij>div>b{font:700 34px "Space Grotesk",sans-serif;color:var(--accent)}@media(max-width:640px){.rp-wie-rij{grid-template-columns:1fr}}</style>
 <main class="rp" id="rp"><div class="kaart rp-wacht"><p class="zacht">Rapport laden…</p></div></main>
 <script src="assets/basis.js"></script>
 <script>
+// ---------- alle extra checks en de vergelijking met de concurrent ----------
+const RP_CAT = [
+  ["Snelheid", "⚡", ["snelheid", "afbeeldingen"]], ["Op de telefoon", "📱", ["mobiel"]], ["Gevonden in Google", "🔎", ["google-voorbeeld", "indexeerbaar", "koppen"]],
+  ["Vindbaar in AI", "🤖", ["ai", "bedrijfsgegevens"]], ["Veiligheid", "🛡️", ["veiligheid", "links"]], ["Je mail", "✉️", ["mail"]], ["Teksten en delen", "💬", ["leesbaarheid", "social", "toegankelijkheid"]]];
+const RP_NAAM = { snelheid: "Snelheid", afbeeldingen: "Afbeeldingen", mobiel: "Telefoon", "google-voorbeeld": "Zo zie je eruit in Google", indexeerbaar: "Toegang voor Google", koppen: "Opbouw van je pagina",
+  ai: "ChatGPT en andere AI", bedrijfsgegevens: "Bedrijfsgegevens", veiligheid: "Beveiliging", links: "Links", mail: "Komt je mail aan?", leesbaarheid: "Leesbaarheid", social: "Delen in WhatsApp en social media", toegankelijkheid: "Bruikbaar voor iedereen" };
+async function rpExtra(d) {
+  const el = document.createElement("section"); el.className = "kaart"; el.id = "rpalles";
+  const anker = document.querySelector(".rp-advies"); anker.parentNode.insertBefore(el, anker);
+  el.innerHTML = `<h2>Alle checks</h2><div class="srt-laden"><div class="srt-robot">${robotSvg("rust")}</div><b>Ik doe nog 14 extra checks op je site…</b><div class="srt-voort"><i style="width:4%"></i></div><p class="zacht" style="margin:0">Dit duurt ongeveer een minuut.</p></div>`;
+  let pct = 4; const tik = setInterval(() => { pct = Math.min(95, pct + 1.6); const v = el.querySelector(".srt-voort i"); if (v) v.style.width = pct + "%"; }, 900);
+  let r;
+  try {
+    const x = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-tools", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": (typeof sessieVan === "function" && sessieVan("beheer")) || "" }, body: JSON.stringify({ actie: "rapport", id: q.get("id"), t: q.get("t") }) });
+    r = await x.json(); if (!x.ok) throw new Error(r.fout || "");
+  } catch (e) { clearInterval(tik); el.remove(); return; }
+  clearInterval(tik);
+  const R = window.SR_RENDER, T = r.tools || {};
+  const gem = (ts) => { const s = ts.map((t) => T[t]?.score).filter((x) => x != null); return s.length ? Math.round(s.reduce((a, b) => a + b, 0) / s.length) : null; };
+  const punten = (ts) => ts.reduce((n, t) => n + (T[t]?.items || []).filter((i) => i.status !== "goed").length, 0);
+  el.innerHTML = `<h2>Alle checks</h2><p class="zacht" style="margin-top:-6px">Naast de controle van je pagina's hebben we je site op 14 onderdelen getest. Klik op een onderdeel voor de details.</p>
+    <div class="rp-cats">${RP_CAT.map(([n, ico, ts], i) => { const s = gem(ts), p = punten(ts); return `<button type="button" class="rp-cat" data-cat="${i}">${R.ring(s ?? 100, 84).replace(/>\d+<\/text>/, s == null ? ">–</text>" : `>${s}</text>`)}<b>${ico} ${n}</b><span>${p ? p + (p === 1 ? " verbeterpunt" : " verbeterpunten") : "Alles in orde"}</span></button>`; }).join("")}</div>
+    <div id="rpcatdetail"></div>`;
+  const toon = (i) => {
+    el.querySelectorAll(".rp-cat").forEach((b) => b.classList.toggle("aan", +b.dataset.cat === i));
+    const [n, ico, ts] = RP_CAT[i];
+    el.querySelector("#rpcatdetail").innerHTML = `<div class="rp-catvak"><h3>${ico} ${n}</h3>${ts.filter((t) => T[t]).map((t) => `<div class="rp-tool"><div class="rp-toolkop"><b>${RP_NAAM[t]}</b><span class="rp-door ${T[t].door}">${T[t].door === "vb" ? "Lost Vindbaarheid op" : "Lost Sitehulpje op"}</span></div>
+      ${R.EXTRA[t] && T[t].extra && ["google-voorbeeld", "social", "ai"].includes(t) ? R.EXTRA[t](T[t].extra) : ""}${R.itemsHtml(T[t].items || [])}</div>`).join("")}</div>`;
+  };
+  el.querySelectorAll(".rp-cat").forEach((b) => (b.onclick = () => toon(+b.dataset.cat)));
+  const eerste = RP_CAT.findIndex(([, , ts]) => punten(ts) > 0); toon(eerste < 0 ? 0 : eerste);
+  // wie lost wat op + één knop
+  const alle = Object.entries(T).flatMap(([t, u]) => (u.items || []).filter((i) => i.status !== "goed").map(() => u.door));
+  const nvb = alle.filter((x) => x === "vb").length + (d.uitslag?.problemen || []).filter((p) => p.groep === "Inhoud" || p.groep === "AI-vindbaarheid").length;
+  const nsh = alle.filter((x) => x === "sh").length + (d.uitslag?.problemen || []).filter((p) => p.groep === "Techniek" || p.groep === "Snelheid").length;
+  const pk = (d.advies?.pakket && ["basis", "plus", "pro"].includes(d.advies.pakket)) ? d.advies.pakket : "basis";
+  const link = `bestellen?${nvb ? "pakket=" + pk + "&" : "pakket=&"}${nsh ? "sh=1&" : ""}ref=check:${encodeURIComponent(q.get("id"))}`;
+  const wie = document.createElement("section"); wie.className = "kaart rp-wie";
+  wie.innerHTML = `<p class="label mono">Wie lost wat op</p><h2>${nvb + nsh} verbeterpunten, allemaal op te lossen</h2>
+    <div class="rp-wie-rij"><div><b>${nvb}</b><span><b>Vindbaarheid</b> regelt de teksten en gegevens voor Google en AI: titels, omschrijvingen, beschrijvingen bij foto's en je bedrijfsgegevens. Jij keurt goed met één klik.</span></div>
+    <div><b>${nsh}</b><span><b>Sitehulpje</b> regelt alles aan de website zelf: snelheid, beveiliging, links, je mail-instellingen en teksten op de pagina.</span></div></div>
+    <p class="zacht" style="margin:4px 0 0">${nvb && nsh ? "Samen: Vindbaarheid vanaf €99 + Sitehulpje €75 per maand (in plaats van €125)." : nsh ? "Sitehulpje: €125 per maand." : "Vindbaarheid vanaf €99 per maand."} Prijzen excl. btw.</p>
+    <div class="rp-cta"><a class="knop groot-knop" href="${link}">Laat Sitehulpje alles oplossen &rarr;</a></div>
+    <p class="zacht" style="margin:8px 0 0;font-size:14px">Alle punten uit dit rapport gaan direct mee naar je account. Je hoeft niets opnieuw uit te leggen.</p>`;
+  el.after(wie);
+  // concurrent
+  const vs = document.createElement("section"); vs.className = "kaart";
+  vs.innerHTML = `<h2>🥊 Hoe sta je ervoor tegenover je concurrent?</h2><p class="zacht" style="margin-top:-6px">Vul de website van een concurrent in en zie per onderdeel wie er wint.</p><div data-sr-tool="concurrent" data-bron="check:${R.e(q.get("id"))}"></div>`;
+  wie.after(vs);
+  const veld = () => { const i = vs.querySelector("input[name=site]"); if (i) { i.value = d.site.replace(/^https?:\/\//, ""); i.closest("label").style.display = "none"; } };
+  const s2 = document.createElement("script"); s2.src = "assets/tools.js?v=20261110u"; s2.onload = veld; document.body.appendChild(s2);
+}
+
 const CHECK_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-check";
 const q = new URLSearchParams(location.search);
 const nl = (n) => Number(n).toLocaleString("nl-NL");
@@ -198,6 +252,7 @@ function opbouw(d) {
     }
     document.title = `Website-check ${d.site.replace(/^https?:\/\/(www\.)?/, "")} – Sitehulpje`;
     el.innerHTML = opbouw(d);
+    rpExtra(d);
     try { document.getElementById("rpbot").innerHTML = robotSvg("rust"); } catch {}
     const t = document.getElementById("teller"), doel = Number(d.score) || 0, start = performance.now();
     const stap = (nu) => { const f = Math.min(1, (nu - start) / 1800); t.textContent = Math.round(doel * (1 - Math.pow(1 - f, 3))); if (f < 1) requestAnimationFrame(stap); };
