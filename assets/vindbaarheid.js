@@ -436,7 +436,7 @@ async function vbGezondheid(el, klantId, toonTab) {
         <div class="vb-probleem-lijf">${x.oplossing ? `<p><b>Zo los je het op:</b> ${esc(x.oplossing)}</p>` : ""}
         ${x.voorbeelden?.length ? `<p class="zacht vb-klein" style="margin-bottom:4px">${x.aantal > x.voorbeelden.length ? `Voorbeelden (${x.voorbeelden.length} van ${x.aantal}):` : "Waar:"}</p>
           <ul class="vb-vb">${x.voorbeelden.map((v) => { const [url, rest] = v.split(" (op "); return `<li><a href="${esc(url)}" target="_blank" rel="noopener">${esc(vbKort(url))}</a>${rest ? ` <span class="zacht">(op ${esc(vbKort(rest.replace(/\)$/, "")))})</span>` : ""}</li>`; }).join("")}</ul>` : ""}
-        <p class="zacht vb-klein" style="margin:6px 0 0">Wil je dat Sitehulpje dit oplost? Stuur een verzoek, dan pakken we het op.</p></div></details>`;
+        <div data-vb-fix="${p.indexOf(x)}"></div></div></details>`;
       paneel.innerHTML = `<div class="kaart">
         <div class="rij" style="gap:18px;align-items:center">${vbScoreRing(L.score)}
           <div class="vul"><h2 style="margin:0"><span class="tag">&gt;_</span>Website-gezondheid</h2>
@@ -455,6 +455,7 @@ async function vbGezondheid(el, klantId, toonTab) {
       ${groepen.map((g) => { const lijst = p.filter((x) => (x.groep || "Techniek") === g); return lijst.length ? `<div class="kaart"><h2><span class="tag">&gt;_</span>${g} <span class="zacht" style="font-weight:400">(${lijst.length})</span></h2>${lijst.map(probleemHtml).join("")}</div>` : ""; }).join("")}
       ${u.goed?.length ? `<div class="kaart"><h2><span class="tag">&gt;_</span>Dit is in orde</h2><ul class="vb-goed">${u.goed.map((t) => `<li>${esc(t)}</li>`).join("")}</ul></div>` : ""}`;
     }
+    if (L) vbFixVul(paneel, L.uitslag.problemen || [], klantId);
     paneel.querySelectorAll("[data-vb-gz-nu]").forEach((b) => (b.onclick = async () => {
       b.disabled = true; b.textContent = "Bezig met controleren… (1 tot 2 minuten)";
       try { await vbGzApi("nu", { klant_id: klantId }); teken(await vbGzApi("laatste", { klant_id: klantId })); }
@@ -464,6 +465,73 @@ async function vbGezondheid(el, klantId, toonTab) {
   try { teken(await vbGzApi("laatste", { klant_id: klantId })); }
   catch (e) { paneel.innerHTML = `<div class="kaart"><div class="melding fout">${esc(e.message)}</div></div>`; }
   vbBereikbaarheid(paneel, klantId);
+}
+
+// ---------- Website-check: direct een oplossing laten zien, met één knop toepassen ----------
+const VB_TEKSTSOORT = ["titel", "titel_lang", "titel_kort", "titel_dubbel", "omschrijving", "omschrijving_lang", "omschrijving_dubbel"];
+async function vbFixVul(paneel, problemen, klantId) {
+  const vakken = [...paneel.querySelectorAll("[data-vb-fix]")];
+  if (!vakken.length) return;
+  let vs = null;
+  const laadVs = async () => { try { vs = await vbVsApi("lijst", { klant_id: klantId }); } catch { vs = { voorstellen: [], automatisch: false }; } };
+  await laadVs();
+  const urlsVan = (x) => (x.voorbeelden || []).map((v) => v.split(" (op ")[0]);
+  const zelfde = (a, b) => (a || "").replace(/\/$/, "") === (b || "").replace(/\/$/, "");
+  vakken.forEach((vak) => {
+    const x = problemen[+vak.dataset.vbFix]; if (!x) return;
+    const tekst = VB_TEKSTSOORT.includes(x.soort), alt = x.soort === "alt";
+    if (tekst || alt) {
+      const urls = urlsVan(x);
+      const eigen = vs.voorstellen.filter((v) => v.soort === (alt ? "alt" : "titel_omschrijving") && urls.some((u) => zelfde(u, v.pagina)));
+      const open = eigen.filter((v) => v.status === "nieuw"), klaar = eigen.filter((v) => v.status !== "nieuw" && v.status !== "geweigerd");
+      const toepasKnop = vs.automatisch ? "Toepassen op mijn website" : "Goedkeuren";
+      let h = "";
+      if (open.length) {
+        h += `<p style="margin:10px 0 6px"><b>Ons voorstel</b> <span class="zacht vb-klein">· volgens de regels van Google: titel maximaal 60 tekens, omschrijving maximaal 155. Je kunt het nog aanpassen.</span></p>`;
+        h += open.map((v) => alt ? `<div class="vb-fix" data-fixid="${v.id}"><div class="zacht vb-klein">${esc(vbKort(v.pagina))}</div>
+            <ul class="vb-vb">${v.voorstel.afbeeldingen.map((a) => `<li><span class="zacht">${esc(a.src.split("/").pop().slice(0, 50))}</span> → <b>${esc(a.alt)}</b></li>`).join("")}</ul>
+            <div class="rij" style="margin-top:6px"><button class="knop klein" data-fixja>${toepasKnop}</button><button class="knop rand klein" data-fixnee>Niet doen</button></div><div data-fixmeld></div></div>`
+          : `<div class="vb-fix" data-fixid="${v.id}"><div class="zacht vb-klein">${esc(vbKort(v.pagina))}</div>
+            <label class="vb-klein">Titel in Google</label><input data-fixt value="${esc(v.voorstel.titel)}"><div class="vb-klein" data-fixtt></div>
+            <label class="vb-klein">Omschrijving in Google</label><textarea data-fixo rows="2">${esc(v.voorstel.omschrijving)}</textarea><div class="vb-klein" data-fixot></div>
+            <div class="rij" style="margin-top:8px"><button class="knop klein" data-fixja>${toepasKnop}</button><button class="knop rand klein" data-fixnee>Niet doen</button></div><div data-fixmeld></div></div>`).join("");
+      }
+      if (klaar.length) h += `<p class="vb-op vb-klein" style="margin:8px 0 0">✓ Al aangepakt voor ${klaar.length} ${klaar.length === 1 ? "pagina" : "pagina's"}. Bij de volgende check verdwijnt dit punt.</p>`;
+      if (open.length + klaar.length < urls.length) h += `<div class="rij" style="margin-top:10px"><button class="knop klein" data-fixmaak>${open.length ? "Ook voor de andere pagina's" : alt ? "Maak beschrijvingen" : "Maak betere teksten"}</button><span class="zacht vb-klein">Sitehulpje schrijft ze in ongeveer een minuut, volgens de regels van Google.</span></div><div data-fixmeld></div>`;
+      if (!vs.automatisch && open.length) h += `<p class="zacht vb-klein" style="margin:6px 0 0">Na goedkeuren zet Jan het op je website.</p>`;
+      vak.innerHTML = h;
+      vak.querySelectorAll("[data-fixid]").forEach((blok) => {
+        const v = vs.voorstellen.find((y) => String(y.id) === blok.dataset.fixid);
+        const ti = blok.querySelector("[data-fixt]"), om = blok.querySelector("[data-fixo]");
+        const tel = () => { if (!ti) return; blok.querySelector("[data-fixtt]").innerHTML = vbTeller(ti.value.length, 60); blok.querySelector("[data-fixot]").innerHTML = vbTeller(om.value.length, 155); };
+        if (ti) { ti.oninput = om.oninput = tel; tel(); }
+        const meld = (t, s = "fout") => toonMelding(blok.querySelector("[data-fixmeld]"), t, s);
+        blok.querySelector("[data-fixja]").onclick = async (e) => {
+          if (ti && (ti.value.length > 60 || om.value.length > 155)) return meld("Maak de tekst iets korter: Google kapt hem anders af.");
+          e.target.disabled = true; e.target.textContent = "Bezig…";
+          try { const r = await vbVsApi("goedkeuren", { klant_id: klantId, id: v.id, voorstel: ti ? { titel: ti.value, omschrijving: om.value } : undefined });
+            blok.innerHTML = `<div class="melding ok">${r.status === "handmatig" ? "Goedgekeurd. Jan zet dit op je website." : r.status === "uitgevoerd" ? "Klaar! Het staat op je website. Google neemt het binnen een paar dagen over." : "Goedgekeurd. Sitehulpje zet het nu op je website."}</div>`; }
+          catch (err) { meld(err.message); e.target.disabled = false; e.target.textContent = toepasKnop; }
+        };
+        blok.querySelector("[data-fixnee]").onclick = async () => { try { await vbVsApi("weiger", { klant_id: klantId, id: v.id }); blok.remove(); } catch (err) { meld(err.message); } };
+      });
+      const maak = vak.querySelector("[data-fixmaak]");
+      if (maak) maak.onclick = async () => {
+        maak.disabled = true; maak.textContent = "Bezig met schrijven… (± 1 minuut)";
+        try { await vbVsApi("maak", { klant_id: klantId }); await laadVs(); vbFixVul(paneel, problemen, klantId); }
+        catch (e) { toonMelding(vak.querySelector("[data-fixmeld]"), e.message); maak.disabled = false; maak.textContent = "Probeer opnieuw"; }
+      };
+    } else if (!IS_BEHEER && typeof api === "function") {
+      vak.innerHTML = `<div class="rij" style="margin-top:10px"><button class="knop klein" data-fixverzoek>Laat Sitehulpje dit oplossen</button><span class="zacht vb-klein">Eén klik, wij regelen de rest. Je ziet het bij Iets laten aanpassen.</span></div><div data-fixmeld></div>`;
+      vak.querySelector("[data-fixverzoek]").onclick = async (e) => {
+        e.target.disabled = true; e.target.textContent = "Versturen…";
+        const urls = urlsVan(x).slice(0, 10);
+        try { await api("verzoek_nieuw", { tekst: `Uit de website-check: ${x.tekst}\n${x.oplossing ? "Oplossing: " + x.oplossing + "\n" : ""}${urls.length ? "Pagina's:\n" + urls.map((u) => "- " + u).join("\n") : ""}`, fotos: [] });
+          vak.innerHTML = `<div class="melding ok">Verstuurd. Sitehulpje gaat ermee aan de slag; je ziet de voortgang bij Iets laten aanpassen.</div>`; }
+        catch (err) { toonMelding(vak.querySelector("[data-fixmeld]"), err.message); e.target.disabled = false; e.target.textContent = "Laat Sitehulpje dit oplossen"; }
+      };
+    } else vak.innerHTML = "";
+  });
 }
 
 async function vbBereikbaarheid(paneel, klantId) {

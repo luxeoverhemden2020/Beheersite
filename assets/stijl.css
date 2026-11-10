@@ -295,3 +295,5 @@ h1,h2,h3,h4,.kop .merk,.vb-waarde,.stats b{font-family:"Space Grotesk",system-ui
 /* donkere vlakken (hero) houden altijd de donkere knopvariant */
 :root .podium .knop.rand,:root .knop.licht-op-donker,:root[data-thema=licht] .podium .knop.rand,:root[data-thema=licht] .knop.licht-op-donker{color:#e6f1ff;background:linear-gradient(rgba(7,11,20,.55),rgba(7,11,20,.55)) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6) border-box;box-shadow:0 0 0 3px rgba(34,227,196,.08)}
 :root .podium .knop.rand:hover,:root .knop.licht-op-donker:hover,:root[data-thema=licht] .podium .knop.rand:hover,:root[data-thema=licht] .knop.licht-op-donker:hover{color:#e6fffa;background:linear-gradient(135deg,rgba(34,227,196,.18),rgba(59,130,246,.18)) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6) border-box;box-shadow:0 0 22px rgba(34,227,196,.45)}
+
+.vb-fix{border:1px solid var(--lijn);border-radius:12px;padding:10px 12px;margin-top:8px;background:var(--bg2)}.vb-fix label{display:block;margin:8px 0 4px;color:var(--zacht)}
