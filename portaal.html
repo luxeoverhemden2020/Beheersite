@@ -102,6 +102,7 @@ body{background:var(--bg)}
   <div id="shstart" data-kp="verzoeken"></div>
   <div id="vbpromo" data-kp="promo"></div>
   <div id="kprapport" data-kp="gezondheid"></div>
+  <div id="reviewvraag2" data-kp="reviews"></div>
   <div id="vindbaarheid" data-kp="VBALLE"></div>
   <div id="verzoekenDeel" data-kp="verzoeken">
 
@@ -112,6 +113,7 @@ body{background:var(--bg)}
     <div id="nieuw"></div>
     <div id="meld" class="verborgen"></div>
   </div>
+  <div id="reviewvraag"></div>
   <div id="lijst"><p class="zacht">Laden…</p></div>
   </div>
   <div id="klussen" style="margin-top:28px" data-kp="verzoeken"></div>
@@ -385,11 +387,33 @@ function kpNaar(p) {
   $("#kptitel").textContent = t; $("#kpuitleg").textContent = u; $("#kpuitleg").hidden = !u; $("#kpbovtitel").textContent = t;
   kpTekenMenu(); kpDicht();
   const vbPagina = kpHeeftVb && !["verzoeken", "abonnement", "promo"].includes(p);
+  if (p === "verzoeken" || p === "reviews") kpReviewVraag(p === "reviews" ? $("#reviewvraag2") : $("#reviewvraag"));
   if (p === "gezondheid" && !kpRapportGeladen) { kpRapportGeladen = true; kpRapport(); }
   if (vbPagina && !kpVbGeladen) { kpVbGeladen = true; kpLaadVb(); }
   kpAutoBlok(p);
   try { history.replaceState(null, "", location.pathname + location.search + (p === "verzoeken" ? "" : "#" + p)); } catch {}
   scrollTo(0, 0);
+}
+// ---------- klanten om een Google-review vragen ----------
+async function kpReviewVraag(el) {
+  if (!el || el.dataset.geladen) return; el.dataset.geladen = "1";
+  const RV = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-reviewvraag";
+  const roep = async (data) => { const x = await fetch(RV, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify(data) }); const d = await x.json().catch(() => ({})); if (!x.ok) throw new Error(d.fout || "Dat lukte niet."); return d; };
+  let s; try { s = await roep({ actie: "status" }); } catch { el.innerHTML = ""; return; }
+  const dat = (x) => new Date(x).toLocaleDateString("nl-NL", { day: "numeric", month: "short" });
+  el.innerHTML = `<div class="kaart"><h2 style="margin-top:0">⭐ Vraag een klant om een review</h2>
+    <p class="zacht" style="margin-top:0">Klus klaar? Vul de naam en het e-mailadres van je klant in. Wij sturen namens jouw bedrijf een korte mail met één knop naar Google. Na 3 dagen volgt nog één herinnering.</p>
+    ${s.klaar ? `<form id="rvform" class="rij" style="flex-wrap:wrap;gap:8px"><input name="naam" placeholder="Naam van je klant" style="flex:1;min-width:160px" maxlength="80"><input name="email" type="email" required placeholder="E-mailadres" style="flex:1;min-width:200px" maxlength="150"><button class="knop" type="submit">Versturen</button></form><p class="zacht" id="rvmeld" style="margin:8px 0 0;min-height:1em"></p>`
+      : `<p style="margin:0"><b>Even geduld, we zetten dit voor je klaar.</b> Je krijgt bericht zodra het werkt.</p>`}
+    ${s.verstuurd ? `<p class="zacht" style="margin:12px 0 0">${s.verstuurd} ${s.verstuurd === 1 ? "verzoek" : "verzoeken"} verstuurd · ${s.geklikt} ${s.geklikt === 1 ? "klant klikte" : "klanten klikten"} door naar Google</p>
+      <ul class="zacht" style="margin:6px 0 0;padding-left:18px;font-size:14px">${s.laatste.map((v) => `<li>${esc(v.naam || "Klant")} · ${dat(v.aangemaakt)} · ${v.geklikt ? "✓ doorgeklikt" : v.herinnerd ? "herinnering gestuurd" : "verstuurd"}</li>`).join("")}</ul>` : ""}</div>`;
+  const f = el.querySelector("#rvform");
+  if (f) f.onsubmit = async (e) => {
+    e.preventDefault(); const b = f.querySelector("button"), m = el.querySelector("#rvmeld"); b.disabled = true; m.textContent = "Even geduld…";
+    try { await roep({ actie: "vraag", naam: f.naam.value, email: f.email.value }); m.textContent = `✓ Verstuurd naar ${f.email.value}.`; f.reset(); }
+    catch (er) { m.textContent = er.message; }
+    b.disabled = false;
+  };
 }
 // ---------- Werkt alles goed? 14 checks op de eigen site, elke week vers ----------
 async function kpRapport(opnieuw) {

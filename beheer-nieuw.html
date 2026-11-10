@@ -162,6 +162,7 @@ body{background:var(--bg)}
     <div id="vbcodes"></div>
     <div id="vbwidget"></div>
     <div id="srtgebruik"></div>
+    <div id="rvlinks"></div>
   </section>
 
   <section id="t-geld" class="verborgen">
@@ -269,7 +270,7 @@ function laadTab(tab, opnieuw) {
   geladen[tab] = true;
   if (tab === "vandaag") { vbgOmzet($("#vdtegels"), "tegels"); tekenTaken(); vbMeldingen(); vbStartOverzicht($("#vbstart"), (id) => openKlantPagina(id, "cijfers")); }
   if (tab === "klanten") laadKlanten();
-  if (tab === "verkoop") { vbcBeheer($("#vbchecks"), new URLSearchParams(location.search).get("check")); vbbBestellingen($("#vbbestel")); vbkCodes($("#vbcodes")); vbgWidget($("#vbwidget")); srtGebruik($("#srtgebruik")); }
+  if (tab === "verkoop") { vbcBeheer($("#vbchecks"), new URLSearchParams(location.search).get("check")); vbbBestellingen($("#vbbestel")); vbkCodes($("#vbcodes")); vbgWidget($("#vbwidget")); srtGebruik($("#srtgebruik")); rvLinks($("#rvlinks")); }
   if (tab === "geld") { vbfBeheer($("#vbfacturen")); vbgOmzet($("#geldlijsten"), "lijsten"); vbKosten($("#vbkosten")); }
   if (tab === "instellingen") vbgInstellingen($("#vbinst"));
 }
@@ -624,6 +625,20 @@ $("#aopslaan").onclick = async () => {
 
 
 // ---- gebruik van de gratis tools (siteregelaar.nl) ----
+async function rvLinks(el) {
+  if (!el) return;
+  const RV = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-reviewvraag";
+  const roep = async (data) => { const x = await fetch(RV, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify(data) }); const d = await x.json().catch(() => ({})); if (!x.ok) throw new Error(d.fout || "Mislukt"); return d; };
+  try {
+    const d = await roep({ actie: "links" });
+    el.innerHTML = `<div class="kaart"><h2>⭐ Reviews vragen</h2><p class="zacht" style="margin-top:0">Per klant de link naar het Google-reviewvenster. Bij een gekoppeld Google-bedrijfsprofiel vult hij zichzelf in. Leeg = de klant ziet "we zetten dit voor je klaar".</p>
+      ${d.klanten.map((k) => `<div class="rij" style="gap:8px;margin:6px 0;flex-wrap:wrap"><b style="min-width:170px">${esc(k.naam)}</b><input data-rv="${esc(k.id)}" value="${esc(k.review_link || "")}" placeholder="${k.gbp ? "Wordt automatisch opgehaald" : "https://g.page/r/.../review"}" style="flex:1;min-width:220px"><button class="knop rand klein" type="button" data-rvzet="${esc(k.id)}">Opslaan</button><span class="zacht" style="font-size:13px">${k.verstuurd} verstuurd · ${k.geklikt} geklikt</span></div>`).join("")}</div>`;
+    el.querySelectorAll("[data-rvzet]").forEach((b) => (b.onclick = async () => {
+      const id = b.dataset.rvzet, i = el.querySelector(`[data-rv="${CSS.escape(id)}"]`);
+      try { const r = await roep({ actie: "link_zet", klant_id: id, link: i.value }); i.value = r.link || ""; b.textContent = "✓"; setTimeout(() => (b.textContent = "Opslaan"), 1500); } catch (e) { b.textContent = "Fout: " + e.message; }
+    }));
+  } catch (e) { el.innerHTML = ""; }
+}
 async function srtGebruik(el) {
   if (!el) return;
   try {
