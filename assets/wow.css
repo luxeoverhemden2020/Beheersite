@@ -24,8 +24,8 @@ body.home::after{width:50vw;height:50vw;right:-12vw;top:-6vh;background:radial-g
 :root[data-thema=licht] body.home .voet{background:transparent}
 
 /* 3D kantelen bij muis (alleen fijne aanwijzer) */
-[data-tilt]{transform-style:preserve-3d;will-change:transform}
-.verschijn.zicht[data-tilt],[data-tilt]:not(.verschijn){transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px));transition:transform .25s ease-out,opacity .6s ease,box-shadow .25s}
+/* alleen optillen (geen 3D-kanteling: die maakt tekst wazig) */
+.verschijn.zicht[data-tilt],[data-tilt]:not(.verschijn){transform:translateY(var(--ty,0px));transition:transform .25s ease-out,opacity .6s ease,box-shadow .25s}
 [data-tilt].tilt-aan{--ty:-4px}
 [data-tilt]::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .25s;
   background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.35),transparent 45%)}
