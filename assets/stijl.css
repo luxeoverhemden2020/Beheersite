@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
 :root{--bg:#070b14;--bg2:#0c1322;--kaart:rgba(16,25,43,.82);--tekst:#e6f1ff;--zacht:#8aa0bd;--lijn:#1f2f4a;--accent:#22e3c4;--accent2:rgba(34,227,196,.12);--paars:#8b5cf6;--fout:#ff6b81;--foutbg:rgba(255,107,129,.12);--let:#ffd166;--letbg:rgba(255,209,102,.12);--radius:16px;--glow:0 0 0 1px rgba(34,227,196,.25),0 0 24px rgba(34,227,196,.12);--kopbg:rgba(7,11,20,.8);--veld:rgba(7,11,20,.7);--bel:rgba(7,11,20,.6);--raster:rgba(34,227,196,.035);--paarsbg:rgba(139,92,246,.2);--paarstekst:#c4b5fd;--schaduw:0 10px 30px rgba(0,0,0,.25)}
 :root[data-thema=licht]{--bg:#eef4fb;--bg2:#ffffff;--kaart:rgba(255,255,255,.88);--tekst:#0b1a2e;--zacht:#5a6b82;--lijn:#d3deec;--accent:#0b9f8a;--accent2:rgba(11,159,138,.1);--fout:#d63355;--foutbg:rgba(214,51,85,.08);--let:#a86b00;--letbg:rgba(255,183,0,.12);--glow:0 0 0 1px rgba(11,159,138,.3),0 0 22px rgba(11,159,138,.15);--kopbg:rgba(255,255,255,.82);--veld:#f7fafd;--bel:#f1f6fb;--raster:rgba(11,120,180,.06);--paarsbg:rgba(139,92,246,.12);--paarstekst:#6d3fd8;--schaduw:0 8px 24px rgba(15,40,80,.08)}
 *{box-sizing:border-box}
@@ -275,3 +275,17 @@ td.r,th.r{text-align:right}
 .vbs-laden{height:6px;border-radius:99px;background:var(--lijn);overflow:hidden;margin:12px 0 4px}
 .vbs-laden span{display:block;height:100%;width:35%;background:var(--accent);border-radius:99px;animation:vbsLaden 1.4s ease-in-out infinite}
 @keyframes vbsLaden{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+
+/* === Stijl november 2026: Inter voor tekst, Space Grotesk voor koppen; knoppen met verlichte rand === */
+body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:-.005em}
+h1,h2,h3,h4,.kop .merk,.vb-waarde,.stats b{font-family:"Space Grotesk",system-ui,sans-serif}
+.knop{font-family:inherit;font-weight:600;border:1.5px solid transparent;color:#e6fffa;background:linear-gradient(135deg,rgba(34,227,196,.16),rgba(59,130,246,.16)) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6) border-box;box-shadow:0 0 18px -2px rgba(34,227,196,.4),inset 0 0 12px rgba(34,227,196,.1);transition:box-shadow .2s,background .2s}
+.knop:hover{transform:none;box-shadow:0 0 28px rgba(34,227,196,.6),inset 0 0 14px rgba(34,227,196,.18)}
+.knop.licht,.knop.rand{color:var(--tekst);background:linear-gradient(var(--bg2),var(--bg2)) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6) border-box;box-shadow:0 0 0 3px rgba(34,227,196,.08)}
+.knop.licht:hover,.knop.rand:hover{color:#e6fffa;background:linear-gradient(135deg,rgba(34,227,196,.16),rgba(59,130,246,.16)) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6) border-box;box-shadow:0 0 18px -2px rgba(34,227,196,.4)}
+:root[data-thema=licht] .knop{color:#063a33;background:linear-gradient(135deg,#e3fcf6,#e6eeff) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6) border-box;box-shadow:0 0 18px -2px rgba(34,227,196,.35),inset 0 1px 0 rgba(255,255,255,.9)}
+:root[data-thema=licht] .knop:hover{box-shadow:0 0 28px 2px rgba(34,227,196,.55),inset 0 1px 0 rgba(255,255,255,.9)}
+:root[data-thema=licht] .knop.licht,:root[data-thema=licht] .knop.rand{color:#0b1626;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6) border-box;box-shadow:0 0 0 4px rgba(34,227,196,.1),0 8px 22px -12px rgba(59,130,246,.55)}
+:root[data-thema=licht] .knop.licht:hover,:root[data-thema=licht] .knop.rand:hover{color:#063a33;background:linear-gradient(135deg,#e3fcf6,#e6eeff) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6) border-box;box-shadow:0 0 18px -2px rgba(34,227,196,.35),inset 0 1px 0 rgba(255,255,255,.9)}
+.knop:disabled{opacity:.5;box-shadow:none}
+.knop{border-color:transparent !important}
