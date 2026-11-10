@@ -122,11 +122,13 @@ async function rpExtra(d) {
   const el = document.createElement("section"); el.className = "kaart"; el.id = "rpalles";
   const anker = document.querySelector(".rp-advies"); anker.parentNode.insertBefore(el, anker);
   el.innerHTML = `<h2>Alle checks</h2><div class="srt-laden"><div class="srt-robot">${robotSvg("rust")}</div><b>Ik doe nog 14 extra checks op je site…</b><div class="srt-voort"><i style="width:4%"></i></div><p class="zacht" style="margin:0">Dit duurt ongeveer een minuut.</p></div>`;
+  const laadTools = window.SR_RENDER ? Promise.resolve() : new Promise((ok) => { const s2 = document.createElement("script"); s2.src = "assets/tools.js?v=20261110v"; s2.onload = ok; s2.onerror = ok; document.body.appendChild(s2); });
   let pct = 4; const tik = setInterval(() => { pct = Math.min(95, pct + 1.6); const v = el.querySelector(".srt-voort i"); if (v) v.style.width = pct + "%"; }, 900);
   let r;
   try {
     const x = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-tools", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": (typeof sessieVan === "function" && sessieVan("beheer")) || "" }, body: JSON.stringify({ actie: "rapport", id: q.get("id"), t: q.get("t") }) });
     r = await x.json(); if (!x.ok) throw new Error(r.fout || "");
+    await laadTools; if (!window.SR_RENDER) throw new Error("");
   } catch (e) { clearInterval(tik); el.remove(); return; }
   clearInterval(tik);
   const R = window.SR_RENDER, T = r.tools || {};
@@ -162,7 +164,7 @@ async function rpExtra(d) {
   vs.innerHTML = `<h2>🥊 Hoe sta je ervoor tegenover je concurrent?</h2><p class="zacht" style="margin-top:-6px">Vul de website van een concurrent in en zie per onderdeel wie er wint.</p><div data-sr-tool="concurrent" data-bron="check:${R.e(q.get("id"))}"></div>`;
   wie.after(vs);
   const veld = () => { const i = vs.querySelector("input[name=site]"); if (i) { i.value = d.site.replace(/^https?:\/\//, ""); i.closest("label").style.display = "none"; } };
-  const s2 = document.createElement("script"); s2.src = "assets/tools.js?v=20261110u"; s2.onload = veld; document.body.appendChild(s2);
+  window.SR_START && window.SR_START(); veld();
 }
 
 const CHECK_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-check";

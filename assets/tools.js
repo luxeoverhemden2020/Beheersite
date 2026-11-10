@@ -189,5 +189,6 @@
       maakMeetTool(el, tool, t);
     });
   }
+  window.SR_START = start;
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
