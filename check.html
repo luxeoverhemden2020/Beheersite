@@ -173,7 +173,7 @@ const PAKKET = { basis: ["Basis", 5, 99], plus: ["Plus", 15, 179], pro: ["Pro", 
 const ERNST = { hoog: "Belangrijk", middel: "Middel", laag: "Kleiner" };
 const GROEP = { Techniek: "⚙", Snelheid: "⚡", Inhoud: "✍", "AI-vindbaarheid": "✦" };
 try { document.getElementById("kopbot").innerHTML = robotSvg("rust"); } catch {}
-document.getElementById("pdf").onclick = () => window.print();
+document.addEventListener("click", (e) => { if (e.target.closest("#pdf")) window.print(); });
 
 function opbouw(d) {
   const u = d.uitslag || {}, a = d.advies || {}, s = u.snelheid || {}, pb = u.problemen || [];
@@ -207,7 +207,8 @@ function opbouw(d) {
     <div>
       <p class="label mono">&gt;_ gratis website-check · ${dat(d.datum)}</p>
       <h1 class="${host.length > 18 ? "lang" : ""}">${esc(host)}</h1>
-      <p>We hebben ${nl(u.gecontroleerd || 0)}${u.sitemap_aantal > u.gecontroleerd ? " van je " + nl(u.sitemap_aantal) : ""} pagina's gecontroleerd op ruim 30 punten, en de snelheid op mobiel gemeten met de meetmethode van Google.</p>
+      <p>We hebben ${nl(u.gecontroleerd || 0)}${u.sitemap_aantal > u.gecontroleerd ? " van je " + nl(u.sitemap_aantal) : ""} pagina's gecontroleerd op ruim 30 punten, en de snelheid op mobiel gemeten.</p>
+      <button class="knop rand klein verberg-mobiel" type="button" id="pdf" style="margin-bottom:12px">⬇ Bewaar als PDF</button>
       <div class="rp-bot"><span class="bot-mid" id="rpbot"></span><div class="rp-ballon">Hoi${d.naam ? " " + esc(String(d.naam).split(" ")[0]) : ""}! Ik heb je site bekeken. Hieronder zie je wat er goed gaat en wat beter kan.</div></div>
     </div>
     <div class="meter3d" aria-label="Score ${d.score} van 100" role="img">
