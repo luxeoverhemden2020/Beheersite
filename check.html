@@ -144,14 +144,14 @@ async function rpGidsen(na, R) {
   let g; try { const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-lokaal", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": (typeof sessieVan === "function" && sessieVan("beheer")) || "" }, body: JSON.stringify({ actie: "check", id: q.get("id"), t: q.get("t") }) }); g = await r.json(); if (!r.ok) throw 0; } catch { g = null; }
   stop();
   if (!g || g.gratis || !g.gidsen) { s.remove(); return; }
-  const w = g.website || {}, go = g.google || {};
-  const regel = (x) => [x.naam, x.adres, x.telefoon].filter(Boolean).map(R.e).join(" · ") || "–";
+  const w = g.website || {}, go = g.google || {}; const sc = (v) => String(v ?? "").replace(/<\/?cite[^>]*>/g, "");
+  const regel = (x) => [x.naam, x.adres, x.telefoon].filter(Boolean).map((v) => R.e(sc(v))).join(" · ") || "–";
   s.innerHTML = `<h2>📍 Sta je overal goed vermeld?</h2><p class="zacht" style="margin-top:-6px">Google vertrouwt een bedrijf meer als naam, adres en telefoonnummer overal precies hetzelfde zijn.</p>
     <p style="margin:6px 0"><b>Op je website:</b> ${regel(w)}</p>
     <div class="rp-tool"><div class="rp-toolkop"><b>Google-bedrijfsprofiel (Google Maps)</b><span class="rp-door ${go.gevonden ? "sh" : "vb"}">${go.gevonden ? "✓ Gevonden" : "✗ Niet gevonden"}</span></div>
       <p class="zacht" style="margin:0">${go.gevonden ? regel(go) + (go.sterren ? ` · ${R.e(go.sterren)} sterren${go.reviews ? ` (${R.e(go.reviews)} reviews)` : ""}` : "") : "We vonden geen Google-bedrijfsprofiel. Daarmee verschijn je in Google Maps; het is gratis en voor lokale bedrijven het belangrijkst."}</p></div>
     ${g.gidsen.map((x) => `<div class="rp-tool"><div class="rp-toolkop"><b>${R.e(x.site)}</b><span class="rp-door ${x.gevonden && x.klopt ? "sh" : "vb"}">${!x.gevonden ? "Niet gevonden" : x.klopt ? "✓ Klopt" : "✗ Klopt niet"}</span></div>
-      <p class="zacht" style="margin:0">${x.gevonden ? (x.klopt ? regel(x) : R.e(x.verschil || "Gegevens wijken af van je website.")) : "Je staat hier (nog) niet."}</p></div>`).join("")}
+      <p class="zacht" style="margin:0">${x.gevonden ? (x.klopt ? regel(x) : R.e(sc(x.verschil) || "Gegevens wijken af van je website.")) : "Je staat hier (nog) niet."}</p></div>`).join("")}
     <p style="margin:12px 0 0">${g.fout ? `<b>${g.fout} ${g.fout === 1 ? "vermelding klopt" : "vermeldingen kloppen"} niet.</b> ` : ""}Met <b>Vindbaarheid Plus</b> controleren we dit elk kwartaal en houden we je Google-bedrijfsprofiel actief met een bericht per week.</p>`;
 }
 async function rpExtra(d) {
