@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Sitehulpje">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="assets/stijl.css?v=20261110f">
+<link rel="stylesheet" href="assets/stijl.css?v=20261111ai">
 <link rel="stylesheet" href="assets/tools.css?v=20261110v">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96.png">
@@ -756,13 +756,27 @@ async function kpVolg(actie, extra) {
   // AI
   if (!pro) aiv.innerHTML = proNodig("🤖 Noemt AI jou?");
   else {
-    const l = d.ai[d.ai.length - 1];
-    aiv.innerHTML = `<div class="kaart"><h2 style="margin-top:0">🤖 Noemt AI jou?</h2><p class="zacht" style="margin-top:0">Elke week vragen we AI, net als je klanten doen, om een bedrijf aan te raden voor jouw zoekwoorden.</p>
-      ${l ? `<p style="font-size:20px;margin:6px 0 4px"><b>Je werd ${l.genoemd} van de ${l.totaal} keer genoemd.</b></p>
+    const l = d.ai[d.ai.length - 1], pl = d.plan || {}, pv = pl.vragen || [];
+    const titel = (t) => t ? ` “${esc(t)}”` : "";
+    const actie = (v) => !v ? "" : ({
+      goedkeuren: `<div class="ai-actie wacht"><span>📝</span><div class="vul">Er staat een pagina klaar die precies deze vraag beantwoordt${titel(v.titel)}. Keur hem goed, dan zetten wij hem op je site.</div><button class="knop klein" type="button" onclick="kpNaar('voorstellen')">Bekijken</button></div>`,
+      bezig: `<div class="ai-actie"><span>⏳</span><div class="vul">Goedgekeurd. We zetten de pagina${titel(v.titel)} nu op je site.</div></div>`,
+      online: `<div class="ai-actie"><span>✅</span><div class="vul">De pagina${titel(v.titel)} staat online sinds ${dat(v.datum)}. Het kan een paar weken duren voordat AI-diensten hem oppikken.</div></div>`,
+      gepland: `<div class="ai-actie"><span>🗓️</span><div class="vul">Gepland: begin ${esc(v.maand || "volgende maand")} schrijven we een pagina die precies deze vraag beantwoordt. Jij hoeft niets te doen.</div></div>`,
+      goed: `<div class="ai-actie"><span>👍</span><div class="vul">Mooi. We blijven dit elke week meten.</div></div>`,
+    })[v.status] || "";
+    const wachten = pv.filter((v) => v.status === "goedkeuren").length + (pl.gegevens?.status === "goedkeuren" ? 1 : 0);
+    const gg = pl.gegevens ? ({ goedkeuren: "staan klaar om goed te keuren", bezig: "worden nu op je site gezet", online: `staan online sinds ${dat(pl.gegevens.datum)}` })[pl.gegevens.status] : "";
+    aiv.innerHTML = `<div class="kaart"><h2 style="margin-top:0">🤖 Noemt AI jou?</h2><p class="zacht" style="margin-top:0">Elke week vragen we AI, net als je klanten doen, om een bedrijf aan te raden voor jouw zoekwoorden. En we zorgen dat AI jou steeds beter leert kennen.</p>
+      ${l ? `${l.genoemd ? `<p style="font-size:20px;margin:6px 0 4px"><b>Je werd ${l.genoemd} van de ${l.totaal} keer genoemd.</b></p>`
+        : `<p style="font-size:20px;margin:6px 0 4px"><b>Nog niet genoemd. Daar werken we aan.</b></p><p class="zacht" style="margin:0 0 10px">AI raadt bedrijven aan die duidelijk laten zien wat ze doen en waar. Hieronder zie je per vraag wat we daarvoor doen.</p>`}
       ${d.ai.length > 1 ? `<p class="zacht" style="margin:0 0 10px">Verloop: ${d.ai.slice(-8).map((x) => `${dat(x.datum)}: ${x.genoemd}/${x.totaal}`).join(" · ")}</p>` : ""}
-      ${l.antwoorden.map((a) => `<div class="rp-tool"><div class="rp-toolkop"><b>${esc(a.vraag)}</b><span class="rp-door ${a.genoemd ? "sh" : "vb"}">${a.genoemd ? `✓ Genoemd${a.plek ? " (plek " + a.plek + ")" : ""}` : "✗ Niet genoemd"}</span></div>
-        <p class="zacht" style="margin:0">AI raadt aan: ${a.bedrijven.map((b) => esc(b.naam)).join(", ") || "–"}</p></div>`).join("")}
-      <p class="zacht" style="font-size:13px;margin:10px 0 0">Gemeten op ${dat(l.datum)}.</p>` : `<p class="zacht" style="margin:0">De eerste meting volgt maandag.</p>`}</div>`;
+      ${wachten ? `<div class="ai-actie wacht" style="margin:10px 0 4px"><span>✨</span><div class="vul"><b>Er ${wachten === 1 ? "staat 1 verbetering" : `staan ${wachten} verbeteringen`} voor je klaar.</b> Eén klik op Goedkeuren en wij zetten het op je site.</div><button class="knop klein" type="button" onclick="kpNaar('voorstellen')">Goedkeuren</button></div>` : ""}
+      ${l.antwoorden.map((a, n) => `<div class="rp-tool"><div class="rp-toolkop"><b>${esc(a.vraag)}</b><span class="rp-door ${a.genoemd ? "sh" : "nog"}">${a.genoemd ? `✓ Genoemd${a.plek ? " (plek " + a.plek + ")" : ""}` : "Nog niet genoemd"}</span></div>
+        ${actie(pv[n])}
+        <p class="zacht" style="margin:6px 0 0;font-size:13px">AI raadt nu aan: ${a.bedrijven.map((b) => esc(b.naam)).join(", ") || "–"}</p></div>`).join("")}
+      ${gg ? `<div class="ai-actie" style="margin-top:10px"><span>🏷️</span><div class="vul">Je bedrijfsgegevens en veelgestelde vragen, in een vorm die AI goed kan lezen, ${gg}.</div></div>` : ""}
+      <p class="zacht" style="font-size:13px;margin:12px 0 0">Gemeten op ${dat(l.datum)}${pl.volgende ? ` · volgende meting maandag ${dat(pl.volgende)}` : ""}.</p>` : `<p class="zacht" style="margin:0">De eerste meting volgt maandag.</p>`}</div>`;
   }
 }
 // ---------- klanten om een Google-review vragen ----------
