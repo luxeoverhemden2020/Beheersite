@@ -16,7 +16,7 @@
     <h2><span class="tag">&gt;_</span>Google koppelen</h2>
     <p id="tekst">Even geduld, we maken de koppeling en halen je cijfers op. Dit kan een minuut duren…</p>
     <div id="meld" class="verborgen"></div>
-    <div class="rij"><a class="knop rand klein verborgen" id="terug" href="verzoeken#vindbaarheid">Terug naar Sitehulpje</a></div>
+    <div class="rij"><a class="knop rand klein verborgen" id="terug" href="portaal#vindbaarheid">Terug naar Sitehulpje</a></div>
   </div>
 </div>
 <script src="assets/basis.js"></script>
@@ -32,14 +32,14 @@
   };
   if (p.get("accountTicketId")) { // terug van de Analytics-voorwaarden: verder met aanmaken
     let t = null; try { t = sessionStorage.getItem("vb_ga4_terug"); sessionStorage.removeItem("vb_ga4_terug"); } catch { /* geen opslag */ }
-    location.replace(t || "verzoeken?google=ga4#vindbaarheid"); return;
+    location.replace(t || "portaal?google=ga4#vindbaarheid"); return;
   }
   if (p.get("error")) { klaar(p.get("error") === "access_denied" ? "Je hebt de koppeling geannuleerd. Er is niets veranderd." : "Google gaf een foutmelding. Probeer het opnieuw.", "let"); return; }
   try {
     const r = await vbApi("google_terug", { code: p.get("code") || "", state: p.get("state") || "" });
     const st = r.ga4 ? "ga4" : r.kiezen ? "kies" : "ok";
     const doel = r.beheer ? `beheer?vb=${encodeURIComponent(r.klant_id)}&google=${st}#vindbaarheid`
-                          : `verzoeken?google=${st}#vindbaarheid`;
+                          : `portaal?google=${st}#vindbaarheid`;
     location.replace(doel);
   } catch (e) { klaar(e.message, "fout"); }
 })();

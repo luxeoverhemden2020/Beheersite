@@ -69,7 +69,7 @@ if (direct) {
   wwApi({ actie: "direct", token: direct }).then((d) => {
     bewaar(d.rol, d.token);
     if (d.link) { try { localStorage.setItem("bs_link", d.link); } catch {} }
-    location.href = d.rol === "admin" ? "beheer" : "verzoeken";
+    location.href = d.rol === "admin" ? "beheer" : "portaal";
   }).catch((e) => { $("#uitleg").textContent = "Log in om aanpassingen aan je website door te geven."; toonMelding($("#meld"), e.message); });
 }
 $("#vergeten").onclick = (e) => {
@@ -92,7 +92,7 @@ async function naarScherm() {
     try {
       const d = await api("ik", {}, t);
       if (soort === "beheer" && d.gebruiker.rol === "admin") { location.href = "beheer"; return; }
-      if (soort === "klant") { location.href = d.gebruiker.rol === "admin" && !d.klant ? "beheer" : "verzoeken"; return; }
+      if (soort === "klant") { location.href = d.gebruiker.rol === "admin" && !d.klant ? "beheer" : "portaal"; return; }
     } catch { zetSessieVan(soort, ""); }
   }
 }
@@ -128,7 +128,7 @@ $("#inlog").onsubmit = async (e) => {
       d = await api("inloggen", { email: $("#email").value, wachtwoord: $("#ww").value });
     }
     bewaar(d.rol, d.token);
-    location.href = d.rol === "admin" ? "beheer" : "verzoeken";
+    location.href = d.rol === "admin" ? "beheer" : "portaal";
   } catch (err) { toonMelding($("#meld"), err.message); }
   $("#knop").disabled = false;
 };
