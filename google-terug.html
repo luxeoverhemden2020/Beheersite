@@ -35,6 +35,15 @@
     location.replace(t || "portaal?google=ga4#vindbaarheid"); return;
   }
   if (p.get("error")) { klaar(p.get("error") === "access_denied" ? "Je hebt de koppeling geannuleerd. Er is niets veranderd." : "Google gaf een foutmelding. Probeer het opnieuw.", "let"); return; }
+  if ((p.get("state") || "").startsWith("ads.")) { // Google Ads-koppeling door de beheerder
+    try {
+      const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-ads", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actie: "google_terug", code: p.get("code") || "", state: p.get("state") || "" }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.fout || "Koppelen lukte niet.");
+      location.replace("ads-beheer?ads=ok");
+    } catch (e) { klaar(e.message, "fout", "ads-beheer"); }
+    return;
+  }
   try {
     const r = await vbApi("google_terug", { code: p.get("code") || "", state: p.get("state") || "" });
     const st = r.ga4 ? "ga4" : r.kiezen ? "kies" : "ok";

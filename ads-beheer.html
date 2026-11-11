@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Advertenties beheren | Sitehulpje</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/stijl.css?v=20261110f">
+<style>
+.ab{max-width:900px;margin:0 auto;padding:28px 16px 60px;display:flex;flex-direction:column;gap:16px}
+.ab-rij{display:grid;grid-template-columns:1.2fr 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--lijn)}
+.ab-rij:last-child{border-bottom:0}
+@media (max-width:640px){.ab-rij{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="ab">
+  <p><a href="beheer">← Terug naar beheer</a></p>
+  <h1 style="margin:0">Advertenties (Google Ads)</h1>
+  <div class="kaart" id="koppeling"><p class="zacht" style="margin:0">Laden…</p></div>
+  <div class="kaart" id="klanten" hidden></div>
+  <div id="meld" class="verborgen"></div>
+</main>
+<script src="assets/basis.js"></script>
+<script>
+const ADS = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-ads";
+const ads = async (actie, data = {}) => {
+  const r = await fetch(ADS, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("beheer") }, body: JSON.stringify({ actie, ...data }) });
+  const d = await r.json().catch(() => ({}));
+  if (r.status === 401) { location.href = "inloggen?voor=beheer"; throw new Error("Niet ingelogd"); }
+  if (!r.ok) throw new Error(d.fout || "Er ging iets mis.");
+  return d;
+};
+async function laad() {
+  let s;
+  try { s = await ads("status"); } catch (e) { $("#koppeling").innerHTML = `<p style="margin:0">${esc(e.message)}</p>`; return; }
+  const q = new URLSearchParams(location.search);
+  $("#koppeling").innerHTML = s.gekoppeld
+    ? `<h2 style="margin-top:0">✓ Google Ads is gekoppeld</h2><p class="zacht" style="margin:0 0 10px">Via beheerdersaccount Siteregelaar (${s.manager.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3")})${s.sinds ? ", sinds " + new Date(s.sinds).toLocaleDateString("nl-NL") : ""}. Elke nacht worden de cijfers opgehaald, elke maandag volgt de weekanalyse.</p>
+       <button class="knop rand klein" id="opnieuw" type="button">Opnieuw koppelen</button>`
+    : `<h2 style="margin-top:0">Google Ads koppelen</h2><p>Eén keer toestemming geven met het Google-account dat het beheerdersaccount Siteregelaar beheert (info@luxeoverhemden.nl). Daarna kunnen we de cijfers van alle gekoppelde klantaccounts lezen.</p>
+       <p class="zacht">Google kan een waarschuwing tonen dat de app deze toestemming nog niet heeft laten controleren. Kies dan "Geavanceerd" en ga door naar Sitehulpje.</p>
+       <button class="knop" id="opnieuw" type="button">Koppel Google Ads</button>`;
+  if (q.get("ads") === "ok") toonMelding($("#meld"), "Google Ads is gekoppeld.", "ok");
+  $("#opnieuw").onclick = async () => { try { const d = await ads("koppel_start"); location.href = d.url; } catch (e) { toonMelding($("#meld"), e.message); } };
+  if (!s.gekoppeld) return;
+  let acc = [];
+  try { acc = (await ads("accounts")).accounts; } catch (e) { toonMelding($("#meld"), "Accounts ophalen lukte niet: " + e.message); }
+  const opties = (huidig) => `<option value="">Geen advertenties</option>` + acc.map((a) => `<option value="${a.id}" ${a.id === huidig ? "selected" : ""}>${esc(a.naam || a.id)} (${a.id.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3")})</option>`).join("")
+    + (huidig && !acc.some((a) => a.id === huidig) ? `<option value="${huidig}" selected>${huidig} (niet onder Siteregelaar)</option>` : "");
+  $("#klanten").hidden = false;
+  $("#klanten").innerHTML = `<h2 style="margin-top:0">Klanten en hun Google Ads-account</h2><p class="zacht" style="margin:0 0 8px">${acc.length} account(s) onder Siteregelaar. Nieuwe klant? Koppel eerst zijn account onder Siteregelaar in Google Ads.</p>`
+    + s.klanten.map((k) => `<div class="ab-rij"><div><b>${esc(k.naam)}</b><br><span class="zacht" style="font-size:13px">${k.ads_fout ? "⚠ " + esc(k.ads_fout) : k.ads_laatst ? "Bijgewerkt " + new Date(k.ads_laatst).toLocaleString("nl-NL") : k.ads_klant ? "Nog niet opgehaald" : ""}</span></div>
+      <select data-klant="${esc(k.id)}" aria-label="Google Ads-account voor ${esc(k.naam)}">${opties(k.ads_klant || "")}</select>
+      <button class="knop rand klein" type="button" data-nu="${esc(k.id)}" ${k.ads_klant ? "" : "hidden"}>Nu ophalen</button></div>`).join("");
+  document.querySelectorAll("[data-klant]").forEach((sel) => sel.onchange = async () => {
+    try { await ads("toewijzen", { klant_id: sel.dataset.klant, ads_klant: sel.value }); toonMelding($("#meld"), "Opgeslagen.", "ok"); laad(); } catch (e) { toonMelding($("#meld"), e.message); }
+  });
+  document.querySelectorAll("[data-nu]").forEach((b) => b.onclick = async () => {
+    b.disabled = true; b.textContent = "Bezig…";
+    try { const d = await ads("nu", { klant_id: b.dataset.nu }); toonMelding($("#meld"), `Klaar: ${d.dagen} dagregels, ${d.zoektermen} zoekopdrachten, ${d.producten} producten.`, "ok"); laad(); }
+    catch (e) { toonMelding($("#meld"), e.message); b.disabled = false; b.textContent = "Nu ophalen"; }
+  });
+}
+laad();
+</script>
+</body>
+</html>

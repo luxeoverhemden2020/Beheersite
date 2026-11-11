@@ -50,6 +50,17 @@ body{background:var(--bg)}
 .kp-mono{font:500 12.5px ui-monospace,monospace;color:var(--accent)}
 .kp-tegels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
 .kp-held .kp-tegels{margin-bottom:0}
+.ad-held{display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px}
+.ad-held .ad-g{display:flex;flex-direction:column;gap:2px}.ad-held .ad-g b{font-family:"Space Grotesk",sans-serif;font-size:clamp(32px,5vw,48px);line-height:1}
+.ad-held .ad-g b.glans{background:linear-gradient(135deg,#22e3c4,#3b82f6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ad-status{display:flex;gap:10px;align-items:center;padding:12px 16px;border-radius:12px;border:1px solid var(--lijn);font-size:15px}
+.ad-status.goed{border-color:rgba(34,227,196,.5);background:rgba(34,227,196,.08)}.ad-status.let{border-color:rgba(255,209,102,.6);background:rgba(255,209,102,.1)}
+.ad-rij{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--lijn);font-size:14.5px}.ad-rij:last-child{border-bottom:0}
+.ad-balken{display:flex;align-items:flex-end;gap:6px;height:120px;margin-top:8px}.ad-balk{flex:1;display:flex;gap:2px;align-items:flex-end;height:100%}
+.ad-balk i{flex:1;border-radius:4px 4px 0 0;min-height:2px}.ad-balk i.k{background:var(--lijn)}.ad-balk i.w{background:linear-gradient(180deg,#22e3c4,#3b82f6)}
+.ad-actie{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--lijn)}.ad-actie:last-child{border-bottom:0}
+.ad-pil{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(34,227,196,.14);white-space:nowrap}
+.ad-twee{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
 .kp-tegel{background:var(--bg2);border:1px solid var(--lijn);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
 .kp-tegel b{font:700 40px/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.02em}
 .kp-tegel span{font-size:13.5px}.kp-goed{color:var(--accent);font-weight:600}
@@ -104,6 +115,7 @@ body{background:var(--bg)}
   <div id="kprapport" data-kp="gezondheid"></div>
   <div id="reviewvraag2" data-kp="reviews"></div>
   <div id="kpinhoud" data-kp="voorstellen"></div>
+  <div id="kpads" data-kp="advertenties"></div>
   <div id="kplokaal" data-kp="maps"></div>
   <div id="kpconc" data-kp="concurrenten"></div>
   <div id="kpaivm" data-kp="ai"></div>
@@ -312,8 +324,9 @@ const KP_IC = {
   gevonden: "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4", website: "M3 5h18v14H3zM3 9h18M7 7h.01M10 7h.01",
   klanten: "M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11zM12 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z",
   rapporten: "M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5", inst: "M4 7h10M18 7h2M4 17h4M12 17h8M16 5v4M10 15v4",
-  promo: "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4", abonnement: "M3 7h18v12H3zM3 11h18M7 15h4" };
+  advertenties: "M4 10v4h3l6 4V6L7 10zM17 9a4 4 0 010 6", promo: "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4", abonnement: "M3 7h18v12H3zM3 11h18M7 15h4" };
 const KP_TITEL = {
+  advertenties: ["Advertenties", "Wat je advertenties in Google kostten en opleverden, en wat wij ervoor doen."],
   verzoeken: ["Iets laten aanpassen", ""],
   overzicht: ["Overzicht", ""],
   zoekwoorden: ["Waar zoeken mensen op?", "Dit zijn woorden die mensen in Google typten, waarna jouw website in de resultaten verscheen. Op pagina 1 zien de meeste mensen je."],
@@ -331,6 +344,7 @@ const KP_TITEL = {
   abonnement: ["Abonnement", "Je pakket en je facturen."],
   promo: ["Beter gevonden worden", ""] };
 const KP_AUTO = {
+  advertenties: "Wij halen elke nacht de cijfers op en bekijken elke maandag waar je geld verloren gaat en waar het meer kan opleveren. Grote wijzigingen doen we alleen na jouw akkoord.",
   overzicht: "Wij controleren je website elke week, halen elke nacht de nieuwste cijfers op en zoeken waar je makkelijk hoger kunt komen.",
   zoekwoorden: "Wij zoeken in deze lijst naar kansen en maken daar verbeteringen voor. Die vind je bij Je website › Klaar om goed te keuren.",
   maps: "Wij halen elke nacht de cijfers op en laten het je weten als je profiel ineens minder wordt gezien.",
@@ -352,15 +366,17 @@ function kpMenu(vb) {
     ["gevonden", "Gevonden worden", [["zoekwoorden", "In Google zoeken"], ["maps", "Google Maps"], ["ai", "ChatGPT en andere AI"], ["concurrenten", "Je concurrenten"]]],
     ["website", "Je website", [["gezondheid", "Werkt alles goed?"], ["voorstellen", "Klaar om goed te keuren"], ["paginas", "Meest bekeken pagina's"]]],
     ["klanten", "Klanten", [["reviews", "Reviews"], ["acties", "Telefoontjes en routes"]]],
+    ["advertenties", "Advertenties", []],
     ["rapporten", "Rapporten", []], ["-"],
     ["inst", "Instellingen", [["bedrijf", "Over je bedrijf"], ["koppelingen", "Google-account"], ["abonnement", "Abonnement"]]] ] : [
     ["verzoeken", "Iets laten aanpassen", []],
-    ["gezondheid", "Werkt alles goed?", []], ["-"],
+    ["gezondheid", "Werkt alles goed?", []],
+    ["advertenties", "Advertenties", []], ["-"],
     ["promo", "Beter gevonden worden", []], ["-"],
     ["abonnement", "Abonnement", []] ];
   // CSS: per pagina alleen de blokken met die pagina laten zien
   const alle = KP_MENU.flatMap((m) => m[2]?.length ? m[2].map((x) => x[0]) : [m[0]]).filter((x) => x !== "-");
-  document.querySelectorAll('[data-kp="VBALLE"]').forEach((x) => (x.dataset.kp = alle.filter((p) => !["verzoeken", "abonnement", "promo"].includes(p)).join(" ")));
+  document.querySelectorAll('[data-kp="VBALLE"]').forEach((x) => (x.dataset.kp = alle.filter((p) => !["verzoeken", "abonnement", "promo", "advertenties"].includes(p)).join(" ")));
   let css = alle.map((p) => `body[data-pagina="${p}"] [data-kp~="${p}"]{display:block}body[data-pagina="${p}"] #vindbaarheid [data-vb-paneel][data-kp~="${p}"]{display:block!important}`).join("");
   let st = $("#kpcss"); if (!st) { st = document.createElement("style"); st.id = "kpcss"; document.head.append(st); } st.textContent = css;
   kpTekenMenu();
@@ -391,7 +407,8 @@ function kpNaar(p) {
   const [t, u] = KP_TITEL[p] || [p, ""];
   $("#kptitel").textContent = t; $("#kpuitleg").textContent = u; $("#kpuitleg").hidden = !u; $("#kpbovtitel").textContent = t;
   kpTekenMenu(); kpDicht();
-  const vbPagina = kpHeeftVb && !["verzoeken", "abonnement", "promo"].includes(p);
+  const vbPagina = kpHeeftVb && !["verzoeken", "abonnement", "promo", "advertenties"].includes(p);
+  if (p === "advertenties") kpAds();
   if (p === "verzoeken" || p === "reviews") kpReviewVraag(p === "reviews" ? $("#reviewvraag2") : $("#reviewvraag"));
   if (p === "concurrenten" || p === "ai") kpVolg();
   if (p === "voorstellen") kpInhoud();
@@ -401,6 +418,78 @@ function kpNaar(p) {
   kpAutoBlok(p);
   try { history.replaceState(null, "", location.pathname + location.search + (p === "verzoeken" ? "" : "#" + p)); } catch {}
   scrollTo(0, 0);
+}
+
+// ---------- advertenties (Google Ads) ----------
+async function kpAds() {
+  const el = $("#kpads");
+  el.innerHTML = `<div class="kaart"><p class="zacht" style="margin:0">Even je cijfers ophalen…</p></div>`;
+  let d;
+  try { const x = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-ads", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify({ actie: "overzicht" }) }); d = await x.json(); if (!x.ok) throw new Error(d.fout); }
+  catch { el.innerHTML = `<div class="kaart"><p class="zacht" style="margin:0">De cijfers zijn nu even niet op te halen. Probeer het straks nog eens.</p></div>`; return; }
+  const eu = (n, dec) => "€" + Number(n || 0).toLocaleString("nl-NL", { minimumFractionDigits: dec ?? (n % 1 && n < 100 ? 2 : 0), maximumFractionDigits: dec ?? (n < 100 ? 2 : 0) });
+  const nl = (n) => Number(n || 0).toLocaleString("nl-NL", { maximumFractionDigits: 1 });
+  if (!d.actief) {
+    el.innerHTML = `<div class="kaart"><h2 style="margin-top:0">Sneller klanten met advertenties in Google</h2>
+      <p>Wij zetten je advertenties op, sturen ze elke week bij en laten je hier precies zien wat ze kosten en opleveren. Je budget betaal je vooraf, dus je kunt nooit meer kwijtraken dan je wilt.</p>
+      <p class="zacht" style="margin:0 0 12px">Binnenkort zet je dit hier met één klik aan. Wil je niet wachten? Laat het Jan weten.</p>
+      <a class="knop" href="https://wa.me/31627254383?text=${encodeURIComponent("Ik wil graag advertenties in Google")}">Laat het Jan weten</a></div>`;
+    return;
+  }
+  const omzet = d.soortKlant === "omzet";
+  const opbrengst = (x) => omzet ? eu(x.waarde) : nl(x.conversies) + (Math.round(x.conversies) === 1 ? " aanvraag" : " aanvragen");
+  const ST = { loopt: ["goed", "✓ Je advertenties lopen."], uit: ["", "Er lopen nu geen advertenties. Alles staat uit, er wordt niets uitgegeven."], stil: ["let", "Je advertenties staan aan, maar hebben de laatste dagen niets uitgegeven. Wij kijken waarom."], wachten: ["", "We halen je cijfers voor het eerst op. Dat duurt tot morgenochtend."], fout: ["let", "We konden je cijfers even niet ophalen. Jan is ingelicht."] };
+  const [stK, stT] = ST[d.status] || ST.wachten;
+  let h = `<div class="ad-status ${stK}">${stT}</div>`;
+  // groot getal
+  const m = d.deze.kosten > 0 ? d.deze : d.d30.kosten > 0 ? d.d30 : null;
+  const label = d.deze.kosten > 0 ? "Deze maand" : "Afgelopen 30 dagen";
+  if (m) {
+    const per = omzet && m.kosten ? m.waarde / m.kosten : 0;
+    const vg = d.deze.kosten > 0 && d.vorige.kosten > 0 ? (omzet ? d.vorige.waarde : d.vorige.conversies) : null;
+    const nuW = omzet ? m.waarde : m.conversies;
+    h += `<div class="kaart"><p class="zacht" style="margin:0 0 10px">${label}</p><div class="ad-held">
+      <div class="ad-g"><b>${eu(m.kosten)}</b><span class="zacht">erin gestopt</span></div><span style="font-size:28px" aria-hidden="true">→</span>
+      <div class="ad-g"><b class="glans">${opbrengst(m)}</b><span class="zacht">${omzet ? "omzet via advertenties" : "via advertenties"}</span></div>
+      ${per ? `<span class="ad-pil">Elke euro leverde ${eu(per, 2)} op</span>` : ""}</div>
+      ${vg !== null ? `<p class="zacht" style="margin:12px 0 0">Vorige maand rond deze tijd: ${omzet ? eu(vg) : nl(vg) + " aanvragen"}.</p>` : ""}</div>`;
+  } else if (d.historie.kosten > 0) {
+    const sinds = new Date(d.historie.eerste).toLocaleDateString("nl-NL", { month: "long", year: "numeric" });
+    h += `<div class="kaart"><p class="zacht" style="margin:0 0 10px">Totaal sinds ${sinds}</p><div class="ad-held">
+      <div class="ad-g"><b>${eu(d.historie.kosten)}</b><span class="zacht">uitgegeven</span></div><span style="font-size:28px" aria-hidden="true">→</span>
+      <div class="ad-g"><b class="glans">${opbrengst(d.historie)}</b><span class="zacht">${omzet ? "omzet via advertenties" : "via advertenties"}</span></div></div>
+      <p class="zacht" style="margin:12px 0 0">De laatste 30 dagen liepen er geen advertenties.</p></div>`;
+  }
+  // weekbericht
+  const wk = d.acties.length ? d.acties[0].week : null, deze = d.acties.filter((a) => a.week === wk);
+  if (deze.length) h += `<div class="kaart"><h2 style="margin-top:0">Deze week</h2><p class="zacht" style="margin:0 0 6px">Wat wij zagen en wat we gaan doen.</p>
+    ${deze.map((a) => `<div class="ad-actie"><span aria-hidden="true">${a.soort === "status" ? "ℹ️" : a.soort === "uitsluiten" ? "✂️" : a.soort === "uitbouwen" ? "📈" : a.soort === "budget" ? "⚖️" : "🏷️"}</span><div class="kp-vul"><b>${esc(a.tekst)}</b>${a.waarom ? `<div class="zacht" style="font-size:14px">${esc(a.waarom)}</div>` : ""}${a.besparing ? `<div style="font-size:14px;color:var(--accent)">Bespaart ongeveer ${eu(a.besparing)} per week</div>` : ""}</div></div>`).join("")}</div>`;
+  // waar komt het vandaan + weken
+  const NAAM = { SHOPPING: "Shopping", PERFORMANCE_MAX: "Shopping en meer", SEARCH: "Zoekadvertenties", DISPLAY: "Banners", VIDEO: "Video", SMART: "Slimme campagnes" };
+  let twee = "";
+  if (d.soorten.length) twee += `<div class="kaart"><h2 style="margin-top:0">Waar komt het vandaan?</h2><p class="zacht" style="margin:0 0 6px">Afgelopen 30 dagen</p>${d.soorten.map((s) => `<div class="ad-rij"><span>${NAAM[s.soort] || s.soort}</span><span>${eu(s.kosten)} → <b>${opbrengst(s)}</b></span></div>`).join("")}</div>`;
+  if (d.reeks.length) { const mx = Math.max(...d.reeks.map((r) => Math.max(r.kosten, omzet ? r.waarde : r.conversies * 10)), 1);
+    twee += `<div class="kaart"><h2 style="margin-top:0">Per week</h2><p class="zacht" style="margin:0">Grijs: kosten · Blauw: ${omzet ? "omzet" : "aanvragen"}</p><div class="ad-balken">${d.reeks.map((r) => `<div class="ad-balk" title="${new Date(r.week).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}: ${eu(r.kosten)} → ${opbrengst(r)}"><i class="k" style="height:${(r.kosten / mx) * 100}%"></i><i class="w" style="height:${((omzet ? r.waarde : r.conversies * 10) / mx) * 100}%"></i></div>`).join("")}</div></div>`; }
+  if (twee) h += `<div class="ad-twee">${twee}</div>`;
+  // producten en zoekopdrachten
+  let pz = "";
+  if (d.producten.length) pz += `<div class="kaart"><h2 style="margin-top:0">Producten in je advertenties</h2><p class="zacht" style="margin:0 0 6px">Afgelopen 30 dagen</p>${d.producten.map((x) => `<div class="ad-rij"><span>${esc(x.titel)}</span><span class="zacht">${x.conversies ? `<b style="color:inherit">${nl(x.conversies)}× verkocht</b> · ` : ""}${x.klikken} klikken</span></div>`).join("")}</div>`;
+  if (d.zoektermen.length) pz += `<div class="kaart"><h2 style="margin-top:0">Waar mensen op zochten</h2><p class="zacht" style="margin:0 0 6px">Toen ze je advertentie zagen, afgelopen 30 dagen</p>${d.zoektermen.map((x) => `<div class="ad-rij"><span>"${esc(x.term)}"</span><span class="zacht">${x.conversies ? `<b style="color:inherit">${omzet && x.waarde ? eu(x.waarde) : nl(x.conversies) + "×"}</b> · ` : ""}${x.klikken} klikken</span></div>`).join("")}</div>`;
+  if (pz) h += `<div class="ad-twee">${pz}</div>`;
+  // campagnes en details
+  const STAT = { ENABLED: "loopt", PAUSED: "onderbroken", REMOVED: "verwijderd" };
+  const camp = d.campagnes.filter((c) => c.status !== "REMOVED");
+  const m30 = d.d30;
+  h += `<div class="ad-twee">${camp.length ? `<div class="kaart"><h2 style="margin-top:0">Je campagnes</h2>${camp.map((c) => `<div class="ad-rij"><span>${esc(c.campagne)}<br><span class="zacht" style="font-size:13px">${NAAM[c.soort] || c.soort}</span></span><span class="ad-pil" style="${c.status === "ENABLED" ? "" : "background:var(--lijn)"}">${STAT[c.status] || c.status}</span></div>`).join("")}</div>` : ""}
+    <div class="kaart"><h2 style="margin-top:0">Alle details</h2><p class="zacht" style="margin:0 0 6px">Afgelopen 30 dagen</p>
+      <div class="ad-rij"><span>Kosten bij Google</span><b>${eu(m30.kosten, 2)}</b></div>
+      <div class="ad-rij"><span>Klikken</span><b>${m30.klikken.toLocaleString("nl-NL")}</b></div>
+      <div class="ad-rij"><span>Keer getoond in Google</span><b>${m30.vertoningen.toLocaleString("nl-NL")}</b></div>
+      <div class="ad-rij"><span>${omzet ? "Bestellingen" : "Aanvragen"} via advertenties</span><b>${nl(m30.conversies)}</b></div>
+      ${omzet ? `<div class="ad-rij"><span>Omzet via advertenties</span><b>${eu(m30.waarde)}</b></div>` : ""}
+      <p class="zacht" style="font-size:13px;margin:10px 0 0">Kosten bij Google zijn precies wat Google rekent, zonder onze vergoeding. ${omzet ? "Omzet is wat klanten via een advertentie bij je kochten, geen winst." : ""}</p></div></div>`;
+  h += `<p class="zacht" style="font-size:13px;margin:4px 2px">Bijgewerkt: ${d.laatst ? new Date(d.laatst).toLocaleString("nl-NL", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) : "nog niet"}</p>`;
+  el.innerHTML = h;
 }
 // ---------- nieuwe inhoud om goed te keuren (artikelen, veelgestelde vragen, productgegevens) ----------
 async function kpInhoud(actie, id) {
