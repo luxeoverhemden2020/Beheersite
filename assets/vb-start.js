@@ -273,6 +273,7 @@ async function vbStartToon(el, klantId, opties = {}) {
     }
   })();
   if (typeof vbSiteToon === "function") el.querySelectorAll("[data-vbsite]").forEach((c) => vbSiteToon(c, klantId, { klaar: () => opnieuw(volgendeNa("website")) }));
+  if (typeof vbGeenGoogle === "function" && !(typeof IS_BEHEER !== "undefined" && IS_BEHEER)) el.querySelectorAll('[data-vbs="google"]').forEach((b) => vbGeenGoogle(b, klantId));
   el.querySelectorAll('[data-vbs="google"]').forEach((b) => (b.onclick = async () => {
     b.disabled = true;
     try { const r = await vbApi("google_start", { klant_id: klantId }); location.href = r.url; }

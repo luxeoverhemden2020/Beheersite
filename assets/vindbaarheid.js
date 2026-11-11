@@ -548,7 +548,35 @@ async function vbBereikbaarheid(paneel, klantId) {
   } catch { /* niet erg */ }
 }
 
+// ---------- "Nog geen Google-account?" – zo simpel mogelijk voor de klant ----------
+function vbGeenGoogle(knop, klantId) {
+  if (!knop || knop.parentElement.querySelector(".vb-geengoogle")) return;
+  const w = document.createElement("div"); w.className = "vb-geengoogle"; w.style.cssText = "margin-top:10px;font-size:14px";
+  w.innerHTML = `<button type="button" class="link" style="background:none;border:0;padding:0;color:var(--accent);cursor:pointer;font:inherit;text-decoration:underline">Nog geen Google-account, of weet je het niet zeker?</button>
+    <div hidden style="margin-top:10px;padding:14px;border:1px solid var(--lijn);border-radius:14px;background:var(--bg2)">
+      <p style="margin:0 0 8px"><b>Geen probleem, het is gratis en wij doen de rest.</b></p>
+      <ol style="margin:0 0 12px;padding-left:20px;line-height:1.6">
+        <li>Maak een gratis Google-account. Gebruik gewoon je eigen mailadres, je hebt geen Gmail nodig.<br>
+          <a class="knop rand klein" style="margin-top:6px" href="https://accounts.google.com/signup/v2/createaccount?flowName=GlifWebSignIn&flowEntry=SignUp" target="_blank" rel="noopener">Gratis Google-account maken</a>
+          <span class="zacht" style="display:block;margin-top:4px">Kies daar "Mijn huidige e-mailadres gebruiken".</span></li>
+        <li>Kom terug en klik op <b>Google koppelen</b>.</li>
+        <li>Wij zetten de rest voor je klaar: Search Console en je Google-bedrijfsprofiel (Google Maps). Je krijgt alleen nog een bericht als Google iets van jou nodig heeft, zoals een code die per post komt.</li>
+      </ol>
+      <button type="button" class="knop klein" data-regel>Ja, regel het voor mij</button> <span class="zacht" data-regelmeld></span>
+    </div>`;
+  knop.insertAdjacentElement("afterend", w);
+  w.querySelector("button.link").onclick = () => { const v = w.querySelector("div"); v.hidden = !v.hidden; };
+  const b = w.querySelector("[data-regel]");
+  b.onclick = async () => {
+    b.disabled = true; b.textContent = "Even geduld…";
+    try {
+      await api("verzoek_nieuw", { tekst: "Ik heb nog geen (complete) Google-omgeving. Graag voor mij klaarzetten:\n- Search Console voor mijn website (bevestigen via de website)\n- Mijn Google-bedrijfsprofiel (Google Maps) invullen en de bevestiging aanvragen\nLaat me weten wat ik zelf moet doen (bijvoorbeeld een code invullen of een uitnodiging accepteren).", fotos: [] });
+      b.textContent = "Geregeld ✓"; w.querySelector("[data-regelmeld]").textContent = "We gaan ermee aan de slag. Je ziet het verzoek bij \"Iets laten aanpassen\".";
+    } catch (e) { b.disabled = false; b.textContent = "Ja, regel het voor mij"; w.querySelector("[data-regelmeld]").textContent = e.message || "Dat lukte niet, probeer het nog eens."; }
+  };
+}
 function vbKnoppen(el, klantId, d) {
+  if (!(typeof IS_BEHEER !== "undefined" && IS_BEHEER)) el.querySelectorAll('[data-vb="koppel"]').forEach((b) => vbGeenGoogle(b, klantId));
   const fout = (t) => el.querySelectorAll("[data-vb-fout]").forEach((f) => toonMelding(f, t));
   el.querySelectorAll('[data-vb="koppel"]').forEach((b) => (b.onclick = async () => {
     b.disabled = true;
