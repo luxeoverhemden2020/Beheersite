@@ -15,6 +15,14 @@
 .bs-stap{display:flex;align-items:center;gap:10px;margin:22px 0 10px;font-family:"Space Grotesk",sans-serif;font-size:19px;font-weight:700}
 .bs-stap b{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#22e3c4,#3b82f6);color:#04111a;font-size:14px;flex:none}
 .bs-stap:first-of-type{margin-top:8px}
+.advies{padding:20px 22px;border-radius:16px;border:1.5px solid transparent;background:linear-gradient(var(--bg2,#fff),var(--bg2,#fff)) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6 55%,#8b5cf6) border-box;box-shadow:0 0 0 5px rgba(34,227,196,.08);margin-bottom:12px}
+.advies .ad-kop{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:flex-start}
+.advies h2{margin:4px 0 0;font-size:clamp(20px,2.6vw,24px)}
+.advies .ad-prijs{text-align:right;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:26px;line-height:1.1}
+.advies .ad-prijs small{display:block;font-family:inherit;font-weight:400;font-size:12.5px;color:var(--zacht)}
+.advies ul{margin:12px 0 0;padding-left:20px}
+.ander summary{cursor:pointer;font-weight:600;margin:6px 0 10px}
+.ads-binnenkort{margin-top:14px;font-size:13px;line-height:1.5;color:var(--zacht);border-top:1px solid var(--lijn);padding-top:12px}
 [hidden]{display:none!important}
 body.home .keuzes.pakket{grid-template-columns:repeat(4,1fr)}
 .keuzes.pakket .keuze span{flex-direction:column;align-items:flex-start;gap:2px;padding-right:34px}
@@ -85,16 +93,24 @@ details.extra summary{cursor:pointer;color:var(--zacht);font-size:15px;margin:14
       <p class="zacht" style="margin:0">Kies wat je wilt, vul je gegevens in en betaal de eerste maand met iDEAL. Daarna gaat het vanzelf.</p>
       <div class="vriend-band" id="vriendband" hidden></div>
 
-      <div class="bs-stap"><b>1</b>Wat wil je?</div>
-      <label>Vindbaarheid-pakket</label>
+      <div class="bs-stap"><b>1</b><span id="stap1kop">Ons advies voor jou</span></div>
+      <div class="advies" id="advies" aria-live="polite">
+        <div class="ad-kop">
+          <div><p class="label mono" id="adlabel" style="margin:0">Ons advies · op basis van je check</p><h2 id="adnaam">Vindbaarheid Plus</h2><p class="zacht" id="adsub" style="margin:2px 0 0">Lokaal groeien</p></div>
+          <div class="ad-prijs" id="adprijs">€179<small>per maand, excl. btw</small></div>
+        </div>
+        <ul id="adpunten"></ul>
+      </div>
+      <details class="ander" id="ander"><summary>Ander pakket kiezen</summary>
       <div class="keuzes pakket" role="radiogroup" aria-label="Vindbaarheid-pakket">
         <label class="keuze"><input type="radio" name="pakket" value="basis"><span>Basis<small>Gezond &amp; gevonden</small><em>€99</em></span></label>
         <label class="keuze"><input type="radio" name="pakket" value="plus"><span>Plus<small>Lokaal groeien</small><em>€179</em></span></label>
         <label class="keuze"><input type="radio" name="pakket" value="pro"><span>Pro<small>Voorsprong</small><em>€249</em></span></label>
         <label class="keuze"><input type="radio" name="pakket" value=""><span>Geen<small>alleen Sitehulpje</small><em>–</em></span></label>
       </div>
+      </details>
       <label class="sh-schakel"><input type="checkbox" id="b_sh">
-        <span><b>Sitehulpje webbeheer erbij</b> <span id="shprijs"></span><br><span class="zacht">Je website aanpassen door het gewoon te vragen. 24/7, meestal binnen een minuut. Bespaar duizenden euro's aan webbouwers.</span></span></label>
+        <span><b>Ook je site aanpassen door het te vragen?</b> <span id="shprijs"></span><br><span class="zacht">Sitehulpje erbij: typ of spreek in wat er anders moet, meestal staat het er binnen een minuut.</span></span></label>
 
       <div class="bs-stap"><b>2</b>Jouw gegevens</div>
       <div class="grid2">
@@ -138,8 +154,9 @@ details.extra summary{cursor:pointer;color:var(--zacht);font-size:15px;margin:14
       <div class="totaal"><span>Per maand<br><span class="zacht vb-klein">excl. btw</span></span><b id="tot">€0</b></div>
       <div class="vandaag" id="vandaag"></div>
       <ul id="punten"></ul>
+      <p class="ads-binnenkort">Binnenkort: ook advertenties in Google, aan te zetten vanuit je eigen omgeving. Wij regelen de rest.</p>
       <div id="bmeld" class="verborgen" style="margin-top:12px"></div>
-      <button class="knop groot-knop betaal" id="bknop" type="submit">Betaal veilig met iDEAL &rarr;</button>
+      <button class="knop groot-knop betaal" id="bknop" type="submit">Akkoord, betaal met iDEAL &rarr;</button>
       <div class="slot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Beveiligde betaling via Mollie</div>
     </aside>
   </form>
@@ -227,8 +244,21 @@ if (codeUitLink) { $("#codevak").hidden = false; $("#codeopen").hidden = true; $
 
 // ---------- keuze en prijs ----------
 const keuze = () => ({ pakket: document.querySelector("input[name=pakket]:checked")?.value ?? null, sh: $("#b_sh").checked });
+const AD = { basis: ["Gezond & gevonden", ["De punten uit je check lossen wij op", "Elke maand gecontroleerd op fouten", "Elke maand een helder rapport"]],
+  plus: ["Lokaal groeien", ["De punten uit je check lossen wij op", "Je Google-bedrijfsprofiel elke week bijgehouden", "Elke maand een helder rapport"]],
+  pro: ["Voorsprong", ["De punten uit je check lossen wij op", "Elke maand nieuwe artikelen voor je site", "Elke week gemeten of AI je noemt"]] };
+const uitCheck = /^check:/.test(herkomst.ref || "");
+function tekenAdvies(pakket, p) {
+  $("#advies").hidden = !p; $("#stap1kop").textContent = p ? (uitCheck ? "Ons advies voor jou" : "Je keuze") : "Wat wil je?";
+  if (!p) { $("#ander").open = true; return; }
+  $("#adlabel").textContent = uitCheck ? "Ons advies · op basis van je check" : "Je gekozen pakket";
+  $("#adnaam").textContent = p.naam; $("#adsub").textContent = AD[pakket][0];
+  $("#adprijs").innerHTML = eur(p.prijs) + "<small>per maand, excl. btw</small>";
+  $("#adpunten").innerHTML = AD[pakket][1].map((x) => `<li>${esc(x)}</li>`).join("");
+}
 function teken() {
   const { pakket, sh } = keuze(), p = pakket ? PK[pakket] : null;
+  tekenAdvies(pakket, p);
   if (pakket === "" && !sh) $("#b_sh").checked = true;
   const shAan = $("#b_sh").checked, shPrijs = shAan ? (p ? 75 : 125) : 0;
   $("#shprijs").innerHTML = p ? `<span class="mono">€75/mnd</span> <s>€125</s>` : `<span class="mono">€125/mnd</span>`;
@@ -248,7 +278,7 @@ function teken() {
   $("#vandaag").innerHTML = tot ? `Vandaag betaal je <b>${eur(incl, 2)}</b> incl. btw voor de rest van ${maand} (${rest} van ${dagen} dagen). Daarna elke maand automatisch.${af && korting.maanden ? ` Na de korting wordt het ${eur(bruto)} per maand.` : ""}` : "";
   $("#vandaag").hidden = !tot;
   $("#looptijd").textContent = ", met een minimale looptijd van 3 maanden";
-  $("#punten").innerHTML = ["Minimaal 3 maanden, daarna per maand opzegbaar", "Elke maand een factuur per mail", "Prijzen exclusief 21% btw"].map((x) => `<li>${x}</li>`).join("");
+  $("#punten").innerHTML = ["Minimaal 3 maanden", "Elke maand een factuur per mail", "Prijzen exclusief 21% btw"].map((x) => `<li>${x}</li>`).join("");
   try { localStorage.setItem("sh_bestel", JSON.stringify({ pakket, sh: shAan })); } catch {}
 }
 // voorkeuze uit de link (bestellen?pakket=plus&sh=1) of van vorige keer
