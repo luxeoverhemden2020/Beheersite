@@ -104,6 +104,13 @@ body[data-pagina="advertenties"] #kpads{display:flex}
 .ad-stappen li{counter-increment:st;display:grid;grid-template-columns:32px 1fr;column-gap:12px;row-gap:2px;font-size:15px;line-height:1.5}
 .ad-stappen li:before{content:counter(st);grid-row:span 2;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:700 14px "Space Grotesk",system-ui,sans-serif;color:#063a33;background:linear-gradient(135deg,#e3fcf6,#e6eeff) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6) border-box;border:1.5px solid transparent;box-sizing:border-box}
 .ad-stappen span{color:var(--zacht);font-size:14px}
+.ad-keuzes{display:flex;flex-direction:column;gap:8px}.ad-keuzes.rij3{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.ad-keuze{display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:12px;border:1.5px solid var(--lijn);background:#fff;cursor:pointer;font-size:15px}
+.ad-keuze input{accent-color:#0b9f8a;width:18px;height:18px;margin:0;flex:none}
+.ad-keuze:has(input:checked){border-color:#22e3c4;box-shadow:0 0 0 4px rgba(34,227,196,.12);font-weight:700}
+.ad-veld{display:flex;flex-direction:column;gap:6px;font-size:13.5px;color:var(--zacht)}
+.ad-veld input,.ad-veld textarea{font:inherit;font-size:15px;padding:12px 14px;color:var(--tekst)}
+.ad-binnen{border-left:4px solid #22e3c4}
 .ad-knoppen{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .ad-kies{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .ad-terug{background:none;border:0;padding:6px 0;font:600 14px "Inter",system-ui,sans-serif;color:var(--accent);cursor:pointer}
@@ -538,11 +545,13 @@ async function kpAds() {
   const kaart = (inh, extra = "") => `<section class="kaart ${extra}">${inh}</section>`;
   el.innerHTML = kaart(`<p class="zacht" style="margin:0">Even je cijfers ophalen…</p>`);
   let d;
+  const aanvP = adsStartApi({ actie: "status" }).then((x) => x.aanvraag).catch(() => null);
   try { const x = await fetch(SR, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify({ actie: "overzicht" }) }); d = await x.json(); if (!x.ok) throw new Error(d.fout); }
   catch { el.innerHTML = kaart(`<p class="zacht" style="margin:0">De cijfers zijn nu even niet op te halen. Probeer het straks nog eens.</p>`); return; }
   const eu = (n, dec) => "€" + Number(n || 0).toLocaleString("nl-NL", { minimumFractionDigits: dec ?? (n % 1 && n < 100 ? 2 : 0), maximumFractionDigits: dec ?? (n < 100 ? 2 : 0) });
   const nl = (n) => Number(n || 0).toLocaleString("nl-NL", { maximumFractionDigits: 1 });
   const maand = new Date().toLocaleDateString("nl-NL", { month: "long" });
+  const aanv = await aanvP;
 
   // 1. Nog geen Google Ads-account gekoppeld: korte uitleg
   if (!d.actief) {
@@ -552,7 +561,8 @@ async function kpAds() {
         <span class="ad-vink">${VINK}<span>Wij maken de advertenties uit je eigen website</span></span>
         <span class="ad-vink">${VINK}<span>Elke week kijken wij waar geld verloren gaat en waar het meer kan opleveren</span></span>
         <span class="ad-vink">${VINK}<span>Er gaat niets live zonder jouw akkoord</span></span></div>
-      <div class="ad-knoppen"><a class="knop" href="${WA("Ik wil graag advertenties in Google")}">Ik wil advertenties</a><span class="ad-klein">Binnenkort zet je dit hier zelf aan.</span></div>`, "ad-held");
+      ${aanv ? "" : `<div class="ad-knoppen"><button type="button" class="knop" data-adstart>Ik wil advertenties</button><span class="ad-klein">Je vraagt eerst een voorstel aan. Er gaat niets aan zonder jouw akkoord.</span></div>`}`, "ad-held") + (aanv ? adAanvKaart(aanv) : "");
+    adStartKnoppen(el);
     return;
   }
 
@@ -581,13 +591,14 @@ async function kpAds() {
         <li><b>Wij maken een voorstel</b><span>Advertenties uit je eigen website, met een budget dat bij je past.</span></li>
         <li><b>Jij zegt akkoord</b><span>Je ziet eerst wat het kost. Pas daarna gaat er iets live.</span></li>
         <li><b>Wij sturen elke week bij</b><span>Hier zie je wat het kostte, wat het opleverde en wat wij deden.</span></li></ol>`)
-      + kaart(`<h2>Advertenties starten?</h2>
-      <p class="zacht" style="font-size:15px;line-height:1.6;margin:0">Laat het ons weten. Wij zetten alles voor je klaar en sturen je het voorstel.</p>
+      + (aanv ? adAanvKaart(aanv) : kaart(`<h2>Advertenties starten?</h2>
+      <p class="zacht" style="font-size:15px;line-height:1.6;margin:0">Beantwoord twee korte vragen. Wij zetten alles voor je klaar en sturen je het voorstel.</p>
       <div class="ad-vinken">
         <span class="ad-vink">${VINK}<span>Er gaat niets live zonder jouw akkoord</span></span>
         <span class="ad-vink">${VINK}<span>Je budget gaat 1-op-1 naar Google</span></span></div>
-      <div class="ad-knoppen" style="margin-top:auto"><a class="knop" href="${WA("Ik wil graag advertenties in Google starten")}">Vraag een voorstel aan</a></div>`) + `</div>`
+      <div class="ad-knoppen" style="margin-top:auto"><button type="button" class="knop" data-adstart>Vraag een voorstel aan</button></div>`)) + `</div>`
       + bijgewerkt;
+    adStartKnoppen(el);
     return;
   }
 
@@ -651,6 +662,60 @@ async function kpAds() {
   h += `<div class="ad-knoppen"><button type="button" class="knop rand" id="admeer">Meer details →</button></div>` + bijgewerkt;
   el.innerHTML = h;
   $("#admeer").onclick = () => kpAdsDetails();
+}
+// ---------- advertenties aanvragen (zet niets aan, kost niets) ----------
+const AD_DOEL = { kopen: "Online iets kopen", bellen: "Bellen of een aanvraag doen", winkel: "Langskomen in de winkel" };
+async function adsStartApi(data) {
+  const x = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-ads-start", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify(data) });
+  const d = await x.json().catch(() => ({})); if (!x.ok) throw new Error(d.fout || "Dat lukte niet. Probeer het nog eens."); return d;
+}
+function adStartKnoppen(el) { el.querySelectorAll("[data-adstart]").forEach((b) => (b.onclick = () => kpAdsStart())); }
+function adAanvKaart(a) {
+  const dag = new Date(a.aangemaakt).toLocaleDateString("nl-NL", { day: "numeric", month: "long" });
+  return `<section class="kaart ad-binnen"><span class="ad-mono">aangevraagd op ${dag}</span><h2>Je aanvraag is binnen</h2>
+    <p class="zacht" style="font-size:15px;line-height:1.6;margin:0">Wij maken je voorstel en laten het je weten. Er staat nog niets aan en het kost nog niets.</p>
+    <div>${[["Na een klik", AD_DOEL[a.doel] || a.doel], ["Budget per maand", a.budget ? "€" + Number(a.budget).toLocaleString("nl-NL") + " excl. btw" : "Weet ik nog niet"], ...(a.niet_adverteren ? [["Liever niet", esc(a.niet_adverteren)]] : [])].map(([k, v]) => `<div class="ad-rij"><span class="zacht">${k}</span><b>${v}</b></div>`).join("")}</div>
+    <div class="ad-knoppen"><button type="button" class="knop rand klein" data-adstart>Aanvraag aanpassen</button></div></section>`;
+}
+function kpAdsStart() {
+  const el = $("#kpads");
+  const kaart = (inh, extra = "") => `<section class="kaart ${extra}">${inh}</section>`;
+  const r = (naam, w, t, aan) => `<label class="ad-keuze"><input type="radio" name="${naam}" value="${w}"${aan ? " checked" : ""}>${t}</label>`;
+  el.innerHTML = `<div class="ad-kies"><button type="button" class="ad-terug" id="adterug">← Terug naar Advertenties</button></div>`
+    + kaart(`<span class="ad-mono">advertenties in Google</span><h1>Advertenties aanvragen</h1>
+      <p class="ad-uitleg">Nog twee vragen. Daarna maken wij een voorstel uit je eigen website. Pas na jouw akkoord gaat er iets live.</p>`, "ad-held")
+    + `<form id="adform" class="ad-twee" style="align-items:start">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        ${kaart(`<h2>1. Wat moeten mensen doen na een klik?</h2><div class="ad-keuzes" role="radiogroup" aria-label="Doel">${r("doel", "kopen", "Online iets kopen", true)}${r("doel", "bellen", "Bellen of een aanvraag doen")}${r("doel", "winkel", "Langskomen in de winkel")}</div>`)}
+        ${kaart(`<h2>2. Hoeveel wil je per maand inzetten?</h2><div class="ad-keuzes rij3" role="radiogroup" aria-label="Budget">${r("budget", "100", "€100")}${r("budget", "250", "€250", true)}${r("budget", "500", "€500")}${r("budget", "", "Weet ik nog niet")}</div>
+          <p class="ad-klein">Bedragen zijn excl. btw. Je betaalt pas als je het voorstel goedkeurt. In het voorstel zie je ons advies voor jouw situatie.</p>`)}
+        <details class="kaart"><summary style="cursor:pointer;font-weight:700;font-size:15px">Liever iets niet adverteren? (niet nodig)</summary>
+          <label class="ad-veld" style="margin-top:10px">Bijvoorbeeld een merk of productgroep<input type="text" name="niet" maxlength="300" placeholder="Bijvoorbeeld: sale-artikelen"></label>
+          <label class="ad-veld" style="margin-top:10px">Nog iets dat wij moeten weten?<textarea name="opmerking" rows="3" maxlength="1000"></textarea></label></details>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        ${kaart(`<h2>Wat gebeurt er hierna?</h2><ol class="ad-stappen">
+          <li><b>Wij maken een voorstel</b><span>Advertenties uit je eigen website, met een voorbeeld van hoe je in Google komt te staan.</span></li>
+          <li><b>Jij zegt akkoord</b><span>Je ziet eerst wat het kost. Pas daarna gaat er iets live.</span></li>
+          <li><b>Wij sturen elke week bij</b><span>Hier zie je wat het kostte, wat het opleverde en wat wij deden.</span></li></ol>`)}
+        <div class="ad-knoppen"><button type="submit" class="knop groot">Vraag het voorstel aan</button></div>
+        <p class="ad-klein" id="admeld">Dit kost nog niets en zet nog niets aan.</p>
+      </div></form>`;
+  $("#adterug").onclick = () => { kpAds(); scrollTo(0, 0); };
+  $("#adform").onsubmit = async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target), knop = e.target.querySelector("[type=submit]");
+    knop.disabled = true; knop.textContent = "Even versturen…";
+    try {
+      await adsStartApi({ actie: "aanvraag", doel: f.get("doel"), budget: f.get("budget") || null, niet: f.get("niet"), opmerking: f.get("opmerking") });
+      el.innerHTML = kaart(`<span class="ad-mono">advertenties in Google</span><h1>Je aanvraag is binnen.</h1>
+        <p class="ad-uitleg">Wij maken je voorstel en laten het je weten. Er staat nog niets aan en het kost nog niets.</p>
+        <div class="ad-knoppen"><button type="button" class="knop" id="adterug2">Terug naar Advertenties</button></div>`, "ad-held");
+      $("#adterug2").onclick = () => { kpAds(); scrollTo(0, 0); };
+      scrollTo(0, 0);
+    } catch (err) { knop.disabled = false; knop.textContent = "Vraag het voorstel aan"; $("#admeld").textContent = err.message; $("#admeld").style.color = "var(--let, #b45309)"; }
+  };
+  scrollTo(0, 0);
 }
 // "Meer details" voor de klant: uitgekozen, rustig en eerlijk
 async function kpAdsDetails(periode = "maand") {
