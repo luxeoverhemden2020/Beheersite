@@ -193,6 +193,11 @@
 <script src="assets/basis.js"></script>
 <script>
 try { document.getElementById("kopbot").innerHTML = robotSvg("rust"); } catch {}
+let voorstel = null, voorstelVoor = "";
+$("#c_site").addEventListener("change", async () => {
+  const s = $("#c_site").value.trim(); if (!s || s === voorstelVoor) return; voorstelVoor = s; voorstel = null;
+  try { const r = await fetch(API.replace(/beheersite$/, "sr-voorstel"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actie: "voorstel", site: s }) }); voorstel = await r.json(); } catch { voorstel = null; }
+});
 $("#bform").onsubmit = async (e) => {
   e.preventDefault(); toonMelding($("#cmeld"), "");
   const naar = $("#c_email").value.trim();
@@ -201,7 +206,9 @@ $("#bform").onsubmit = async (e) => {
   $("#cknop").disabled = true;
   try {
     const r = await fetch(API.replace(/beheersite$/, "vb-check"), { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ actie: "aanvraag", site: $("#c_site").value, email: naar, website2: $("#c_website2").value, bron: "pagina:gratis-website-check" }) });
+      body: JSON.stringify({ actie: "aanvraag", site: $("#c_site").value, email: naar, website2: $("#c_website2").value, bron: "pagina:gratis-website-check",
+        woorden: voorstel?.woorden || [], plaats: voorstel?.plaats || "", werkgebied: voorstel?.plaats ? "plaatselijk" : "" }) });
+    if (voorstel?.concurrenten?.length) fetch(API.replace(/beheersite$/, "sr-voorstel"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actie: "kies", site: $("#c_site").value, concurrenten: voorstel.concurrenten.map((c) => c.site) }) }).catch(() => {});
     const d = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(d.fout || "Versturen lukte niet. Probeer het zo nog eens.");
     $("#bform").reset();

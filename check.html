@@ -189,6 +189,19 @@ async function rpExtra(d) {
   wie.after(vs);
   const veld = () => { const i = vs.querySelector("input[name=site]"); if (i) { i.value = d.site.replace(/^https?:\/\//, ""); i.closest("label").style.display = "none"; } };
   window.SR_START && window.SR_START(); veld();
+  // concurrenten die bij de aanvraag gekozen of voorgesteld zijn: invullen en als knopjes tonen
+  try {
+    const x = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-voorstel", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actie: "lees", id: q.get("id"), t: q.get("t") }) });
+    const cc = (await x.json()).concurrenten || [];
+    const i2 = vs.querySelector("input[name=site2]");
+    if (cc.length && i2) {
+      i2.value = cc[0];
+      const rij = document.createElement("p"); rij.className = "zacht"; rij.style.margin = "4px 0 10px";
+      rij.innerHTML = `Jouw concurrenten: ${cc.map((c) => `<button type="button" class="knop rand klein" style="margin:2px">${R.e(c)}</button>`).join(" ")}<br>Kies er een, of vul zelf een andere in. In je account kun je ze later wijzigen of aanvullen.`;
+      rij.querySelectorAll("button").forEach((b) => (b.onclick = () => { i2.value = b.textContent; i2.closest("form")?.requestSubmit(); }));
+      i2.closest("form")?.before(rij);
+    }
+  } catch { /* niet erg */ }
 }
 
 const CHECK_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-check";
