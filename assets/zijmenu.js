@@ -10,7 +10,7 @@
     ["portfolio", "Portfolio", "M4 5h7v6H4zM13 5h7v6h-7zM4 13h7v6H4zM13 13h7v6h-7z"],
     ["prijs", "Prijs", "M12 3v18M16.5 7.5c0-1.7-2-3-4.5-3s-4.5 1.3-4.5 3 2 2.6 4.5 3 4.5 1.3 4.5 3-2 3-4.5 3-4.5-1.3-4.5-3"],
     ["vindbaarheid", "Vindbaarheid (SEO)", "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4", "https://siteregelaar.nl/vindbaarheid"],
-    ["adverteren", "Adverteren in Google", "M4 10v4h3l6 4V6L7 10zM17 9a4 4 0 010 6", "https://siteregelaar.nl/google-advertenties"],
+    ["adverteren", "Google Ads", "M4 10v4h3l6 4V6L7 10zM17 9a4 4 0 010 6", "https://siteregelaar.nl/google-advertenties"],
     ["vragen", "Vragen", "M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.5"],
     ["contact", "Contact", "M4 6h16v12H4zM4 7l8 6 8-6"]
   ].filter(function (p) { return p[3] || document.getElementById(p[0]) || location.pathname !== "/"; });
