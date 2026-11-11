@@ -113,6 +113,29 @@
 <script src="assets/rapport.js?v=20261110a"></script>
 <script>
 // ---------- alle extra checks en de vergelijking met de concurrent (onderdelen: assets/rapport.js) ----------
+// top 5, voor/na in Google en "noemt AI jou?" (Claude, met plafond; bij misbruik of plafond gewoon weggelaten)
+async function rpAdvies(na, R) {
+  const s = document.createElement("section"); s.className = "kaart"; na.before(s);
+  const stop = rpLaden(s, "Ik schrijf je persoonlijke advies en vraag AI naar jouw bedrijf…");
+  let x;
+  try { const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-tools", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": (typeof sessieVan === "function" && sessieVan("beheer")) || "" }, body: JSON.stringify({ actie: "extra", id: q.get("id"), t: q.get("t") }) }); x = await r.json(); if (!r.ok) throw 0; } catch { x = null; }
+  stop();
+  if (!x || x.gratis) { s.remove(); return; }
+  let h = "";
+  if (x.ai?.length) {
+    const n = x.ai.filter((a) => a.genoemd).length;
+    h += `<h2>🤖 Noemt AI jou?</h2><p class="zacht" style="margin-top:-6px">We vroegen AI, net als een klant zou doen, om een bedrijf aan te raden.</p>
+      <p style="font-size:20px;margin:6px 0 12px"><b>Je wordt ${n} van de ${x.ai.length} keer genoemd.</b></p>
+      ${x.ai.map((a) => `<div class="rp-tool"><div class="rp-toolkop"><b>${R.e(a.vraag)}</b><span class="rp-door ${a.genoemd ? "sh" : "vb"}">${a.genoemd ? "✓ Jij wordt genoemd" : "✗ Jij wordt niet genoemd"}</span></div>
+        <p class="zacht" style="margin:0">AI raadt aan: ${a.bedrijven.length ? a.bedrijven.map((b) => R.e(b.naam)).join(", ") : "geen bedrijven gevonden"}</p></div>`).join("")}
+      ${n < x.ai.length ? `<p style="margin:10px 0 0">Met <b>Vindbaarheid</b> zorgen we dat AI-diensten jouw bedrijf leren kennen en aanraden.</p>` : ""}`;
+  }
+  if (x.top5?.length) h += `<h2 style="margin-top:${h ? "26px" : "0"}">⭐ Jouw top 5</h2><p class="zacht" style="margin-top:-6px">Als je maar 5 dingen aanpakt, doe dan deze.</p>
+    <ol style="padding-left:20px;margin:6px 0 0">${x.top5.map((t) => `<li style="margin:8px 0"><b>${R.e(t.titel)}</b><br><span class="zacht">${R.e(t.uitleg)}</span></li>`).join("")}</ol>`;
+  if (x.titel && x.oud && R.EXTRA["google-voorbeeld"]) h += `<h2 style="margin-top:26px">🔎 Zo kun je eruitzien in Google</h2><p class="zacht" style="margin-top:-6px">Een voorbeeld van wat wij voor je homepage zouden schrijven.</p>
+    <div class="rp-wie-rij"><div style="display:block"><p class="label mono" style="margin:0 0 6px">Nu</p>${R.EXTRA["google-voorbeeld"](x.oud)}</div><div style="display:block"><p class="label mono" style="margin:0 0 6px">Met Vindbaarheid</p>${R.EXTRA["google-voorbeeld"]({ ...x.oud, titel: x.titel, omschrijving: x.omschrijving })}</div></div>`;
+  s.innerHTML = h || ""; if (!h) s.remove();
+}
 async function rpExtra(d) {
   const el = document.createElement("section"); el.className = "kaart"; el.id = "rpalles";
   const anker = document.querySelector(".rp-advies"); anker.parentNode.insertBefore(el, anker);
@@ -127,6 +150,7 @@ async function rpExtra(d) {
   const R = window.SR_RENDER, T = r.tools || {};
   el.innerHTML = `<h2>Alle checks</h2><p class="zacht" style="margin-top:-6px">Naast de controle van je pagina's hebben we je site op 14 onderdelen getest. Klik op een onderdeel voor de details.</p><div id="rpcats"></div>`;
   rpCategorieen(el.querySelector("#rpcats"), T);
+  rpAdvies(el, R);
   // wie lost wat op + één knop
   const alle = Object.entries(T).flatMap(([t, u]) => (u.items || []).filter((i) => i.status !== "goed").map(() => u.door));
   const nvb = alle.filter((x) => x === "vb").length + (d.uitslag?.problemen || []).filter((p) => p.groep === "Inhoud" || p.groep === "AI-vindbaarheid").length;
