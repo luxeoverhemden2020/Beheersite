@@ -135,6 +135,24 @@ async function rpAdvies(na, R) {
   if (x.titel && x.oud && R.EXTRA["google-voorbeeld"]) h += `<h2 style="margin-top:26px">🔎 Zo kun je eruitzien in Google</h2><p class="zacht" style="margin-top:-6px">Een voorbeeld van wat wij voor je homepage zouden schrijven.</p>
     <div class="rp-wie-rij"><div style="display:block"><p class="label mono" style="margin:0 0 6px">Nu</p>${R.EXTRA["google-voorbeeld"](x.oud)}</div><div style="display:block"><p class="label mono" style="margin:0 0 6px">Met Vindbaarheid</p>${R.EXTRA["google-voorbeeld"]({ ...x.oud, titel: x.titel, omschrijving: x.omschrijving })}</div></div>`;
   s.innerHTML = h || ""; if (!h) s.remove();
+  rpGidsen(s, R);
+}
+// sta je overal goed vermeld? (Google-bedrijfsprofiel en bedrijvengidsen)
+async function rpGidsen(na, R) {
+  const s = document.createElement("section"); s.className = "kaart"; (na.isConnected ? na : document.querySelector("#rpalles")).after(s);
+  const stop = rpLaden(s, "Ik zoek op waar je bedrijf op internet vermeld staat…");
+  let g; try { const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-lokaal", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": (typeof sessieVan === "function" && sessieVan("beheer")) || "" }, body: JSON.stringify({ actie: "check", id: q.get("id"), t: q.get("t") }) }); g = await r.json(); if (!r.ok) throw 0; } catch { g = null; }
+  stop();
+  if (!g || g.gratis || !g.gidsen) { s.remove(); return; }
+  const w = g.website || {}, go = g.google || {};
+  const regel = (x) => [x.naam, x.adres, x.telefoon].filter(Boolean).map(R.e).join(" · ") || "–";
+  s.innerHTML = `<h2>📍 Sta je overal goed vermeld?</h2><p class="zacht" style="margin-top:-6px">Google vertrouwt een bedrijf meer als naam, adres en telefoonnummer overal precies hetzelfde zijn.</p>
+    <p style="margin:6px 0"><b>Op je website:</b> ${regel(w)}</p>
+    <div class="rp-tool"><div class="rp-toolkop"><b>Google-bedrijfsprofiel (Google Maps)</b><span class="rp-door ${go.gevonden ? "sh" : "vb"}">${go.gevonden ? "✓ Gevonden" : "✗ Niet gevonden"}</span></div>
+      <p class="zacht" style="margin:0">${go.gevonden ? regel(go) + (go.sterren ? ` · ${R.e(go.sterren)} sterren${go.reviews ? ` (${R.e(go.reviews)} reviews)` : ""}` : "") : "We vonden geen Google-bedrijfsprofiel. Daarmee verschijn je in Google Maps; het is gratis en voor lokale bedrijven het belangrijkst."}</p></div>
+    ${g.gidsen.map((x) => `<div class="rp-tool"><div class="rp-toolkop"><b>${R.e(x.site)}</b><span class="rp-door ${x.gevonden && x.klopt ? "sh" : "vb"}">${!x.gevonden ? "Niet gevonden" : x.klopt ? "✓ Klopt" : "✗ Klopt niet"}</span></div>
+      <p class="zacht" style="margin:0">${x.gevonden ? (x.klopt ? regel(x) : R.e(x.verschil || "Gegevens wijken af van je website.")) : "Je staat hier (nog) niet."}</p></div>`).join("")}
+    <p style="margin:12px 0 0">${g.fout ? `<b>${g.fout} ${g.fout === 1 ? "vermelding klopt" : "vermeldingen kloppen"} niet.</b> ` : ""}Met <b>Vindbaarheid Plus</b> controleren we dit elk kwartaal en houden we je Google-bedrijfsprofiel actief met een bericht per week.</p>`;
 }
 async function rpExtra(d) {
   const el = document.createElement("section"); el.className = "kaart"; el.id = "rpalles";
