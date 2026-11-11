@@ -98,6 +98,12 @@ body[data-pagina="advertenties"] #kpads{display:flex}
 .ad-voor b{font:700 15px "Space Grotesk",system-ui,sans-serif}
 .ad-voor span{color:var(--zacht);font-size:14px;line-height:1.5}
 .ad-voor em{font:700 28px/1 "Space Grotesk",system-ui,sans-serif;font-style:normal;color:var(--lijn)}
+.ad-leeg b{color:#b8c6d8}
+.ad-leeg .ad-pijl{background:none;color:#c9d6ea;-webkit-text-fill-color:#c9d6ea}
+.ad-stappen{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;counter-reset:st}
+.ad-stappen li{counter-increment:st;display:grid;grid-template-columns:32px 1fr;column-gap:12px;row-gap:2px;font-size:15px;line-height:1.5}
+.ad-stappen li:before{content:counter(st);grid-row:span 2;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:700 14px "Space Grotesk",system-ui,sans-serif;color:#063a33;background:linear-gradient(135deg,#e3fcf6,#e6eeff) padding-box,linear-gradient(135deg,#22e3c4,#3b82f6) border-box;border:1.5px solid transparent;box-sizing:border-box}
+.ad-stappen span{color:var(--zacht);font-size:14px}
 .ad-knoppen{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .ad-kies{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .ad-terug{background:none;border:0;padding:6px 0;font:600 14px "Inter",system-ui,sans-serif;color:var(--accent);cursor:pointer}
@@ -565,15 +571,21 @@ async function kpAds() {
       stil: ["Je advertenties staan aan, maar geven niets uit.", "Wij kijken waarom. Je hoeft zelf niets te doen."] };
     const [kop, uitleg] = T[d.status] || ["Er lopen nu geen advertenties.", "Alles staat uit, dus er wordt niets uitgegeven. Je Google Ads-account is wel gekoppeld: wij houden het elke nacht in de gaten."];
     el.innerHTML = kaart(`<div class="ad-kop"><div><span class="ad-mono">${maand} · advertenties in Google</span><h1>${kop}</h1></div>${pil}</div>
-      <p class="ad-uitleg">${uitleg}</p>`, "ad-held")
-      + kaart(`<h2>Dit zie je hier zodra je advertenties lopen</h2>
-      <div class="ad-voor">
-        <div><em>€ → €</em><b>Wat het kost en oplevert</b><span>Eén duidelijk getal: wat je erin stopte en wat het opleverde.</span></div>
-        <div><em>✓</em><b>Wat wij deden</b><span>Elke week zie je wat wij hebben bijgestuurd en waarom.</span></div>
-        <div><em>▮▮</em><b>Wat het beste werkt</b><span>Welke producten en zoekwoorden verkopen, en waar het vandaan komt.</span></div></div>`)
+      <p class="ad-uitleg">${uitleg}</p>
+      <div class="ad-cijfers ad-leeg" aria-label="Nog geen cijfers">
+        <div class="ad-g"><b>€0</b><span>erin gestopt</span></div><span class="ad-pijl" aria-hidden="true">→</span>
+        <div class="ad-g"><b>${omzet ? "€0" : "0"}</b><span>${omzet ? "omzet via advertenties" : "aanvragen via advertenties"}</span></div></div>`, "ad-held")
+      + `<div class="ad-twee">` + kaart(`<h2>Zo gaat het als je start</h2>
+      <ol class="ad-stappen">
+        <li><b>Wij maken een voorstel</b><span>Advertenties uit je eigen website, met een budget dat bij je past.</span></li>
+        <li><b>Jij zegt akkoord</b><span>Je ziet eerst wat het kost. Pas daarna gaat er iets live.</span></li>
+        <li><b>Wij sturen elke week bij</b><span>Hier zie je wat het kostte, wat het opleverde en wat wij deden.</span></li></ol>`)
       + kaart(`<h2>Advertenties starten?</h2>
-      <p class="zacht" style="font-size:15px;line-height:1.6;margin:0">Wij zetten alles voor je klaar uit je website. Je ziet eerst een voorbeeld en het budget. Pas na jouw akkoord gaat er iets live.</p>
-      <div class="ad-knoppen"><a class="knop" href="${WA("Ik wil graag advertenties in Google starten")}">Laat het ons weten</a></div>`)
+      <p class="zacht" style="font-size:15px;line-height:1.6;margin:0">Laat het ons weten. Wij zetten alles voor je klaar en sturen je het voorstel.</p>
+      <div class="ad-vinken">
+        <span class="ad-vink">${VINK}<span>Er gaat niets live zonder jouw akkoord</span></span>
+        <span class="ad-vink">${VINK}<span>Je budget gaat 1-op-1 naar Google</span></span></div>
+      <div class="ad-knoppen" style="margin-top:auto"><a class="knop" href="${WA("Ik wil graag advertenties in Google starten")}">Vraag een voorstel aan</a></div>`) + `</div>`
       + bijgewerkt;
     return;
   }
