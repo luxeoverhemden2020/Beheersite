@@ -562,12 +562,14 @@ async function kpAds() {
   el.innerHTML = kaart(`<p class="zacht" style="margin:0">Even je cijfers ophalen…</p>`);
   let d;
   const aanvP = adsStartApi({ actie: "vstatus" }).then((x) => x.voorstel).catch(() => null);
+  const saldoP = adsGeldApi({ actie: "saldo" }).catch(() => null);
   try { const x = await fetch(SR, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify({ actie: "overzicht" }) }); d = await x.json(); if (!x.ok) throw new Error(d.fout); }
   catch { el.innerHTML = kaart(`<p class="zacht" style="margin:0">De cijfers zijn nu even niet op te halen. Probeer het straks nog eens.</p>`); return; }
   const eu = (n, dec) => "€" + Number(n || 0).toLocaleString("nl-NL", { minimumFractionDigits: dec ?? (n % 1 && n < 100 ? 2 : 0), maximumFractionDigits: dec ?? (n < 100 ? 2 : 0) });
   const nl = (n) => Number(n || 0).toLocaleString("nl-NL", { maximumFractionDigits: 1 });
   const maand = new Date().toLocaleDateString("nl-NL", { month: "long" });
-  const aanv = await aanvP;
+  const aanv = await aanvP, sal = await saldoP;
+  const geld = adBudgetKaarten(sal, aanv);
 
   // 1. Nog geen Google Ads-account gekoppeld: korte uitleg
   if (!d.actief) {
@@ -602,7 +604,7 @@ async function kpAds() {
       <div class="ad-cijfers ad-leeg" aria-label="Nog geen cijfers">
         <div class="ad-g"><b>€0</b><span>erin gestopt</span></div><span class="ad-pijl" aria-hidden="true">→</span>
         <div class="ad-g"><b>${omzet ? "€0" : "0"}</b><span>${omzet ? "omzet via advertenties" : "aanvragen via advertenties"}</span></div></div>`, "ad-held")
-      + `<div class="ad-twee">` + kaart(`<h2>Zo gaat het als je start</h2>
+      + geld + `<div class="ad-twee">` + kaart(`<h2>Zo gaat het als je start</h2>
       <ol class="ad-stappen">
         <li><b>Wij maken een voorstel</b><span>Advertenties uit je eigen website, met een budget dat bij je past.</span></li>
         <li><b>Jij zegt akkoord</b><span>Je ziet eerst wat het kost. Pas daarna gaat er iets live.</span></li>
@@ -614,7 +616,7 @@ async function kpAds() {
         <span class="ad-vink">${VINK}<span>Je budget gaat 1-op-1 naar Google</span></span></div>
       <div class="ad-knoppen" style="margin-top:auto"><button type="button" class="knop" data-adstart>Maak mijn voorstel</button></div>`)) + `</div>`
       + bijgewerkt;
-    adStartKnoppen(el);
+    adStartKnoppen(el); adBudgetKoppel(el);
     return;
   }
 
@@ -640,6 +642,7 @@ async function kpAds() {
         <div class="ad-g"><b class="glans">${opbrengst(d.historie)}</b><span>${omzet ? "omzet via advertenties" : "via advertenties"}</span></div></div>`, "ad-held");
   }
 
+  h += geld;
   // deze week + waar komt het vandaan
   const wk = d.acties.length ? d.acties[0].week : null, deze = d.acties.filter((a) => a.week === wk);
   const NAAM = { SHOPPING: "Google Shopping", PERFORMANCE_MAX: "Shopping en meer", SEARCH: "Zoekadvertenties", DISPLAY: "Banners", VIDEO: "Video", SMART: "Slimme campagnes" };
@@ -677,6 +680,7 @@ async function kpAds() {
     <p class="ad-klein">Kosten bij Google zijn precies wat Google rekent, zonder onze vergoeding.${omzet ? " Omzet is wat klanten via een advertentie bij je kochten, geen winst." : ""}</p>`);
   h += `<div class="ad-knoppen"><button type="button" class="knop rand" id="admeer">Meer details →</button></div>` + bijgewerkt;
   el.innerHTML = h;
+  adBudgetKoppel(el);
   $("#admeer").onclick = () => kpAdsDetails();
 }
 // ---------- advertenties aanvragen (zet niets aan, kost niets) ----------
@@ -685,13 +689,61 @@ async function adsStartApi(data) {
   const x = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-ads-start", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify(data) });
   const d = await x.json().catch(() => ({})); if (!x.ok) throw new Error(d.fout || "Dat lukte niet. Probeer het nog eens."); return d;
 }
+async function adsGeldApi(data) {
+  const x = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-ads-geld", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify(data) });
+  const d = await x.json().catch(() => ({})); if (!x.ok) throw new Error(d.fout || "Dat lukte niet. Probeer het nog eens."); return d;
+}
+// budgetkaarten: tegoed + aanvullen (alleen na akkoord of als er al betaald is)
+function adBudgetKaarten(s, v) {
+  if (!s || !(v?.status === "akkoord" || s.gestort > 0)) return "";
+  const eu = (n) => "€" + Number(n || 0).toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const net = new URLSearchParams(location.search).get("betaald") === "ads";
+  const pct = s.gestort > 0 ? Math.max(0, Math.min(100, (s.over / s.gestort) * 100)) : 0;
+  const advies = Number(v?.keuzes?.budget ?? v?.advies) || 250;
+  const opties = [...new Set([100, 250, 500, advies])].sort((a, b) => a - b).slice(0, 3);
+  const keuze = opties.includes(advies) ? advies : opties[1];
+  return `<div class="ad-twee">
+    <section class="kaart"><h2>Je advertentiebudget</h2>
+      ${net ? `<p class="ad-klein" style="color:var(--accent)">Bedankt! Je betaling wordt verwerkt. Het kan een minuutje duren voordat je tegoed hier staat.</p>` : ""}
+      ${s.gestort > 0 ? `<div style="display:flex;justify-content:space-between;font-size:15px;gap:10px"><span><b>Nog ${eu(s.over)}</b> over</span><span class="zacht">${eu(s.uitgegeven)} van ${eu(s.gestort)} gebruikt</span></div>
+        <div class="ad-baan" style="height:10px"><i style="width:${pct}%"></i></div>
+        <p class="ad-klein">${s.aan ? "Je advertenties lopen. Is het tegoed op, dan zetten wij ze vanzelf op pauze. Je betaalt nooit meer dan je stort." : s.campagne ? "Je advertenties staan klaar, maar lopen nog niet." : "Wij zetten je advertenties klaar en laten het je weten voordat ze starten."}</p>`
+      : `<p class="zacht" style="font-size:15px;line-height:1.6;margin:0">Je advertenties starten zodra er budget is. Je betaalt vooraf en nooit meer dan je stort.</p>`}
+      ${s.betalingen?.length ? `<details><summary class="ad-klein" style="cursor:pointer">Eerdere betalingen</summary>${s.betalingen.map((b) => `<div class="ad-rij"><span class="zacht">${new Date(b.betaald_op || b.aangemaakt).toLocaleDateString("nl-NL", { day: "numeric", month: "long" })}</span><span>${eu(b.bedrag)} <span class="zacht">${b.status === "betaald" ? "" : "· " + b.status}</span></span></div>`).join("")}</details>` : ""}
+    </section>
+    <section class="kaart" id="adbetaal"><h2>Budget aanvullen</h2>
+      <div class="ad-keuzes rij3" role="radiogroup" aria-label="Kies een bedrag">
+        ${opties.map((b) => `<label class="ad-keuze"><input type="radio" name="adbedrag" value="${b}"${b === keuze ? " checked" : ""}>€${b.toLocaleString("nl-NL")}</label>`).join("")}
+        <label class="ad-keuze"><input type="radio" name="adbedrag" value="eigen">Ander bedrag</label></div>
+      <label class="ad-veld" id="adeigenveld" hidden>Bedrag excl. btw (minimaal €5)<input type="number" id="adeigen" min="5" max="10000" step="1" inputmode="decimal" placeholder="Bijvoorbeeld 50"></label>
+      <div><div class="ad-rij"><span class="zacht">Advertentiebudget</span><b id="adb1"></b></div><div class="ad-rij"><span class="zacht">Btw 21%</span><span id="adb2"></span></div><div class="ad-rij"><b>Totaal</b><b id="adb3"></b></div></div>
+      <p class="ad-klein">Je budget gaat 1-op-1 naar Google. Het beheer door Siteregelaar staat apart op je factuur. Zakelijk? Dan trek je de btw gewoon af.</p>
+      <div class="ad-knoppen"><button type="button" class="knop" id="adbetaalknop">Betalen met iDEAL</button></div>
+      <p class="ad-klein" id="adbetaalmeld" hidden></p>
+    </section></div>`;
+}
+function adBudgetKoppel(el) {
+  const blok = el.querySelector("#adbetaal"); if (!blok) return;
+  const eu = (n) => "€" + Number(n || 0).toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const gekozen = () => blok.querySelector("[name=adbedrag]:checked")?.value;
+  const bedrag = () => gekozen() === "eigen" ? Number($("#adeigen").value || 0) : Number(gekozen() || 0);
+  const reken = () => { const b = bedrag(), btw = Math.round(b * 21) / 100; $("#adeigenveld").hidden = gekozen() !== "eigen"; $("#adb1").textContent = eu(b); $("#adb2").textContent = eu(btw); $("#adb3").textContent = eu(b + btw); };
+  blok.querySelectorAll("[name=adbedrag]").forEach((x) => (x.onchange = reken)); $("#adeigen").oninput = reken; reken();
+  $("#adbetaalknop").onclick = async () => {
+    const b = bedrag(), knop = $("#adbetaalknop"), meld = $("#adbetaalmeld");
+    if (!(b >= 5)) { meld.hidden = false; meld.textContent = "Kies een bedrag van minimaal €5."; return; }
+    knop.disabled = true; knop.textContent = "Even naar de betaalpagina…";
+    try { const d = await adsGeldApi({ actie: "betaal", bedrag: b }); location.href = d.url; }
+    catch (e) { knop.disabled = false; knop.textContent = "Betalen met iDEAL"; meld.hidden = false; meld.textContent = e.message; }
+  };
+}
 function adStartKnoppen(el) { el.querySelectorAll("[data-adstart]").forEach((b) => (b.onclick = () => kpAdsStart())); }
 function adAanvKaart(v) {
   const ok = v.status === "akkoord", dag = (x) => new Date(x).toLocaleDateString("nl-NL", { day: "numeric", month: "long" });
   const budget = v.keuzes?.budget !== undefined ? v.keuzes.budget : v.advies;
   return `<section class="kaart ad-binnen"><span class="ad-mono">${ok ? "akkoord gegeven op " + dag(v.akkoord_op) : "gemaakt op " + dag(v.gemaakt)}</span>
     <h2>${ok ? "Je akkoord is binnen" : "Je voorstel staat klaar"}</h2>
-    <p class="zacht" style="font-size:15px;line-height:1.6;margin:0">${ok ? "Wij zetten alles klaar en laten het je weten voordat het start. Er staat nog niets aan en je betaalt nog niets." : "Bekijk je advertenties, pas aan wat je wilt en geef akkoord. Er gaat niets live zonder jouw akkoord."}</p>
+    <p class="zacht" style="font-size:15px;line-height:1.6;margin:0">${ok ? "Wij zetten alles klaar. Je advertenties starten zodra er budget is: dat vul je aan op de pagina Advertenties. Je betaalt vooraf en nooit meer dan je stort." : "Bekijk je advertenties, pas aan wat je wilt en geef akkoord. Er gaat niets live zonder jouw akkoord."}</p>
     ${budget ? `<div class="ad-rij"><span class="zacht">Budget per maand</span><b>€${Number(budget).toLocaleString("nl-NL")} excl. btw</b></div>` : ""}
     <div class="ad-knoppen"><button type="button" class="knop${ok ? " rand klein" : ""}" data-adstart>${ok ? "Bekijk je voorstel" : "Bekijk en geef akkoord"}</button></div></section>`;
 }
@@ -724,7 +776,7 @@ async function kpAdsStart(opnieuw) {
   const shop = d.shopping || {};
   el.innerHTML = terug
     + kaart(`<div class="ad-kop"><div><span class="ad-mono">jouw voorstel · automatisch gemaakt</span><h1>${ok ? "Je akkoord is binnen." : "Zo komen je advertenties eruit te zien."}</h1></div>${ok ? `<span class="ad-pil ok">akkoord</span>` : `<span class="ad-pil grijs">nog niet live</span>`}</div>
-      <p class="ad-uitleg">${ok ? "Wij zetten alles klaar en laten het je weten voordat het start. Er staat nog niets aan en je betaalt nog niets." : "Gemaakt uit je eigen website en je Google-cijfers. Pas aan wat je wilt en geef akkoord. Pas daarna gaat er iets live."}</p>`, "ad-held")
+      <p class="ad-uitleg">${ok ? "Wij zetten alles klaar. Je advertenties starten zodra er budget is: dat vul je aan op de pagina Advertenties. Je betaalt vooraf en nooit meer dan je stort." : "Gemaakt uit je eigen website en je Google-cijfers. Pas aan wat je wilt en geef akkoord. Pas daarna gaat er iets live."}</p>`, "ad-held")
     + kaart(`<h2>Je advertenties</h2><p class="ad-klein">Google wisselt deze teksten af en laat vaker zien wat het beste werkt. Een kop mag ${AD_KOP} tekens hebben, een omschrijving ${AD_TEKST}.</p>
       <div class="ad-advs">${ads.map(advKaart).join("")}</div>`)
     + `<div class="ad-twee" style="align-items:start"><div style="display:flex;flex-direction:column;gap:16px">

@@ -27,6 +27,7 @@
   <h1 style="margin:0">Advertenties (Google Ads)</h1>
   <div class="kaart" id="koppeling"><p class="zacht" style="margin:0">Laden…</p></div>
   <div class="kaart" id="klanten" hidden></div>
+  <div class="kaart" id="campagnes" hidden></div>
   <div class="kaart" id="cijfers" hidden></div>
   <div id="meld" class="verborgen"></div>
 </main>
@@ -57,7 +58,7 @@ async function laad() {
   try { acc = (await ads("accounts")).accounts; } catch (e) { toonMelding($("#meld"), "Accounts ophalen lukte niet: " + e.message); }
   const opties = (huidig) => `<option value="">Geen advertenties</option>` + acc.map((a) => `<option value="${a.id}" ${a.id === huidig ? "selected" : ""}>${esc(a.naam || a.id)} (${a.id.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3")})</option>`).join("")
     + (huidig && !acc.some((a) => a.id === huidig) ? `<option value="${huidig}" selected>${huidig} (niet onder Siteregelaar)</option>` : "");
-  $("#klanten").hidden = false; abKlanten = s.klanten; abCijfers();
+  $("#klanten").hidden = false; abKlanten = s.klanten; abCijfers(); abCampagnes(s.klanten.filter((k) => k.ads_klant));
   $("#klanten").innerHTML = `<h2 style="margin-top:0">Klanten en hun Google Ads-account</h2><p class="zacht" style="margin:0 0 8px">${acc.length} account(s) onder Siteregelaar. Nieuwe klant? Koppel eerst zijn account onder Siteregelaar in Google Ads.</p>`
     + s.klanten.map((k) => `<div class="ab-rij"><div><b>${esc(k.naam)}</b><br><span class="zacht" style="font-size:13px">${k.ads_fout ? "⚠ " + esc(k.ads_fout) : k.ads_laatst ? "Bijgewerkt " + new Date(k.ads_laatst).toLocaleString("nl-NL") : k.ads_klant ? "Nog niet opgehaald" : ""}</span></div>
       <select data-klant="${esc(k.id)}" aria-label="Google Ads-account voor ${esc(k.naam)}">${opties(k.ads_klant || "")}</select>
@@ -70,6 +71,35 @@ async function laad() {
     try { const d = await ads("nu", { klant_id: b.dataset.nu }); toonMelding($("#meld"), `Klaar: ${d.dagen} dagregels, ${d.zoektermen} zoekopdrachten, ${d.producten} producten.`, "ok"); laad(); }
     catch (e) { toonMelding($("#meld"), e.message); b.disabled = false; b.textContent = "Nu ophalen"; }
   });
+}
+// ---------- campagnes: klaarzetten, aanzetten, pauzeren (sr-ads-geld) ----------
+const geld = async (actie, data = {}) => {
+  const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-ads-geld", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("beheer") }, body: JSON.stringify({ actie, ...data }) });
+  const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d;
+};
+async function abCampagnes(lijst) {
+  const el = $("#campagnes"); if (!lijst.length) return; el.hidden = false;
+  const rijen = await Promise.all(lijst.map(async (k) => ({ k, s: await geld("saldo", { klant_id: k.id }).catch(() => null) })));
+  el.innerHTML = `<h2 style="margin-top:0">Campagnes en budget</h2>
+    <p class="zacht" style="margin:0 0 8px">Klaarzetten maakt de campagne uit het voorstel <b>gepauzeerd</b> aan in Google Ads (kost niets). Aanzetten kost geld: Google rekent af met de betaalmethode in het account. Elk uur kijken wij de uitgaven na en pauzeren we vanzelf als het tegoed op is.</p>`
+    + rijen.map(({ k, s }) => `<div class="ab-rij" style="flex-wrap:wrap"><div style="flex:1 1 220px"><b>${esc(k.naam)}</b><br><span class="zacht" style="font-size:13px">${s ? `Tegoed ${eu2(s.over)} (gestort ${eu2(s.gestort)}, uitgegeven ${eu2(s.uitgegeven)}) · ${s.aan ? "● loopt" : s.campagne ? "klaar, gepauzeerd" : "nog niet klaargezet"}` : "Saldo niet op te halen"}</span></div>
+      <label class="zacht" style="font-size:13px">Dagbudget € <input type="number" min="1" step="0.5" value="5" style="width:80px" data-dag="${esc(k.id)}"></label>
+      ${s && !s.campagne ? `<button class="knop rand klein" type="button" data-cam="toets" data-k="${esc(k.id)}">Proefronde</button><button class="knop rand klein" type="button" data-cam="klaarzetten" data-k="${esc(k.id)}">Klaarzetten (gepauzeerd)</button>` : ""}
+      ${s && s.campagne && !s.aan ? `<button class="knop klein" type="button" data-cam="aanzetten" data-k="${esc(k.id)}">Aanzetten</button>` : ""}
+      ${s && s.aan ? `<button class="knop klein" type="button" data-cam="pauzeren" data-k="${esc(k.id)}">Pauzeren</button>` : ""}
+      ${s && s.campagne ? `<button class="knop rand klein" type="button" data-cam="bijwerken" data-k="${esc(k.id)}">Uitgaven bijwerken</button>` : ""}</div>`).join("");
+  el.querySelectorAll("[data-cam]").forEach((b) => (b.onclick = async () => {
+    const kid = b.dataset.k, soort = b.dataset.cam, dag = Number(el.querySelector(`[data-dag="${kid}"]`).value) || 5;
+    if (soort === "aanzetten" && !confirm(`Campagne aanzetten met €${dag} per dag? Dit kost echt geld.`)) return;
+    const tekst = b.textContent; b.disabled = true; b.textContent = "Bezig…";
+    try {
+      const d = soort === "toets" ? await geld("klaarzetten", { klant_id: kid, dagbudget: dag, toets: true })
+        : soort === "aanzetten" ? await geld("aanzetten", { klant_id: kid, dagbudget: dag }) : await geld(soort, { klant_id: kid, dagbudget: dag });
+      toonMelding($("#meld"), soort === "toets" ? `Proefronde goed: Google accepteert ${d.zoekwoorden} zoekwoorden, ${d.koppen} koppen en ${d.teksten} omschrijvingen (voorstel: ${d.voorstel}). Er is niets aangemaakt.`
+        : soort === "klaarzetten" ? "Campagne staat gepauzeerd klaar in Google Ads." : soort === "aanzetten" ? "Campagne staat aan." : soort === "pauzeren" ? "Campagne gepauzeerd." : "Uitgaven bijgewerkt.", "ok");
+      if (soort !== "toets") abCampagnes(lijst); else { b.disabled = false; b.textContent = tekst; }
+    } catch (e) { toonMelding($("#meld"), e.message); b.disabled = false; b.textContent = tekst; }
+  }));
 }
 // ---------- volledige cijfers per klant (alleen beheer) ----------
 let abData = null, abKlanten = [];
