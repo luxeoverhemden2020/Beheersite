@@ -103,6 +103,7 @@ body{background:var(--bg)}
   <div id="vbpromo" data-kp="promo"></div>
   <div id="kprapport" data-kp="gezondheid"></div>
   <div id="reviewvraag2" data-kp="reviews"></div>
+  <div id="kpinhoud" data-kp="voorstellen"></div>
   <div id="kpconc" data-kp="concurrenten"></div>
   <div id="kpaivm" data-kp="ai"></div>
   <div id="vindbaarheid" data-kp="VBALLE"></div>
@@ -392,11 +393,29 @@ function kpNaar(p) {
   const vbPagina = kpHeeftVb && !["verzoeken", "abonnement", "promo"].includes(p);
   if (p === "verzoeken" || p === "reviews") kpReviewVraag(p === "reviews" ? $("#reviewvraag2") : $("#reviewvraag"));
   if (p === "concurrenten" || p === "ai") kpVolg();
+  if (p === "voorstellen") kpInhoud();
   if (p === "gezondheid" && !kpRapportGeladen) { kpRapportGeladen = true; kpRapport(); }
   if (vbPagina && !kpVbGeladen) { kpVbGeladen = true; kpLaadVb(); }
   kpAutoBlok(p);
   try { history.replaceState(null, "", location.pathname + location.search + (p === "verzoeken" ? "" : "#" + p)); } catch {}
   scrollTo(0, 0);
+}
+// ---------- nieuwe inhoud om goed te keuren (artikelen, veelgestelde vragen, productgegevens) ----------
+async function kpInhoud(actie, id) {
+  const el = $("#kpinhoud");
+  let d;
+  try { const x = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-inhoud", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify({ actie: actie || "lijst", id }) }); d = await x.json(); if (!x.ok) throw new Error(d.fout); } catch { el.innerHTML = ""; return; }
+  const nieuw = d.items.filter((x) => x.status === "nieuw"), klaar = d.items.filter((x) => x.status !== "nieuw").slice(0, 6);
+  if (!d.items.length) { el.innerHTML = ""; return; }
+  const ico = { artikel: "📝", gegevens: "🏷️", producten: "🛒" };
+  const voorbeeld = (x) => x.soort === "artikel" ? `<p class="zacht" style="margin:4px 0">${esc(x.inhoud.omschrijving || "")}</p><details><summary style="cursor:pointer">Lees het artikel</summary><div style="margin-top:10px;max-height:420px;overflow:auto;border:1px solid var(--lijn);border-radius:12px;padding:12px 16px">${String(x.inhoud.html || "").replace(/<(script|style|iframe)[\s\S]*?<\/\1>/gi, "").replace(/ on\w+=/gi, " data-x=")}</div></details>`
+    : x.soort === "gegevens" ? `<p class="zacht" style="margin:4px 0">Deze vragen en antwoorden komen op je website, samen met je openingstijden en diensten in een vorm die Google en AI begrijpen.</p><details><summary style="cursor:pointer">Bekijk de ${x.inhoud.faq?.length || 0} vragen</summary><ul style="margin:8px 0 0;padding-left:18px">${(x.inhoud.faq || []).map((f) => `<li style="margin:6px 0"><b>${esc(f.vraag)}</b><br><span class="zacht">${esc(f.antwoord)}</span></li>`).join("")}</ul>${x.inhoud.openingstijden ? `<p class="zacht" style="margin:8px 0 0">Openingstijden: ${esc(x.inhoud.openingstijden)}</p>` : ""}</details>`
+    : `<p class="zacht" style="margin:4px 0">${esc(x.inhoud.uitleg || "")}</p>`;
+  el.innerHTML = (nieuw.length ? `<div class="kaart"><h2 style="margin-top:0">✨ Nieuw voor je website</h2><p class="zacht" style="margin-top:0">Lees het even door. Klik op Goedkeuren, dan zetten wij het op je website. Er gaat niets online zonder jouw akkoord.</p>
+    ${nieuw.map((x) => `<div class="rp-tool"><b>${ico[x.soort] || ""} ${esc(x.titel)}</b>${voorbeeld(x)}<div class="rij" style="gap:8px;margin-top:10px"><button class="knop klein" type="button" data-keur="${x.id}">Goedkeuren</button><button class="knop rand klein" type="button" data-weiger="${x.id}">Liever niet</button></div></div>`).join("")}</div>` : "")
+    + (klaar.length ? `<div class="kaart"><h3 style="margin-top:0">Eerder</h3>${klaar.map((x) => `<p style="margin:6px 0">${ico[x.soort] || ""} ${esc(x.titel)} · <span class="zacht">${x.status === "goedgekeurd" ? "✓ goedgekeurd, wij zetten het op je site" : "niet gebruikt"}</span></p>`).join("")}</div>` : "");
+  el.querySelectorAll("[data-keur]").forEach((b) => (b.onclick = () => { b.disabled = true; b.textContent = "Even geduld…"; kpInhoud("keur", b.dataset.keur); }));
+  el.querySelectorAll("[data-weiger]").forEach((b) => (b.onclick = () => { b.disabled = true; kpInhoud("weiger", b.dataset.weiger); }));
 }
 // ---------- concurrenten volgen en "noemt AI jou?" (Pro) ----------
 let kpVolgData = null;
