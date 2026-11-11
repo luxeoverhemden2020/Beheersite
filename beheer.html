@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Beheersite – Beheer</title>
+<title>Sitehulpje – Beheer</title>
 <meta name="robots" content="noindex">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0b1220">
@@ -19,29 +19,65 @@
 .taak.belangrijk{border-color:color-mix(in srgb,var(--accent) 45%,var(--lijn))}
 .taak .vul{min-width:0}
 .taak-ico{width:26px;text-align:center;flex:0 0 26px}
-#hooftabs{position:sticky;top:0;z-index:5;background:var(--bg);padding:6px 0}
 #kdtabs{flex-wrap:wrap}
 tr.klik{cursor:pointer}
-@media (max-width:640px){#hooftabs{position:static}#ktabel th:nth-child(n+3),#ktabel td:nth-child(n+3){display:none}}
+@media (max-width:640px){#ktabel th:nth-child(n+3),#ktabel td:nth-child(n+3){display:none}}
+
+body{background:var(--bg)}
+.bh{display:flex;min-height:100vh}
+.bh-zij{width:236px;flex:none;background:#0b1626;color:#e6f1ff;padding:18px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;box-sizing:border-box}
+.bh-merk{display:flex;align-items:center;gap:9px;padding:2px 8px 18px;font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700;font-size:17px}
+.bh-merk b,.bh-merkm b{color:#22e3c4}.bh-merk small{margin-left:auto;color:#7f93af;font:500 11px ui-monospace,monospace}
+.bh-merk .bot-klein{width:30px;height:30px}
+.bh-nav{display:flex;flex-direction:column;gap:3px}
+.bh-nav button{display:flex;align-items:center;gap:12px;padding:10px 12px;border:0;border-radius:12px;background:none;color:#9fb0c8;font:500 15px "Inter",system-ui,sans-serif;cursor:pointer;text-align:left}
+.bh-nav button:hover{background:rgba(255,255,255,.05);color:#fff}
+.bh-nav button.aan{background:rgba(34,227,196,.12);box-shadow:inset 3px 0 0 #22e3c4;color:#fff;font-weight:700}
+.bh svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.bh-nav button.aan svg{stroke:#22e3c4}
+.teller{background:#22e3c4;color:#04111a;font-size:12px;font-weight:700;border-radius:999px;padding:1px 8px;line-height:1.5}
+.bh-ik{display:flex;align-items:center;gap:8px;padding:14px 6px 0;margin-top:10px;border-top:1px solid #1f2f4a;font-weight:600;font-size:14px}
+.bh-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#22e3c4,#3b82f6);color:#04111a;display:grid;place-items:center;font-weight:700}
+.bh-uit{background:none;border:0;color:#7f93af;font:inherit;font-size:13px;cursor:pointer;padding:4px}.bh-uit:hover{color:#fff}
+.bh .thema{background:transparent!important;border:0!important;box-shadow:none!important;padding:4px 6px;font-size:16px}
+#klijst .rij>h2,#t-verzoeken .rij>h2{display:none}
+#klijst .rij>input,#t-verzoeken .rij>input{margin-right:auto}
+.bh-main{flex:1;min-width:0;padding:32px 40px 48px;max-width:1180px}
+.bh-titel{margin-bottom:20px}.bh-titel h1{margin:2px 0 0;font-size:30px;letter-spacing:-.02em}
+.bh-sub{font:500 12px ui-monospace,monospace;color:var(--zacht);text-transform:lowercase}
+.bh-boven,.bh-onder{display:none}
+.bh .kaart{border-radius:16px;box-shadow:none}
+
+@media (max-width:860px){
+  .bh{flex-direction:column}
+  .bh-zij{display:none}
+  .bh-boven{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:6;background:#0b1626;color:#fff;height:56px;padding:0 14px;font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700}
+  .bh-boven .bot-klein{width:26px;height:26px}
+  .bh-ico{background:none;border:0;color:#9fb0c8;padding:6px;cursor:pointer;display:flex}.bh-ico svg{width:22px;height:22px}
+  .bh-main{padding:18px 14px 90px}
+  .bh-titel h1{font-size:24px}
+  .bh-onder{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--bg2);border-top:1px solid var(--lijn);padding:0 4px env(safe-area-inset-bottom)}
+  .bh-onder button{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 7px;border:0;background:none;color:var(--zacht);font:500 11px "Inter",system-ui,sans-serif;cursor:pointer}
+  .bh-onder button.aan{color:var(--tekst);font-weight:700}.bh-onder button.aan svg{stroke:var(--accent)}
+  .bh-onder svg{width:22px;height:22px}
+  .bh-onder .teller{position:absolute;top:3px;left:56%;font-size:10px;padding:0 6px}
+}
 </style>
 </head>
 <body>
-<div class="kop">
-  <span class="bot-klein" id="kopbot"></span>
-  <div class="merk">Site<b>hulpje</b><small>Beheerscherm Jan</small></div>
-  <div class="rechts">
-    <button class="knop rand klein thema" type="button"></button><button class="knop rand klein" id="uit">Uitloggen</button>
-  </div>
-</div>
-<div class="wrap breed">
-  <div class="tabs" id="hooftabs">
-    <button data-tab="vandaag" class="aan">Vandaag</button>
-    <button data-tab="klanten">Klanten</button>
-    <button data-tab="verzoeken">Verzoeken</button>
-    <button data-tab="verkoop">Verkoop</button>
-    <button data-tab="geld">Geld</button>
-    <button data-tab="instellingen">Instellingen</button>
-  </div>
+<div class="bh">
+<aside class="bh-zij" aria-label="Beheermenu">
+  <div class="bh-merk"><span class="bot-klein" id="kopbot"></span><span>Site<b>hulpje</b></span><small>beheer</small></div>
+  <nav class="bh-nav"><button type="button" data-tab="vandaag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1z"/></svg><span class="vul">Vandaag</span><b class="teller" data-teller="vandaag" hidden></b></button><button type="button" data-tab="klanten"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 19c0-2.2-1.8-4-4-4s-4 1.8-4 4M12 12a3 3 0 100-6 3 3 0 000 6zM20 19c0-1.7-1-3.1-2.5-3.7M17 6.5a2.5 2.5 0 010 5"/></svg><span class="vul">Klanten</span><b class="teller" data-teller="klanten" hidden></b></button><button type="button" data-tab="verzoeken"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg><span class="vul">Verzoeken</span><b class="teller" data-teller="verzoeken" hidden></b></button><button type="button" data-tab="verkoop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg><span class="vul">Verkoop</span><b class="teller" data-teller="verkoop" hidden></b></button><button type="button" data-tab="geld"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v12H3zM3 11h18M7 15h4"/></svg><span class="vul">Geld</span><b class="teller" data-teller="geld" hidden></b></button></nav>
+  <div class="vul"></div>
+  <nav class="bh-nav"><button type="button" data-tab="instellingen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-2.7 1.1V21a2 2 0 11-4 0v-.1a1.6 1.6 0 00-2.7-1.1l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00-1.1-2.7H3a2 2 0 110-4h.1a1.6 1.6 0 001.1-2.7l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 002.7-1.1V3a2 2 0 114 0v.1a1.6 1.6 0 002.7 1.1l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 001.1 2.7H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg><span class="vul">Instellingen</span></button></nav>
+  <div class="bh-ik"><span class="bh-av">J</span><span class="vul">Jan</span><button class="knop rand klein thema" type="button"></button><button class="bh-uit" id="uit" type="button">Uitloggen</button></div>
+</aside>
+<header class="bh-boven"><span class="bot-klein" id="kopbot2"></span><span class="bh-merkm">Site<b>hulpje</b></span><span class="vul"></span>
+  <button class="knop rand klein thema" type="button"></button>
+  <button type="button" class="bh-ico" data-tab="instellingen" aria-label="Instellingen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-2.7 1.1V21a2 2 0 11-4 0v-.1a1.6 1.6 0 00-2.7-1.1l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00-1.1-2.7H3a2 2 0 110-4h.1a1.6 1.6 0 001.1-2.7l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 002.7-1.1V3a2 2 0 114 0v.1a1.6 1.6 0 002.7 1.1l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 001.1 2.7H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg></button></header>
+<main class="bh-main">
+  <div class="bh-titel"><span class="bh-sub" id="bhsub"></span><h1 id="bhkop">Vandaag</h1></div>
   <div id="meld" class="verborgen"></div>
 
   <section id="t-vandaag">
@@ -192,12 +228,14 @@ tr.klik{cursor:pointer}
       <button class="knop" id="aopslaan" style="margin-top:12px">Opslaan</button>
     </div>
   </section>
+</main>
+<nav class="bh-onder" aria-label="Beheermenu"><button type="button" data-tab="vandaag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1z"/></svg><span>Vandaag</span><b class="teller" data-teller="vandaag" hidden></b></button><button type="button" data-tab="klanten"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 19c0-2.2-1.8-4-4-4s-4 1.8-4 4M12 12a3 3 0 100-6 3 3 0 000 6zM20 19c0-1.7-1-3.1-2.5-3.7M17 6.5a2.5 2.5 0 010 5"/></svg><span>Klanten</span><b class="teller" data-teller="klanten" hidden></b></button><button type="button" data-tab="verzoeken"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg><span>Verzoeken</span><b class="teller" data-teller="verzoeken" hidden></b></button><button type="button" data-tab="verkoop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg><span>Verkoop</span><b class="teller" data-teller="verkoop" hidden></b></button><button type="button" data-tab="geld"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v12H3zM3 11h18M7 15h4"/></svg><span>Geld</span><b class="teller" data-teller="geld" hidden></b></button></nav>
 </div>
 
 <div class="paneel verborgen" id="paneel"><div class="in" id="paneelin"></div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="assets/basis.js"></script>
+<script src="assets/basis.js?v=20261110b"></script>
 <script src="assets/vindbaarheid.js?v=20261111b"></script>
 <script src="assets/vb-start.js?v=20261111a"></script>
 <script src="assets/vb-site.js"></script>
@@ -212,14 +250,21 @@ const meld = (t, s = "fout") => { toonMelding($("#meld"), t, s); if (t) scrollTo
 // ---------- tabbladen ----------
 const TABS = ["vandaag", "klanten", "verzoeken", "verkoop", "geld", "instellingen"];
 const geladen = {};
+const TITELS = { vandaag: "Vandaag", klanten: "Klanten", verzoeken: "Verzoeken", verkoop: "Verkoop", geld: "Geld", instellingen: "Instellingen" };
+function zetKop(tab) {
+  const nu = new Date(), u = nu.getHours();
+  $("#bhkop").textContent = tab === "vandaag" ? (u < 12 ? "Goedemorgen, Jan." : u < 18 ? "Goedemiddag, Jan." : "Goedenavond, Jan.") : TITELS[tab];
+  $("#bhsub").textContent = nu.toLocaleDateString("nl-NL", { weekday: "long", day: "numeric", month: "long" });
+}
 function naarTab(tab) {
-  document.querySelectorAll("#hooftabs button").forEach((x) => x.classList.toggle("aan", x.dataset.tab === tab));
+  document.querySelectorAll("[data-tab]").forEach((x) => x.classList.toggle("aan", x.dataset.tab === tab));
+  zetKop(tab);
   TABS.forEach((t) => $("#t-" + t).classList.toggle("verborgen", t !== tab));
   if (tab === "klanten" && !openKlant) { $("#klijst").hidden = false; $("#kdetail").hidden = true; }
   laadTab(tab);
   try { history.replaceState(null, "", "#" + tab); } catch {}
 }
-document.querySelectorAll("#hooftabs button").forEach((b) => b.onclick = () => { if (b.dataset.tab === "klanten") openKlant = null; naarTab(b.dataset.tab); });
+document.querySelectorAll("[data-tab]").forEach((b) => b.onclick = () => { if (b.dataset.tab === "klanten") openKlant = null; naarTab(b.dataset.tab); });
 function laadTab(tab, opnieuw) {
   if (geladen[tab] && !opnieuw) return;
   geladen[tab] = true;
@@ -235,8 +280,7 @@ async function tekenTaken() {
     .map((v) => ({ soort: "verzoek", ico: "💬", belangrijk: true, verzoek: v.id, tekst: `Verzoek #${v.nr} van <b>${esc(klantNaam(v.klant_id))}</b>: ${esc(v.onderwerp)} <span class="chip ${v.status}">${STATUS[v.status]}</span>` }));
   const n = await vbgTaken($("#vdtaken"), { extra, opKlant: (id, soort) => openKlantPagina(id, soort === "koppeling" ? "website" : ["factuur", "korting", "opzegging"].includes(soort) ? "abonnement" : soort === "stil" ? "verzoeken" : "cijfers"),
     opCheck: (id) => { history.replaceState(null, "", "?check=" + id + "#verkoop"); geladen.verkoop = false; naarTab("verkoop"); } });
-  const knop = document.querySelector('#hooftabs button[data-tab="vandaag"]');
-  if (knop) knop.textContent = n ? `Vandaag (${n})` : "Vandaag";
+  document.querySelectorAll('[data-teller="vandaag"]').forEach((t) => { t.hidden = !n; t.textContent = n || ""; });
 }
 
 // ---------- klanten: één lijst, per klant één pagina ----------
@@ -392,6 +436,8 @@ async function laad() {
   try {
     data = await api("admin_overzicht", { maand: $("#maand").value });
     tekenVerzoeken(); tekenKlanten(); tekenGebruikers();
+    const open = (data.verzoeken || []).filter((v) => ACTIEF.includes(v.status) || v.status === "doorgestuurd").length;
+    document.querySelectorAll('[data-teller="verzoeken"]').forEach((t) => { t.hidden = !open; t.textContent = open || ""; });
     if (geladen.vandaag && !laad.eerst) { laad.eerst = true; tekenTaken(); }
     $("#apistatus").textContent = data.api_sleutel_ingesteld
       ? "✓ API-sleutel is ingesteld. WordPress-verzoeken worden nu snel afgehandeld (Haiku), binnen het budget per klant. Daarboven neemt de gewone routine het over."
@@ -616,7 +662,7 @@ $("#psiopslaan").onclick = async (ev) => {
   catch (e) { meld(e.message); }
   ev.target.disabled = false; ev.target.textContent = "Opslaan en testen";
 };
-$("#kopbot").innerHTML = robotSvg("rust");
+$("#kopbot").innerHTML = $("#kopbot2").innerHTML = robotSvg("rust");
 (async () => {
   // Overstap: vroeger stond ook Jans sessie in het klantvakje. Is dat een beheerder, verhuis hem.
   if (!sessie() && sessieVan("klant")) {
