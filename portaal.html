@@ -5,7 +5,8 @@
 <title>Sitehulpje</title>
 <meta name="robots" content="noindex">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0b1220">
+<meta name="theme-color" content="#0b1626">
+<script>document.documentElement.dataset.thema = "licht";</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Sitehulpje">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -50,17 +51,66 @@ body{background:var(--bg)}
 .kp-mono{font:500 12.5px ui-monospace,monospace;color:var(--accent)}
 .kp-tegels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
 .kp-held .kp-tegels{margin-bottom:0}
-.ad-held{display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px}
-.ad-held .ad-g{display:flex;flex-direction:column;gap:2px}.ad-held .ad-g b{font-family:"Space Grotesk",sans-serif;font-size:clamp(32px,5vw,48px);line-height:1}
-.ad-held .ad-g b.glans{background:linear-gradient(135deg,#22e3c4,#3b82f6);-webkit-background-clip:text;background-clip:text;color:transparent}
-.ad-status{display:flex;gap:10px;align-items:center;padding:12px 16px;border-radius:12px;border:1px solid var(--lijn);font-size:15px}
-.ad-status.goed{border-color:rgba(34,227,196,.5);background:rgba(34,227,196,.08)}.ad-status.let{border-color:rgba(255,209,102,.6);background:rgba(255,209,102,.1)}
-.ad-rij{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--lijn);font-size:14.5px}.ad-rij:last-child{border-bottom:0}
-.ad-balken{display:flex;align-items:flex-end;gap:6px;height:120px;margin-top:8px}.ad-balk{flex:1;display:flex;gap:2px;align-items:flex-end;height:100%}
+/* ---- Advertenties (Siteregelaar-stijl) ---- */
+#kpads{display:none;flex-direction:column;gap:16px}
+body[data-pagina="advertenties"] #kpads{display:flex}
+#kpads .kaart{margin:0;padding:22px;border-radius:16px;display:flex;flex-direction:column;gap:12px}
+#kpads h2{margin:0;font-size:19px;letter-spacing:-.01em}
+#kpads p{margin:0}
+.ad-mono{font:500 12.5px/1.3 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.3px;color:var(--accent)}
+.ad-held{gap:20px!important;background:linear-gradient(135deg,var(--kaart),var(--accent2))!important;padding:26px!important}
+.ad-kop{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start;justify-content:space-between}
+.ad-kop>div{display:flex;flex-direction:column;gap:6px;min-width:0}
+.ad-held h1{margin:0;font-size:clamp(26px,3.4vw,36px);line-height:1.12;letter-spacing:-.02em;max-width:720px}
+.ad-held .ad-uitleg{color:var(--zacht);font-size:15.5px;line-height:1.6;max-width:680px}
+.ad-cijfers{display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px}
+.ad-g{display:flex;flex-direction:column;gap:4px}
+.ad-g b{font:700 clamp(36px,4.6vw,48px)/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.02em}
+.ad-g b.glans{font-size:clamp(44px,5.6vw,60px)}
+.ad-g span{color:var(--zacht);font-size:14px}
+.glans,.ad-pijl{background:linear-gradient(90deg,#14c9ac,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ad-pijl{font-size:30px}
+.ad-pil{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;padding:6px 11px;border-radius:999px;white-space:nowrap;background:var(--accent2);color:var(--accent)}
+.ad-pil.groot{font-size:14px;padding:8px 14px}
+.ad-pil.grijs{background:var(--bel);color:var(--zacht);border:1px solid var(--lijn)}
+.ad-pil.let{background:var(--letbg);color:var(--let)}
+.ad-pil.ok:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.ad-twee{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px}
+.ad-rij{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--lijn);font-size:15px}
+.ad-rij:last-child{border-bottom:0}
+.ad-rij .zacht{margin:0;font-size:14px}
+.ad-vinken{display:flex;flex-direction:column;gap:12px}
+.ad-vink{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.5}
+.ad-vink>i{width:22px;height:22px;flex:none;border-radius:50%;background:var(--accent2);display:inline-flex;align-items:center;justify-content:center;margin-top:1px}
+.ad-vink>i svg{width:12px;height:12px;fill:none;stroke:var(--accent);stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.ad-vink .zacht{display:block;margin:2px 0 0;font-size:14px}
+.ad-bron{display:flex;flex-direction:column;gap:6px}
+.ad-bron>div:first-child{display:flex;justify-content:space-between;gap:10px;font-size:15px}
+.ad-baan{height:8px;border-radius:8px;background:var(--lijn);overflow:hidden}
+.ad-baan i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,#22e3c4,#3b82f6)}
+.ad-balken{display:flex;align-items:flex-end;gap:6px;height:120px;margin-top:4px}
+.ad-balk{flex:1;max-width:64px;display:flex;gap:2px;align-items:flex-end;height:100%}
 .ad-balk i{flex:1;border-radius:4px 4px 0 0;min-height:2px}.ad-balk i.k{background:var(--lijn)}.ad-balk i.w{background:linear-gradient(180deg,#22e3c4,#3b82f6)}
-.ad-actie{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--lijn)}.ad-actie:last-child{border-bottom:0}
-.ad-pil{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(34,227,196,.14);white-space:nowrap}
-.ad-twee{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+.ad-details{display:grid;grid-template-columns:1fr 1fr;column-gap:40px}
+.ad-klein{color:var(--zacht);font-size:13px;line-height:1.5}
+.ad-voor{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ad-voor>div{border:1px dashed var(--lijn);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px;background:var(--bel)}
+.ad-voor b{font:700 15px "Space Grotesk",system-ui,sans-serif}
+.ad-voor span{color:var(--zacht);font-size:14px;line-height:1.5}
+.ad-voor em{font:700 28px/1 "Space Grotesk",system-ui,sans-serif;font-style:normal;color:var(--lijn)}
+.ad-knoppen{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ad-kies{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.ad-terug{background:none;border:0;padding:6px 0;font:600 14px "Inter",system-ui,sans-serif;color:var(--accent);cursor:pointer}
+.ad-tabs{display:inline-flex;gap:4px;padding:4px;border-radius:12px;background:var(--bg2);border:1px solid var(--lijn)}
+.ad-tabs button{border:0;background:none;padding:8px 14px;border-radius:9px;font:600 14px "Inter",system-ui,sans-serif;color:var(--zacht);cursor:pointer}
+.ad-tabs button[aria-selected=true]{background:var(--accent2);color:var(--tekst);box-shadow:inset 0 0 0 1.5px rgba(34,227,196,.55)}
+.ad-scroll{overflow-x:auto;margin:0 -4px}
+.ad-tabel{width:100%;border-collapse:collapse;font-size:14.5px}
+.ad-tabel th,.ad-tabel td{padding:11px 8px;border-bottom:1px solid var(--lijn);text-align:right;white-space:nowrap}
+.ad-tabel th:first-child,.ad-tabel td:first-child{text-align:left;white-space:normal}
+.ad-tabel th{font:600 12.5px "Inter",system-ui,sans-serif;text-transform:none;letter-spacing:0;color:var(--zacht)}
+.ad-tabel tr:last-child td{border-bottom:0}
+@media (max-width:860px){.ad-details,.ad-voor{grid-template-columns:1fr}.ad-held{padding:20px!important}#kpads .kaart{padding:18px}}
 .kp-tegel{background:var(--bg2);border:1px solid var(--lijn);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
 .kp-tegel b{font:700 40px/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.02em}
 .kp-tegel span{font-size:13.5px}.kp-goed{color:var(--accent);font-weight:600}
@@ -93,6 +143,38 @@ body{background:var(--bg)}
   .kp-held h2{font-size:23px}.kp-tegel b{font-size:34px}
 }
 </style>
+<style>
+/* ===== Siteregelaar-stijl (Design-canvas) voor het hele portaal ===== */
+:root[data-thema=licht]{--bg:#eef4fb;--bg2:#ffffff;--kaart:rgba(255,255,255,.92);--tekst:#0b1626;--zacht:#5b6b82;--lijn:#d9e4f2;--accent:#0b9f8a;--accent2:rgba(34,227,196,.12);--schaduw:0 10px 30px rgba(11,22,38,.06);--veld:#ffffff;--bel:#f2f7fd}
+body{background:var(--bg);color:var(--tekst)}
+.kp-main{padding:32px 40px 56px}
+.kp-titel{margin-bottom:20px}.kp-titel h1{font:700 34px/1.12 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.02em}
+.kp-titel p{font-size:16px;color:var(--zacht)}
+.kp-main .kaart{border-radius:16px;padding:22px;margin-bottom:16px;border-color:var(--lijn);background:var(--kaart);box-shadow:var(--schaduw)}
+.kp-main .kaart h2{font-size:19px;letter-spacing:-.01em;line-height:1.3}
+.kp-main .kaart h3{font-size:17px}
+.kp-main .zacht{color:var(--zacht)}
+.kp-main a:not(.knop){color:var(--accent)}
+.kp-main .knop{border-radius:12px;padding:12px 20px;font-weight:700}
+.kp-main .knop.klein{padding:9px 16px;font-size:14px}
+.kp-main .knop.groot{padding:15px 24px;font-size:16px}
+.kp-main input,.kp-main textarea,.kp-main select{border-radius:12px;border:1.5px solid var(--lijn);background:#fff}
+.kp-main input:focus,.kp-main textarea:focus,.kp-main select:focus{outline:0;border-color:#22e3c4;box-shadow:0 0 0 4px rgba(34,227,196,.12)}
+.kp-tegel{background:#fff;border-color:var(--lijn);border-radius:16px}
+.kp-held{background:linear-gradient(135deg,#ffffff,#f2fbff)!important}
+.kp-auto{border-radius:16px;padding:16px 18px}
+.kp-taak{background:#f2fbf9;border-color:#cdefe7}
+.kp-zij{background:#0b1626}
+@media (max-width:860px){
+  .kp-main{padding:18px 14px 40px}
+  .kp-zij{background:#0b1626;color:#e6f1ff}
+  .kp-item,.kp-sub{color:#9fb0c8}.kp-item.open,.kp-item.aan,.kp-sub.aan{color:#fff}
+  .kp-item:hover,.kp-sub:hover{color:#fff;background:rgba(255,255,255,.05)}
+  .kp-item.aan,.kp-sub.aan{background:rgba(34,227,196,.12);box-shadow:inset 3px 0 0 #22e3c4}
+  .kp-streep{background:#1f2f4a}.kp-onder{border-color:#1f2f4a}.kp-uit{color:#9fb0c8}
+  .kp-main .kaart{padding:18px}
+}
+</style>
 </head>
 <body>
 <div class="kp">
@@ -101,7 +183,7 @@ body{background:var(--bg)}
   <div class="kp-site" id="site"></div>
   <nav class="kp-nav" id="kpnav"></nav>
   <div class="kp-vul"></div>
-  <div class="kp-onder"><button class="knop rand klein thema" type="button"></button><span class="kp-vul"></span><button class="kp-uit" id="uit" type="button">Uitloggen</button></div>
+  <div class="kp-onder"><span class="kp-vul"></span><button class="kp-uit" id="uit" type="button">Uitloggen</button></div>
 </aside>
 <div class="kp-dek" id="kpdek"></div>
 <div class="kp-hoofd">
@@ -144,6 +226,7 @@ body{background:var(--bg)}
 .vb-aanbod .rij{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .vriend-link{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}.vriend-link input{flex:1 1 220px;min-width:0;font-family:var(--mono,monospace);font-size:13px}</style>
 <script src="assets/basis.js?v=20261110b"></script>
+<script>document.documentElement.dataset.thema = "licht"; // portaal is altijd licht (Siteregelaar-stijl)</script>
 <script src="assets/rapport.js?v=20261110a"></script>
 <script src="assets/vindbaarheid.js?v=20261111b"></script>
 <script src="assets/vb-start.js?v=20261111a"></script>
@@ -423,73 +506,166 @@ function kpNaar(p) {
 // ---------- advertenties (Google Ads) ----------
 async function kpAds() {
   const el = $("#kpads");
-  el.innerHTML = `<div class="kaart"><p class="zacht" style="margin:0">Even je cijfers ophalen…</p></div>`;
+  const SR = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-ads";
+  const WA = (t) => `https://wa.me/31627254383?text=${encodeURIComponent(t)}`;
+  const VINK = `<i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>`;
+  const kaart = (inh, extra = "") => `<section class="kaart ${extra}">${inh}</section>`;
+  el.innerHTML = kaart(`<p class="zacht" style="margin:0">Even je cijfers ophalen…</p>`);
   let d;
-  try { const x = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-ads", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify({ actie: "overzicht" }) }); d = await x.json(); if (!x.ok) throw new Error(d.fout); }
-  catch { el.innerHTML = `<div class="kaart"><p class="zacht" style="margin:0">De cijfers zijn nu even niet op te halen. Probeer het straks nog eens.</p></div>`; return; }
+  try { const x = await fetch(SR, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify({ actie: "overzicht" }) }); d = await x.json(); if (!x.ok) throw new Error(d.fout); }
+  catch { el.innerHTML = kaart(`<p class="zacht" style="margin:0">De cijfers zijn nu even niet op te halen. Probeer het straks nog eens.</p>`); return; }
   const eu = (n, dec) => "€" + Number(n || 0).toLocaleString("nl-NL", { minimumFractionDigits: dec ?? (n % 1 && n < 100 ? 2 : 0), maximumFractionDigits: dec ?? (n < 100 ? 2 : 0) });
   const nl = (n) => Number(n || 0).toLocaleString("nl-NL", { maximumFractionDigits: 1 });
+  const maand = new Date().toLocaleDateString("nl-NL", { month: "long" });
+
+  // 1. Nog geen Google Ads-account gekoppeld: korte uitleg
   if (!d.actief) {
-    el.innerHTML = `<div class="kaart"><h2 style="margin-top:0">Sneller klanten met advertenties in Google</h2>
-      <p>Wij zetten je advertenties op, sturen ze elke week bij en laten je hier precies zien wat ze kosten en opleveren. Je budget betaal je vooraf, dus je kunt nooit meer kwijtraken dan je wilt.</p>
-      <p class="zacht" style="margin:0 0 12px">Binnenkort zet je dit hier met één klik aan. Wil je niet wachten? Laat het Jan weten.</p>
-      <a class="knop" href="https://wa.me/31627254383?text=${encodeURIComponent("Ik wil graag advertenties in Google")}">Laat het Jan weten</a></div>`;
+    el.innerHTML = kaart(`<div class="ad-kop"><div><span class="ad-mono">advertenties in Google</span><h1>Sneller klanten via Google.</h1></div></div>
+      <p class="ad-uitleg">Wij zetten je advertenties op, sturen ze elke week bij en laten je hier precies zien wat ze kosten en opleveren.</p>
+      <div class="ad-vinken">
+        <span class="ad-vink">${VINK}<span>Wij maken de advertenties uit je eigen website</span></span>
+        <span class="ad-vink">${VINK}<span>Elke week kijken wij waar geld verloren gaat en waar het meer kan opleveren</span></span>
+        <span class="ad-vink">${VINK}<span>Er gaat niets live zonder jouw akkoord</span></span></div>
+      <div class="ad-knoppen"><a class="knop" href="${WA("Ik wil graag advertenties in Google")}">Ik wil advertenties</a><span class="ad-klein">Binnenkort zet je dit hier zelf aan.</span></div>`, "ad-held");
     return;
   }
+
   const omzet = d.soortKlant === "omzet";
   const opbrengst = (x) => omzet ? eu(x.waarde) : nl(x.conversies) + (Math.round(x.conversies) === 1 ? " aanvraag" : " aanvragen");
-  const ST = { loopt: ["goed", "✓ Je advertenties lopen."], uit: ["", "Er lopen nu geen advertenties. Alles staat uit, er wordt niets uitgegeven."], stil: ["let", "Je advertenties staan aan, maar hebben de laatste dagen niets uitgegeven. Wij kijken waarom."], wachten: ["", "We halen je cijfers voor het eerst op. Dat duurt tot morgenochtend."], fout: ["let", "We konden je cijfers even niet ophalen. Jan is ingelicht."] };
-  const [stK, stT] = ST[d.status] || ST.wachten;
-  let h = `<div class="ad-status ${stK}">${stT}</div>`;
-  // groot getal
+  const PIL = { loopt: ["ok", "loopt"], uit: ["grijs", "staat uit"], stil: ["let", "staat stil"], wachten: ["grijs", "eerste keer ophalen"], fout: ["let", "even niet bij te werken"] };
+  const [pK, pT] = PIL[d.status] || PIL.wachten;
+  const pil = `<span class="ad-pil ${pK}">${pT}</span>`;
+  const bijgewerkt = `<p class="ad-klein" style="margin:0 2px">Bijgewerkt: ${d.laatst ? new Date(d.laatst).toLocaleString("nl-NL", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) : "nog niet"}. Wij halen de cijfers elke nacht op.</p>`;
   const m = d.deze.kosten > 0 ? d.deze : d.d30.kosten > 0 ? d.d30 : null;
-  const label = d.deze.kosten > 0 ? "Deze maand" : "Afgelopen 30 dagen";
+
+  // 2. Gekoppeld, maar er lopen (nog) geen advertenties: nette lege toestand
+  if (!m && !(d.historie.kosten > 0)) {
+    const T = {
+      wachten: ["We halen je cijfers voor het eerst op.", "Dat duurt tot morgenochtend. Daarna zie je hier precies wat je advertenties kosten en opleveren."],
+      fout: ["Je cijfers zijn even niet bij te werken.", "Wij hebben het gezien en lossen het op. Je hoeft zelf niets te doen."],
+      stil: ["Je advertenties staan aan, maar geven niets uit.", "Wij kijken waarom. Je hoeft zelf niets te doen."] };
+    const [kop, uitleg] = T[d.status] || ["Er lopen nu geen advertenties.", "Alles staat uit, dus er wordt niets uitgegeven. Je Google Ads-account is wel gekoppeld: wij houden het elke nacht in de gaten."];
+    el.innerHTML = kaart(`<div class="ad-kop"><div><span class="ad-mono">${maand} · advertenties in Google</span><h1>${kop}</h1></div>${pil}</div>
+      <p class="ad-uitleg">${uitleg}</p>`, "ad-held")
+      + kaart(`<h2>Dit zie je hier zodra je advertenties lopen</h2>
+      <div class="ad-voor">
+        <div><em>€ → €</em><b>Wat het kost en oplevert</b><span>Eén duidelijk getal: wat je erin stopte en wat het opleverde.</span></div>
+        <div><em>✓</em><b>Wat wij deden</b><span>Elke week zie je wat wij hebben bijgestuurd en waarom.</span></div>
+        <div><em>▮▮</em><b>Wat het beste werkt</b><span>Welke producten en zoekwoorden verkopen, en waar het vandaan komt.</span></div></div>`)
+      + kaart(`<h2>Advertenties starten?</h2>
+      <p class="zacht" style="font-size:15px;line-height:1.6;margin:0">Wij zetten alles voor je klaar uit je website. Je ziet eerst een voorbeeld en het budget. Pas na jouw akkoord gaat er iets live.</p>
+      <div class="ad-knoppen"><a class="knop" href="${WA("Ik wil graag advertenties in Google starten")}">Laat het ons weten</a></div>`)
+      + bijgewerkt;
+    return;
+  }
+
+  // 3. Met cijfers
+  let h = "";
   if (m) {
+    const label = d.deze.kosten > 0 ? maand : "afgelopen 30 dagen";
     const per = omzet && m.kosten ? m.waarde / m.kosten : 0;
     const vg = d.deze.kosten > 0 && d.vorige.kosten > 0 ? (omzet ? d.vorige.waarde : d.vorige.conversies) : null;
-    const nuW = omzet ? m.waarde : m.conversies;
-    h += `<div class="kaart"><p class="zacht" style="margin:0 0 10px">${label}</p><div class="ad-held">
-      <div class="ad-g"><b>${eu(m.kosten)}</b><span class="zacht">erin gestopt</span></div><span style="font-size:28px" aria-hidden="true">→</span>
-      <div class="ad-g"><b class="glans">${opbrengst(m)}</b><span class="zacht">${omzet ? "omzet via advertenties" : "via advertenties"}</span></div>
-      ${per ? `<span class="ad-pil">Elke euro leverde ${eu(per, 2)} op</span>` : ""}</div>
-      ${vg !== null ? `<p class="zacht" style="margin:12px 0 0">Vorige maand rond deze tijd: ${omzet ? eu(vg) : nl(vg) + " aanvragen"}.</p>` : ""}</div>`;
-  } else if (d.historie.kosten > 0) {
+    const leverde = omzet ? m.waarde > 0 : m.conversies > 0;
+    const kop = leverde ? `Je advertenties leverden ${opbrengst(m)} op.` : `Je advertenties kostten ${eu(m.kosten)}, nog zonder ${omzet ? "verkoop" : "aanvraag"}.`;
+    h += kaart(`<div class="ad-kop"><div><span class="ad-mono">${label} · advertenties in Google</span><h1>${kop}</h1></div>${pil}</div>
+      <div class="ad-cijfers">
+        <div class="ad-g"><b>${eu(m.kosten)}</b><span>erin gestopt</span></div><span class="ad-pijl" aria-hidden="true">→</span>
+        <div class="ad-g"><b class="glans">${opbrengst(m)}</b><span>${omzet ? "omzet via advertenties" : "via advertenties"}</span></div>
+        ${per >= 0.01 ? `<span class="ad-pil groot">Elke euro leverde ${eu(per, 2)} op</span>` : ""}</div>
+      ${vg !== null ? `<p class="ad-klein">Vorige maand rond deze tijd: ${omzet ? eu(vg) : nl(vg) + " aanvragen"}.</p>` : ""}`, "ad-held");
+  } else {
     const sinds = new Date(d.historie.eerste).toLocaleDateString("nl-NL", { month: "long", year: "numeric" });
-    h += `<div class="kaart"><p class="zacht" style="margin:0 0 10px">Totaal sinds ${sinds}</p><div class="ad-held">
-      <div class="ad-g"><b>${eu(d.historie.kosten)}</b><span class="zacht">uitgegeven</span></div><span style="font-size:28px" aria-hidden="true">→</span>
-      <div class="ad-g"><b class="glans">${opbrengst(d.historie)}</b><span class="zacht">${omzet ? "omzet via advertenties" : "via advertenties"}</span></div></div>
-      <p class="zacht" style="margin:12px 0 0">De laatste 30 dagen liepen er geen advertenties.</p></div>`;
+    h += kaart(`<div class="ad-kop"><div><span class="ad-mono">sinds ${sinds} · advertenties in Google</span><h1>De laatste 30 dagen liepen er geen advertenties.</h1></div>${pil}</div>
+      <div class="ad-cijfers">
+        <div class="ad-g"><b>${eu(d.historie.kosten)}</b><span>in totaal uitgegeven</span></div><span class="ad-pijl" aria-hidden="true">→</span>
+        <div class="ad-g"><b class="glans">${opbrengst(d.historie)}</b><span>${omzet ? "omzet via advertenties" : "via advertenties"}</span></div></div>`, "ad-held");
   }
-  // weekbericht
+
+  // deze week + waar komt het vandaan
   const wk = d.acties.length ? d.acties[0].week : null, deze = d.acties.filter((a) => a.week === wk);
-  if (deze.length) h += `<div class="kaart"><h2 style="margin-top:0">Deze week</h2><p class="zacht" style="margin:0 0 6px">Wat wij zagen en wat we gaan doen.</p>
-    ${deze.map((a) => `<div class="ad-actie"><span aria-hidden="true">${a.soort === "status" ? "ℹ️" : a.soort === "uitsluiten" ? "✂️" : a.soort === "uitbouwen" ? "📈" : a.soort === "budget" ? "⚖️" : "🏷️"}</span><div class="kp-vul"><b>${esc(a.tekst)}</b>${a.waarom ? `<div class="zacht" style="font-size:14px">${esc(a.waarom)}</div>` : ""}${a.besparing ? `<div style="font-size:14px;color:var(--accent)">Bespaart ongeveer ${eu(a.besparing)} per week</div>` : ""}</div></div>`).join("")}</div>`;
-  // waar komt het vandaan + weken
-  const NAAM = { SHOPPING: "Shopping", PERFORMANCE_MAX: "Shopping en meer", SEARCH: "Zoekadvertenties", DISPLAY: "Banners", VIDEO: "Video", SMART: "Slimme campagnes" };
+  const NAAM = { SHOPPING: "Google Shopping", PERFORMANCE_MAX: "Shopping en meer", SEARCH: "Zoekadvertenties", DISPLAY: "Banners", VIDEO: "Video", SMART: "Slimme campagnes" };
+  const UITLEG = { SHOPPING: "Je producten met foto en prijs in Google", PERFORMANCE_MAX: "Google kiest zelf waar je advertentie het best werkt", SEARCH: "Een tekstadvertentie bovenaan de zoekresultaten" };
   let twee = "";
-  if (d.soorten.length) twee += `<div class="kaart"><h2 style="margin-top:0">Waar komt het vandaan?</h2><p class="zacht" style="margin:0 0 6px">Afgelopen 30 dagen</p>${d.soorten.map((s) => `<div class="ad-rij"><span>${NAAM[s.soort] || s.soort}</span><span>${eu(s.kosten)} → <b>${opbrengst(s)}</b></span></div>`).join("")}</div>`;
-  if (d.reeks.length) { const mx = Math.max(...d.reeks.map((r) => Math.max(r.kosten, omzet ? r.waarde : r.conversies * 10)), 1);
-    twee += `<div class="kaart"><h2 style="margin-top:0">Per week</h2><p class="zacht" style="margin:0">Grijs: kosten · Blauw: ${omzet ? "omzet" : "aanvragen"}</p><div class="ad-balken">${d.reeks.map((r) => `<div class="ad-balk" title="${new Date(r.week).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}: ${eu(r.kosten)} → ${opbrengst(r)}"><i class="k" style="height:${(r.kosten / mx) * 100}%"></i><i class="w" style="height:${((omzet ? r.waarde : r.conversies * 10) / mx) * 100}%"></i></div>`).join("")}</div></div>`; }
+  if (deze.length) twee += kaart(`<h2>Deze week</h2><p class="ad-klein">Wat wij zagen en wat wij gaan doen.</p><div class="ad-vinken">
+    ${deze.map((a) => `<span class="ad-vink">${VINK}<span><b>${esc(a.tekst)}</b>${a.waarom ? `<span class="zacht">${esc(a.waarom)}</span>` : ""}${a.besparing ? `<span class="zacht" style="color:var(--accent)">Bespaart ongeveer ${eu(a.besparing)} per week</span>` : ""}</span></span>`).join("")}</div>`);
+  if (d.soorten.length) {
+    const w = (s) => omzet ? s.waarde : s.conversies, mx = Math.max(...d.soorten.map(w), 0.0001);
+    twee += kaart(`<h2>Waar komt het vandaan?</h2><p class="ad-klein">Afgelopen 30 dagen</p><div class="ad-vinken">
+      ${d.soorten.map((s) => `<div class="ad-bron"><div><b>${NAAM[s.soort] || s.soort}</b><span>${eu(s.kosten)} → <b>${opbrengst(s)}</b></span></div><div class="ad-baan"><i style="width:${Math.max(2, (w(s) / mx) * 100)}%"></i></div>${UITLEG[s.soort] ? `<span class="ad-klein">${UITLEG[s.soort]}</span>` : ""}</div>`).join("")}</div>`);
+  }
   if (twee) h += `<div class="ad-twee">${twee}</div>`;
+
   // producten en zoekopdrachten
   let pz = "";
-  if (d.producten.length) pz += `<div class="kaart"><h2 style="margin-top:0">Producten in je advertenties</h2><p class="zacht" style="margin:0 0 6px">Afgelopen 30 dagen</p>${d.producten.map((x) => `<div class="ad-rij"><span>${esc(x.titel)}</span><span class="zacht">${x.conversies ? `<b style="color:inherit">${nl(x.conversies)}× verkocht</b> · ` : ""}${x.klikken} klikken</span></div>`).join("")}</div>`;
-  if (d.zoektermen.length) pz += `<div class="kaart"><h2 style="margin-top:0">Waar mensen op zochten</h2><p class="zacht" style="margin:0 0 6px">Toen ze je advertentie zagen, afgelopen 30 dagen</p>${d.zoektermen.map((x) => `<div class="ad-rij"><span>"${esc(x.term)}"</span><span class="zacht">${x.conversies ? `<b style="color:inherit">${omzet && x.waarde ? eu(x.waarde) : nl(x.conversies) + "×"}</b> · ` : ""}${x.klikken} klikken</span></div>`).join("")}</div>`;
+  if (d.producten.length) pz += kaart(`<h2>Best verkochte producten via advertenties</h2><p class="ad-klein">Afgelopen 30 dagen</p><div>${d.producten.map((x) => `<div class="ad-rij"><span>${esc(x.titel)}</span><span class="zacht">${x.conversies ? `${nl(x.conversies)} verkocht · ` : ""}${x.waarde ? `<b style="color:var(--tekst)">${eu(x.waarde)}</b>` : `${x.klikken} klikken`}</span></div>`).join("")}</div>`);
+  if (d.zoektermen.length) pz += kaart(`<h2>Waar mensen op zochten</h2><p class="ad-klein">Toen ze je advertentie zagen, afgelopen 30 dagen</p><div>${d.zoektermen.map((x) => `<div class="ad-rij"><span>"${esc(x.term)}"</span><span class="zacht">${x.conversies ? `<b style="color:var(--tekst)">${omzet && x.waarde ? eu(x.waarde) : nl(x.conversies) + "×"}</b> · ` : ""}${x.klikken} klikken</span></div>`).join("")}</div>`);
   if (pz) h += `<div class="ad-twee">${pz}</div>`;
-  // campagnes en details
+
+  // per week + campagnes
   const STAT = { ENABLED: "loopt", PAUSED: "onderbroken", REMOVED: "verwijderd" };
   const camp = d.campagnes.filter((c) => c.status !== "REMOVED");
-  const m30 = d.d30;
-  h += `<div class="ad-twee">${camp.length ? `<div class="kaart"><h2 style="margin-top:0">Je campagnes</h2>${camp.map((c) => `<div class="ad-rij"><span>${esc(c.campagne)}<br><span class="zacht" style="font-size:13px">${NAAM[c.soort] || c.soort}</span></span><span class="ad-pil" style="${c.status === "ENABLED" ? "" : "background:var(--lijn)"}">${STAT[c.status] || c.status}</span></div>`).join("")}</div>` : ""}
-    <div class="kaart"><h2 style="margin-top:0">Alle details</h2><p class="zacht" style="margin:0 0 6px">Afgelopen 30 dagen</p>
-      <div class="ad-rij"><span>Kosten bij Google</span><b>${eu(m30.kosten, 2)}</b></div>
-      <div class="ad-rij"><span>Klikken</span><b>${m30.klikken.toLocaleString("nl-NL")}</b></div>
-      <div class="ad-rij"><span>Keer getoond in Google</span><b>${m30.vertoningen.toLocaleString("nl-NL")}</b></div>
-      <div class="ad-rij"><span>${omzet ? "Bestellingen" : "Aanvragen"} via advertenties</span><b>${nl(m30.conversies)}</b></div>
-      ${omzet ? `<div class="ad-rij"><span>Omzet via advertenties</span><b>${eu(m30.waarde)}</b></div>` : ""}
-      <p class="zacht" style="font-size:13px;margin:10px 0 0">Kosten bij Google zijn precies wat Google rekent, zonder onze vergoeding. ${omzet ? "Omzet is wat klanten via een advertentie bij je kochten, geen winst." : ""}</p></div></div>`;
-  h += `<p class="zacht" style="font-size:13px;margin:4px 2px">Bijgewerkt: ${d.laatst ? new Date(d.laatst).toLocaleString("nl-NL", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) : "nog niet"}</p>`;
+  let wc = "";
+  if (d.reeks.length) { const mx = Math.max(...d.reeks.map((r) => Math.max(r.kosten, omzet ? r.waarde : r.conversies * 10)), 1);
+    wc += kaart(`<h2>Per week</h2><p class="ad-klein">Grijs: kosten · Kleur: ${omzet ? "omzet" : "aanvragen"}</p><div class="ad-balken">${d.reeks.map((r) => `<div class="ad-balk" title="${new Date(r.week).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}: ${eu(r.kosten)} → ${opbrengst(r)}"><i class="k" style="height:${(r.kosten / mx) * 100}%"></i><i class="w" style="height:${((omzet ? r.waarde : r.conversies * 10) / mx) * 100}%"></i></div>`).join("")}</div>`); }
+  if (camp.length) wc += kaart(`<h2>Je campagnes</h2><div>${camp.map((c) => `<div class="ad-rij"><span>${esc(c.campagne)}<br><span class="ad-klein">${NAAM[c.soort] || c.soort}</span></span><span><span class="ad-pil ${c.status === "ENABLED" ? "ok" : "grijs"}">${STAT[c.status] || c.status}</span></span></div>`).join("")}</div>`);
+  if (wc) h += `<div class="ad-twee">${wc}</div>`;
+
+  // alle details
+  const m30 = d.d30, rij = (a, b) => `<div class="ad-rij"><span class="zacht">${a}</span><b>${b}</b></div>`;
+  h += kaart(`<h2>Alle details</h2><p class="ad-klein">Afgelopen 30 dagen</p>
+    <div class="ad-details"><div>${rij("Kosten bij Google", eu(m30.kosten, 2))}${rij(`${omzet ? "Bestellingen" : "Aanvragen"} via advertenties`, nl(m30.conversies))}${rij(`Kosten per ${omzet ? "bestelling" : "aanvraag"}`, m30.conversies ? eu(m30.kosten / m30.conversies, 2) : "–")}</div>
+    <div>${rij("Klikken", m30.klikken.toLocaleString("nl-NL"))}${rij("Keer getoond in Google", m30.vertoningen.toLocaleString("nl-NL"))}${omzet ? rij("Omzet via advertenties", eu(m30.waarde)) : rij("Kosten per klik", m30.klikken ? eu(m30.kosten / m30.klikken, 2) : "–")}</div></div>
+    <p class="ad-klein">Kosten bij Google zijn precies wat Google rekent, zonder onze vergoeding.${omzet ? " Omzet is wat klanten via een advertentie bij je kochten, geen winst." : ""}</p>`);
+  h += `<div class="ad-knoppen"><button type="button" class="knop rand" id="admeer">Meer details →</button></div>` + bijgewerkt;
   el.innerHTML = h;
+  $("#admeer").onclick = () => kpAdsDetails();
+}
+// "Meer details" voor de klant: uitgekozen, rustig en eerlijk
+async function kpAdsDetails(periode = "maand") {
+  const el = $("#kpads");
+  const kaart = (inh, extra = "") => `<section class="kaart ${extra}">${inh}</section>`;
+  const P = { maand: "Deze maand", vorige: "Vorige maand", d90: "90 dagen" };
+  const kop = `<div class="ad-kies"><button type="button" class="ad-terug" id="adterug">← Terug naar overzicht</button><span class="kp-vul"></span>
+    <div class="ad-tabs" role="tablist" aria-label="Periode">${Object.entries(P).map(([k, t]) => `<button type="button" role="tab" aria-selected="${k === periode}" data-per="${k}">${t}</button>`).join("")}</div></div>`;
+  const koppel = () => { $("#adterug").onclick = () => { kpAds(); scrollTo(0, 0); }; el.querySelectorAll("[data-per]").forEach((b) => (b.onclick = () => kpAdsDetails(b.dataset.per))); };
+  el.innerHTML = kop + kaart(`<p class="zacht" style="margin:0">Even ophalen…</p>`); koppel();
+  let d;
+  try { const x = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-ads", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify({ actie: "details", periode }) }); d = await x.json(); if (!x.ok) throw new Error(d.fout); }
+  catch { el.innerHTML = kop + kaart(`<p class="zacht" style="margin:0">De details zijn nu even niet op te halen. Probeer het straks nog eens.</p>`); koppel(); return; }
+  const eu = (n, dec) => "€" + Number(n || 0).toLocaleString("nl-NL", { minimumFractionDigits: dec ?? (n % 1 && n < 100 ? 2 : 0), maximumFractionDigits: dec ?? (n < 100 ? 2 : 0) });
+  const nl = (n) => Number(n || 0).toLocaleString("nl-NL", { maximumFractionDigits: 1 });
+  const omzet = d.omzet, t = d.totaal, v = d.ervoor;
+  const opbrengst = (x) => omzet ? eu(x.waarde) : nl(x.conversies) + (Math.round(x.conversies) === 1 ? " aanvraag" : " aanvragen");
+  const NAAM = { SHOPPING: "Google Shopping", PERFORMANCE_MAX: "Shopping en meer", SEARCH: "Zoekadvertenties", DISPLAY: "Banners", VIDEO: "Video", SMART: "Slimme campagnes" };
+  const dag = (x) => new Date(x).toLocaleDateString("nl-NL", { day: "numeric", month: "long" });
+  const wOud = omzet ? v.waarde : v.conversies, wNu = omzet ? t.waarde : t.conversies;
+  let h = kop + kaart(`<span class="ad-mono">${dag(d.van)} t/m ${dag(d.tot)}</span>
+    <div class="ad-cijfers">
+      <div class="ad-g"><b>${eu(t.kosten)}</b><span>erin gestopt</span></div><span class="ad-pijl" aria-hidden="true">→</span>
+      <div class="ad-g"><b class="glans">${opbrengst(t)}</b><span>${omzet ? "omzet via advertenties" : "via advertenties"}</span></div>
+      ${omzet && t.kosten > 0 && t.waarde > 0 ? `<span class="ad-pil groot">Elke euro leverde ${eu(t.waarde / t.kosten, 2)} op</span>` : ""}</div>
+    ${v.kosten > 0 ? `<p class="ad-klein">De periode ervoor: ${eu(v.kosten)} erin, ${opbrengst(v)} eruit${wOud ? ` (nu ${Math.abs(Math.round((wNu - wOud) / wOud * 100))}% ${wNu >= wOud ? "meer" : "minder"})` : ""}.</p>` : ""}`, "ad-held");
+  if (!t.kosten && !d.campagnes.some((c) => c.kosten > 0)) {
+    h += kaart(`<p class="zacht" style="margin:0;font-size:15px">In deze periode liepen er geen advertenties. Kies hierboven een andere periode.</p>`);
+    el.innerHTML = h; koppel(); return;
+  }
+  // per campagne
+  const camp = d.campagnes.filter((c) => c.kosten > 0 || c.status === "ENABLED");
+  if (camp.length) h += kaart(`<h2>Per campagne</h2><div class="ad-scroll"><table class="ad-tabel"><thead><tr><th>Campagne</th><th>Kosten</th><th>Klikken</th><th>Getoond</th><th>${omzet ? "Bestellingen" : "Aanvragen"}</th>${omzet ? "<th>Omzet</th>" : ""}</tr></thead><tbody>
+    ${camp.map((c) => `<tr><td><b>${esc(c.campagne)}</b><br><span class="ad-klein">${NAAM[c.soort] || esc(c.soort)} · ${c.status === "ENABLED" ? "loopt" : "onderbroken"}</span></td><td>${eu(c.kosten)}</td><td>${c.klikken.toLocaleString("nl-NL")}</td><td>${c.vertoningen.toLocaleString("nl-NL")}</td><td>${nl(c.conversies)}</td>${omzet ? `<td><b>${eu(c.waarde)}</b></td>` : ""}</tr>`).join("")}
+    </tbody></table></div><p class="ad-klein">Kosten zijn precies wat Google rekent, zonder onze vergoeding.</p>`);
+  // per week
+  if (d.reeks.length > 1) { const mx = Math.max(...d.reeks.map((r) => Math.max(r.kosten, omzet ? r.waarde : r.conversies * 10)), 1);
+    h += kaart(`<h2>Per week</h2><p class="ad-klein">Grijs: kosten · Kleur: ${omzet ? "omzet" : "aanvragen"}</p><div class="ad-balken">${d.reeks.map((r) => `<div class="ad-balk" title="Week van ${dag(r.week)}: ${eu(r.kosten)} → ${opbrengst(r)}"><i class="k" style="height:${(r.kosten / mx) * 100}%"></i><i class="w" style="height:${((omzet ? r.waarde : r.conversies * 10) / mx) * 100}%"></i></div>`).join("")}</div>`); }
+  // lijsten
+  let l = "";
+  if (d.producten.length) l += kaart(`<h2>Producten</h2><p class="ad-klein">Afgelopen 30 dagen</p><div>${d.producten.map((x) => `<div class="ad-rij"><span>${esc(x.naam)}</span><span class="zacht">${x.conversies ? `${nl(x.conversies)} verkocht · ` : ""}${x.waarde ? `<b style="color:var(--tekst)">${eu(x.waarde)}</b>` : `${x.klikken} klikken`}</span></div>`).join("")}</div>`);
+  if (d.zoektermen.length) l += kaart(`<h2>Waar mensen op zochten</h2><p class="ad-klein">Afgelopen 30 dagen</p><div>${d.zoektermen.map((x) => `<div class="ad-rij"><span>"${esc(x.naam)}"</span><span class="zacht">${x.conversies ? `<b style="color:var(--tekst)">${omzet && x.waarde ? eu(x.waarde) : nl(x.conversies) + "×"}</b> · ` : ""}${x.klikken} klikken</span></div>`).join("")}</div>`);
+  if (l) h += `<div class="ad-twee">${l}</div>`;
+  // wat wij hebben gedaan (alleen echt uitgevoerd)
+  if (d.uitgevoerd.length) h += kaart(`<h2>Dit hebben wij bijgestuurd</h2><div class="ad-vinken">${d.uitgevoerd.map((a) => `<span class="ad-vink"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i><span><b>${esc(a.tekst)}</b>${a.besparing ? `<span class="zacht" style="color:var(--accent)">Bespaart ongeveer ${eu(a.besparing)} per week</span>` : ""}</span></span>`).join("")}</div>`);
+  h += `<p class="ad-klein" style="margin:0 2px">Omzet is wat klanten via een advertentie bij je kochten, geen winst. Een uitgebreid overzicht nodig? Vraag het ons, dan sturen we het je.</p>`;
+  el.innerHTML = h; koppel(); scrollTo(0, 0);
 }
 // ---------- nieuwe inhoud om goed te keuren (artikelen, veelgestelde vragen, productgegevens) ----------
 async function kpInhoud(actie, id) {

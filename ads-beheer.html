@@ -6,10 +6,19 @@
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="assets/stijl.css?v=20261110f">
 <style>
-.ab{max-width:900px;margin:0 auto;padding:28px 16px 60px;display:flex;flex-direction:column;gap:16px}
+.ab{max-width:1100px;margin:0 auto;padding:28px 16px 60px;display:flex;flex-direction:column;gap:16px}
 .ab-rij{display:grid;grid-template-columns:1.2fr 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--lijn)}
 .ab-rij:last-child{border-bottom:0}
 @media (max-width:640px){.ab-rij{grid-template-columns:1fr}}
+.ab-tabel{width:100%;border-collapse:collapse;font-size:13.5px}
+.ab-tabel th,.ab-tabel td{padding:7px 8px;border-bottom:1px solid var(--lijn);text-align:right;white-space:nowrap}
+.ab-tabel th:first-child,.ab-tabel td:first-child{text-align:left;white-space:normal}
+.ab-tabel th{font-weight:600;color:var(--zacht);cursor:pointer;user-select:none}
+.ab-tabel tr.weg td{background:var(--foutbg)}
+.ab-scroll{overflow-x:auto}
+.ab-tegels{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.ab-tegels div{border:1px solid var(--lijn);border-radius:12px;padding:10px 12px}.ab-tegels b{display:block;font:700 22px "Space Grotesk",sans-serif}.ab-tegels span{font-size:12.5px;color:var(--zacht)}
+.ab-kies{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.ab-kies select{width:auto}
 </style>
 </head>
 <body>
@@ -18,6 +27,7 @@
   <h1 style="margin:0">Advertenties (Google Ads)</h1>
   <div class="kaart" id="koppeling"><p class="zacht" style="margin:0">Laden…</p></div>
   <div class="kaart" id="klanten" hidden></div>
+  <div class="kaart" id="cijfers" hidden></div>
   <div id="meld" class="verborgen"></div>
 </main>
 <script src="assets/basis.js"></script>
@@ -47,7 +57,7 @@ async function laad() {
   try { acc = (await ads("accounts")).accounts; } catch (e) { toonMelding($("#meld"), "Accounts ophalen lukte niet: " + e.message); }
   const opties = (huidig) => `<option value="">Geen advertenties</option>` + acc.map((a) => `<option value="${a.id}" ${a.id === huidig ? "selected" : ""}>${esc(a.naam || a.id)} (${a.id.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3")})</option>`).join("")
     + (huidig && !acc.some((a) => a.id === huidig) ? `<option value="${huidig}" selected>${huidig} (niet onder Siteregelaar)</option>` : "");
-  $("#klanten").hidden = false;
+  $("#klanten").hidden = false; abKlanten = s.klanten; abCijfers();
   $("#klanten").innerHTML = `<h2 style="margin-top:0">Klanten en hun Google Ads-account</h2><p class="zacht" style="margin:0 0 8px">${acc.length} account(s) onder Siteregelaar. Nieuwe klant? Koppel eerst zijn account onder Siteregelaar in Google Ads.</p>`
     + s.klanten.map((k) => `<div class="ab-rij"><div><b>${esc(k.naam)}</b><br><span class="zacht" style="font-size:13px">${k.ads_fout ? "⚠ " + esc(k.ads_fout) : k.ads_laatst ? "Bijgewerkt " + new Date(k.ads_laatst).toLocaleString("nl-NL") : k.ads_klant ? "Nog niet opgehaald" : ""}</span></div>
       <select data-klant="${esc(k.id)}" aria-label="Google Ads-account voor ${esc(k.naam)}">${opties(k.ads_klant || "")}</select>
@@ -60,6 +70,67 @@ async function laad() {
     try { const d = await ads("nu", { klant_id: b.dataset.nu }); toonMelding($("#meld"), `Klaar: ${d.dagen} dagregels, ${d.zoektermen} zoekopdrachten, ${d.producten} producten.`, "ok"); laad(); }
     catch (e) { toonMelding($("#meld"), e.message); b.disabled = false; b.textContent = "Nu ophalen"; }
   });
+}
+// ---------- volledige cijfers per klant (alleen beheer) ----------
+let abData = null, abKlanten = [];
+const eu2 = (n) => "€" + Number(n || 0).toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const nl1 = (n) => Number(n || 0).toLocaleString("nl-NL", { maximumFractionDigits: 1 });
+const pct = (a, b) => b ? (a / b * 100).toLocaleString("nl-NL", { maximumFractionDigits: 1 }) + "%" : "–";
+const del = (a, b) => (b ? a / b : 0);
+const verschil = (nu, toen) => !toen ? "" : ` <span class="zacht" style="font-size:12px">${nu >= toen ? "▲" : "▼"} ${Math.abs((nu - toen) / toen * 100).toFixed(0)}%</span>`;
+function abTabel(id, kop, rijen, klasse) {
+  return `<div class="ab-scroll"><table class="ab-tabel" data-tabel="${id}"><thead><tr>${kop.map((k, i) => `<th data-kol="${i}">${k}</th>`).join("")}</tr></thead><tbody>${rijen.map((r, n) => `<tr class="${klasse ? klasse(n) : ""}">${r.map((c) => `<td data-w="${typeof c === "object" ? c.w : c}">${typeof c === "object" ? c.t : c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+const cel = (t, w) => ({ t, w });
+async function abCijfers(klant, periode) {
+  const el = $("#cijfers"); el.hidden = false;
+  const kl = abKlanten.filter((k) => k.ads_klant);
+  if (!kl.length) { el.innerHTML = `<h2 style="margin-top:0">Cijfers</h2><p class="zacht" style="margin:0">Nog geen klant met een Google Ads-account.</p>`; return; }
+  klant = klant || kl[0].id; periode = periode || "d30";
+  const P = { d7: "7 dagen", d14: "14 dagen", d30: "30 dagen", d90: "90 dagen", d365: "365 dagen", maand: "Deze maand", vorige: "Vorige maand" };
+  el.innerHTML = `<div class="ab-kies"><h2 class="vul" style="margin:0">Cijfers</h2>
+    <select id="abklant">${kl.map((k) => `<option value="${esc(k.id)}" ${k.id === klant ? "selected" : ""}>${esc(k.naam)}</option>`).join("")}</select>
+    <select id="abper">${Object.entries(P).map(([k, t]) => `<option value="${k}" ${k === periode ? "selected" : ""}>${t}</option>`).join("")}</select>
+    <button class="knop rand klein" id="abcsv" type="button">Download (Excel)</button></div><div id="abinhoud"><p class="zacht">Laden…</p></div>`;
+  $("#abklant").onchange = () => abCijfers($("#abklant").value, $("#abper").value);
+  $("#abper").onchange = () => abCijfers($("#abklant").value, $("#abper").value);
+  try { abData = await ads("details", { klant_id: klant, periode }); } catch (e) { $("#abinhoud").innerHTML = `<p>${esc(e.message)}</p>`; return; }
+  const d = abData, t = d.totaal, v = d.ervoor;
+  if (!d.actief) { $("#abinhoud").innerHTML = `<p class="zacht">Geen Google Ads-account.</p>`; return; }
+  const tegel = (w, l) => `<div><b>${w}</b><span>${l}</span></div>`;
+  let h = `<p class="zacht" style="margin:10px 0">${esc(d.label)}: ${d.van} t/m ${d.tot}. Pijltjes: vergeleken met de periode ervoor.</p><div class="ab-tegels">
+    ${tegel(eu2(t.kosten) + verschil(t.kosten, v.kosten), "kosten")}${tegel(t.klikken.toLocaleString("nl-NL") + verschil(t.klikken, v.klikken), "klikken")}
+    ${tegel(t.vertoningen.toLocaleString("nl-NL"), "vertoningen")}${tegel(pct(t.klikken, t.vertoningen), "klikratio (CTR)")}
+    ${tegel(t.klikken ? eu2(t.kosten / t.klikken) : "–", "prijs per klik")}${tegel(nl1(t.conversies) + verschil(t.conversies, v.conversies), "conversies")}
+    ${tegel(t.conversies ? eu2(t.kosten / t.conversies) : "–", "kosten per conversie")}${tegel(eu2(t.waarde) + verschil(t.waarde, v.waarde), "omzet")}
+    ${tegel(t.kosten ? nl1(t.waarde / t.kosten) + "×" : "–", "ROAS")}${tegel(pct(t.conversies, t.klikken), "conversieratio")}</div>`;
+  const rij = (x, naam) => [naam, cel(eu2(x.kosten), x.kosten), cel(x.klikken.toLocaleString("nl-NL"), x.klikken), cel(x.vertoningen != null ? x.vertoningen.toLocaleString("nl-NL") : "–", x.vertoningen || 0), cel(pct(x.klikken, x.vertoningen), del(x.klikken, x.vertoningen)), cel(x.klikken ? eu2(x.kosten / x.klikken) : "–", del(x.kosten, x.klikken)), cel(nl1(x.conversies), x.conversies), cel(eu2(x.waarde), x.waarde), cel(x.kosten ? nl1(x.waarde / x.kosten) + "×" : "–", del(x.waarde, x.kosten))];
+  const KOP = ["Kosten", "Klikken", "Getoond", "CTR", "CPC", "Conv.", "Omzet", "ROAS"];
+  h += `<h3 style="margin:18px 0 6px">Per campagne</h3>` + (d.campagnes.length ? abTabel("camp", ["Campagne", ...KOP], d.campagnes.map((c) => rij(c, `${esc(c.campagne)}<br><span class="zacht" style="font-size:12px">${esc(c.soort)} · ${c.status === "ENABLED" ? "loopt" : c.status === "PAUSED" ? "onderbroken" : esc(c.status)}</span>`))) : `<p class="zacht">Geen campagnes.</p>`);
+  h += `<h3 style="margin:18px 0 6px">Per dag</h3>` + (d.dagen.length ? abTabel("dag", ["Datum", ...KOP], d.dagen.map((x) => rij(x, new Date(x.datum).toLocaleDateString("nl-NL", { weekday: "short", day: "numeric", month: "short" })))) : `<p class="zacht">Geen kosten in deze periode.</p>`);
+  const isWeg = (x) => !x.conversies && x.kosten > 0;
+  const zk = d.zoektermen, weg = zk.filter(isWeg);
+  h += `<h3 style="margin:18px 0 6px">Zoekopdrachten <span class="zacht" style="font-weight:400;font-size:13px">(afgelopen 30 dagen, ${zk.length} totaal · rood: kostte geld zonder conversie, samen ${eu2(weg.reduce((s, x) => s + x.kosten, 0))})</span></h3>` + (zk.length ? abTabel("zoek", ["Zoekopdracht", ...KOP], zk.map((x) => rij(x, `"${esc(x.naam)}"`)), (n) => isWeg(zk[n]) ? "weg" : "") : `<p class="zacht">Geen zoekopdrachten.</p>`);
+  const pr = d.producten, pweg = pr.filter(isWeg);
+  h += `<h3 style="margin:18px 0 6px">Producten <span class="zacht" style="font-weight:400;font-size:13px">(afgelopen 30 dagen, ${pr.length} totaal · rood: kostte geld zonder verkoop, samen ${eu2(pweg.reduce((s, x) => s + x.kosten, 0))})</span></h3>` + (pr.length ? abTabel("prod", ["Product", ...KOP], pr.map((x) => rij(x, esc(x.naam))), (n) => isWeg(pr[n]) ? "weg" : "") : `<p class="zacht">Geen Shopping-producten.</p>`);
+  h += `<h3 style="margin:18px 0 6px">Weekanalyse</h3>` + (d.acties.length ? d.acties.map((a) => `<p style="margin:6px 0"><span class="zacht">${new Date(a.week).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })} · ${esc(a.status)}</span> · <b>${esc(a.tekst)}</b>${a.waarom ? `<br><span class="zacht">${esc(a.waarom)}</span>` : ""}</p>`).join("") : `<p class="zacht">Nog geen analyses.</p>`);
+  h += `<p class="zacht" style="font-size:12.5px;margin-top:12px">Klik op een kolomkop om te sorteren. Bijgewerkt: ${d.laatst ? new Date(d.laatst).toLocaleString("nl-NL") : "nog niet"}.</p>`;
+  $("#abinhoud").innerHTML = h;
+  document.querySelectorAll(".ab-tabel th").forEach((th) => th.onclick = () => {
+    const tb = th.closest("table").tBodies[0], k = +th.dataset.kol, op = th.dataset.op !== "1";
+    th.closest("tr").querySelectorAll("th").forEach((x) => delete x.dataset.op); if (op) th.dataset.op = "1";
+    [...tb.rows].sort((a, b) => { const x = a.cells[k].dataset.w, y = b.cells[k].dataset.w; const nx = parseFloat(x), ny = parseFloat(y);
+      return (isNaN(nx) || isNaN(ny) ? String(x).localeCompare(String(y)) : nx - ny) * (op ? -1 : 1); }).forEach((r) => tb.append(r));
+  });
+  $("#abcsv").onclick = () => {
+    const regels = [["Soort", "Naam", "Kosten", "Klikken", "Vertoningen", "Conversies", "Omzet"]];
+    const zet = (soort, x, naam) => regels.push([soort, naam, x.kosten.toFixed(2).replace(".", ","), x.klikken, x.vertoningen ?? "", String(x.conversies).replace(".", ","), x.waarde.toFixed(2).replace(".", ",")]);
+    d.campagnes.forEach((c) => zet("Campagne", c, c.campagne)); d.dagen.forEach((x) => zet("Dag", x, x.datum));
+    zk.forEach((x) => zet("Zoekopdracht (30 dagen)", x, x.naam)); pr.forEach((x) => zet("Product (30 dagen)", x, x.naam));
+    const csv = "﻿" + regels.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(";")).join("\r\n");
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    a.download = `advertenties-${klant}-${d.van}-${d.tot}.csv`; a.click();
+  };
 }
 laad();
 </script>
