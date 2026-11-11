@@ -725,6 +725,8 @@ async function vbVoorstellen(houder, klantId, el) {
       ${v.status === "handmatig" ? `<div class="rij" style="margin-top:10px"><button class="knop rand klein" data-vs-kopie>Kopiëren</button>${IS_BEHEER ? `<button class="knop rand klein" data-vs-klaar>Staat erop</button>` : ""}</div>` : ""}
       <div data-vs-meld></div></div>`;
   };
+  const isLopend = (v) => ["nieuw", "goedgekeurd", "handmatig"].includes(v.status);
+  const lopend = d.voorstellen.filter(isLopend), afgerond = d.voorstellen.filter((v) => !isLopend(v));
   houder.innerHTML = `<div class="kaart"><div class="rij"><h2 class="vul" style="margin:0"><span class="tag">&gt;_</span>Verbetervoorstellen</h2>
       <button class="knop ${d.voorstellen.length ? "rand " : ""}klein" data-vs-maak>${d.voorstellen.length ? "Nieuwe voorstellen maken" : "Maak voorstellen"}</button></div>
     <p class="zacht vb-klein" style="margin:6px 0 0">Sitehulpje stelt betere teksten voor op basis van de website-check. Er verandert niets op je site zonder jouw goedkeuring.${d.automatisch ? " Na goedkeuren voert Sitehulpje het meteen uit; terugdraaien kan altijd via Verzoeken." : ""}</p>
@@ -733,7 +735,8 @@ async function vbVoorstellen(houder, klantId, el) {
       <b>Je maand zit vol.</b> <span class="vb-klein">Met ${VB_VOLGEND[d.pakket][0]} verbetert Sitehulpje elke maand ${VB_VOLGEND[d.pakket][1]} pagina's in plaats van ${d.per_maand}, voor €${VB_VOLGEND[d.pakket][2]} per maand. Het gaat meteen in.</span>
       <div style="margin-top:8px"><button class="knop klein" data-vs-upgrade="${VB_VOLGEND[d.pakket][3]}">Overstappen naar ${VB_VOLGEND[d.pakket][0]}</button></div><div data-vs-upmeld></div></div>` : ""}
     <div data-vs-maakmeld></div></div>
-    ${d.voorstellen.length ? `<div class="kaart">${d.voorstellen.map(kaart).join("")}</div>` : ""}`;
+    ${lopend.length ? `<div class="kaart">${lopend.map(kaart).join("")}</div>` : ""}
+    ${afgerond.length ? `<details class="kaart"><summary style="cursor:pointer"><b>Afgerond (${afgerond.length})</b> <span class="zacht vb-klein">· een aangepaste pagina laten we ${Math.round((d.rust_dagen || 56) / 7)} weken met rust, zodat Google de nieuwe tekst kan oppakken</span></summary>${afgerond.map(kaart).join("")}</details>` : ""}`;
 
   const up = houder.querySelector("[data-vs-upgrade]");
   if (up) up.onclick = async () => {
@@ -768,7 +771,7 @@ async function vbVoorstellen(houder, klantId, el) {
   const maak = houder.querySelector("[data-vs-maak]");
   maak.onclick = async () => {
     maak.disabled = true; maak.textContent = "Voorstellen maken… (± 1 minuut)";
-    try { const r = await vbVsApi("maak", { klant_id: klantId }); toonMelding(houder.querySelector("[data-vs-maakmeld]"), r.vol ? "Je hebt het aantal pagina's voor deze maand bereikt. Volgende maand komen er nieuwe voorstellen." : r.nieuw ? `${r.nieuw} nieuwe voorstellen.` : "Geen nieuwe voorstellen: alles wat de check vond, staat al in de lijst of is in orde.", "ok"); setTimeout(() => vbVoorstellen(houder, klantId, el), 1200); }
+    try { const r = await vbVsApi("maak", { klant_id: klantId }); toonMelding(houder.querySelector("[data-vs-maakmeld]"), r.vol ? "Je hebt het aantal pagina's voor deze maand bereikt. Volgende maand komen er nieuwe voorstellen." : r.nieuw ? `${r.nieuw} nieuwe voorstellen.` : (r.rust ? `Geen nieuwe voorstellen. ${r.rust === 1 ? "1 pagina is" : r.rust + " pagina's zijn"} net aangepast; die laten we even met rust zodat Google de nieuwe tekst kan oppakken.` : "Geen nieuwe voorstellen: alles wat de check vond, staat al in de lijst of is in orde."), "ok"); setTimeout(() => vbVoorstellen(houder, klantId, el), 1200); }
     catch (e) { toonMelding(houder.querySelector("[data-vs-maakmeld]"), e.message); maak.disabled = false; maak.textContent = "Maak voorstellen"; }
   };
 }
