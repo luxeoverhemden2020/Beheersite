@@ -103,6 +103,8 @@ body{background:var(--bg)}
   <div id="vbpromo" data-kp="promo"></div>
   <div id="kprapport" data-kp="gezondheid"></div>
   <div id="reviewvraag2" data-kp="reviews"></div>
+  <div id="kpconc" data-kp="concurrenten"></div>
+  <div id="kpaivm" data-kp="ai"></div>
   <div id="vindbaarheid" data-kp="VBALLE"></div>
   <div id="verzoekenDeel" data-kp="verzoeken">
 
@@ -314,6 +316,7 @@ const KP_TITEL = {
   overzicht: ["Overzicht", ""],
   zoekwoorden: ["Waar zoeken mensen op?", "Dit zijn woorden die mensen in Google typten, waarna jouw website in de resultaten verscheen. Op pagina 1 zien de meeste mensen je."],
   maps: ["Google Maps", "Hoe vaak je bedrijf in Google Maps verscheen en wat mensen daarna deden. Dit komt van je Google Bedrijfsprofiel: het kaartje met je adres, openingstijden en reviews."],
+  concurrenten: ["Je concurrenten", "Elke week vergelijken we jouw website met die van je concurrenten. Zo zie je waar jij voor staat en waar zij beter zijn."],
   ai: ["ChatGPT en andere AI", "Steeds meer mensen vragen ChatGPT, Gemini of Copilot om een bedrijf aan te raden. Hier zie je hoeveel mensen zo op je website kwamen."],
   gezondheid: ["Werkt alles goed?", "Wij controleren je website elke week: gaat hij snel open, werkt hij op de telefoon, kloppen de links en kan Google alles lezen."],
   voorstellen: ["Klaar om goed te keuren", "Wij hebben verbeteringen voor je website klaargezet. Keur ze goed en wij zetten ze op je site. Niets gebeurt zonder jouw akkoord."],
@@ -344,7 +347,7 @@ function kpMenu(vb) {
   KP_MENU = vb ? [
     ["verzoeken", "Iets laten aanpassen", []], ["-"],
     ["overzicht", "Overzicht", []],
-    ["gevonden", "Gevonden worden", [["zoekwoorden", "In Google zoeken"], ["maps", "Google Maps"], ["ai", "ChatGPT en andere AI"]]],
+    ["gevonden", "Gevonden worden", [["zoekwoorden", "In Google zoeken"], ["maps", "Google Maps"], ["ai", "ChatGPT en andere AI"], ["concurrenten", "Je concurrenten"]]],
     ["website", "Je website", [["gezondheid", "Werkt alles goed?"], ["voorstellen", "Klaar om goed te keuren"], ["paginas", "Meest bekeken pagina's"]]],
     ["klanten", "Klanten", [["reviews", "Reviews"], ["acties", "Telefoontjes en routes"]]],
     ["rapporten", "Rapporten", []], ["-"],
@@ -388,11 +391,50 @@ function kpNaar(p) {
   kpTekenMenu(); kpDicht();
   const vbPagina = kpHeeftVb && !["verzoeken", "abonnement", "promo"].includes(p);
   if (p === "verzoeken" || p === "reviews") kpReviewVraag(p === "reviews" ? $("#reviewvraag2") : $("#reviewvraag"));
+  if (p === "concurrenten" || p === "ai") kpVolg();
   if (p === "gezondheid" && !kpRapportGeladen) { kpRapportGeladen = true; kpRapport(); }
   if (vbPagina && !kpVbGeladen) { kpVbGeladen = true; kpLaadVb(); }
   kpAutoBlok(p);
   try { history.replaceState(null, "", location.pathname + location.search + (p === "verzoeken" ? "" : "#" + p)); } catch {}
   scrollTo(0, 0);
+}
+// ---------- concurrenten volgen en "noemt AI jou?" (Pro) ----------
+let kpVolgData = null;
+async function kpVolg(actie, extra) {
+  const VG = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-volg";
+  const roep = async (data) => { const x = await fetch(VG, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify(data) }); const d = await x.json().catch(() => ({})); if (!x.ok) throw new Error(d.fout || "Dat lukte niet."); return d; };
+  const conc = $("#kpconc"), aiv = $("#kpaivm");
+  if (!actie && kpVolgData) return;
+  try { kpVolgData = await roep({ actie: actie || "lijst", ...(extra || {}) }); } catch (e) { conc.innerHTML = aiv.innerHTML = `<div class="kaart"><p class="zacht" style="margin:0">${esc(e.message)}</p></div>`; return; }
+  const d = kpVolgData, pro = d.pakket === "pro", dat = (x) => new Date(x).toLocaleDateString("nl-NL", { day: "numeric", month: "short" });
+  const proNodig = (wat) => `<div class="kaart"><h2 style="margin-top:0">${wat}</h2><p class="zacht" style="margin:0 0 10px">Dit zit in het Pro-pakket. Wil je het ook? Dan zetten we het voor je aan.</p><button class="knop rand klein" type="button" onclick="kpNaar('abonnement')">Bekijk je abonnement</button></div>`;
+  // concurrenten
+  if (!pro) conc.innerHTML = proNodig("🥊 Je concurrenten gevolgd");
+  else {
+    const laatst = {}; d.metingen.forEach((m) => { const host = (m.site2 || "").replace(/^https?:\/\/(www\.)?/, ""); laatst[host] = m; });
+    const per = Object.entries(laatst).filter(([hst]) => d.concurrenten.includes(hst));
+    conc.innerHTML = `<div class="kaart"><h2 style="margin-top:0">🥊 Wie volg je?</h2><p class="zacht" style="margin-top:0">Vul tot 3 websites van concurrenten in. Elke maandag meten we ze opnieuw.</p>
+      <form id="vgform" class="rij" style="flex-wrap:wrap;gap:8px">${[0, 1, 2].map((n) => `<input name="s${n}" value="${esc(d.concurrenten[n] || "")}" placeholder="concurrent${n + 1}.nl" style="flex:1;min-width:160px">`).join("")}<button class="knop" type="submit">Opslaan</button></form><p class="zacht" id="vgmeld" style="margin:6px 0 0"></p></div>
+      ${per.map(([hst, m]) => { const rijen = m.rijen || [], wint = rijen.filter((r) => r.jij != null && r.zij != null && r.jij >= r.zij).length, tel = rijen.filter((r) => r.jij != null && r.zij != null).length;
+        return `<div class="kaart"><div class="rij"><h3 class="vul" style="margin:0">Jij tegen ${esc(hst)}</h3><span class="zacht" style="font-size:13px">gemeten ${dat(m.aangemaakt)}</span></div>
+        <p style="margin:6px 0 12px"><b>${wint > tel / 2 ? `Je wint op ${wint} van de ${tel} onderdelen` : `${esc(hst)} wint op ${tel - wint} van de ${tel} onderdelen`}</b></p>
+        ${rijen.map((r) => `<div style="margin:8px 0"><div class="rij" style="font-size:14px"><span class="vul">${esc(r.naam)}</span><span class="zacht">jij ${r.jij ?? "–"} · zij ${r.zij ?? "–"}</span></div>
+          <div style="display:grid;gap:3px;margin-top:4px"><i style="display:block;height:7px;border-radius:9px;background:var(--accent);width:${Math.max(2, r.jij || 0)}%"></i><i style="display:block;height:7px;border-radius:9px;background:#94a3b8;width:${Math.max(2, r.zij || 0)}%"></i></div></div>`).join("")}</div>`; }).join("")}
+      ${d.concurrenten.length && !per.length ? `<div class="kaart"><p class="zacht" style="margin:0">De eerste meting loopt. Kijk over een paar minuten nog eens.</p></div>` : ""}`;
+    const f = $("#vgform");
+    f.onsubmit = async (e) => { e.preventDefault(); $("#vgmeld").textContent = "Opslaan en meten… dit duurt een minuutje."; f.querySelector("button").disabled = true; await kpVolg("zet", { sites: [f.s0.value, f.s1.value, f.s2.value] }); };
+  }
+  // AI
+  if (!pro) aiv.innerHTML = proNodig("🤖 Noemt AI jou?");
+  else {
+    const l = d.ai[d.ai.length - 1];
+    aiv.innerHTML = `<div class="kaart"><h2 style="margin-top:0">🤖 Noemt AI jou?</h2><p class="zacht" style="margin-top:0">Elke week vragen we AI, net als je klanten doen, om een bedrijf aan te raden voor jouw zoekwoorden.</p>
+      ${l ? `<p style="font-size:20px;margin:6px 0 4px"><b>Je werd ${l.genoemd} van de ${l.totaal} keer genoemd.</b></p>
+      ${d.ai.length > 1 ? `<p class="zacht" style="margin:0 0 10px">Verloop: ${d.ai.slice(-8).map((x) => `${dat(x.datum)}: ${x.genoemd}/${x.totaal}`).join(" · ")}</p>` : ""}
+      ${l.antwoorden.map((a) => `<div class="rp-tool"><div class="rp-toolkop"><b>${esc(a.vraag)}</b><span class="rp-door ${a.genoemd ? "sh" : "vb"}">${a.genoemd ? `✓ Genoemd${a.plek ? " (plek " + a.plek + ")" : ""}` : "✗ Niet genoemd"}</span></div>
+        <p class="zacht" style="margin:0">AI raadt aan: ${a.bedrijven.map((b) => esc(b.naam)).join(", ") || "–"}</p></div>`).join("")}
+      <p class="zacht" style="font-size:13px;margin:10px 0 0">Gemeten op ${dat(l.datum)}.</p>` : `<p class="zacht" style="margin:0">De eerste meting volgt maandag.</p>`}</div>`;
+  }
 }
 // ---------- klanten om een Google-review vragen ----------
 async function kpReviewVraag(el) {
