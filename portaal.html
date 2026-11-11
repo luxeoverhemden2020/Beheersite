@@ -142,6 +142,25 @@ body[data-pagina="advertenties"] #kpads{display:flex}
   .kp-tegels,.kp-twee{grid-template-columns:1fr}
   .kp-held h2{font-size:23px}.kp-tegel b{font-size:34px}
 }
+.kpz-houder{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;display:flex;flex-direction:column;gap:14px}
+.kpz-houder>h2,.kpz-houder>.tag{display:none}
+.kpz-chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.kpz-chip{flex:none;white-space:nowrap;font:inherit;font-size:13px;font-weight:600;padding:7px 12px;border-radius:999px;border:1px solid var(--lijn);background:#fff;color:#43546e;cursor:pointer}
+.kpz-chip.aan{background:#0b1626;color:#fff;border-color:#0b1626}
+.kpz-groep{display:flex;flex-direction:column;gap:14px;margin:0!important;padding:18px 20px!important}
+.kpz-kop{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center}
+.kpz-titel{display:flex;gap:12px;align-items:center;flex:1 1 240px;min-width:0}.kpz-titel b{display:block;font-size:17px}.kpz-titel .zacht{font-size:13.5px}
+.kpz-ic{width:42px;height:42px;border-radius:12px;background:#e3fcf6;display:grid;place-items:center;font-size:20px;flex:none}
+.kpz-balk{display:flex;flex-direction:column;gap:4px;min-width:160px;flex:1}
+.kpz-spoor{position:relative;height:8px;border-radius:99px;background:linear-gradient(90deg,#bff3e8 0 10%,#e2ecf8 10% 20%,#eef3f9 20%)}
+.kpz-spoor span{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;transform:translate(-50%,-50%);background:#fff;border:3px solid #3b82f6;box-sizing:border-box}
+.kpz-as{position:relative;height:14px;font-size:11px;color:#7f93af}.kpz-as span{position:absolute}.kpz-as span:nth-child(1){left:0}.kpz-as span:nth-child(2){left:50%;transform:translateX(-50%)}.kpz-as span:nth-child(3){right:0}
+.kpz-kans{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;background:#fff8e6;border:1px solid #f5e0a8;font-size:14px;flex-wrap:wrap}.kpz-kans span{flex:1 1 220px}
+.kpz-rij{display:grid;grid-template-columns:1fr auto 64px 52px;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #eef3f9;font-size:14.5px}.kpz-rij>span:nth-child(n+3){text-align:right}
+.kpz-hoofd{border-top:0;padding:0 0 6px;font-family:"JetBrains Mono",monospace;font-size:11.5px;color:#7f93af}
+.kpz-pl{font-style:normal;font-size:11.5px;padding:3px 8px;border-radius:999px;background:#eef3f9;color:#43546e}
+.kpz-meer{align-self:flex-start;background:none;border:0;padding:0;font:inherit;font-size:14px;font-weight:600;color:#0b9f8a;cursor:pointer}
+@media (max-width:560px){.kpz-rij{grid-template-columns:1fr 52px 44px;font-size:14px}.kpz-rij>span:nth-child(2){display:none}}
 </style>
 <style>
 /* ===== Siteregelaar-stijl (Design-canvas) voor het hele portaal ===== */
@@ -412,7 +431,7 @@ const KP_TITEL = {
   advertenties: ["Advertenties", "Wat je advertenties in Google kostten en opleverden, en wat wij ervoor doen."],
   verzoeken: ["Iets laten aanpassen", ""],
   overzicht: ["Overzicht", ""],
-  zoekwoorden: ["Waar zoeken mensen op?", "Dit zijn woorden die mensen in Google typten, waarna jouw website in de resultaten verscheen. Op pagina 1 zien de meeste mensen je."],
+  zoekwoorden: ["Waar zoeken mensen op?", "Dit zijn woorden die mensen in Google typten, waarna jouw website in de resultaten verscheen. Ze staan per onderwerp bij elkaar. Het bolletje laat zien op welke pagina van Google je staat: hoe meer naar links, hoe beter. Op pagina 1 zien de meeste mensen je."],
   maps: ["Google Maps", "Hoe vaak je bedrijf in Google Maps verscheen en wat mensen daarna deden. Dit komt van je Google Bedrijfsprofiel: het kaartje met je adres, openingstijden en reviews."],
   concurrenten: ["Je concurrenten", "Elke week vergelijken we jouw website met die van je concurrenten. Zo zie je waar jij voor staat en waar zij beter zijn."],
   ai: ["ChatGPT en andere AI", "Steeds meer mensen vragen ChatGPT, Gemini of Copilot om een bedrijf aan te raden. Hier zie je hoeveel mensen zo op je website kwamen."],
@@ -889,15 +908,49 @@ function kpTodo() {
     : `<p class="zacht" style="margin:0">Je hoeft nu niets te doen. Wij houden alles in de gaten en laten het weten als er iets is.</p>`;
 }
 function kpZoekwoorden(d) {
+  // zoekwoorden per onderwerp, met plaatsfilter en een balkje dat laat zien op welke pagina van Google je staat
   const el = $('#vbdash [data-vb-blok="zoektabel"]'); if (!el) return;
-  const max = vbPakket(d.klant.pakket).zoekwoorden;
-  const rij = (z) => `<tr><td>${esc(z.sleutel)}</td><td class="r mono">${kpPag(z.positie)}</td><td class="r mono">${vbGetal(z.vertoningen)}</td><td class="r mono">${vbGetal(z.klikken)}</td></tr>`;
-  const teken = (q) => { const l = (q ? d.zoekwoorden.filter((z) => z.sleutel.toLowerCase().includes(q)) : d.zoekwoorden).slice(0, max);
-    el.querySelector("[data-kpz]").innerHTML = l.length ? `<div class="vb-tabelwrap"><table class="vb-tabel"><thead><tr><th>Waar mensen op zochten</th><th class="r">Pagina in Google</th><th class="r">Keer gezien</th><th class="r">Doorgeklikt</th></tr></thead><tbody>${l.map(rij).join("")}</tbody></table></div>` : `<p class="zacht">Nog geen zoekwoorden in deze periode.</p>`; };
-  el.innerHTML = `<input type="search" placeholder="Zoek een woord…" style="margin-bottom:10px"><div data-kpz></div>
-    <p class="zacht vb-klein" style="margin-bottom:0">Pagina 1 is bovenaan in Google. Google laat niet álle zoekwoorden zien, om de privacy van mensen te beschermen.${d.zoekwoorden.length > max ? ` Je pakket laat de beste ${max} zien.` : ""}</p>`;
-  el.querySelector("input").oninput = (e) => teken(e.target.value.trim().toLowerCase());
-  teken("");
+  const max = vbPakket(d.klant.pakket).zoekwoorden, zw = (d.zoekwoorden || []).slice(0, max);
+  if (!zw.length) { el.innerHTML = `<p class="zacht" style="margin:0">Nog geen zoekwoorden in de afgelopen 4 weken. Zodra Google je website laat zien, verschijnen ze hier.</p>`; return; }
+  el.classList.add("kpz-houder");
+  el.innerHTML = `<p class="zacht" style="margin:0">Zoekwoorden ordenen per onderwerp…</p>`;
+  let plaats = "", open = null;
+  const teken = (o) => {
+    const groepen = (o.groepen || []).map((g) => ({ ...g, rijen: [] })), overig = { naam: "Overige zoekwoorden", emoji: "🔹", rijen: [] };
+    zw.forEach((z) => { const [gi, pl] = o.woord?.[z.sleutel] || [-1, ""]; (groepen[gi] || overig).rijen.push({ ...z, plaats: pl || "" }); });
+    const alle = [...groepen, overig].filter((g) => g.rijen.length);
+    const telPl = {}; zw.forEach((z) => { const pl = o.woord?.[z.sleutel]?.[1] || ""; telPl[pl] = (telPl[pl] || 0) + 1; });
+    const pls = Object.entries(telPl).filter(([p]) => p).sort((x, y) => y[1] - x[1]);
+    const chip = (waarde, tekst) => `<button type="button" class="kpz-chip ${plaats === waarde ? "aan" : ""}" data-pl="${esc(waarde)}">${esc(tekst)}</button>`;
+    let h = pls.length ? `<div class="kpz-chips">${chip("", `Alle plaatsen · ${zw.length}`)}${pls.map(([p, n]) => chip(p, `${p} · ${n}`)).join("")}${telPl[""] ? chip("-", `Zonder plaatsnaam · ${telPl[""]}`) : ""}</div>` : "";
+    const zicht = alle.map((g) => ({ ...g, rijen: g.rijen.filter((r) => !plaats || (plaats === "-" ? !r.plaats : r.plaats === plaats)) })).filter((g) => g.rijen.length)
+      .sort((x, y) => y.rijen.reduce((s, r) => s + r.vertoningen, 0) - x.rijen.reduce((s, r) => s + r.vertoningen, 0));
+    if (open === null && zicht[0]) open = zicht[0].naam;
+    h += zicht.map((g) => {
+      const gezien = g.rijen.reduce((s, r) => s + r.vertoningen, 0), gem = g.rijen.reduce((s, r) => s + r.positie * r.vertoningen, 0) / (gezien || 1);
+      const beste = Math.min(...g.rijen.map((r) => r.positie)), links = Math.min(100, Math.max(0, ((gem - 1) / 99) * 100));
+      const lc = (t) => String(t || "").toLowerCase();
+      const art = (o.artikelen || []).find((a) => a.zoekwoord && g.rijen.some((r) => lc(r.sleutel).includes(lc(a.zoekwoord)) || lc(a.zoekwoord).includes(lc(r.sleutel))));
+      const bijna = [...g.rijen].filter((r) => r.positie > 7 && r.positie <= 20).sort((x, y) => y.vertoningen - x.vertoningen)[0];
+      const kans = art ? `<div class="kpz-kans"><span>💡 <b>Kans:</b> mensen zoeken op <b>${esc(art.zoekwoord)}</b>, maar je website heeft daar nog geen eigen pagina over. Wij hebben er een voor je geschreven.</span><button class="knop klein" type="button" onclick="kpNaar('voorstellen')">Pagina lezen</button></div>`
+        : bijna ? `<div class="kpz-kans"><span>💡 <b>Kans:</b> met <b>${esc(bijna.sleutel)}</b> sta je net buiten pagina 1. Met een betere tekst op die pagina kom je daar sneller.</span></div>` : "";
+      const isOpen = open === g.naam;
+      return `<div class="kaart kpz-groep">
+        <div class="kpz-kop"><div class="kpz-titel"><span class="kpz-ic">${esc(g.emoji)}</span><div><b>${esc(g.naam)}</b><span class="zacht">${g.rijen.length} zoekwoord${g.rijen.length === 1 ? "" : "en"} · ${vbGetal(gezien)} keer gezien · beste plek: pagina ${kpPag(beste)}</span></div></div>
+          <div class="kpz-balk"><div class="kpz-spoor"><span style="left:${links.toFixed(1)}%" title="Gemiddeld pagina ${kpPag(gem)}"></span></div><div class="kpz-as"><span>bovenaan</span><span>pagina 5</span><span>pagina 10</span></div></div></div>
+        ${kans}
+        ${isOpen ? `<div class="kpz-lijst"><div class="kpz-rij kpz-hoofd"><span>waar mensen op zochten</span><span>plaats</span><span>pagina</span><span>gezien</span></div>
+          ${g.rijen.map((r) => `<div class="kpz-rij"><span>${esc(r.sleutel)}</span><span>${r.plaats ? `<i class="kpz-pl">${esc(r.plaats)}</i>` : ""}</span><span class="mono">${kpPag(r.positie)}</span><span class="mono zacht">${vbGetal(r.vertoningen)}×</span></div>`).join("")}</div>
+          <button type="button" class="kpz-meer" data-groep="${esc(g.naam)}">▾ Inklappen</button>`
+        : `<button type="button" class="kpz-meer" data-groep="${esc(g.naam)}">▸ Laat zien (${g.rijen.length})</button>`}</div>`;
+    }).join("");
+    h += `<p class="zacht vb-klein">Google laat niet álle zoekwoorden zien, om de privacy van mensen te beschermen. Cijfers van de afgelopen 4 weken, elke nacht bijgewerkt.${(d.zoekwoorden || []).length > max ? ` Je pakket laat de beste ${max} zien.` : ""}</p>`;
+    el.innerHTML = h;
+    el.querySelectorAll("[data-pl]").forEach((b) => (b.onclick = () => { plaats = b.dataset.pl; open = null; teken(o); }));
+    el.querySelectorAll("[data-groep]").forEach((b) => (b.onclick = () => { open = open === b.dataset.groep ? "" : b.dataset.groep; teken(o); }));
+  };
+  fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-volg", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify({ actie: "onderwerpen" }) })
+    .then((r) => r.json()).then((o) => teken(o && o.groepen ? o : {})).catch(() => teken({}));
 }
 function kpActies(d) {
   const c = kpCijfers(d), el = $("#kpacties");
