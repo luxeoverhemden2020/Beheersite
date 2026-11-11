@@ -684,7 +684,7 @@ async function vbVsApi(actie, data = {}) {
   if (!r.ok) throw new Error(d.fout || "Er ging iets mis.");
   return d;
 }
-const VB_VS_SOORT = { titel_omschrijving: "Titel en omschrijving in Google", alt: "Beschrijvingen bij afbeeldingen", llms: "Uitleg voor AI-diensten (llms.txt)", schema: "Bedrijfsgegevens voor Google (LocalBusiness)" };
+const VB_VS_SOORT = { nieuwe_pagina: "Kans: een nieuwe pagina", titel_omschrijving: "Titel en omschrijving in Google", alt: "Beschrijvingen bij afbeeldingen", llms: "Uitleg voor AI-diensten (llms.txt)", schema: "Bedrijfsgegevens voor Google (LocalBusiness)" };
 const VB_VS_STATUS = { nieuw: ["Wacht op jou", "vb-let"], goedgekeurd: ["Wordt uitgevoerd", "vb-op"], uitgevoerd: ["Uitgevoerd", "vb-op"], handmatig: ["Goedgekeurd · Jan zet het erop", "vb-op"], geweigerd: ["Niet gedaan", "vb-gelijk"] };
 function vbTeller(n, max) { return `<span class="${n > max ? "vb-af" : "vb-gelijk"} vb-klein">${n} tekens</span>`; }
 
@@ -712,13 +712,18 @@ async function vbVoorstellen(houder, klantId, el) {
       inhoud = `<ul class="vb-vb">${v.voorstel.afbeeldingen.map((a) => `<li><span class="zacht">${esc(a.src.split("/").pop().slice(0, 60))}</span> → <b>${esc(a.alt)}</b></li>`).join("")}</ul>`;
     } else if (v.soort === "llms") {
       inhoud = `<pre class="vb-pre">${esc(v.voorstel.tekst)}</pre>`;
+    } else if (v.soort === "nieuwe_pagina") {
+      inhoud = `<div class="vb-vs-kop">Voorstel voor een nieuwe pagina op je site</div>
+        <div class="vb-vs-titel">${esc(v.voorstel.titel)}</div><div class="zacht vb-klein">${esc(v.voorstel.pad)}</div>
+        <div class="vb-vs-oms">${esc(v.voorstel.omschrijving)}</div>
+        ${(v.voorstel.opzet || []).length ? `<div class="vb-vs-kop" style="margin-top:8px">Wat erop komt</div><ul class="vb-vb">${v.voorstel.opzet.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>` : ""}`;
     } else if (v.soort === "schema") {
       inhoud = `<pre class="vb-pre">${esc(JSON.stringify(v.voorstel.jsonld, null, 2))}</pre>`;
     }
-    const handmatig = v.soort === "llms" || v.soort === "schema" || !d.automatisch;
+    const handmatig = v.soort === "llms" || v.soort === "schema" || v.soort === "nieuwe_pagina" || !d.automatisch;
     return `<div class="vb-voorstel" data-vs="${v.id}">
       <div class="rij" style="gap:8px"><b class="vul">${VB_VS_SOORT[v.soort] || v.soort}</b><span class="${kl} vb-klein">${st}${v.verzoek_nr ? ` · verzoek #${v.verzoek_nr}` : ""}</span></div>
-      <div class="zacht vb-klein" style="margin:2px 0 8px"><a href="${esc(v.pagina)}" target="_blank" rel="noopener">${esc(pad)}</a>${v.uitleg ? " · " + esc(v.uitleg) : ""}</div>
+      <div class="zacht vb-klein" style="margin:2px 0 8px">${v.soort === "nieuwe_pagina" ? "Gezien bij " : ""}<a href="${esc(v.pagina)}" target="_blank" rel="noopener">${esc(v.soort === "nieuwe_pagina" ? (v.huidig?.concurrent || "") + pad : pad)}</a>${v.uitleg ? " · " + esc(v.uitleg) : ""}</div>
       ${inhoud}
       ${v.status === "nieuw" ? `<div class="rij" style="margin-top:10px"><button class="knop klein" data-vs-ja>${handmatig ? "Goedkeuren" : "Goedkeuren en uitvoeren"}</button><button class="knop rand klein" data-vs-nee>Niet doen</button>
         ${handmatig && v.soort !== "titel_omschrijving" ? `<button class="knop rand klein" data-vs-kopie>Kopiëren</button>` : ""}</div>` : ""}
@@ -745,6 +750,7 @@ async function vbVoorstellen(houder, klantId, el) {
     catch (e) { toonMelding(houder.querySelector("[data-vs-upmeld]"), e.message); up.disabled = false; }
   };
   const tekst = (v) => v.soort === "llms" ? v.voorstel.tekst : v.soort === "schema" ? `<script type="application/ld+json">\n${JSON.stringify(v.voorstel.jsonld, null, 2)}\n</script>` :
+    v.soort === "nieuwe_pagina" ? `Nieuwe pagina: ${v.voorstel.pad}\nTitel: ${v.voorstel.titel}\nOmschrijving: ${v.voorstel.omschrijving}\nWat erop komt:\n${(v.voorstel.opzet || []).map((p) => "- " + p).join("\n")}` :
     v.soort === "alt" ? v.voorstel.afbeeldingen.map((a) => `${a.src}\t${a.alt}`).join("\n") : `Titel: ${v.voorstel.titel}\nOmschrijving: ${v.voorstel.omschrijving}`;
   houder.querySelectorAll("[data-vs]").forEach((blok) => {
     const v = d.voorstellen.find((x) => String(x.id) === blok.dataset.vs);
