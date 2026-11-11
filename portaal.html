@@ -111,6 +111,22 @@ body[data-pagina="advertenties"] #kpads{display:flex}
 .ad-veld{display:flex;flex-direction:column;gap:6px;font-size:13.5px;color:var(--zacht)}
 .ad-veld input,.ad-veld textarea{font:inherit;font-size:15px;padding:12px 14px;color:var(--tekst)}
 .ad-binnen{border-left:4px solid #22e3c4}
+.ad-advs{display:grid;align-items:start;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:14px}
+.ad-adv{border:1px solid var(--lijn);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;background:#fff}
+.ad-adv.uit{opacity:.5}
+.ad-adv-kop{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px}
+.ad-schakel{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--zacht);cursor:pointer}.ad-schakel input{accent-color:#0b9f8a;width:16px;height:16px;margin:0}
+.ad-google{display:flex;flex-direction:column;gap:4px;font-family:Arial,Helvetica,sans-serif;padding:12px 14px;border-radius:10px;background:var(--bel);min-height:110px}
+.ad-g-spons{font-size:12px;font-weight:700;color:#202124}.ad-g-url{font-size:13px;color:#202124}
+.ad-g-kop{font-size:18px;line-height:1.3;color:#1a0dab}.ad-g-tekst{font-size:14px;line-height:1.5;color:#4d5156}
+.ad-pas summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--accent)}
+.ad-pas[open]{display:flex;flex-direction:column;gap:8px}.ad-pas[open] summary{margin-bottom:2px}
+.ad-teller{font-size:12px;color:var(--zacht);justify-self:end}
+.ad-pas .ad-veld{display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:end}.ad-pas .ad-veld input,.ad-pas .ad-veld textarea{grid-column:1/-1}
+.ad-woorden{display:flex;flex-direction:column}
+.ad-woord{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--lijn);cursor:pointer;font-size:15px}.ad-woord:last-child{border-bottom:0}
+.ad-woord input{accent-color:#0b9f8a;width:18px;height:18px;margin:2px 0 0;flex:none}
+.ad-woord>span{display:flex;flex-direction:column;gap:2px}.ad-woord .zacht{font-size:13px}
 .ad-knoppen{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .ad-kies{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .ad-terug{background:none;border:0;padding:6px 0;font:600 14px "Inter",system-ui,sans-serif;color:var(--accent);cursor:pointer}
@@ -545,7 +561,7 @@ async function kpAds() {
   const kaart = (inh, extra = "") => `<section class="kaart ${extra}">${inh}</section>`;
   el.innerHTML = kaart(`<p class="zacht" style="margin:0">Even je cijfers ophalen…</p>`);
   let d;
-  const aanvP = adsStartApi({ actie: "status" }).then((x) => x.aanvraag).catch(() => null);
+  const aanvP = adsStartApi({ actie: "vstatus" }).then((x) => x.voorstel).catch(() => null);
   try { const x = await fetch(SR, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify({ actie: "overzicht" }) }); d = await x.json(); if (!x.ok) throw new Error(d.fout); }
   catch { el.innerHTML = kaart(`<p class="zacht" style="margin:0">De cijfers zijn nu even niet op te halen. Probeer het straks nog eens.</p>`); return; }
   const eu = (n, dec) => "€" + Number(n || 0).toLocaleString("nl-NL", { minimumFractionDigits: dec ?? (n % 1 && n < 100 ? 2 : 0), maximumFractionDigits: dec ?? (n < 100 ? 2 : 0) });
@@ -561,7 +577,7 @@ async function kpAds() {
         <span class="ad-vink">${VINK}<span>Wij maken de advertenties uit je eigen website</span></span>
         <span class="ad-vink">${VINK}<span>Elke week kijken wij waar geld verloren gaat en waar het meer kan opleveren</span></span>
         <span class="ad-vink">${VINK}<span>Er gaat niets live zonder jouw akkoord</span></span></div>
-      ${aanv ? "" : `<div class="ad-knoppen"><button type="button" class="knop" data-adstart>Ik wil advertenties</button><span class="ad-klein">Je vraagt eerst een voorstel aan. Er gaat niets aan zonder jouw akkoord.</span></div>`}`, "ad-held") + (aanv ? adAanvKaart(aanv) : "");
+      ${aanv ? "" : `<div class="ad-knoppen"><button type="button" class="knop" data-adstart>Maak mijn voorstel</button><span class="ad-klein">Je ziet direct je advertenties en het budget. Er gaat niets aan zonder jouw akkoord.</span></div>`}`, "ad-held") + (aanv ? adAanvKaart(aanv) : "");
     adStartKnoppen(el);
     return;
   }
@@ -592,11 +608,11 @@ async function kpAds() {
         <li><b>Jij zegt akkoord</b><span>Je ziet eerst wat het kost. Pas daarna gaat er iets live.</span></li>
         <li><b>Wij sturen elke week bij</b><span>Hier zie je wat het kostte, wat het opleverde en wat wij deden.</span></li></ol>`)
       + (aanv ? adAanvKaart(aanv) : kaart(`<h2>Advertenties starten?</h2>
-      <p class="zacht" style="font-size:15px;line-height:1.6;margin:0">Beantwoord twee korte vragen. Wij zetten alles voor je klaar en sturen je het voorstel.</p>
+      <p class="zacht" style="font-size:15px;line-height:1.6;margin:0">Wij maken direct een voorstel uit je eigen website en je Google-cijfers. Je kunt alles aanpassen.</p>
       <div class="ad-vinken">
         <span class="ad-vink">${VINK}<span>Er gaat niets live zonder jouw akkoord</span></span>
         <span class="ad-vink">${VINK}<span>Je budget gaat 1-op-1 naar Google</span></span></div>
-      <div class="ad-knoppen" style="margin-top:auto"><button type="button" class="knop" data-adstart>Vraag een voorstel aan</button></div>`)) + `</div>`
+      <div class="ad-knoppen" style="margin-top:auto"><button type="button" class="knop" data-adstart>Maak mijn voorstel</button></div>`)) + `</div>`
       + bijgewerkt;
     adStartKnoppen(el);
     return;
@@ -670,52 +686,86 @@ async function adsStartApi(data) {
   const d = await x.json().catch(() => ({})); if (!x.ok) throw new Error(d.fout || "Dat lukte niet. Probeer het nog eens."); return d;
 }
 function adStartKnoppen(el) { el.querySelectorAll("[data-adstart]").forEach((b) => (b.onclick = () => kpAdsStart())); }
-function adAanvKaart(a) {
-  const dag = new Date(a.aangemaakt).toLocaleDateString("nl-NL", { day: "numeric", month: "long" });
-  return `<section class="kaart ad-binnen"><span class="ad-mono">aangevraagd op ${dag}</span><h2>Je aanvraag is binnen</h2>
-    <p class="zacht" style="font-size:15px;line-height:1.6;margin:0">Wij maken je voorstel en laten het je weten. Er staat nog niets aan en het kost nog niets.</p>
-    <div>${[["Na een klik", AD_DOEL[a.doel] || a.doel], ["Budget per maand", a.budget ? "€" + Number(a.budget).toLocaleString("nl-NL") + " excl. btw" : "Weet ik nog niet"], ...(a.niet_adverteren ? [["Liever niet", esc(a.niet_adverteren)]] : [])].map(([k, v]) => `<div class="ad-rij"><span class="zacht">${k}</span><b>${v}</b></div>`).join("")}</div>
-    <div class="ad-knoppen"><button type="button" class="knop rand klein" data-adstart>Aanvraag aanpassen</button></div></section>`;
+function adAanvKaart(v) {
+  const ok = v.status === "akkoord", dag = (x) => new Date(x).toLocaleDateString("nl-NL", { day: "numeric", month: "long" });
+  const budget = v.keuzes?.budget !== undefined ? v.keuzes.budget : v.advies;
+  return `<section class="kaart ad-binnen"><span class="ad-mono">${ok ? "akkoord gegeven op " + dag(v.akkoord_op) : "gemaakt op " + dag(v.gemaakt)}</span>
+    <h2>${ok ? "Je akkoord is binnen" : "Je voorstel staat klaar"}</h2>
+    <p class="zacht" style="font-size:15px;line-height:1.6;margin:0">${ok ? "Wij zetten alles klaar en laten het je weten voordat het start. Er staat nog niets aan en je betaalt nog niets." : "Bekijk je advertenties, pas aan wat je wilt en geef akkoord. Er gaat niets live zonder jouw akkoord."}</p>
+    ${budget ? `<div class="ad-rij"><span class="zacht">Budget per maand</span><b>€${Number(budget).toLocaleString("nl-NL")} excl. btw</b></div>` : ""}
+    <div class="ad-knoppen"><button type="button" class="knop${ok ? " rand klein" : ""}" data-adstart>${ok ? "Bekijk je voorstel" : "Bekijk en geef akkoord"}</button></div></section>`;
 }
-function kpAdsStart() {
+const AD_KOP = 30, AD_TEKST = 90;
+async function kpAdsStart(opnieuw) {
   const el = $("#kpads");
   const kaart = (inh, extra = "") => `<section class="kaart ${extra}">${inh}</section>`;
-  const r = (naam, w, t, aan) => `<label class="ad-keuze"><input type="radio" name="${naam}" value="${w}"${aan ? " checked" : ""}>${t}</label>`;
-  el.innerHTML = `<div class="ad-kies"><button type="button" class="ad-terug" id="adterug">← Terug naar Advertenties</button></div>`
-    + kaart(`<span class="ad-mono">advertenties in Google</span><h1>Advertenties aanvragen</h1>
-      <p class="ad-uitleg">Nog twee vragen. Daarna maken wij een voorstel uit je eigen website. Pas na jouw akkoord gaat er iets live.</p>`, "ad-held")
-    + `<form id="adform" class="ad-twee" style="align-items:start">
-      <div style="display:flex;flex-direction:column;gap:16px">
-        ${kaart(`<h2>1. Wat moeten mensen doen na een klik?</h2><div class="ad-keuzes" role="radiogroup" aria-label="Doel">${r("doel", "kopen", "Online iets kopen", true)}${r("doel", "bellen", "Bellen of een aanvraag doen")}${r("doel", "winkel", "Langskomen in de winkel")}</div>`)}
-        ${kaart(`<h2>2. Hoeveel wil je per maand inzetten?</h2><div class="ad-keuzes rij3" role="radiogroup" aria-label="Budget">${r("budget", "100", "€100")}${r("budget", "250", "€250", true)}${r("budget", "500", "€500")}${r("budget", "", "Weet ik nog niet")}</div>
-          <p class="ad-klein">Bedragen zijn excl. btw. Je betaalt pas als je het voorstel goedkeurt. In het voorstel zie je ons advies voor jouw situatie.</p>`)}
-        <details class="kaart"><summary style="cursor:pointer;font-weight:700;font-size:15px">Liever iets niet adverteren? (niet nodig)</summary>
-          <label class="ad-veld" style="margin-top:10px">Bijvoorbeeld een merk of productgroep<input type="text" name="niet" maxlength="300" placeholder="Bijvoorbeeld: sale-artikelen"></label>
-          <label class="ad-veld" style="margin-top:10px">Nog iets dat wij moeten weten?<textarea name="opmerking" rows="3" maxlength="1000"></textarea></label></details>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:16px">
-        ${kaart(`<h2>Wat gebeurt er hierna?</h2><ol class="ad-stappen">
-          <li><b>Wij maken een voorstel</b><span>Advertenties uit je eigen website, met een voorbeeld van hoe je in Google komt te staan.</span></li>
-          <li><b>Jij zegt akkoord</b><span>Je ziet eerst wat het kost. Pas daarna gaat er iets live.</span></li>
-          <li><b>Wij sturen elke week bij</b><span>Hier zie je wat het kostte, wat het opleverde en wat wij deden.</span></li></ol>`)}
-        <div class="ad-knoppen"><button type="submit" class="knop groot">Vraag het voorstel aan</button></div>
-        <p class="ad-klein" id="admeld">Dit kost nog niets en zet nog niets aan.</p>
-      </div></form>`;
-  $("#adterug").onclick = () => { kpAds(); scrollTo(0, 0); };
-  $("#adform").onsubmit = async (e) => {
-    e.preventDefault();
-    const f = new FormData(e.target), knop = e.target.querySelector("[type=submit]");
-    knop.disabled = true; knop.textContent = "Even versturen…";
-    try {
-      await adsStartApi({ actie: "aanvraag", doel: f.get("doel"), budget: f.get("budget") || null, niet: f.get("niet"), opmerking: f.get("opmerking") });
-      el.innerHTML = kaart(`<span class="ad-mono">advertenties in Google</span><h1>Je aanvraag is binnen.</h1>
-        <p class="ad-uitleg">Wij maken je voorstel en laten het je weten. Er staat nog niets aan en het kost nog niets.</p>
-        <div class="ad-knoppen"><button type="button" class="knop" id="adterug2">Terug naar Advertenties</button></div>`, "ad-held");
-      $("#adterug2").onclick = () => { kpAds(); scrollTo(0, 0); };
-      scrollTo(0, 0);
-    } catch (err) { knop.disabled = false; knop.textContent = "Vraag het voorstel aan"; $("#admeld").textContent = err.message; $("#admeld").style.color = "var(--let, #b45309)"; }
+  const terug = `<div class="ad-kies"><button type="button" class="ad-terug" id="adterug">← Terug naar Advertenties</button></div>`;
+  const bindTerug = () => ($("#adterug").onclick = () => { kpAds(); scrollTo(0, 0); });
+  el.innerHTML = terug + kaart(`<span class="ad-mono">jouw voorstel</span><h1>Je voorstel wordt gemaakt…</h1><p class="ad-uitleg">Wij kijken naar je website en je Google-cijfers. Dit duurt een paar seconden.</p>`, "ad-held");
+  bindTerug(); scrollTo(0, 0);
+  let v;
+  try { v = (await adsStartApi({ actie: "voorstel", opnieuw: !!opnieuw })).voorstel; }
+  catch (e) { el.innerHTML = terug + kaart(`<p class="zacht" style="margin:0">${esc(e.message)}</p>`); bindTerug(); return; }
+  const d = v.data, k = { ...(v.keuzes || {}) }, ok = v.status === "akkoord", dis = ok ? " disabled" : "";
+  const eu = (n, dec = 0) => "€" + Number(n || 0).toLocaleString("nl-NL", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  const getal = (n) => Number(n || 0).toLocaleString("nl-NL");
+  let ads = (k.advertenties || d.advertenties || []).map((a) => ({ koppen: [...a.koppen, "", "", ""].slice(0, 3), tekst: a.tekst || "", aan: a.aan !== false }));
+  const uit = new Set(k.uit || []), doel = k.doel || d.doel, budget = k.budget !== undefined ? k.budget : d.advies;
+  const google = d.bron === "google";
+  const voorbeeld = (a) => `<span class="ad-g-spons">Gesponsord</span><span class="ad-g-url">${esc(d.voorbeeld?.weergave || d.site)}</span>
+    <span class="ad-g-kop">${esc(a.koppen.filter(Boolean).join(" | ") || "Je kop")}</span><span class="ad-g-tekst">${esc(a.tekst || "Je omschrijving")}</span>`;
+  const advKaart = (a, n) => `<div class="ad-adv${a.aan ? "" : " uit"}" data-adv="${n}">
+    <div class="ad-adv-kop"><b>Advertentie ${n + 1}</b><label class="ad-schakel"><input type="checkbox" data-aan${a.aan ? " checked" : ""}${dis}> gebruiken</label></div>
+    <div class="ad-google" data-vb>${voorbeeld(a)}</div>
+    ${ok ? "" : `<details class="ad-pas"><summary>Tekst aanpassen</summary>
+      ${a.koppen.map((x, i) => `<label class="ad-veld">Kop ${i + 1} <span class="ad-teller" data-tel>${x.length}/${AD_KOP}</span><input type="text" maxlength="${AD_KOP}" data-kop="${i}" value="${esc(x)}"></label>`).join("")}
+      <label class="ad-veld">Omschrijving <span class="ad-teller" data-tel>${a.tekst.length}/${AD_TEKST}</span><textarea rows="2" maxlength="${AD_TEKST}" data-tekst>${esc(a.tekst)}</textarea></label></details>`}</div>`;
+  const r = (naam, w, t, aan, extra = "") => `<label class="ad-keuze"><input type="radio" name="${naam}" value="${w}"${aan ? " checked" : ""}${dis}>${t}${extra}</label>`;
+  const shop = d.shopping || {};
+  el.innerHTML = terug
+    + kaart(`<div class="ad-kop"><div><span class="ad-mono">jouw voorstel · automatisch gemaakt</span><h1>${ok ? "Je akkoord is binnen." : "Zo komen je advertenties eruit te zien."}</h1></div>${ok ? `<span class="ad-pil ok">akkoord</span>` : `<span class="ad-pil grijs">nog niet live</span>`}</div>
+      <p class="ad-uitleg">${ok ? "Wij zetten alles klaar en laten het je weten voordat het start. Er staat nog niets aan en je betaalt nog niets." : "Gemaakt uit je eigen website en je Google-cijfers. Pas aan wat je wilt en geef akkoord. Pas daarna gaat er iets live."}</p>`, "ad-held")
+    + kaart(`<h2>Je advertenties</h2><p class="ad-klein">Google wisselt deze teksten af en laat vaker zien wat het beste werkt. Een kop mag ${AD_KOP} tekens hebben, een omschrijving ${AD_TEKST}.</p>
+      <div class="ad-advs">${ads.map(advKaart).join("")}</div>`)
+    + `<div class="ad-twee" style="align-items:start"><div style="display:flex;flex-direction:column;gap:16px">
+      ${kaart(`<h2>Wat moeten mensen doen na een klik?</h2><div class="ad-keuzes" role="radiogroup" aria-label="Doel">${Object.entries(AD_DOEL).map(([w, t]) => r("doel", w, t, w === doel)).join("")}</div>`)}
+      ${kaart(`<h2>Budget per maand</h2><div class="ad-keuzes rij3" role="radiogroup" aria-label="Budget">${[100, 250, 500, 1000].map((b) => r("budget", b, eu(b), Number(budget) === b, b === d.advies ? ` <span class="ad-pil" style="margin-left:auto;padding:3px 8px;font-size:11.5px">ons advies</span>` : "")).join("")}</div>
+        <p class="ad-klein" id="adklik"></p>`)}
+      ${ok ? "" : `<details class="kaart"><summary style="cursor:pointer;font-weight:700;font-size:15px">Liever iets niet adverteren? (niet nodig)</summary>
+        <label class="ad-veld" style="margin-top:10px">Bijvoorbeeld een merk of productgroep<input type="text" maxlength="300" id="adniet" value="${esc(k.niet || "")}" placeholder="Bijvoorbeeld: sale-artikelen"></label>
+        <label class="ad-veld" style="margin-top:10px">Nog iets dat wij moeten weten?<textarea rows="3" maxlength="1000" id="adopm">${esc(k.opmerking || "")}</textarea></label></details>`}
+    </div><div style="display:flex;flex-direction:column;gap:16px">
+      ${kaart(`<h2>Zoekwoorden</h2><p class="ad-klein">Waar je advertentie bij verschijnt. ${google ? "Zoekopdrachten en klikprijs komen van Google." : "De klikprijs is een schatting."}</p>
+        <div class="ad-woorden">${(d.zoekwoorden || []).map((z) => `<label class="ad-woord"><input type="checkbox" value="${esc(z.term)}"${uit.has(z.term) ? "" : " checked"}${dis}><span><b>${esc(z.term)}</b><span class="zacht">${z.volume ? getal(z.volume) + " zoekopdrachten per maand" : getal(z.vertoningen) + " keer getoond in Google"}${z.cpc ? " · ongeveer " + eu(z.cpc, 2) + " per klik" : ""}</span></span></label>`).join("") || `<p class="zacht" style="margin:0">Nog geen zoekwoorden gevonden. Wij kiezen ze voor je.</p>`}</div>`)}
+      ${d.webshop && shop.gekoppeld !== null && shop.gekoppeld !== undefined ? kaart(`<h2>Google Shopping</h2><p class="zacht" style="font-size:15px;line-height:1.6;margin:0">${shop.gekoppeld ? "Je producten staan al in Google Merchant Center. Wij zetten ze ook in Google Shopping, met foto en prijs." : "Je producten staan nog niet in Google Merchant Center. Dat zetten wij voor je klaar, daarna komen ze ook in Google Shopping."}</p>`) : ""}
+      ${ok ? "" : `<div class="ad-knoppen"><button type="button" class="knop groot" id="adakkoord">Akkoord, zet het klaar</button></div>
+      <p class="ad-klein" id="admeld">Er gaat nog niets live en je betaalt nog niets. Wij zetten alles klaar en laten het je weten voordat het start.</p>
+      <button type="button" class="ad-terug" id="adopnieuw" style="align-self:flex-start">Opnieuw maken met de nieuwste cijfers</button>`}
+    </div></div>`;
+  bindTerug();
+  const klik = () => { const b = Number(el.querySelector("[name=budget]:checked")?.value || 0); $("#adklik").textContent = b && d.cpc_gem ? `Daarmee krijg je ongeveer ${getal(Math.round(b / d.cpc_gem))} klikken per maand (gemiddeld ${eu(d.cpc_gem, 2)} per klik${google ? ", volgens Google" : ", geschat"}). Bedragen zijn excl. btw.` : "Bedragen zijn excl. btw."; };
+  klik();
+  if (ok) return;
+  // keuzes bewaren (even wachten na typen)
+  let tijd;
+  const keuzes = () => ({ doel: el.querySelector("[name=doel]:checked")?.value, budget: Number(el.querySelector("[name=budget]:checked")?.value || 0) || null,
+    uit: [...el.querySelectorAll(".ad-woord input:not(:checked)")].map((x) => x.value), advertenties: ads, niet: $("#adniet").value, opmerking: $("#adopm").value });
+  const bewaar = () => { clearTimeout(tijd); tijd = setTimeout(() => adsStartApi({ actie: "keuzes", keuzes: keuzes() }).catch(() => {}), 700); };
+  el.querySelectorAll("[data-adv]").forEach((blok) => {
+    const n = Number(blok.dataset.adv), a = ads[n];
+    const teken = () => { blok.querySelector("[data-vb]").innerHTML = voorbeeld(a); blok.querySelectorAll("[data-tel]").forEach((t, i) => (t.textContent = (i < 3 ? a.koppen[i].length + "/" + AD_KOP : a.tekst.length + "/" + AD_TEKST))); };
+    blok.querySelectorAll("[data-kop]").forEach((inp) => (inp.oninput = () => { a.koppen[Number(inp.dataset.kop)] = inp.value; teken(); bewaar(); }));
+    blok.querySelector("[data-tekst]").oninput = (e) => { a.tekst = e.target.value; teken(); bewaar(); };
+    blok.querySelector("[data-aan]").onchange = (e) => { a.aan = e.target.checked; blok.classList.toggle("uit", !a.aan); bewaar(); };
+  });
+  el.querySelectorAll("[name=doel],[name=budget],.ad-woord input").forEach((x) => (x.onchange = () => { klik(); bewaar(); }));
+  $("#adniet").oninput = bewaar; $("#adopm").oninput = bewaar;
+  $("#adopnieuw").onclick = () => kpAdsStart(true);
+  $("#adakkoord").onclick = async () => {
+    const knop = $("#adakkoord"); knop.disabled = true; knop.textContent = "Even versturen…"; clearTimeout(tijd);
+    try { await adsStartApi({ actie: "akkoord", keuzes: keuzes() }); kpAdsStart(); }
+    catch (e) { knop.disabled = false; knop.textContent = "Akkoord, zet het klaar"; $("#admeld").textContent = e.message; $("#admeld").style.color = "var(--let, #b45309)"; }
   };
-  scrollTo(0, 0);
 }
 // "Meer details" voor de klant: uitgekozen, rustig en eerlijk
 async function kpAdsDetails(periode = "maand") {
