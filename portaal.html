@@ -294,6 +294,7 @@ body{background:var(--bg);color:var(--tekst)}
   <div id="kprapport" data-kp="gezondheid"></div>
   <div id="reviewvraag2" data-kp="reviews"></div>
   <div id="kpinhoud" data-kp="voorstellen"></div>
+  <div id="shaads" data-kp="advertenties"></div>
   <div id="kpads" data-kp="advertenties"></div>
   <div id="kplokaal" data-kp="maps"></div>
   <div id="kpconc" data-kp="concurrenten"></div>
@@ -496,6 +497,7 @@ api("ik").then((d) => {
     if (!s.klant.aan) return vbPromo();
     kpMenu(true);
     vbsApi("status").then((st) => { if (!st.klant_klaar) { kpStartOpen = true; kpNaar("overzicht"); } }).catch(() => {});
+    shAanbodLaad(); // klant met Vindbaarheid: eventueel het advertentie-aanbod
   }).catch((e) => { if (/staat niet aan/.test(e.message || "")) vbPromo(); });
 });
 
@@ -512,6 +514,7 @@ async function shaApi(data) {
 const shaEu = (n) => "€ " + Number(n).toFixed(2).replace(".", ",").replace(",00", "");
 function shAanbodLaad() {
   shaApi({ actie: "status" }).then((a) => {
+    if (!a.mag && a.ads_mag) return shAdsAanbod(a);
     if (!a.mag) return;
     shAanbod = a; kpTekenMenu();
     let later = 0; try { later = Number(localStorage.getItem("sh_aanbod_later") || 0); } catch {}
@@ -553,6 +556,25 @@ function shAanbodLaad() {
       catch (e) { toonMelding($("#sha_meld"), e.message); b.disabled = false; b.textContent = `Kies ${n.naam}`; }
     }));
   }).catch(() => {});
+}
+
+// klanten die al Vindbaarheid hebben maar nog geen advertenties: alleen het advertentie-aanbod
+function shAdsAanbod(a) {
+  shAanbod = { ...a, alleenAds: true }; kpTekenMenu();
+  const prijsRij = `<div class="sha-prijs" style="margin:8px 0"><s>€ 99</s><b style="font-size:24px">€ 79,20</b><span class="zacht">/maand beheer het eerste jaar · geen opstartkosten · minimaal 3 maanden</span></div>`;
+  let later = 0; try { later = Number(localStorage.getItem("sh_ads_later") || 0); } catch {}
+  if (Date.now() - later > 7 * 86400000) {
+    $("#shaanbod").innerHTML = `<section class="sha-ban" aria-label="Aanbieding"><div><span class="sha-lab">Voor jou · ${a.korting_pct}% korting op het beheer</span>
+      <h2>Gevonden worden gaat goed. Nu ook direct bovenaan.</h2><p>Met advertenties in Google sta je meteen bovenaan, ook met je producten (Google Shopping). Wij regelen alles.</p></div>
+      <div class="sha-knoppen"><button class="knop" type="button" id="shads_bekijk">Bekijk het aanbod</button><button class="sha-later" type="button" id="shads_later">Later</button></div></section>`;
+    $("#shads_bekijk").onclick = () => { shaApi({ actie: "ads" }).catch(() => {}); kpNaar("advertenties"); };
+    $("#shads_later").onclick = () => { try { localStorage.setItem("sh_ads_later", String(Date.now())); } catch {} $("#shaanbod").innerHTML = ""; };
+  }
+  $("#shaads").innerHTML = `<div class="kaart" style="border:2px solid #2563EB"><span class="kp-mono">aanbod · ${a.korting_pct}% korting het eerste jaar</span>
+    <h2 style="margin:4px 0">Advertenties in Google, volledig geregeld</h2>
+    <p class="zacht" style="margin:0">Jij kiest een budget, wij maken en beheren de advertenties (ook Google Shopping). Je ziet één getal: wat je erin stopte en wat het opleverde.</p>
+    ${prijsRij}<p class="zacht" style="margin:0;font-size:13px">Advertentiebudget betaal je apart en bepaal je zelf. Het beheer betaal je maandelijks: de eerste keer met iDEAL, daarna automatisch. Hieronder start je.</p></div>`;
+  if (kpPagina === "advertenties") shaApi({ actie: "ads" }).catch(() => {});
 }
 
 // ================= menu (zijpaneel op computer, hamburger op mobiel)
@@ -627,7 +649,7 @@ function kpTekenMenu() {
   $("#kpnav").innerHTML = KP_MENU.map((m) => {
     if (m[0] === "-") return `<div class="kp-streep"></div>`;
     const [k, t, subs] = m, open = k === groep, b = subs.reduce((s, x) => s + (kpBadge[x[0]] || 0), 0);
-    let h = `<button type="button" class="kp-item${open && !subs.length ? " aan" : ""}${open && subs.length ? " open" : ""}" data-kpgroep="${k}">${svg(k)}<span class="kp-vul">${t}</span>${!open && b ? `<b class="kp-teller">${b}</b>` : ""}${k === "promo" && shAanbod ? `<b class="kp-teller">−${shAanbod.korting_pct}%</b>` : ""}${subs.length ? `<span class="kp-pijl">${open ? "▾" : "▸"}</span>` : ""}</button>`;
+    let h = `<button type="button" class="kp-item${open && !subs.length ? " aan" : ""}${open && subs.length ? " open" : ""}" data-kpgroep="${k}">${svg(k)}<span class="kp-vul">${t}</span>${!open && b ? `<b class="kp-teller">${b}</b>` : ""}${(k === "promo" && shAanbod?.mag) || (k === "advertenties" && shAanbod?.alleenAds) ? `<b class="kp-teller">−${shAanbod.korting_pct}%</b>` : ""}${subs.length ? `<span class="kp-pijl">${open ? "▾" : "▸"}</span>` : ""}</button>`;
     if (open && subs.length) h += subs.map(([sk, st]) => `<button type="button" class="kp-sub${sk === kpPagina ? " aan" : ""}" data-kpnaar="${sk}"><span class="kp-vul">${st}</span>${kpBadge[sk] ? `<b class="kp-teller">${kpBadge[sk]}</b>` : ""}</button>`).join("");
     return h;
   }).join("");
@@ -640,7 +662,7 @@ function kpTekenMenu() {
   $("#kpnav").querySelectorAll("[data-kpnaar]").forEach((b) => (b.onclick = () => kpNaar(b.dataset.kpnaar)));
   const pil = $("#kppills");
   if (pil) {
-    pil.innerHTML = KP_MENU.filter((m) => m[0] !== "-" && m[0] !== "inst").map(([k, t, subs]) => `<button type="button" class="kp-pil${k === groep ? " aan" : ""}" data-pil="${subs.length ? subs[0][0] : k}">${k === "verzoeken" ? "Aanpassen" : t}${k === "promo" && shAanbod ? ` −${shAanbod.korting_pct}%` : ""}</button>`).join("");
+    pil.innerHTML = KP_MENU.filter((m) => m[0] !== "-" && m[0] !== "inst").map(([k, t, subs]) => `<button type="button" class="kp-pil${k === groep ? " aan" : ""}" data-pil="${subs.length ? subs[0][0] : k}">${k === "verzoeken" ? "Aanpassen" : t}${(k === "promo" && shAanbod?.mag) || (k === "advertenties" && shAanbod?.alleenAds) ? ` −${shAanbod.korting_pct}%` : ""}</button>`).join("");
     pil.querySelectorAll("[data-pil]").forEach((b) => (b.onclick = () => kpNaar(b.dataset.pil)));
     const a = pil.querySelector(".aan"); if (a) a.scrollIntoView({ block: "nearest", inline: "nearest" });
   }

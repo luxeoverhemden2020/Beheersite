@@ -40,6 +40,8 @@ async function mail(aan: string, onderwerp: string, html: string) {
   return r.ok;
 }
 const magAanbod = (k: any) => k && k.actief !== false && !k.vindbaarheid && !k.vb_pakket && !k.vb_pauze && !k.opzeg_per;
+// advertentie-aanbod: iedereen die nog geen advertenties heeft lopen (ook klanten mét Vindbaarheid)
+const magAds = (k: any) => k && k.actief !== false && !k.ads_tellen_vanaf && !k.vb_pauze && !k.opzeg_per;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
@@ -52,7 +54,7 @@ Deno.serve(async (req) => {
     const shNu = Number(k.sh_prijs) || 0, shNieuw = shNu === 125 ? 75 : shNu;
 
     if (b.actie === "status") {
-      return json({ mag: magAanbod(k), korting_pct: KORTING * 100, sh_nu: shNu, sh_nieuw: shNieuw,
+      return json({ mag: magAanbod(k), ads_mag: magAds(k), korting_pct: KORTING * 100, sh_nu: shNu, sh_nieuw: shNieuw,
         pakketten: Object.fromEntries(Object.entries(PRIJS).map(([p, v]) => [p, { naam: NAAM[p], prijs: v, met_korting: Math.round(v * (1 - KORTING) * 100) / 100 }])) });
     }
     if (b.actie === "kies") {
@@ -84,7 +86,7 @@ Deno.serve(async (req) => {
     }
     if (b.actie === "ads") {
       // klant uit het aanbod kijkt naar advertenties: 20% korting op het advertentiebeheer, als hij binnen een jaar start
-      if (magAanbod(k)) await sql`update beheersite.klanten set ads_korting_tot = coalesce(ads_korting_tot, (current_date + interval '1 year' - interval '1 day')::date) where id = ${k.id}`;
+      if (magAanbod(k) || magAds(k)) await sql`update beheersite.klanten set ads_korting_tot = coalesce(ads_korting_tot, (current_date + interval '1 year' - interval '1 day')::date) where id = ${k.id}`;
       return json({ ok: true });
     }
     throw new Fout(400, "Onbekende actie.");
