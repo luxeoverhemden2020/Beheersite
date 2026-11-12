@@ -1,4 +1,21 @@
 // Gedeelde hulpjes voor Beheersite
+// Netwerkfouten nooit kaal tonen: als de telefoon de verbinding even loslaat (scherm uit, andere app)
+// geeft de browser "Load failed" / "Failed to fetch". Dat vertalen we naar gewone taal.
+(function () {
+  if (window.__fetchVriendelijk) return;
+  window.__fetchVriendelijk = true;
+  const echt = window.fetch.bind(window);
+  window.fetch = async (...a) => {
+    try { return await echt(...a); }
+    catch (e) {
+      const f = new Error(navigator.onLine === false
+        ? "Je hebt even geen internet. Controleer je verbinding en probeer het opnieuw."
+        : "De verbinding viel even weg. Probeer het opnieuw.");
+      f.netwerk = true; f.oorzaak = e;
+      throw f;
+    }
+  };
+})();
 // Thema: licht/donker (onthouden per apparaat; standaard volgt het apparaat)
 function huidigThema() {
   let t = null; try { t = localStorage.getItem("bs_thema"); } catch {}
