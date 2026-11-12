@@ -86,12 +86,18 @@ if (voorBeheer) $("#uitleg").textContent = "Log in op het beheerscherm.";
 const bewaar = (rol, token) => zetSessieVan(rol === "admin" ? "beheer" : "klant", token);
 async function naarScherm() {
   // Al ingelogd? Dan direct door. Bij "voor=beheer" alleen met een beheer-sessie.
-  for (const soort of voorBeheer ? ["beheer"] : ["beheer", "klant"]) {
+  // Gewone inlogpagina: alleen een klant-sessie stuurt direct door. Een beheer-sessie niet, zodat je hier ook als klant kunt inloggen.
+  for (const soort of voorBeheer ? ["beheer"] : ["klant", "beheer"]) {
     const t = sessieVan(soort);
     if (!t) continue;
     try {
       const d = await api("ik", {}, t);
-      if (soort === "beheer" && d.gebruiker.rol === "admin") { location.href = "beheer"; return; }
+      if (soort === "beheer" && d.gebruiker.rol === "admin") {
+        if (voorBeheer) { location.href = "beheer"; return; }
+        const u = $("#uitleg");
+        if (u) u.insertAdjacentHTML("afterend", '<p class="zacht" style="font-size:14px;margin:8px 0 0">Je bent al ingelogd als beheerder. <a href="beheer">Naar beheer</a></p>');
+        continue;
+      }
       if (soort === "klant") { location.href = d.gebruiker.rol === "admin" && !d.klant ? "beheer" : "portaal"; return; }
     } catch { zetSessieVan(soort, ""); }
   }
