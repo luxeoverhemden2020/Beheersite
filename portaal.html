@@ -224,6 +224,52 @@ body{background:var(--bg);color:var(--tekst)}
   .kp-main .kaart{padding:18px}
 }
 </style>
+<style>
+/* ---- Nieuwe look (nov 2026): donkerblauw + blauw accent, chat-bubbels, snelmenu op mobiel ---- */
+:root[data-thema=licht]{--accent:#1D4ED8;--accent2:rgba(37,99,235,.10);--bg:#F6F8FC}
+.kp-zij,.kp-boven{background:#0B1B3F!important}
+.kp-merk b{color:#60A5FA}
+.kp-item.aan,.kp-sub.aan{background:#fff!important;color:#0B1B3F!important;box-shadow:none!important}
+.kp-item.aan svg{stroke:#1D4ED8!important}.kp-item.open svg{stroke:#60A5FA!important}
+.kp-teller{background:#1D4ED8;color:#fff}
+.kp-item.aan .kp-teller{background:#1D4ED8;color:#fff}
+.kp-main .knop{background:linear-gradient(90deg,#E3ECFF,#DDF7FC) padding-box,linear-gradient(90deg,#2563EB,#06B6D4) border-box;border:2px solid transparent;color:#0B1B3F;box-shadow:0 0 14px rgba(37,99,235,.18)}
+.kp-main .knop:hover{box-shadow:0 0 22px rgba(37,99,235,.3)}
+.kp-main .knop.rand,.kp-main .knop.licht{background:#fff;border:1px solid #CBD5E6;color:#0B1B3F;box-shadow:none}
+.kp-main .knop.rand:hover{border-color:#1D4ED8}
+.kp-main input:focus,.kp-main textarea:focus,.kp-main select:focus{border-color:#1D4ED8;box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+.kp-main a:not(.knop){color:#1D4ED8}
+.bericht.klant .tekst{background:#1D4ED8!important;color:#fff;border-color:#1D4ED8!important;border-radius:16px 16px 4px 16px}
+.bericht.klant .tekst a{color:#fff!important}
+.bericht.webbeheer .tekst{background:#fff;border-color:#E3E9F3;border-radius:16px 16px 16px 4px}
+.bericht.klant .wie{justify-content:flex-end}
+#kppills{display:none}
+.sha-ban{display:flex;align-items:center;justify-content:space-between;gap:18px;background:linear-gradient(100deg,#0B1B3F,#13306B);color:#fff;border-radius:18px;padding:22px 24px;margin-bottom:18px}
+.sha-ban h2{margin:6px 0 4px;font:700 22px/1.2 "Space Grotesk",system-ui,sans-serif;color:#fff}
+.sha-ban p{margin:0;color:#C9D4EA;font-size:15px}
+.sha-lab{display:inline-block;font:700 12px "Inter",sans-serif;background:#22D3EE;color:#0B1B3F;padding:4px 10px;border-radius:99px}
+.sha-ban .knop{background:linear-gradient(90deg,#E3ECFF,#DDF7FC) padding-box,linear-gradient(90deg,#2563EB,#06B6D4) border-box!important;border:2px solid transparent;color:#0B1B3F!important}
+.sha-later{background:none;border:0;color:#C9D4EA;font:500 14px "Inter",sans-serif;cursor:pointer;min-height:44px;padding:0 8px}
+.sha-knoppen{display:flex;gap:8px;align-items:center;flex:none}
+.sha-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:4px 0 16px}
+.sha-pk{background:#fff;border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:12px;border:1px solid #E3E9F3;position:relative}
+.sha-pk.advies{border:2px solid #2563EB;box-shadow:0 10px 30px rgba(37,99,235,.15)}
+.sha-advies{position:absolute;top:-12px;left:20px;font:700 12px "Inter",sans-serif;background:#1D4ED8;color:#fff;padding:4px 12px;border-radius:99px}
+.sha-pk h3{margin:0;font:700 20px "Space Grotesk",system-ui,sans-serif}
+.sha-mono{font:600 12px "Inter",sans-serif;color:#4A5878;text-transform:uppercase;letter-spacing:.06em}
+.sha-prijs{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.sha-prijs s{color:#5B6B8C}.sha-prijs b{font:700 30px "Space Grotesk",system-ui,sans-serif}
+.sha-pk ul{margin:0;padding-left:18px;line-height:1.7;color:#2B3A5C}
+.sha-pk .knop{margin-top:auto;justify-content:center}
+.sha-extra{background:#EAF1FF;color:#1E3A8A;border-radius:14px;padding:14px 18px;margin-bottom:16px}
+@media (max-width:860px){
+  #kppills{display:flex;gap:8px;overflow-x:auto;padding:12px 14px 0;scrollbar-width:none}
+  .kp-pil{flex:none;padding:10px 14px;border-radius:99px;background:#fff;color:#0B1B3F;border:0;font:500 14px "Inter",sans-serif;box-shadow:0 1px 6px rgba(11,27,63,.08);cursor:pointer;white-space:nowrap}
+  .kp-pil.aan{background:#0B1B3F;color:#fff;font-weight:600}
+  .sha-ban{flex-direction:column;align-items:stretch;padding:20px}
+  .sha-knoppen{flex-direction:column;align-items:stretch}
+  .sha-grid{grid-template-columns:1fr}
+}
+</style>
 </head>
 <body>
 <div class="kp">
@@ -237,8 +283,10 @@ body{background:var(--bg);color:var(--tekst)}
 <div class="kp-dek" id="kpdek"></div>
 <div class="kp-hoofd">
 <header class="kp-boven"><button type="button" class="kp-ham" id="kpham" aria-label="Menu openen"><span></span><span></span><span></span></button><strong id="kpbovtitel">Sitehulpje</strong><span class="bot-klein" id="kopbot2"></span></header>
+<nav id="kppills" aria-label="Snelmenu"></nav>
 <main class="kp-main">
   <div class="kp-titel"><h1 id="kptitel"></h1><p class="zacht" id="kpuitleg"></p></div>
+  <div id="shaanbod" data-kp="verzoeken"></div>
   <div id="appTip" data-kp="verzoeken"></div>
   <div id="vbpauze" data-kp="verzoeken overzicht"></div>
   <div id="shstart" data-kp="verzoeken"></div>
@@ -442,6 +490,7 @@ api("ik").then((d) => {
       <ul class="vb-goed" style="margin-bottom:12px"><li>Elke week een website-check</li><li>Betere teksten voor Google, jij keurt goed met één klik</li><li>Je cijfers uit Google en Bing</li><li>Elke maand een rapport in gewone taal</li></ul>
       <p style="margin:0 0 12px"><b>Vanaf €99 per maand.</b> <span class="zacht">Met Vindbaarheid erbij kost Sitehulpje nog maar €75 per maand.</span></p>
       <a class="knop" href="https://siteregelaar.nl/vindbaarheid#pakketten">Bekijk de pakketten</a></div>`;
+    shAanbodLaad();
   }).catch(() => {});
   vbApi("status").then((s) => {
     if (!s.klant.aan) return vbPromo();
@@ -449,6 +498,62 @@ api("ik").then((d) => {
     vbsApi("status").then((st) => { if (!st.klant_klaar) { kpStartOpen = true; kpNaar("overzicht"); } }).catch(() => {});
   }).catch((e) => { if (/staat niet aan/.test(e.message || "")) vbPromo(); });
 });
+
+
+// ================= Sitehulpje-aanbod: 20% korting op Vindbaarheid voor klanten met alleen Sitehulpje
+var shAanbod = null;
+const SHA_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sh-aanbod";
+async function shaApi(data) {
+  const x = await fetch(SHA_API, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify(data) });
+  const d = await x.json().catch(() => ({}));
+  if (!x.ok) throw new Error(d.fout || "Er ging iets mis.");
+  return d;
+}
+const shaEu = (n) => "€ " + Number(n).toFixed(2).replace(".", ",").replace(",00", "");
+function shAanbodLaad() {
+  shaApi({ actie: "status" }).then((a) => {
+    if (!a.mag) return;
+    shAanbod = a; kpTekenMenu();
+    let later = 0; try { later = Number(localStorage.getItem("sh_aanbod_later") || 0); } catch {}
+    if (Date.now() - later > 7 * 86400000) {
+      $("#shaanbod").innerHTML = `<section class="sha-ban" aria-label="Aanbieding"><div><span class="sha-lab">Alleen voor Sitehulpje-klanten · ${a.korting_pct}% korting per maand</span>
+        <h2>Je website staat goed. Nu nog gevonden worden.</h2><p>Meer klanten via Google en AI, of direct bovenaan met advertenties. Wij regelen alles.</p></div>
+        <div class="sha-knoppen"><button class="knop" type="button" id="sha_bekijk">Bekijk mijn aanbod</button><button class="sha-later" type="button" id="sha_later">Later</button></div></section>`;
+      $("#sha_bekijk").onclick = () => { kpNaar("promo"); window.scrollTo(0, 0); };
+      $("#sha_later").onclick = () => { try { localStorage.setItem("sh_aanbod_later", String(Date.now())); } catch {} $("#shaanbod").innerHTML = ""; };
+    }
+    const P = a.pakketten, pk = (k, titel, punten, advies) => `<article class="sha-pk${advies ? " advies" : ""}">${advies ? `<span class="sha-advies">Ons advies voor jou</span>` : ""}
+      <div class="sha-mono"${advies ? ' style="color:#1D4ED8"' : ""}>${P[k].naam}</div><h3>${titel}</h3>
+      <div class="sha-prijs"><s>${shaEu(P[k].prijs)}</s><b>${shaEu(P[k].met_korting)}</b><span class="zacht">/maand</span></div>
+      <ul>${punten.map((x) => `<li>${x}</li>`).join("")}</ul>
+      <button class="knop${advies ? "" : " rand"}" type="button" data-sha="${k}">Kies ${P[k].naam}${advies ? ` met ${a.korting_pct}% korting` : ""}</button></article>`;
+    $("#vbpromo").innerHTML = `<button type="button" class="knop rand klein" id="sha_terug" style="margin-bottom:14px">‹ Terug naar mijn verzoeken</button>
+      <p class="zacht" style="margin:0 0 18px;font-size:16px;max-width:720px">Je website is in goede handen. Met Vindbaarheid zorgen we dat nieuwe klanten je ook vinden in Google en in AI. Wij doen het werk, jij ziet elke maand wat het oplevert.</p>
+      <div class="sha-grid">
+        ${pk("basis", "Gezond &amp; gevonden", ["Elke week een website-check", "Verbeteringen voeren wij voor je door", "Maandrapport in gewone taal"])}
+        ${pk("plus", "Lokaal groeien", ["Alles uit Basis", "Google-bedrijfsprofiel: wekelijkse berichten", "Pagina's per dienst en plaats", "Controle van bedrijvengidsen"], true)}
+        ${pk("pro", "Voorsprong", ["Alles uit Plus", "Elke maand nieuwe artikelen", "Elke week meten of AI je noemt", "Je concurrenten volgen"])}
+      </div>
+      ${a.sh_nieuw < a.sh_nu ? `<div class="sha-extra">Extra voordeel: met een Vindbaarheid-pakket betaal je voor Sitehulpje <b>${shaEu(a.sh_nieuw)}</b> per maand in plaats van ${shaEu(a.sh_nu)}.</div>` : ""}
+      <div id="sha_meld"></div>
+      <div class="kaart"><span class="kp-mono">ook mogelijk · advertenties in Google</span><h2 style="margin:4px 0">Sneller klanten via Google</h2>
+        <p class="zacht" style="margin:0">Jij kiest een budget, wij regelen de advertenties (ook Google Shopping). Je ziet één getal: wat je erin stopte en wat het opleverde.</p>
+        <div class="sha-prijs" style="margin:10px 0"><s>€ 99</s><b style="font-size:24px">€ 79,20</b><span class="zacht">/maand beheer · geen opstartkosten · minimaal 3 maanden</span></div>
+        <p class="zacht" style="margin:0 0 12px;font-size:13px">Advertentiebudget betaal je apart en bepaal je zelf.</p>
+        <button type="button" class="knop rand" id="sha_ads">Meer over advertenties</button></div>
+      <button type="button" class="knop rand" id="sha_terug2" style="margin-top:16px">Nu niet, terug naar mijn verzoeken</button>
+      <p class="zacht" style="font-size:13px;margin:14px 0 0">Prijzen per maand, excl. btw. Minimale looptijd 3 maanden. De korting geldt zolang je het pakket hebt.</p>`;
+    $("#sha_terug").onclick = $("#sha_terug2").onclick = () => kpNaar("verzoeken");
+    $("#sha_ads").onclick = () => kpNaar("advertenties");
+    $("#vbpromo").querySelectorAll("[data-sha]").forEach((b) => (b.onclick = async () => {
+      const k = b.dataset.sha, n = P[k];
+      if (!confirm(`Vindbaarheid ${n.naam} erbij nemen voor ${shaEu(n.met_korting)} per maand (excl. btw, minimaal 3 maanden)?`)) return;
+      b.disabled = true; b.textContent = "Bezig…";
+      try { await shaApi({ actie: "kies", pakket: k }); toonMelding($("#sha_meld"), `Geregeld! Vindbaarheid ${n.naam} staat aan. Je krijgt een bevestiging per mail. We zetten nu alles voor je klaar…`, "ok"); setTimeout(() => location.reload(), 2500); }
+      catch (e) { toonMelding($("#sha_meld"), e.message); b.disabled = false; b.textContent = `Kies ${n.naam}`; }
+    }));
+  }).catch(() => {});
+}
 
 // ================= menu (zijpaneel op computer, hamburger op mobiel)
 const KP_IC = {
@@ -522,7 +627,7 @@ function kpTekenMenu() {
   $("#kpnav").innerHTML = KP_MENU.map((m) => {
     if (m[0] === "-") return `<div class="kp-streep"></div>`;
     const [k, t, subs] = m, open = k === groep, b = subs.reduce((s, x) => s + (kpBadge[x[0]] || 0), 0);
-    let h = `<button type="button" class="kp-item${open && !subs.length ? " aan" : ""}${open && subs.length ? " open" : ""}" data-kpgroep="${k}">${svg(k)}<span class="kp-vul">${t}</span>${!open && b ? `<b class="kp-teller">${b}</b>` : ""}${subs.length ? `<span class="kp-pijl">${open ? "▾" : "▸"}</span>` : ""}</button>`;
+    let h = `<button type="button" class="kp-item${open && !subs.length ? " aan" : ""}${open && subs.length ? " open" : ""}" data-kpgroep="${k}">${svg(k)}<span class="kp-vul">${t}</span>${!open && b ? `<b class="kp-teller">${b}</b>` : ""}${k === "promo" && shAanbod ? `<b class="kp-teller">−${shAanbod.korting_pct}%</b>` : ""}${subs.length ? `<span class="kp-pijl">${open ? "▾" : "▸"}</span>` : ""}</button>`;
     if (open && subs.length) h += subs.map(([sk, st]) => `<button type="button" class="kp-sub${sk === kpPagina ? " aan" : ""}" data-kpnaar="${sk}"><span class="kp-vul">${st}</span>${kpBadge[sk] ? `<b class="kp-teller">${kpBadge[sk]}</b>` : ""}</button>`).join("");
     return h;
   }).join("");
@@ -533,6 +638,12 @@ function kpTekenMenu() {
     kpNaar(m[2][0][0]);
   }));
   $("#kpnav").querySelectorAll("[data-kpnaar]").forEach((b) => (b.onclick = () => kpNaar(b.dataset.kpnaar)));
+  const pil = $("#kppills");
+  if (pil) {
+    pil.innerHTML = KP_MENU.filter((m) => m[0] !== "-" && m[0] !== "inst").map(([k, t, subs]) => `<button type="button" class="kp-pil${k === groep ? " aan" : ""}" data-pil="${subs.length ? subs[0][0] : k}">${k === "verzoeken" ? "Aanpassen" : t}${k === "promo" && shAanbod ? ` −${shAanbod.korting_pct}%` : ""}</button>`).join("");
+    pil.querySelectorAll("[data-pil]").forEach((b) => (b.onclick = () => kpNaar(b.dataset.pil)));
+    const a = pil.querySelector(".aan"); if (a) a.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }
 }
 function kpNaar(p) {
   kpPagina = p; document.body.dataset.pagina = p;
