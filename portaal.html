@@ -818,6 +818,7 @@ function adBudgetKaarten(s, v) {
       ${net ? `<p class="ad-klein" style="color:var(--accent)">Bedankt! Je betaling wordt verwerkt. Het kan een minuutje duren voordat je tegoed hier staat.</p>` : ""}
       ${s.gestort > 0 ? `<div style="display:flex;justify-content:space-between;font-size:15px;gap:10px"><span><b>Nog ${eu(s.over)}</b> over</span><span class="zacht">${eu(s.uitgegeven)} van ${eu(s.gestort)} gebruikt</span></div>
         <div class="ad-baan" style="height:10px"><i style="width:${pct}%"></i></div>
+        ${s.eind ? `<p class="ad-klein">Deze periode loopt tot ${new Date(s.eind).toLocaleDateString("nl-NL", { day: "numeric", month: "long" })}. Is er dan nog tegoed, dan gaan we vanzelf door.</p>` : ""}
         <p class="ad-klein">${s.aan ? "Je advertenties lopen. Is het tegoed op, dan zetten wij ze vanzelf op pauze. Je betaalt nooit meer dan je stort." : s.campagne ? "Je advertenties staan klaar, maar lopen nog niet." : "Wij zetten je advertenties klaar en laten het je weten voordat ze starten."}</p>`
       : `<p class="zacht" style="font-size:15px;line-height:1.6;margin:0">Je advertenties starten zodra er budget is. Je betaalt vooraf en nooit meer dan je stort.</p>`}
       ${s.betalingen?.length ? `<details><summary class="ad-klein" style="cursor:pointer">Eerdere betalingen</summary>${s.betalingen.map((b) => `<div class="ad-rij"><span class="zacht">${new Date(b.betaald_op || b.aangemaakt).toLocaleDateString("nl-NL", { day: "numeric", month: "long" })}</span><span>${eu(b.bedrag)} <span class="zacht">${b.status === "betaald" ? "" : "· " + b.status}</span></span></div>`).join("")}</details>` : ""}
@@ -826,8 +827,10 @@ function adBudgetKaarten(s, v) {
       <div class="ad-keuzes rij3" role="radiogroup" aria-label="Kies een bedrag">
         ${opties.map((b) => `<label class="ad-keuze"><input type="radio" name="adbedrag" value="${b}"${b === keuze ? " checked" : ""}>€${b.toLocaleString("nl-NL")}</label>`).join("")}
         <label class="ad-keuze"><input type="radio" name="adbedrag" value="eigen">Ander bedrag</label></div>
+      <label class="ad-veld">Hoe lang moeten je advertenties lopen?<select id="addagen"><option value="7">1 week</option><option value="10">10 dagen</option><option value="14" selected>2 weken</option><option value="21">3 weken</option><option value="28">4 weken</option></select></label>
       <label class="ad-veld" id="adeigenveld" hidden>Bedrag excl. btw (minimaal €5)<input type="number" id="adeigen" min="5" max="10000" step="1" inputmode="decimal" placeholder="Bijvoorbeeld 50"></label>
       <div><div class="ad-rij"><span class="zacht">Advertentiebudget</span><b id="adb1"></b></div><div class="ad-rij"><span class="zacht">Btw 21%</span><span id="adb2"></span></div><div class="ad-rij"><b>Totaal</b><b id="adb3"></b></div></div>
+      <p class="ad-klein" id="adperdag"></p>
       <p class="ad-klein">Je budget gaat 1-op-1 naar Google. Het beheer door Siteregelaar staat apart op je factuur. Zakelijk? Dan trek je de btw gewoon af.</p>
       <div class="ad-knoppen"><button type="button" class="knop" id="adbetaalknop">Betalen met iDEAL</button></div>
       <p class="ad-klein" id="adbetaalmeld" hidden></p>
@@ -838,13 +841,13 @@ function adBudgetKoppel(el) {
   const eu = (n) => "€" + Number(n || 0).toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const gekozen = () => blok.querySelector("[name=adbedrag]:checked")?.value;
   const bedrag = () => gekozen() === "eigen" ? Number($("#adeigen").value || 0) : Number(gekozen() || 0);
-  const reken = () => { const b = bedrag(), btw = Math.round(b * 21) / 100; $("#adeigenveld").hidden = gekozen() !== "eigen"; $("#adb1").textContent = eu(b); $("#adb2").textContent = eu(btw); $("#adb3").textContent = eu(b + btw); };
-  blok.querySelectorAll("[name=adbedrag]").forEach((x) => (x.onchange = reken)); $("#adeigen").oninput = reken; reken();
+  const reken = () => { const b = bedrag(), btw = Math.round(b * 21) / 100; $("#adeigenveld").hidden = gekozen() !== "eigen"; $("#adb1").textContent = eu(b); $("#adb2").textContent = eu(btw); $("#adb3").textContent = eu(b + btw); const dg = Number($("#addagen").value); $("#adperdag").textContent = b ? `Google verdeelt ${eu(b)} over ${dg} dagen, ongeveer ${eu(b / dg)} per dag, en gaat daar nooit overheen.` : ""; };
+  blok.querySelectorAll("[name=adbedrag]").forEach((x) => (x.onchange = reken)); $("#adeigen").oninput = reken; $("#addagen").onchange = reken; reken();
   $("#adbetaalknop").onclick = async () => {
     const b = bedrag(), knop = $("#adbetaalknop"), meld = $("#adbetaalmeld");
     if (!(b >= 5)) { meld.hidden = false; meld.textContent = "Kies een bedrag van minimaal €5."; return; }
     knop.disabled = true; knop.textContent = "Even naar de betaalpagina…";
-    try { const d = await adsGeldApi({ actie: "betaal", bedrag: b }); location.href = d.url; }
+    try { const d = await adsGeldApi({ actie: "betaal", bedrag: b, dagen: Number($("#addagen").value) }); location.href = d.url; }
     catch (e) { knop.disabled = false; knop.textContent = "Betalen met iDEAL"; meld.hidden = false; meld.textContent = e.message; }
   };
 }
@@ -894,6 +897,11 @@ async function kpAdsStart(opnieuw) {
       ${kaart(`<h2>Wat moeten mensen doen na een klik?</h2><div class="ad-keuzes" role="radiogroup" aria-label="Doel">${Object.entries(AD_DOEL).map(([w, t]) => r("doel", w, t, w === doel)).join("")}</div>`)}
       ${kaart(`<h2>Budget per maand</h2><div class="ad-keuzes rij3" role="radiogroup" aria-label="Budget">${[100, 250, 500, 1000].map((b) => r("budget", b, eu(b), Number(budget) === b, b === d.advies ? ` <span class="ad-pil" style="margin-left:auto;padding:3px 8px;font-size:11.5px">ons advies</span>` : "")).join("")}</div>
         <p class="ad-klein" id="adklik"></p>`)}
+      ${(() => { const gb = k.gebied || d.gebied || { soort: "land", landen: ["NL"] }, w = gb.soort === "straal" ? "s" + (gb.km || 25) : (gb.landen || ["NL"]).join("+");
+        const opt = [["NL", "Heel Nederland"], ["NL+BE", "Nederland en België"], ...(d.adres?.plaats ? [10, 25, 50].map((km) => ["s" + km, `${esc(d.adres.plaats)} en ${km} km eromheen`]) : [])];
+        return kaart(`<h2>Waar zien mensen je advertentie?</h2><div class="ad-keuzes" role="radiogroup" aria-label="Gebied">${opt.map(([v, t]) => r("gebied", v, t, v === w)).join("")}</div>
+          ${(k.doel || d.doel) !== "kopen" && d.tijden?.length ? `<p class="ad-klein">Je advertenties lopen alleen tijdens je openingstijden: ${esc(d.openingstijden)}.</p>` : ""}`); })()}
+      ${d.meting?.bekend ? kaart(`<h2>Verkopen meten</h2><p class="zacht" style="font-size:15px;line-height:1.6;margin:0">${d.meting.aantal ? `Staat aan. Google ziet wat je advertenties opleveren (${esc(d.meting.namen.join(", "))}).` : "Staat nog niet aan. Wij regelen dat voordat je advertenties starten, zodat je ziet wat ze opleveren."}</p>`) : ""}
       ${ok ? "" : `<details class="kaart"><summary style="cursor:pointer;font-weight:700;font-size:15px">Liever iets niet adverteren? (niet nodig)</summary>
         <label class="ad-veld" style="margin-top:10px">Bijvoorbeeld een merk of productgroep<input type="text" maxlength="300" id="adniet" value="${esc(k.niet || "")}" placeholder="Bijvoorbeeld: sale-artikelen"></label>
         <label class="ad-veld" style="margin-top:10px">Nog iets dat wij moeten weten?<textarea rows="3" maxlength="1000" id="adopm">${esc(k.opmerking || "")}</textarea></label></details>`}
@@ -912,7 +920,7 @@ async function kpAdsStart(opnieuw) {
   // keuzes bewaren (even wachten na typen)
   let tijd;
   const keuzes = () => ({ doel: el.querySelector("[name=doel]:checked")?.value, budget: Number(el.querySelector("[name=budget]:checked")?.value || 0) || null,
-    uit: [...el.querySelectorAll(".ad-woord input:not(:checked)")].map((x) => x.value), advertenties: ads, niet: $("#adniet").value, opmerking: $("#adopm").value });
+    uit: [...el.querySelectorAll(".ad-woord input:not(:checked)")].map((x) => x.value), advertenties: ads, gebied: (() => { const g = el.querySelector("[name=gebied]:checked")?.value || "NL"; return g.startsWith("s") ? { soort: "straal", km: Number(g.slice(1)) } : { soort: "land", landen: g.split("+") }; })(), niet: $("#adniet").value, opmerking: $("#adopm").value });
   const bewaar = () => { clearTimeout(tijd); tijd = setTimeout(() => adsStartApi({ actie: "keuzes", keuzes: keuzes() }).catch(() => {}), 700); };
   el.querySelectorAll("[data-adv]").forEach((blok) => {
     const n = Number(blok.dataset.adv), a = ads[n];
@@ -921,7 +929,7 @@ async function kpAdsStart(opnieuw) {
     blok.querySelector("[data-tekst]").oninput = (e) => { a.tekst = e.target.value; teken(); bewaar(); };
     blok.querySelector("[data-aan]").onchange = (e) => { a.aan = e.target.checked; blok.classList.toggle("uit", !a.aan); bewaar(); };
   });
-  el.querySelectorAll("[name=doel],[name=budget],.ad-woord input").forEach((x) => (x.onchange = () => { klik(); bewaar(); }));
+  el.querySelectorAll("[name=doel],[name=budget],[name=gebied],.ad-woord input").forEach((x) => (x.onchange = () => { klik(); bewaar(); }));
   $("#adniet").oninput = bewaar; $("#adopm").oninput = bewaar;
   $("#adopnieuw").onclick = () => kpAdsStart(true);
   $("#adakkoord").onclick = async () => {

@@ -83,7 +83,7 @@ async function abCampagnes(lijst) {
   el.innerHTML = `<h2 style="margin-top:0">Campagnes en budget</h2>
     <p class="zacht" style="margin:0 0 8px">Klaarzetten maakt de campagne uit het voorstel <b>gepauzeerd</b> aan in Google Ads (kost niets). Aanzetten kost geld: Google rekent af met de betaalmethode in het account. Elk uur kijken wij de uitgaven na en pauzeren we vanzelf als het tegoed op is.</p>`
     + rijen.map(({ k, s }) => `<div class="ab-rij" style="flex-wrap:wrap"><div style="flex:1 1 220px"><b>${esc(k.naam)}</b><br><span class="zacht" style="font-size:13px">${s ? `Tegoed ${eu2(s.over)} (gestort ${eu2(s.gestort)}, uitgegeven ${eu2(s.uitgegeven)}) · ${s.aan ? "● loopt" : s.campagne ? "klaar, gepauzeerd" : "nog niet klaargezet"}` : "Saldo niet op te halen"}</span></div>
-      <label class="zacht" style="font-size:13px">Dagbudget € <input type="number" min="1" step="0.5" value="5" style="width:80px" data-dag="${esc(k.id)}"></label>
+      <label class="zacht" style="font-size:13px">Dagbudget € (alleen als totaalbudget niet lukt) <input type="number" min="1" step="0.5" value="5" style="width:80px" data-dag="${esc(k.id)}"></label>
       ${s && !s.campagne ? `<button class="knop rand klein" type="button" data-cam="toets" data-k="${esc(k.id)}">Proefronde</button><button class="knop rand klein" type="button" data-cam="klaarzetten" data-k="${esc(k.id)}">Klaarzetten (gepauzeerd)</button>` : ""}
       ${s && s.campagne && !s.aan ? `<button class="knop klein" type="button" data-cam="aanzetten" data-k="${esc(k.id)}">Aanzetten</button>` : ""}
       ${s && s.aan ? `<button class="knop klein" type="button" data-cam="pauzeren" data-k="${esc(k.id)}">Pauzeren</button>` : ""}
@@ -95,8 +95,9 @@ async function abCampagnes(lijst) {
     try {
       const d = soort === "toets" ? await geld("klaarzetten", { klant_id: kid, dagbudget: dag, toets: true })
         : soort === "aanzetten" ? await geld("aanzetten", { klant_id: kid, dagbudget: dag }) : await geld(soort, { klant_id: kid, dagbudget: dag });
-      toonMelding($("#meld"), soort === "toets" ? `Proefronde goed: Google accepteert ${d.zoekwoorden} zoekwoorden, ${d.koppen} koppen en ${d.teksten} omschrijvingen (voorstel: ${d.voorstel}). Er is niets aangemaakt.`
-        : soort === "klaarzetten" ? "Campagne staat gepauzeerd klaar in Google Ads." : soort === "aanzetten" ? "Campagne staat aan." : soort === "pauzeren" ? "Campagne gepauzeerd." : "Uitgaven bijgewerkt.", "ok");
+      const info = d.budget ? ` Budget: ${d.budget}. ${d.zoekwoorden} zoekwoorden in ${d.groepen} groep(en), ${d.koppen} koppen, ${d.teksten} omschrijvingen. Gebied: ${d.gebied}.${d.tijden ? " Alleen tijdens openingstijden." : ""} Verkopen meten: ${d.meting?.bekend ? (d.meting.aantal ? "staat aan" : "STAAT NOG NIET AAN") : "onbekend"}.` : "";
+      toonMelding($("#meld"), soort === "toets" ? `Proefronde goed, er is niets aangemaakt.${info}`
+        : soort === "klaarzetten" ? `Campagne staat gepauzeerd klaar in Google Ads.${info}` : soort === "aanzetten" ? "Campagne staat aan." : soort === "pauzeren" ? "Campagne gepauzeerd." : "Uitgaven bijgewerkt.", "ok");
       if (soort !== "toets") abCampagnes(lijst); else { b.disabled = false; b.textContent = tekst; }
     } catch (e) { toonMelding($("#meld"), e.message); b.disabled = false; b.textContent = tekst; }
   }));
