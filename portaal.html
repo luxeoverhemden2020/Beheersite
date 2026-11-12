@@ -313,7 +313,6 @@ body{background:var(--bg);color:var(--tekst)}
   <div id="reviewvraag"></div>
   <div id="lijst"><p class="zacht">Laden…</p></div>
   </div>
-  <div id="klussen" style="margin-top:28px" data-kp="verzoeken"></div>
   <div id="vriend" style="margin-top:16px" data-kp="verzoeken"></div>
   <div id="abonnement" data-kp="abonnement"></div>
 </main></div></div>
@@ -482,7 +481,7 @@ api("ik").then((d) => {
   $("#site").textContent = d.klant ? `${d.klant.naam} · ${d.klant.site.replace(/^https?:\/\//, "")}` : "";
   laad();
   appTip($("#appTip"));
-  if (d.klant) { vbfPauzeMelding($("#vbpauze")); vbfOpzegKlant($("#abonnement")); shStart($("#shstart")); vbfKlussen($("#klussen")); vbfVriend($("#vriend")); }
+  if (d.klant) { vbfPauzeMelding($("#vbpauze")); vbfOpzegKlant($("#abonnement")); shStart($("#shstart")); vbfVriend($("#vriend")); }
   const vbPromo = () => vbfApi("status").then((p) => {
     if (p.pauze || !d.klant) return;
     kpMenu(false);
