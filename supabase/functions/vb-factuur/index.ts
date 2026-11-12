@@ -40,7 +40,7 @@ function abonnement(k: any, periode?: string) {
   const adsVol = k.ads_tellen_vanaf && bun !== "pro" ? Number(k.ads_prijs ?? ADS_PRIJS) : 0;
   const adsKort = adsVol > 0 && !!k.ads_korting_tot && (!periode || `${periode}-01` <= dag(k.ads_korting_tot));
   const ads = adsVol > 0 ? (adsKort ? Math.round(adsVol * 80) / 100 : adsVol) : 0;
-  const delen = [bundel ? `Sitehulpje ${PAKKET[bun]}${bunKort ? " (10% korting eerste jaar)" : ""}` : "", vb ? `Sitehulpje Vindbaarheid ${PAKKET[k.vb_pakket]}` : "", sh ? "Sitehulpje webbeheer" : "", ads ? `Google Advertenties beheer${adsKort ? " (20% korting)" : ""}` : ""].filter(Boolean);
+  const delen = [bundel ? `Sitehulpje ${PAKKET[bun]}${bunKort ? " (10% korting eerste jaar)" : ""}` : "", vb ? `Sitehulpje Vindbaarheid ${PAKKET[k.vb_pakket]}` : "", sh ? "Sitehulpje" : "", ads ? `Google Advertenties beheer${adsKort ? " (20% korting)" : ""}` : ""].filter(Boolean);
   const bruto = Math.round((bundel + vb + sh + ads) * 100) / 100;
   // korting_van: korting die pas later ingaat (pauzemaand, vriendenkorting); korting_tot: tot en met die datum
   const geldig = !periode || ((!k.korting_tot || `${periode}-01` <= dag(k.korting_tot)) && (!k.korting_van || `${periode}-01` >= dag(k.korting_van).slice(0, 7) + "-01"));
@@ -418,7 +418,7 @@ async function abonnementVan(klantId: string) {
   if (!k.bundel && Number(k.sh_prijs) > 0) {
     // Sitehulpje webbeheer: ook minimaal 3 maanden, gerekend vanaf de maand van het akkoord
     const st = o?.akkoord?.datum ? new Date(o.akkoord.datum) : (k.vb_start ? new Date(k.vb_start) : nu);
-    delen.push({ id: "sitehulpje", naam: "Sitehulpje webbeheer", prijs: Number(k.sh_prijs), minEind: iso(laatsteDag(st.getFullYear(), st.getMonth() + 2)) });
+    delen.push({ id: "sitehulpje", naam: "Sitehulpje", prijs: Number(k.sh_prijs), minEind: iso(laatsteDag(st.getFullYear(), st.getMonth() + 2)) });
   }
   if (k.ads_tellen_vanaf && k.bundel !== "pro" && Number(k.ads_prijs ?? ADS_PRIJS) > 0) {
     // Google Advertenties beheer: minimaal 3 maanden vanaf de start
