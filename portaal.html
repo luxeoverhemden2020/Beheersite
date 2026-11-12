@@ -933,6 +933,7 @@ async function kpAdsStart(opnieuw) {
       ${d.webshop && shop.gekoppeld !== null && shop.gekoppeld !== undefined ? kaart(`<h2>Google Shopping</h2><p class="zacht" style="font-size:15px;line-height:1.6;margin:0">${shop.gekoppeld ? "Je producten staan al in Google Merchant Center. Wij zetten ze ook in Google Shopping, met foto en prijs." : "Je producten staan nog niet in Google Merchant Center. Dat zetten wij voor je klaar, daarna komen ze ook in Google Shopping."}</p>`) : ""}
       ${ok ? "" : `<div class="ad-knoppen"><button type="button" class="knop groot" id="adakkoord">Akkoord, zet het klaar</button></div>
       <p class="ad-klein" id="admeld">Er gaat nog niets live en je betaalt nog niets. Wij zetten alles klaar en laten het je weten voordat het start.</p>
+      <p class="ad-klein">Kosten zodra de advertenties lopen: het advertentiebudget dat je kiest (dat gaat 1-op-1 naar Google) plus beheer ${shAanbod?.korting_pct ? `<s>€ 99</s> <b>€ 79,20</b> per maand het eerste jaar` : `<b>€ 99</b> per maand`} (excl. btw, geen opstartkosten, minimaal 3 maanden). Het beheer betaal je de eerste keer met iDEAL, daarna automatisch.</p>
       <button type="button" class="ad-terug" id="adopnieuw" style="align-self:flex-start">Opnieuw maken met de nieuwste cijfers</button>`}
     </div></div>`;
   bindTerug();
