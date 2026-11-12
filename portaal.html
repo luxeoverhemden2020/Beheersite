@@ -300,6 +300,7 @@ body{background:var(--bg);color:var(--tekst)}
   <div id="kpconc" data-kp="concurrenten"></div>
   <div id="kpaivm" data-kp="ai"></div>
   <div id="vindbaarheid" data-kp="VBALLE"></div>
+  <div id="shwebbeheer" data-kp="verzoeken"></div>
   <div id="verzoekenDeel" data-kp="verzoeken">
 
   <div class="kaart">
@@ -498,6 +499,7 @@ api("ik").then((d) => {
     kpMenu(true);
     vbsApi("status").then((st) => { if (!st.klant_klaar) { kpStartOpen = true; kpNaar("overzicht"); } }).catch(() => {});
     shAanbodLaad(); // klant met Vindbaarheid: eventueel het advertentie-aanbod
+    if (d.klant && d.klant.id !== "luxe-overhemden") shWebbeheerAanbod(); // alleen Vindbaarheid: geen verzoeken, wel aanbod webbeheer
   }).catch((e) => { if (/staat niet aan/.test(e.message || "")) vbPromo(); });
 });
 
@@ -556,6 +558,28 @@ function shAanbodLaad() {
       catch (e) { toonMelding($("#sha_meld"), e.message); b.disabled = false; b.textContent = `Kies ${n.naam}`; }
     }));
   }).catch(() => {});
+}
+
+// klanten met alleen Vindbaarheid (zonder Sitehulpje webbeheer): geen verzoekformulier, wel het aanbod om webbeheer erbij te nemen
+async function shWebbeheerAanbod() {
+  let ab; try { ab = await vbfApi("abonnement"); } catch { return; }
+  if (!ab?.delen?.some((x) => x.id === "vindbaarheid") || ab.delen.some((x) => x.id === "sitehulpje")) return;
+  $("#verzoekenDeel").dataset.kp = "verborgen-blok";
+  $("#shwebbeheer").innerHTML = `<section class="kaart" style="border:2px solid #2563EB">
+    <span class="kp-mono">voor Vindbaarheid-klanten · € 75 in plaats van € 125</span>
+    <h2 style="margin:4px 0 8px">Iets laten aanpassen? Neem Sitehulpje webbeheer erbij.</h2>
+    <p class="zacht" style="margin:0 0 10px">Dan regelen wij elke aanpassing aan je website voor je: teksten, foto's, prijzen, openingstijden, nieuwe pagina's. Gewoon intypen of inspreken, 24/7. Je bekijkt het eerst op een testsite en zet het met één klik live. Ook terugdraaien kan altijd.</p>
+    <div class="sha-prijs" style="margin:6px 0"><s>€ 125</s><b style="font-size:26px">€ 75</b><span class="zacht">/maand naast Vindbaarheid · geen opstartkosten · minimaal 3 maanden</span></div>
+    <div id="shwb_meld"></div>
+    <button class="knop" type="button" id="shwb_knop" style="margin-top:8px">Sitehulpje webbeheer erbij</button>
+    <p class="zacht" style="margin:10px 0 0;font-size:13px">Het bedrag gaat mee met je maandelijkse incasso. Liever eerst iets vragen? Mail info@sitehulpje.nl of bel 06 27 25 43 83.</p></section>`;
+  kpTekenMenu();
+  $("#shwb_knop").onclick = async () => {
+    if (!confirm("Sitehulpje webbeheer erbij nemen voor € 75 per maand (excl. btw, minimaal 3 maanden)?")) return;
+    const b = $("#shwb_knop"); b.disabled = true; b.textContent = "Bezig…";
+    try { await vbfApi("wissel", { sitehulpje: true }); toonMelding($("#shwb_meld"), "Geregeld! Sitehulpje webbeheer staat aan. Je kunt nu meteen je eerste aanpassing doorgeven.", "ok"); setTimeout(() => location.reload(), 2200); }
+    catch (e) { toonMelding($("#shwb_meld"), e.message); b.disabled = false; b.textContent = "Sitehulpje webbeheer erbij"; }
+  };
 }
 
 // klanten die al Vindbaarheid hebben maar nog geen advertenties: alleen het advertentie-aanbod
