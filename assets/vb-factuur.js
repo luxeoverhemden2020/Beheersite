@@ -123,13 +123,15 @@ async function vbfOpzegKlant(el) {
   let d; try { d = await vbfApi("abonnement"); } catch { el.innerHTML = ""; return; }
   if (!d.delen.length) { el.innerHTML = ""; return; }
   const datum = (s) => new Date(s).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" });
-  const PK = { basis: ["Basis", 99], plus: ["Plus", 179], pro: ["Pro", 249] };
-  const vb = d.delen.find((x) => x.id === "vindbaarheid"), sh = d.delen.find((x) => x.id === "sitehulpje");
-  const huidig = vb ? Object.keys(PK).find((p) => vb.naam.endsWith(PK[p][0])) : null;
+  // pakket = Sitehulpje Basis/Plus/Pro (Sitehulpje zit erin); vindbaarheid + sitehulpje = oude losse opzet
+  const BUN = { basis: ["Basis", 169], plus: ["Plus", 239], pro: ["Pro", 369] }, OUD = { basis: ["Basis", 99], plus: ["Plus", 179], pro: ["Pro", 249] };
+  const pkDeel = d.delen.find((x) => x.id === "pakket"), vb = d.delen.find((x) => x.id === "vindbaarheid"), sh = pkDeel || d.delen.find((x) => x.id === "sitehulpje");
+  const PK = pkDeel ? BUN : OUD, hoofd = pkDeel || vb;
+  const huidig = hoofd ? Object.keys(PK).find((p) => hoofd.naam.endsWith(PK[p][0])) : null;
   const kleiner = huidig === "pro" ? "plus" : huidig === "plus" ? "basis" : null;
   const wissel = [
-    ...(huidig ? Object.keys(PK).filter((p) => p !== huidig).map((p) => `<button class="knop rand klein vbo_pk" data-pk="${p}">Naar ${PK[p][0]} (€${PK[p][1]})</button>`) : []),
-    ...(!sh ? [`<button class="knop klein" id="vbo_sh">Sitehulpje webbeheer erbij (€${vb ? 75 : 125})</button>`] : []),
+    ...(huidig ? Object.keys(PK).filter((p) => p !== huidig).map((p) => `<button class="knop rand klein vbo_pk" data-pk="${p}">Naar ${pkDeel ? "Sitehulpje " : ""}${PK[p][0]} (€${PK[p][1]})</button>`) : []),
+    ...(!sh ? [`<button class="knop klein" id="vbo_sh">${vb && huidig ? `Stap over naar Sitehulpje ${BUN[huidig][0]} (€${BUN[huidig][1]}, eerste jaar 10% korting)` : "Sitehulpje erbij (€125)"}</button>`] : []),
   ];
   el.innerHTML = `<details class="kaart abonnement"><summary>Abonnement</summary>
     <table style="margin-top:8px"><tbody>${d.delen.map((x) => `<tr><td>${esc(x.naam)}</td><td class="r mono">${vbfEuro(x.prijs)} /mnd</td></tr>`).join("")}
@@ -138,7 +140,7 @@ async function vbfOpzegKlant(el) {
     <p class="zacht vb-klein">Prijzen exclusief btw. De factuur krijg je elke maand per mail.</p>
     ${wissel.length && !d.opzeg_per ? `<details style="margin-top:8px"><summary class="zacht vb-klein">Abonnement aanpassen</summary>
       <p class="vb-klein">Een ander pakket gaat meteen in. Vanaf de volgende factuur betaal je het nieuwe bedrag.</p><div style="display:flex;flex-wrap:wrap;gap:8px">${wissel.join("")}</div>
-      ${!sh ? `<p class="zacht vb-klein">Sitehulpje webbeheer: je website aanpassen door het gewoon te vragen. Minimaal 3 maanden.</p>` : ""}</details>` : ""}
+      ${!sh ? `<p class="zacht vb-klein">Sitehulpje: je website aanpassen door het gewoon te vragen. Minimaal 3 maanden.</p>` : ""}</details>` : ""}
     ${d.opzeg_per ? `<p>Je hebt opgezegd per <b>${datum(d.opzeg_per)}</b>. Tot die dag loopt alles gewoon door.</p><button class="knop rand klein" id="vbo_terug">Toch niet opzeggen</button>`
       : `<details style="margin-top:8px"><summary class="zacht vb-klein">Opzeggen</summary>
         <p class="vb-klein">Opzeggen kan per het einde van de maand, na een minimale looptijd van 3 maanden.</p>
@@ -185,7 +187,7 @@ async function vbfOpzegKlant(el) {
   const shk = $("#vbo_sh");
   if (shk) shk.onclick = async () => {
     shk.disabled = true;
-    try { await vbfApi("wissel", { sitehulpje: true }); meld("Sitehulpje webbeheer staat aan. We sturen je een mail; daarna zetten we samen de koppeling met je website klaar.", "ok"); setTimeout(() => location.reload(), 2500); }
+    try { await vbfApi("wissel", { sitehulpje: true }); meld("Sitehulpje staat aan. We sturen je een mail; daarna zetten we samen de koppeling met je website klaar.", "ok"); setTimeout(() => location.reload(), 2500); }
     catch (e) { meld(e.message); shk.disabled = false; }
   };
   const t = $("#vbo_terug");
@@ -210,7 +212,7 @@ async function vbfKlussen(el) {
   el.innerHTML = `<div class="kaart"><h2><span class="tag">+</span>Losse klussen</h2>
     ${betaald ? `<div class="melding ok" style="margin-bottom:10px">Bedankt! Je betaling is binnen. Jan neemt binnen één werkdag contact met je op.</div>` : ""}
     <p class="zacht" style="margin-top:0">Iets extra's op je website? Kies een klus, vertel kort wat je wilt en betaal met iDEAL. Sitehulpje gaat er meteen mee aan de slag.</p>
-    <p class="zacht vb-klein" style="margin-top:0">Vaker iets nodig? Met <b>Sitehulpje webbeheer</b> (€75 per maand) vraag je dit soort dingen gewoon, zonder losse kosten. Dat zet je aan bij Abonnement hieronder.</p>
+    <p class="zacht vb-klein" style="margin-top:0">Vaker iets nodig? Met <b>Sitehulpje</b> in je pakket vraag je dit soort dingen gewoon, zonder losse kosten. Dat zet je aan bij Abonnement hieronder.</p>
     <div class="klus-lijst">${d.klussen.map((x) => `<div class="klus"><b>${esc(x.naam)}</b>${x.uitleg ? `<span class="zacht vb-klein">${esc(x.uitleg)}</span>` : ""}
       <span class="prijs">€${Number(x.prijs).toLocaleString("nl-NL")} <span class="zacht vb-klein" style="font-weight:400">excl. btw</span></span>
       <button class="knop rand klein vbk_kies" data-id="${esc(x.id)}" style="margin-top:auto">Bestellen</button>

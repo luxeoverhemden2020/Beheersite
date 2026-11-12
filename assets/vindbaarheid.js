@@ -739,7 +739,7 @@ async function vbVoorstellen(houder, klantId, el) {
     <p class="zacht vb-klein" style="margin:6px 0 0">Sitehulpje stelt betere teksten voor op basis van de website-check. Er verandert niets op je site zonder jouw goedkeuring.${d.automatisch ? " Na goedkeuren voert Sitehulpje het meteen uit; terugdraaien kan altijd via Verzoeken." : ""}</p>
     <p class="zacht vb-klein" style="margin:4px 0 0">Deze maand: ${d.deze_maand} van ${d.per_maand} pagina's (pakket ${vbPakket(d.pakket).naam}).</p>
     ${!IS_BEHEER && d.deze_maand >= d.per_maand && VB_VOLGEND[d.pakket] ? `<div class="vb-aanbod" style="margin-top:10px;padding:12px 14px;border-radius:14px;border:1px solid var(--lijn);background:var(--bg2)">
-      <b>Je maand zit vol.</b> <span class="vb-klein">Met ${VB_VOLGEND[d.pakket][0]} verbetert Sitehulpje elke maand ${VB_VOLGEND[d.pakket][1]} pagina's in plaats van ${d.per_maand}, voor €${VB_VOLGEND[d.pakket][2]} per maand. Het gaat meteen in.</span>
+      <b>Je maand zit vol.</b> <span class="vb-klein">Met ${VB_VOLGEND[d.pakket][0]} verbetert Sitehulpje elke maand ${VB_VOLGEND[d.pakket][1]} pagina's in plaats van ${d.per_maand}. Het gaat meteen in; de nieuwe prijs zie je bij Abonnement.</span>
       <div style="margin-top:8px"><button class="knop klein" data-vs-upgrade="${VB_VOLGEND[d.pakket][3]}">Overstappen naar ${VB_VOLGEND[d.pakket][0]}</button></div><div data-vs-upmeld></div></div>` : ""}
     <div data-vs-maakmeld></div></div>
     ${lopend.length ? `<div class="kaart">${lopend.map(kaart).join("")}</div>` : ""}

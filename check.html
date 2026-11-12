@@ -180,7 +180,7 @@ async function rpExtra(d) {
   wie.innerHTML = `<p class="label mono">Wie lost wat op</p><h2>${nvb + nsh} verbeterpunten, allemaal op te lossen</h2>
     <div class="rp-wie-rij"><div><b>${nvb}</b><span><b>Vindbaarheid</b> regelt de teksten en gegevens voor Google en AI: titels, omschrijvingen, beschrijvingen bij foto's en je bedrijfsgegevens. Jij keurt goed met één klik.</span></div>
     <div><b>${nsh}</b><span><b>Sitehulpje</b> regelt alles aan de website zelf: snelheid, beveiliging, links, je mail-instellingen en teksten op de pagina.</span></div></div>
-    <p class="zacht" style="margin:4px 0 0">${nvb && nsh ? "Samen: Vindbaarheid vanaf €99 + Sitehulpje €75 per maand (in plaats van €125)." : nsh ? "Sitehulpje: €125 per maand." : "Vindbaarheid vanaf €99 per maand."} Prijzen excl. btw.</p>
+    <p class="zacht" style="margin:4px 0 0">${nvb && nsh ? "Samen in één pakket: Sitehulpje Basis, Plus of Pro, vanaf €169 per maand (eerste jaar 10% korting)." : nsh ? "Sitehulpje: €125 per maand." : "Sitehulpje-pakket vanaf €169 per maand (eerste jaar 10% korting)."} Prijzen excl. btw.</p>
     <div class="rp-cta"><a class="knop groot-knop" href="${link}">Laat Sitehulpje alles oplossen &rarr;</a></div>
     <p class="zacht" style="margin:8px 0 0;font-size:14px">Alle punten uit dit rapport gaan direct mee naar je account. Je hoeft niets opnieuw uit te leggen.</p>`;
   el.after(wie);
@@ -209,7 +209,7 @@ const CHECK_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-chec
 const q = new URLSearchParams(location.search);
 const nl = (n) => Number(n).toLocaleString("nl-NL");
 const dat = (s) => new Date(s).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" });
-const PAKKET = { basis: ["Basis", 5, 99], plus: ["Plus", 15, 179], pro: ["Pro", 30, 249] };
+const PAKKET = { basis: ["Basis", 5, 169], plus: ["Plus", 15, 239], pro: ["Pro", 30, 369] };
 const ERNST = { hoog: "Belangrijk", middel: "Middel", laag: "Kleiner" };
 const GROEP = { Techniek: "⚙", Snelheid: "⚡", Inhoud: "✍", "AI-vindbaarheid": "✦" };
 try { document.getElementById("kopbot").innerHTML = robotSvg("rust"); } catch {}
@@ -268,14 +268,14 @@ function opbouw(d) {
   ${(u.goed || []).length ? `<section class="kaart"><h2>Wat al goed gaat</h2><ul class="rp-goed">${u.goed.map((g) => `<li>${esc(g)}</li>`).join("")}</ul></section>` : ""}
   <section class="kaart rp-advies">
     <p class="label mono">Ons advies</p>
-    <h2>Vindbaarheid <span class="glans">${p[0]}</span> past het best bij ${esc(d.bedrijf || host)}</h2>
+    <h2>Sitehulpje <span class="glans">${p[0]}</span> past het best bij ${esc(d.bedrijf || host)}</h2>
     <p class="zacht" style="margin:0">Dit advies volgt uit wat we op je site vonden, niet uit een vaste regel.</p>
     <div class="rp-waarom">${(a.redenen || []).map((r) => `<div><b>${esc(r.kop)}</b>${esc(r.tekst)}</div>`).join("")}</div>
     ${a.werk ? `<h3 style="font-size:17px;margin:0">Hoe snel je site op orde is, per pakket</h3>
       <p class="zacht" style="margin:4px 0 0;font-size:14.5px">Gerekend met de ${a.werk} pagina's met verbeterpunten uit deze check. Daarna gaan we verder met de rest van je site.</p>
       <div class="rp-balken">${["basis", "plus", "pro"].map(balk).join("")}</div>` : ""}
-    <p style="margin:12px 0 0"><b>Vindbaarheid ${p[0]}: €${p[2]} per maand</b> <span class="zacht">· met Sitehulpje webbeheer erbij €75 per maand in plaats van €125. Prijzen exclusief btw, minimaal 3 maanden.</span></p>
-    <div class="rp-cta"><a class="knop groot-knop" href="bestellen?pakket=${encodeURIComponent(PAKKET[a.pakket] ? a.pakket : "plus")}${d.sitehulpje ? "&sh=1" : ""}${/^[0-9a-f-]{36}$/.test(q.get("id") || "") ? "&ref=check:" + q.get("id") : ""}">Start met ${p[0]} &rarr;</a><a class="knop rand groot-knop" href="https://siteregelaar.nl/vindbaarheid#pakketten">Bekijk alle pakketten</a></div>
+    <p style="margin:12px 0 0"><b>Sitehulpje ${p[0]}: €${p[2]} per maand</b> <span class="zacht">· eerste jaar 10% korting · je website laten aanpassen zit erin. Prijzen exclusief btw, minimaal 3 maanden.</span></p>
+    <div class="rp-cta"><a class="knop groot-knop" href="bestellen?pakket=${encodeURIComponent(PAKKET[a.pakket] ? a.pakket : "plus")}${d.sitehulpje ? "&sh=1" : ""}${/^[0-9a-f-]{36}$/.test(q.get("id") || "") ? "&ref=check:" + q.get("id") : ""}">Start met ${p[0]} &rarr;</a><a class="knop rand groot-knop" href="/#prijs">Bekijk alle pakketten</a></div>
   </section>
   <p class="rp-voet">Vragen? Bel of app Jan: 06 27 25 43 83 · info@sitehulpje.nl<br>Sitehulpje is een dienst van Siteregelaar · Markt 9, 7551 CG Hengelo · KvK 55667147<br>Niemand kan een plek bovenaan in Google garanderen. Resultaat zie je meestal na 2 tot 6 maanden.</p>`;
 }

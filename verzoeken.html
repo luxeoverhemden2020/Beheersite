@@ -49,10 +49,10 @@
 .vb-aanbod .rij{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .vriend-link{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}.vriend-link input{flex:1 1 220px;min-width:0;font-family:var(--mono,monospace);font-size:13px}</style>
 <script src="assets/basis.js"></script>
-<script src="assets/vindbaarheid.js?v=20261112a"></script>
+<script src="assets/vindbaarheid.js?v=20261112b"></script>
 <script src="assets/vb-start.js?v=20261111a"></script>
 <script src="assets/vb-site.js"></script>
-<script src="assets/vb-factuur.js"></script>
+<script src="assets/vb-factuur.js?v=20261112b"></script>
 <script>
 let open = new Set(), cache = {}, timer = null;
 const SNELKNOPPEN = [
@@ -215,8 +215,8 @@ api("ik").then((d) => {
       <h2 style="margin:0 0 6px">Beter gevonden worden in Google én AI</h2>
       <p class="zacht" style="margin:0 0 10px">Met Vindbaarheid controleren we je website elke week, verbeteren we je teksten voor Google en zie je in een helder dashboard hoe vaak je gevonden wordt. Ook in ChatGPT en andere AI-diensten.</p>
       <ul class="vb-goed" style="margin-bottom:12px"><li>Elke week een website-check</li><li>Betere titels en omschrijvingen, jij keurt goed met één klik</li><li>Je cijfers uit Google en Bing</li><li>Elke maand een rapport in gewone taal</li></ul>
-      <p style="margin:0 0 12px"><b>Vanaf €99 per maand.</b> <span class="zacht">Met Vindbaarheid erbij kost Sitehulpje nog maar €75 per maand.</span></p>
-      <a class="knop" href="https://siteregelaar.nl/vindbaarheid#pakketten">Bekijk de pakketten</a></div>`;
+      <p style="margin:0 0 12px"><b>In een pakket met Sitehulpje vanaf €169 per maand.</b> <span class="zacht">Je website laten aanpassen zit erin. Eerste jaar 10% korting.</span></p>
+      <a class="knop" href="/#prijs">Bekijk de pakketten</a></div>`;
     const kies = (t) => {
       tabs.querySelectorAll("button").forEach((b) => b.classList.toggle("aan", b.dataset.hoofd === t));
       $("#verzoekenDeel").classList.toggle("verborgen", t !== "verzoeken");

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Bestellen | Sitehulpje</title>
-<meta name="description" content="Bestel Sitehulpje Vindbaarheid of Sitehulpje webbeheer. In twee minuten geregeld, eerste maand betaal je met iDEAL.">
+<meta name="description" content="Bestel Sitehulpje Basis, Plus of Pro, of alleen Sitehulpje. In twee minuten geregeld, eerste maand betaal je met iDEAL.">
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="assets/stijl.css?v=20261110f">
 <link rel="stylesheet" href="assets/home.css?v=20261110">
@@ -97,21 +97,21 @@ details.extra summary{cursor:pointer;color:var(--zacht);font-size:15px;margin:14
       <div class="bs-stap"><b>1</b><span id="stap1kop">Ons advies voor jou</span></div>
       <div class="advies" id="advies" aria-live="polite">
         <div class="ad-kop">
-          <div><p class="label mono" id="adlabel" style="margin:0">Ons advies · op basis van je check</p><h2 id="adnaam">Vindbaarheid Plus</h2><p class="zacht" id="adsub" style="margin:2px 0 0">Lokaal groeien</p></div>
-          <div class="ad-prijs" id="adprijs">€179<small>per maand, excl. btw</small></div>
+          <div><p class="label mono" id="adlabel" style="margin:0">Ons advies · op basis van je check</p><h2 id="adnaam">Sitehulpje Plus</h2><p class="zacht" id="adsub" style="margin:2px 0 0">Lokaal groeien</p></div>
+          <div class="ad-prijs" id="adprijs">€239<small>per maand, excl. btw</small></div>
         </div>
         <ul id="adpunten"></ul>
       </div>
       <details class="ander" id="ander"><summary>Ander pakket kiezen</summary>
-      <div class="keuzes pakket" role="radiogroup" aria-label="Vindbaarheid-pakket">
-        <label class="keuze"><input type="radio" name="pakket" value="basis"><span>Basis<small>Gezond &amp; gevonden</small><em>€99</em></span></label>
-        <label class="keuze"><input type="radio" name="pakket" value="plus"><span>Plus<small>Lokaal groeien</small><em>€179</em></span></label>
-        <label class="keuze"><input type="radio" name="pakket" value="pro"><span>Pro<small>Voorsprong</small><em>€249</em></span></label>
-        <label class="keuze"><input type="radio" name="pakket" value=""><span>Geen<small>alleen Sitehulpje</small><em>–</em></span></label>
+      <div class="keuzes pakket" role="radiogroup" aria-label="Sitehulpje-pakket">
+        <label class="keuze"><input type="radio" name="pakket" value="basis"><span>Basis<small>Gezond &amp; gevonden</small><em>€169</em></span></label>
+        <label class="keuze"><input type="radio" name="pakket" value="plus"><span>Plus<small>Lokaal groeien</small><em>€239</em></span></label>
+        <label class="keuze"><input type="radio" name="pakket" value="pro"><span>Pro<small>Voorsprong + advertenties</small><em>€369</em></span></label>
+        <label class="keuze"><input type="radio" name="pakket" value=""><span>Alleen Sitehulpje<small>je site laten aanpassen</small><em>€125</em></span></label>
       </div>
+      <p class="zacht vb-klein" style="margin:8px 0 0">In elk pakket zit Sitehulpje: je website laten aanpassen door het te vragen. Nieuwe klanten krijgen het eerste jaar 10% korting op Basis, Plus en Pro.</p>
       </details>
-      <label class="sh-schakel"><input type="checkbox" id="b_sh">
-        <span><b>Ook je site aanpassen door het te vragen?</b> <span id="shprijs"></span><br><span class="zacht">Sitehulpje erbij: typ of spreek in wat er anders moet, meestal staat het er binnen een minuut.</span></span></label>
+      <input type="checkbox" id="b_sh" checked hidden>
 
       <div class="bs-stap"><b>2</b>Jouw gegevens</div>
       <div class="grid2">
@@ -166,7 +166,9 @@ details.extra summary{cursor:pointer;color:var(--zacht);font-size:15px;margin:14
 <script src="assets/basis.js"></script>
 <script>
 const BAPI = API.replace(/beheersite$/, "vb-bestel");
-const PK = { basis: { naam: "Vindbaarheid Basis", prijs: 99 }, plus: { naam: "Vindbaarheid Plus", prijs: 179 }, pro: { naam: "Vindbaarheid Pro", prijs: 249 } };
+const PK = { basis: { naam: "Sitehulpje Basis", prijs: 169 }, plus: { naam: "Sitehulpje Plus", prijs: 239 }, pro: { naam: "Sitehulpje Pro", prijs: 369 } };
+const KORT = 0.10, SH_LOS = 125;
+const metKorting = (p) => Math.round(p * (1 - KORT) * 100) / 100;
 const eur = (n, d = 0) => "€" + Number(n).toLocaleString("nl-NL", { minimumFractionDigits: d, maximumFractionDigits: d });
 try { $("#kopbot").innerHTML = robotSvg("rust"); $("#klaarbot").innerHTML = robotSvg("blij"); } catch {}
 const bapi = async (data) => {
@@ -245,30 +247,32 @@ if (codeUitLink) { $("#codevak").hidden = false; $("#codeopen").hidden = true; $
 
 // ---------- keuze en prijs ----------
 const keuze = () => ({ pakket: document.querySelector("input[name=pakket]:checked")?.value ?? null, sh: $("#b_sh").checked });
-const AD = { basis: ["Gezond & gevonden", ["De punten uit je check lossen wij op", "Elke maand gecontroleerd op fouten", "Elke maand een helder rapport"]],
-  plus: ["Lokaal groeien", ["De punten uit je check lossen wij op", "Je Google-bedrijfsprofiel elke week bijgehouden", "Elke maand een helder rapport"]],
-  pro: ["Voorsprong", ["De punten uit je check lossen wij op", "Elke maand nieuwe artikelen voor je site", "Elke week gemeten of AI je noemt"]] };
+const AD = { basis: ["Gezond & gevonden", ["Je website laten aanpassen: typ of spreek in wat er anders moet", "De punten uit je check lossen wij op", "Elke maand gecontroleerd op fouten, met een helder rapport"]],
+  plus: ["Lokaal groeien", ["Je website laten aanpassen: typ of spreek in wat er anders moet", "Alles uit Basis", "Je Google-bedrijfsprofiel elke week bijgehouden, pagina's per dienst en plaats"]],
+  pro: ["Voorsprong + advertenties", ["Je website laten aanpassen: typ of spreek in wat er anders moet", "Alles uit Plus, plus elke maand nieuwe artikelen en gemeten of AI je noemt", "Je Google-advertenties door ons beheerd (budget betaal je apart aan Google)"]] };
 const uitCheck = /^check:/.test(herkomst.ref || "");
 function tekenAdvies(pakket, p) {
-  $("#advies").hidden = !p; $("#stap1kop").textContent = p ? (uitCheck ? "Ons advies voor jou" : "Je keuze") : "Wat wil je?";
-  if (!p) { $("#ander").open = true; return; }
-  $("#adlabel").textContent = uitCheck ? "Ons advies · op basis van je check" : "Je gekozen pakket";
+  $("#stap1kop").textContent = p ? (uitCheck ? "Ons advies voor jou" : "Je keuze") : "Je keuze";
+  $("#adlabel").textContent = p ? (uitCheck ? "Ons advies · op basis van je check" : "Je gekozen pakket") : "Je keuze";
+  if (!p) {
+    $("#adnaam").textContent = "Alleen Sitehulpje"; $("#adsub").textContent = "Je website laten aanpassen";
+    $("#adprijs").innerHTML = eur(SH_LOS) + "<small>per maand, excl. btw</small>";
+    $("#adpunten").innerHTML = ["Typ of spreek in wat er anders moet", "Eerst bekijken op een testversie, dan akkoord", "Altijd terug te draaien"].map((x) => `<li>${esc(x)}</li>`).join("");
+    return;
+  }
   $("#adnaam").textContent = p.naam; $("#adsub").textContent = AD[pakket][0];
-  $("#adprijs").innerHTML = eur(p.prijs) + "<small>per maand, excl. btw</small>";
+  $("#adprijs").innerHTML = `<s style="font-size:.55em;opacity:.6">${eur(p.prijs)}</s> ${eur(metKorting(p.prijs), 2)}<small>per maand het eerste jaar, excl. btw</small>`;
   $("#adpunten").innerHTML = AD[pakket][1].map((x) => `<li>${esc(x)}</li>`).join("");
 }
 function teken() {
-  const { pakket, sh } = keuze(), p = pakket ? PK[pakket] : null;
+  const { pakket } = keuze(), p = pakket ? PK[pakket] : null;
   tekenAdvies(pakket, p);
-  if (pakket === "" && !sh) $("#b_sh").checked = true;
-  const shAan = $("#b_sh").checked, shPrijs = shAan ? (p ? 75 : 125) : 0;
-  $("#shprijs").innerHTML = p ? `<span class="mono">€75/mnd</span> <s>€125</s>` : `<span class="mono">€125/mnd</span>`;
   const regels = [];
-  if (p) regels.push([p.naam, eur(p.prijs)]);
-  if (shAan) regels.push(["Sitehulpje webbeheer", eur(shPrijs)]);
-  if (!regels.length) regels.push(["Kies een pakket", "–"]);
-  const bruto = (p ? p.prijs : 0) + shPrijs;
-  const af = !korting || !bruto ? 0 : korting.soort === "deel" ? Math.min(bruto, Math.round((p ? p.prijs : 0) * korting.pct_vb + shPrijs * korting.pct_sh) / 100) : korting.soort === "pct" ? Math.round(bruto * korting.waarde) / 100 : Math.min(bruto, korting.waarde);
+  let bruto;
+  if (p) { regels.push([p.naam, eur(p.prijs)]); regels.push(["10% korting het eerste jaar", "−" + eur(Math.round(p.prijs * KORT * 100) / 100, 2)]); bruto = metKorting(p.prijs); }
+  else { regels.push(["Sitehulpje", eur(SH_LOS)]); bruto = SH_LOS; }
+  const vbDeel = p ? bruto : 0, shDeel = p ? 0 : SH_LOS;
+  const af = !korting || !bruto ? 0 : korting.soort === "deel" ? Math.min(bruto, Math.round(vbDeel * korting.pct_vb + shDeel * korting.pct_sh) / 100) : korting.soort === "pct" ? Math.round(bruto * korting.waarde) / 100 : Math.min(bruto, korting.waarde);
   if (af) regels.push([`Kortingscode ${korting.code}${korting.maanden ? ` (${korting.maanden === 1 ? "eerste maand" : korting.maanden + " maanden"})` : ""}`, "−" + eur(af, af % 1 ? 2 : 0)]);
   $("#regels").innerHTML = regels.map(([a, b]) => `<div class="regel"><span>${esc(a)}</span><span>${b}</span></div>`).join("");
   const tot = Math.round((bruto - af) * 100) / 100;
@@ -276,21 +280,19 @@ function teken() {
   const nu = new Date(), dagen = new Date(nu.getFullYear(), nu.getMonth() + 1, 0).getDate(), rest = dagen - nu.getDate() + 1;
   const excl = af ? Math.round((Math.round(bruto * rest / dagen * 100) - Math.round(af * rest / dagen * 100))) / 100 : Math.round((tot * rest / dagen) * 100) / 100, incl = Math.round((excl + Math.round(excl * 21) / 100) * 100) / 100;
   const maand = nu.toLocaleDateString("nl-NL", { month: "long" });
-  $("#vandaag").innerHTML = tot ? `Vandaag betaal je <b>${eur(incl, 2)}</b> incl. btw voor de rest van ${maand} (${rest} van ${dagen} dagen). Daarna elke maand automatisch.${af && korting.maanden ? ` Na de korting wordt het ${eur(bruto)} per maand.` : ""}` : "";
+  $("#vandaag").innerHTML = tot ? `Vandaag betaal je <b>${eur(incl, 2)}</b> incl. btw voor de rest van ${maand} (${rest} van ${dagen} dagen). Daarna elke maand automatisch.${af && korting.maanden ? ` Na de kortingscode wordt het ${eur(bruto, bruto % 1 ? 2 : 0)} per maand.` : ""}${p ? ` Na het eerste jaar betaal je ${eur(p.prijs)} per maand.` : ""}` : "";
   $("#vandaag").hidden = !tot;
   $("#looptijd").textContent = ", met een minimale looptijd van 3 maanden";
   $("#punten").innerHTML = ["Minimaal 3 maanden", "Elke maand een factuur per mail", "Prijzen exclusief 21% btw"].map((x) => `<li>${x}</li>`).join("");
-  try { localStorage.setItem("sh_bestel", JSON.stringify({ pakket, sh: shAan })); } catch {}
+  try { localStorage.setItem("sh_bestel", JSON.stringify({ pakket })); } catch {}
 }
 // voorkeuze uit de link (bestellen?pakket=plus&sh=1) of van vorige keer
 (() => {
   let v = {}; try { v = JSON.parse(localStorage.getItem("sh_bestel") || "{}"); } catch {}
   const pk = q.has("pakket") ? q.get("pakket") : (v.pakket ?? "plus");
   const r = document.querySelector(`input[name=pakket][value="${["basis", "plus", "pro", ""].includes(pk) ? pk : "plus"}"]`); if (r) r.checked = true;
-  $("#b_sh").checked = q.has("sh") ? q.get("sh") === "1" : !!v.sh;
 })();
 document.querySelectorAll("input[name=pakket]").forEach((r) => r.addEventListener("change", teken));
-$("#b_sh").addEventListener("change", () => { if (keuze().pakket === "" && !$("#b_sh").checked) { document.querySelector("input[name=pakket][value=plus]").checked = true; } teken(); });
 teken();
 
 // ---------- postcode-check ----------
@@ -318,7 +320,7 @@ $("#b_hand").addEventListener("focus", () => { if (!$("#b_hand").value && $("#b_
 // ---------- bestellen ----------
 $("#bform").onsubmit = async (e) => {
   e.preventDefault(); toonMelding($("#bmeld"), "");
-  const { pakket } = keuze(), sh = $("#b_sh").checked;
+  const { pakket } = keuze(), sh = true;
   const leeg = [["#b_bedrijf", "je bedrijfsnaam"], ["#b_naam", "je naam"], ["#b_email", "je e-mailadres"], ["#b_site", "je website"], ["#b_pc", "je postcode"], ["#b_nr", "je huisnummer"]].find(([s]) => !$(s).value.trim());
   if (leeg) { toonMelding($("#bmeld"), `Vul ${leeg[1]} in.`); $(leeg[0]).focus(); return; }
   if (!adresOk) { toonMelding($("#bmeld"), "Controleer je postcode en huisnummer."); $("#b_pc").focus(); return; }
@@ -326,7 +328,7 @@ $("#bform").onsubmit = async (e) => {
   if ($("#b_hand").value.trim().length < 3) { toonMelding($("#bmeld"), "Typ je volledige naam als ondertekening."); $("#b_hand").focus(); return; }
   $("#bknop").disabled = true; $("#bknop").textContent = "Even geduld…";
   try {
-    const d = await bapi({ actie: "plaats", pakket: pakket || null, sitehulpje: sh, bedrijf: $("#b_bedrijf").value, naam: $("#b_naam").value, email: $("#b_email").value,
+    const d = await bapi({ actie: "plaats", pakket: pakket || null, sitehulpje: sh, bundel: !!pakket, bedrijf: $("#b_bedrijf").value, naam: $("#b_naam").value, email: $("#b_email").value,
       telefoon: $("#b_tel").value, site: $("#b_site").value, postcode: $("#b_pc").value, huisnummer: $("#b_nr").value, straat: $("#b_straat").value, plaats: $("#b_plaats").value,
       kvk: $("#b_kvk").value, btw: $("#b_btw").value, bericht: $("#b_bericht").value, voorwaarden: $("#b_vw").checked, verwerker: $("#b_vk").checked,
       handtekening: $("#b_hand").value, website2: $("#b_website2").value, ref: herkomst.ref || null, vriend: herkomst.vriend || null, kortingscode: korting ? korting.code : ($("#b_code").value.trim() || null) });
