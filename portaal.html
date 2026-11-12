@@ -1148,12 +1148,24 @@ async function kpLaadVb() {
   vbStartToon(startEl, undefined, { stil: true, klaar: aanpassen }).then((s) => { if (s?.klant_klaar) aanpassen(); });
   const dash = $("#vbdash");
   await vbToon(dash);
-  const tag = (sel, kp) => dash.querySelectorAll(sel).forEach((x) => (x.dataset.kp = kp));
-  tag('[data-vb-blok="tegels"],[data-vb-blok="beste"]', "verborgen-blok");
-  tag('[data-vb-blok="gbp"]', "maps"); tag('[data-vb-blok="ai"]', "ai");
-  tag('[data-vb-blok="grafiek"],[data-vb-gz-kort]', "overzicht"); tag('[data-vb-blok="kansen"]', "zoekwoorden");
-  tag('[data-vb-paneel="overzicht"]', "overzicht maps ai zoekwoorden");
-  ["zoekwoorden", "paginas", "reviews", "voorstellen", "gezondheid", "rapporten", "koppelingen"].forEach((p) => tag(`[data-vb-paneel="${p}"]`, p));
+  // onderdelen van het Vindbaarheid-dashboard aan de juiste menupagina hangen.
+  // Opnieuw doen telkens als het dashboard zichzelf ververst (bijv. na een review beantwoorden), anders valt alles weg.
+  const kpTagVb = () => {
+    const tag = (sel, kp) => dash.querySelectorAll(sel).forEach((x) => (x.dataset.kp = kp));
+    tag('[data-vb-blok="tegels"],[data-vb-blok="beste"]', "verborgen-blok");
+    tag('[data-vb-blok="gbp"]', "maps"); tag('[data-vb-blok="ai"]', "ai");
+    tag('[data-vb-blok="grafiek"],[data-vb-gz-kort]', "overzicht"); tag('[data-vb-blok="kansen"]', "zoekwoorden");
+    tag('[data-vb-paneel="overzicht"]', "overzicht maps ai zoekwoorden");
+    ["zoekwoorden", "paginas", "reviews", "voorstellen", "gezondheid", "rapporten", "koppelingen"].forEach((p) => tag(`[data-vb-paneel="${p}"]`, p));
+    // tijdens "Laden…" de laadkaart op de huidige pagina laten zien
+    dash.querySelectorAll(":scope > .kaart:not([data-kp])").forEach((x) => (x.dataset.kp = kpPagina));
+  };
+  kpTagVb();
+  new MutationObserver(() => {
+    kpTagVb();
+    const t = dash.querySelector(".vb-tabs");
+    if (t && !t.dataset.kpGevolgd) { t.dataset.kpGevolgd = "1"; const l = () => { try { lees(); } catch {} }; new MutationObserver(l).observe(t, { subtree: true, childList: true, characterData: true }); l(); }
+  }).observe(dash, { childList: true });
   const d = dash.vbData;
   if (!d) return;
   if (!d.koppeling?.gbp_locatie) kpBadge.reviews = 0;
@@ -1164,7 +1176,7 @@ async function kpLaadVb() {
     const nv = n('.vb-tab[data-vb-tab="voorstellen"]'), nr = n('.vb-tab[data-vb-tab="reviews"]');
     if (nv !== kpBadge.voorstellen || nr !== kpBadge.reviews) { kpBadge.voorstellen = nv; kpBadge.reviews = nr; kpTekenMenu(); kpTodo(); }
   };
-  lees(); const tabs = dash.querySelector(".vb-tabs"); if (tabs) new MutationObserver(lees).observe(tabs, { subtree: true, childList: true, characterData: true });
+  lees(); const tabs = dash.querySelector(".vb-tabs"); if (tabs) { tabs.dataset.kpGevolgd = "1"; new MutationObserver(lees).observe(tabs, { subtree: true, childList: true, characterData: true }); }
 }
 function kpCijfers(d) {
   const eind = d.gsc.length ? d.gsc[d.gsc.length - 1][0] : d.ga4.length ? d.ga4[d.ga4.length - 1][0] : null;
