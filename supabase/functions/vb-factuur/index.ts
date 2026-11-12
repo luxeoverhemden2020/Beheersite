@@ -24,18 +24,24 @@ const PRIJS: Record<string, number> = { basis: 99, plus: 179, pro: 249 };
 const PAKKET: Record<string, string> = { basis: "Basis", plus: "Plus", pro: "Pro" };
 const BTW = 0.21;
 const ADS_PRIJS = 99;
+// Sitehulpje-pakketten (Sitehulpje zit erin): Basis, Plus, Pro (Pro inclusief advertentiebeheer); 10% korting t/m bundel_korting_tot
+const BUNDEL: Record<string, number> = { basis: 169, plus: 239, pro: 369 };
+const BUNDEL_KORTING = 0.10;
 // maandbedrag en omschrijving: Vindbaarheid-pakket en/of Sitehulpje webbeheer (sh_prijs)
 // Persoonlijke korting (in beheer ingesteld): vast bedrag of percentage per maand, eventueel tot een datum
 function abonnement(k: any, periode?: string) {
   const dag = (d: any) => String(d instanceof Date ? d.toISOString() : d).slice(0, 10);
-  const vb = k.vindbaarheid && k.vb_pakket ? PRIJS[k.vb_pakket] : 0, sh = Number(k.sh_prijs || 0);
+  const bun = k.bundel && BUNDEL[k.bundel] ? String(k.bundel) : "";
+  const bunKort = !!bun && !!k.bundel_korting_tot && (!periode || `${periode}-01` <= dag(k.bundel_korting_tot));
+  const bundel = bun ? (bunKort ? Math.round(BUNDEL[bun] * (1 - BUNDEL_KORTING) * 100) / 100 : BUNDEL[bun]) : 0;
+  const vb = !bun && k.vindbaarheid && k.vb_pakket ? PRIJS[k.vb_pakket] : 0, sh = bun ? 0 : Number(k.sh_prijs || 0);
   // Google Advertenties beheer: loopt zodra de advertenties gestart zijn (ads_tellen_vanaf), standaard €99 (ads_prijs; 0 = opgezegd),
   // met 20% korting t/m ads_korting_tot (Sitehulpje-aanbod, eerste jaar)
-  const adsVol = k.ads_tellen_vanaf ? Number(k.ads_prijs ?? ADS_PRIJS) : 0;
+  const adsVol = k.ads_tellen_vanaf && bun !== "pro" ? Number(k.ads_prijs ?? ADS_PRIJS) : 0;
   const adsKort = adsVol > 0 && !!k.ads_korting_tot && (!periode || `${periode}-01` <= dag(k.ads_korting_tot));
   const ads = adsVol > 0 ? (adsKort ? Math.round(adsVol * 80) / 100 : adsVol) : 0;
-  const delen = [vb ? `Sitehulpje Vindbaarheid ${PAKKET[k.vb_pakket]}` : "", sh ? "Sitehulpje webbeheer" : "", ads ? `Google Advertenties beheer${adsKort ? " (20% korting)" : ""}` : ""].filter(Boolean);
-  const bruto = Math.round((vb + sh + ads) * 100) / 100;
+  const delen = [bundel ? `Sitehulpje ${PAKKET[bun]}${bunKort ? " (10% korting eerste jaar)" : ""}` : "", vb ? `Sitehulpje Vindbaarheid ${PAKKET[k.vb_pakket]}` : "", sh ? "Sitehulpje webbeheer" : "", ads ? `Google Advertenties beheer${adsKort ? " (20% korting)" : ""}` : ""].filter(Boolean);
+  const bruto = Math.round((bundel + vb + sh + ads) * 100) / 100;
   // korting_van: korting die pas later ingaat (pauzemaand, vriendenkorting); korting_tot: tot en met die datum
   const geldig = !periode || ((!k.korting_tot || `${periode}-01` <= dag(k.korting_tot)) && (!k.korting_van || `${periode}-01` >= dag(k.korting_van).slice(0, 7) + "-01"));
   let korting = 0;
@@ -400,17 +406,21 @@ async function abonnementVan(klantId: string) {
   const [o] = await sql`select akkoord from beheersite.vb_onboarding where klant_id = ${klantId}`;
   const delen: { id: string; naam: string; prijs: number; minEind: string | null }[] = [];
   const nu = nuAms(), eindDeze = laatsteDag(nu.getFullYear(), nu.getMonth());
-  if (k.vb_pakket && (k.vindbaarheid || k.vb_pauze)) {
+  if (k.bundel && BUNDEL[k.bundel]) {
+    // pakket met Sitehulpje erin: één onderdeel, minimaal 3 maanden vanaf de start
+    const st = k.vb_start ? new Date(k.vb_start) : nu;
+    delen.push({ id: "pakket", naam: `Sitehulpje ${PAKKET[k.bundel]}`, prijs: BUNDEL[k.bundel], minEind: iso(laatsteDag(st.getFullYear(), st.getMonth() + 2)) });
+  } else if (k.vb_pakket && (k.vindbaarheid || k.vb_pauze)) {
     const st = k.vb_start ? new Date(k.vb_start) : nu;
     const min = Number(o?.akkoord?.minimaal_maanden || 3);
     delen.push({ id: "vindbaarheid", naam: `Vindbaarheid ${PAKKET[k.vb_pakket]}`, prijs: PRIJS[k.vb_pakket], minEind: iso(laatsteDag(st.getFullYear(), st.getMonth() + min - 1)) });
   }
-  if (Number(k.sh_prijs) > 0) {
+  if (!k.bundel && Number(k.sh_prijs) > 0) {
     // Sitehulpje webbeheer: ook minimaal 3 maanden, gerekend vanaf de maand van het akkoord
     const st = o?.akkoord?.datum ? new Date(o.akkoord.datum) : (k.vb_start ? new Date(k.vb_start) : nu);
     delen.push({ id: "sitehulpje", naam: "Sitehulpje webbeheer", prijs: Number(k.sh_prijs), minEind: iso(laatsteDag(st.getFullYear(), st.getMonth() + 2)) });
   }
-  if (k.ads_tellen_vanaf && Number(k.ads_prijs ?? ADS_PRIJS) > 0) {
+  if (k.ads_tellen_vanaf && k.bundel !== "pro" && Number(k.ads_prijs ?? ADS_PRIJS) > 0) {
     // Google Advertenties beheer: minimaal 3 maanden vanaf de start
     const st = new Date(k.ads_prijs_sinds || k.ads_tellen_vanaf);
     delen.push({ id: "advertenties", naam: "Google Advertenties beheer", prijs: Number(k.ads_prijs ?? ADS_PRIJS), minEind: iso(laatsteDag(st.getFullYear(), st.getMonth() + 2)) });
@@ -456,9 +466,11 @@ async function opzegVerwerk() {
   const uit: Record<string, string> = {};
   for (const k of ks) {
     const wat: string[] = k.opzeg_wat || [];
-    const vbWeg = wat.includes("vindbaarheid"), shWeg = wat.includes("sitehulpje"), adsWeg = wat.includes("advertenties");
+    const pkWeg = wat.includes("pakket");
+    const vbWeg = pkWeg || wat.includes("vindbaarheid"), shWeg = pkWeg || wat.includes("sitehulpje"), adsWeg = (pkWeg && k.bundel === "pro") || wat.includes("advertenties");
     await sql`update beheersite.klanten set vindbaarheid = ${vbWeg ? false : k.vindbaarheid}, vb_pakket = ${vbWeg ? null : k.vb_pakket},
       sh_prijs = ${shWeg ? null : k.sh_prijs}, ads_prijs = ${adsWeg ? 0 : k.ads_prijs}, ads_korting_tot = ${adsWeg ? null : k.ads_korting_tot},
+      bundel = ${pkWeg ? null : k.bundel}, bundel_korting_tot = ${pkWeg ? null : k.bundel_korting_tot},
       opzeg_per = null, opzeg_wat = null where id = ${k.id}`;
     if (adsWeg) await mailJan(`Advertenties opgezegd: ${k.naam}`, `<p>Het advertentiebeheer van <b>${esc(k.naam)}</b> is gestopt. Pauzeer de campagne in je beheer bij Advertenties en kijk of er nog tegoed terug moet.</p>`);
     const blijft = (!vbWeg && k.vb_pakket) || (!shWeg && Number(k.sh_prijs) > 0) || (!adsWeg && !!k.ads_tellen_vanaf && Number(k.ads_prijs ?? ADS_PRIJS) > 0);
@@ -553,12 +565,21 @@ async function wissel(g: any, b: any) {
   if (b.pakket) {
     const p = String(b.pakket);
     if (!PRIJS[p]) throw new Fout(400, "Onbekend pakket.");
-    if (!k.vb_pakket || !k.vindbaarheid) throw new Fout(400, "Je hebt nog geen Vindbaarheid. Bestel het via sitehulpje.nl/bestellen.");
-    if (k.vb_pakket === p) return { ok: true };
-    await sql`update beheersite.klanten set vb_pakket = ${p} where id = ${k.id}`;
+    if (k.bundel) {
+      if (k.bundel === p) return { ok: true };
+      await sql`update beheersite.klanten set bundel = ${p}, vb_pakket = ${p} where id = ${k.id}`;
+    } else {
+      if (!k.vb_pakket || !k.vindbaarheid) throw new Fout(400, "Je hebt nog geen pakket. Bestel het via sitehulpje.nl/bestellen.");
+      if (k.vb_pakket === p) return { ok: true };
+      await sql`update beheersite.klanten set vb_pakket = ${p} where id = ${k.id}`;
+    }
   } else if (b.sitehulpje) {
-    if (Number(k.sh_prijs) > 0) return { ok: true };
-    await sql`update beheersite.klanten set sh_prijs = ${k.vb_pakket ? 75 : 125} where id = ${k.id}`;
+    if (k.bundel || Number(k.sh_prijs) > 0) return { ok: true };
+    // klant met alleen Vindbaarheid: wordt het pakket Sitehulpje Basis/Plus/Pro (Sitehulpje zit erin), 10% korting het eerste jaar
+    if (k.vb_pakket) {
+      const tot = iso(new Date(nuAms().getTime() + 365 * 86400_000));
+      await sql`update beheersite.klanten set bundel = ${k.vb_pakket}, bundel_korting_tot = ${tot}, sh_prijs = 75 where id = ${k.id}`;
+    } else await sql`update beheersite.klanten set sh_prijs = 125 where id = ${k.id}`;
   } else throw new Fout(400, "Wat wil je veranderen?");
   const [n] = await sql`select * from beheersite.klanten where id = ${k.id}`;
   const nv = nuAms(), nieuw = abonnement(n, maandVan(new Date(nv.getFullYear(), nv.getMonth() + 1, 1)));
@@ -595,9 +616,10 @@ async function bestelBetaling(id: string) {
   if (bs.betaallink) return { ok: true, url: bs.betaallink };
   const g = bs.gegevens;
   const [kc] = bs.kortingscode ? await sql`select * from beheersite.kortingscodes where code = ${bs.kortingscode}` : [];
-  const shp = bs.sitehulpje ? (bs.pakket ? 75 : 125) : 0, vbp = bs.pakket ? PRIJS[bs.pakket] : 0;
+  const shp = bs.bundel ? 0 : bs.sitehulpje ? (bs.pakket ? 75 : 125) : 0;
+  const vbp = bs.bundel ? Math.round(BUNDEL[bs.pakket] * (1 - BUNDEL_KORTING) * 100) / 100 : bs.pakket ? PRIJS[bs.pakket] : 0;
   const kk = !kc ? null : kc.soort === "deel" ? { soort: "eur", waarde: Math.round(vbp * Number(kc.pct_vb || 0) + shp * Number(kc.pct_sh || 0)) / 100 } : { soort: kc.soort, waarde: Number(kc.waarde) };
-  const ab = abonnement({ vindbaarheid: !!bs.pakket, vb_pakket: bs.pakket, sh_prijs: shp,
+  const ab = abonnement({ vindbaarheid: !!bs.pakket, vb_pakket: bs.pakket, sh_prijs: shp, bundel: bs.bundel ? bs.pakket : null, bundel_korting_tot: bs.bundel ? "2999-12-31" : null,
     korting_pct: kk?.soort === "pct" ? kk.waarde : null, korting_eur: kk?.soort === "eur" ? kk.waarde : null, korting_reden: kc ? `kortingscode ${kc.code}` : null });
   const nu = nuAms(), periode = maandVan(nu), dagen = new Date(nu.getFullYear(), nu.getMonth() + 1, 0).getDate(), rest = dagen - nu.getDate() + 1;
   const oms = `${ab.naam} – ${rest} van ${dagen} dagen ${maandNaam(periode)}`;
