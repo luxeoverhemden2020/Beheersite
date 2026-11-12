@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/sitehulpje/status" method="GET">
+        <service class="Sitehulpje\Koppeling\Api\BeheerInterface" method="status"/>
+        <resources><resource ref="Sitehulpje_Koppeling::beheer"/></resources>
+    </route>
+    <route url="/V1/sitehulpje/adres" method="GET">
+        <service class="Sitehulpje\Koppeling\Api\BeheerInterface" method="controleerAdres"/>
+        <resources><resource ref="Sitehulpje_Koppeling::beheer"/></resources>
+    </route>
+    <route url="/V1/sitehulpje/doorverwijzingen" method="GET">
+        <service class="Sitehulpje\Koppeling\Api\BeheerInterface" method="zoekDoorverwijzingen"/>
+        <resources><resource ref="Sitehulpje_Koppeling::beheer"/></resources>
+    </route>
+    <route url="/V1/sitehulpje/doorverwijzingen" method="POST">
+        <service class="Sitehulpje\Koppeling\Api\BeheerInterface" method="maakDoorverwijzing"/>
+        <resources><resource ref="Sitehulpje_Koppeling::beheer"/></resources>
+    </route>
+    <route url="/V1/sitehulpje/doorverwijzingen/:id" method="DELETE">
+        <service class="Sitehulpje\Koppeling\Api\BeheerInterface" method="verwijderDoorverwijzing"/>
+        <resources><resource ref="Sitehulpje_Koppeling::beheer"/></resources>
+    </route>
+    <route url="/V1/sitehulpje/sitemap/genereren" method="POST">
+        <service class="Sitehulpje\Koppeling\Api\BeheerInterface" method="genereerSitemap"/>
+        <resources><resource ref="Sitehulpje_Koppeling::beheer"/></resources>
+    </route>
+    <route url="/V1/sitehulpje/sitemap/automatisch" method="POST">
+        <service class="Sitehulpje\Koppeling\Api\BeheerInterface" method="sitemapAutomatisch"/>
+        <resources><resource ref="Sitehulpje_Koppeling::beheer"/></resources>
+    </route>
+    <route url="/V1/sitehulpje/robots" method="GET">
+        <service class="Sitehulpje\Koppeling\Api\BeheerInterface" method="leesRobots"/>
+        <resources><resource ref="Sitehulpje_Koppeling::beheer"/></resources>
+    </route>
+    <route url="/V1/sitehulpje/robots" method="POST">
+        <service class="Sitehulpje\Koppeling\Api\BeheerInterface" method="zetRobots"/>
+        <resources><resource ref="Sitehulpje_Koppeling::beheer"/></resources>
+    </route>
+    <route url="/V1/sitehulpje/canonical" method="POST">
+        <service class="Sitehulpje\Koppeling\Api\BeheerInterface" method="canonical"/>
+        <resources><resource ref="Sitehulpje_Koppeling::beheer"/></resources>
+    </route>
+    <route url="/V1/sitehulpje/cache/legen" method="POST">
+        <service class="Sitehulpje\Koppeling\Api\BeheerInterface" method="legenCache"/>
+        <resources><resource ref="Sitehulpje_Koppeling::beheer"/></resources>
+    </route>
+    <route url="/V1/sitehulpje/indexen/bijwerken" method="POST">
+        <service class="Sitehulpje\Koppeling\Api\BeheerInterface" method="bijwerkenIndexen"/>
+        <resources><resource ref="Sitehulpje_Koppeling::beheer"/></resources>
+    </route>
+</routes>

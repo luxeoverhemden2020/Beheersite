@@ -1,0 +1,9 @@
+{
+    "name": "sitehulpje/module-koppeling",
+    "description": "Sitehulpje: vaste, veilige acties voor SEO en onderhoud via de Magento REST API (doorverwijzingen, sitemap, robots.txt, canonical, cache, indexen, gezondheid).",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": "proprietary",
+    "require": { "php": ">=8.1", "magento/framework": "*" },
+    "autoload": { "files": ["registration.php"], "psr-4": { "Sitehulpje\\Koppeling\\": "" } }
+}
