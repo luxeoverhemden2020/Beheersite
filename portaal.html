@@ -538,13 +538,13 @@ function shAanbodLaad() {
       <div id="sha_meld"></div>
       <div class="kaart"><span class="kp-mono">ook mogelijk · advertenties in Google</span><h2 style="margin:4px 0">Sneller klanten via Google</h2>
         <p class="zacht" style="margin:0">Jij kiest een budget, wij regelen de advertenties (ook Google Shopping). Je ziet één getal: wat je erin stopte en wat het opleverde.</p>
-        <div class="sha-prijs" style="margin:10px 0"><s>€ 99</s><b style="font-size:24px">€ 79,20</b><span class="zacht">/maand beheer · geen opstartkosten · minimaal 3 maanden</span></div>
-        <p class="zacht" style="margin:0 0 12px;font-size:13px">Advertentiebudget betaal je apart en bepaal je zelf.</p>
+        <div class="sha-prijs" style="margin:10px 0"><s>€ 99</s><b style="font-size:24px">€ 79,20</b><span class="zacht">/maand beheer het eerste jaar · geen opstartkosten · minimaal 3 maanden</span></div>
+        <p class="zacht" style="margin:0 0 12px;font-size:13px">Advertentiebudget betaal je apart en bepaal je zelf. Het beheer betaal je maandelijks: de eerste keer met iDEAL, daarna automatisch.</p>
         <button type="button" class="knop rand" id="sha_ads">Meer over advertenties</button></div>
       <button type="button" class="knop rand" id="sha_terug2" style="margin-top:16px">Nu niet, terug naar mijn verzoeken</button>
-      <p class="zacht" style="font-size:13px;margin:14px 0 0">Prijzen per maand, excl. btw. Minimale looptijd 3 maanden. De korting geldt zolang je het pakket hebt.</p>`;
+      <p class="zacht" style="font-size:13px;margin:14px 0 0">Prijzen per maand, excl. btw. Minimale looptijd 3 maanden. De korting geldt het eerste jaar.</p>`;
     $("#sha_terug").onclick = $("#sha_terug2").onclick = () => kpNaar("verzoeken");
-    $("#sha_ads").onclick = () => kpNaar("advertenties");
+    $("#sha_ads").onclick = () => { shaApi({ actie: "ads" }).catch(() => {}); kpNaar("advertenties"); };
     $("#vbpromo").querySelectorAll("[data-sha]").forEach((b) => (b.onclick = async () => {
       const k = b.dataset.sha, n = P[k];
       if (!confirm(`Vindbaarheid ${n.naam} erbij nemen voor ${shaEu(n.met_korting)} per maand (excl. btw, minimaal 3 maanden)?`)) return;
