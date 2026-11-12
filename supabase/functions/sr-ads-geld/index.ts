@@ -59,7 +59,7 @@ async function gads(i: Record<string, string>, at: string, pad: string, body: un
   const r = await fetch(`https://googleads.googleapis.com/${V(i)}/${pad}`, { method: "POST", headers: kop(i, at), body: JSON.stringify(body), signal: AbortSignal.timeout(60000) });
   const d = await r.json().catch(() => ({}));
   if (!r.ok) {
-    const fouten = (d?.error?.details || []).flatMap((x: any) => x.errors || []).map((e: any) => e.message).filter(Boolean);
+    const fouten = [...new Set((d?.error?.details || []).flatMap((x: any) => x.errors || []).map((e: any) => e.message).filter(Boolean))];
     throw new Fout(502, `Google Ads: ${(fouten.join(" / ") || d?.error?.message || r.status)}`.slice(0, 500));
   }
   return d;
@@ -92,7 +92,7 @@ function opbouw(cid: string, v: any, budget: { soort: "totaal" | "dag"; bedrag: 
       targetSpend: { cpcBidCeilingMicros: String(Math.round(cpcMax * 1e6)) },
       geoTargetTypeSetting: { positiveGeoTargetType: "PRESENCE" },
       containsEuPoliticalAdvertising: "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING",
-      ...(totaal && budget.eind ? { startDateTime: tijdStr(new Date()), endDateTime: tijdStr(budget.eind) } : {}) } } },
+      ...(totaal && budget.eind ? { startDateTime: tijdStr(new Date()), endDateTime: tijdStr(budget.eind).slice(0, 10) + " 23:59:59" } : {}) } } },
     { campaignCriterionOperation: { create: { campaign: C, language: { languageConstant: "languageConstants/1010" } } } },
     ...UITSLUITEN.map((t) => ({ campaignCriterionOperation: { create: { campaign: C, negative: true, keyword: { text: t, matchType: "BROAD" } } } })),
   ];
@@ -173,7 +173,7 @@ async function totaalBijwerken(i: Record<string, string>, at: string, kid: strin
   if (verleng && (!eind || eind.getTime() < Date.now() + 864e5)) {
     const [t] = await sql`select dagen from beheersite.ads_tegoed where klant_id = ${kid} and status = 'betaald' order by betaald_op desc limit 1`;
     eind = new Date(Date.now() + (t?.dagen || 14) * 864e5);
-    ops.push({ campaignOperation: { update: { resourceName: k.ads_campagne, endDateTime: tijdStr(eind) }, updateMask: "end_date_time" } });
+    ops.push({ campaignOperation: { update: { resourceName: k.ads_campagne, endDateTime: tijdStr(eind).slice(0, 10) + " 23:59:59" }, updateMask: "end_date_time" } });
   }
   await gads(i, at, `customers/${cid}/googleAds:mutate`, { mutateOperations: ops });
   await sql`update beheersite.klanten set ads_periode_eind = ${eind} where id = ${kid}`;

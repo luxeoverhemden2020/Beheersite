@@ -70,7 +70,8 @@ async function sitemapUrls(site: string) {
   return urls.slice(0, 20000);
 }
 function bestePagina(term: string, urls: string[], standaard: string) {
-  const w = term.split(/\s+/).map(stam2).filter((x) => x.length >= 3);
+  const ALG = new Set(["heer", "her", "dame", "voor", "kop", "online", "goedkop", "beste", "mooi", "mooist", "luxe", "nieuw", "man", "mann", "vrouw"]);
+  const w = term.split(/\s+/).map(stam2).filter((x) => x.length >= 3 && !ALG.has(x));
   if (!w.length) return standaard;
   let best = "", bestLen = 1e9;
   for (const u of urls) {
@@ -79,7 +80,8 @@ function bestePagina(term: string, urls: string[], standaard: string) {
     const delen = pad.split(/[\/\-_.]+/).map(stam2).filter(Boolean);
     if (w.every((x) => delen.some((d) => d === x || d.startsWith(x))) && pad.length < bestLen) { best = u; bestLen = pad.length; }
   }
-  return best || standaard;
+  if (!best) return standaard;
+  try { const u = new URL(best), s = new URL(standaard); u.host = s.host; u.protocol = s.protocol; return u.toString(); } catch { return best; }
 }
 // ---------- openingstijden ("ma 13:00–18:00, di–vr 10:30–18:00") -> advertentietijden ----------
 const DAGEN = ["ma", "di", "wo", "do", "vr", "za", "zo"], GDAG = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
@@ -93,10 +95,11 @@ export function leesTijden(t: string) {
 }
 async function meting(i: Record<string, string>, at: string, cid: string) {
   const r = await fetch(`https://googleads.googleapis.com/${V(i)}/customers/${cid}/googleAds:search`, { method: "POST", headers: adsKop(i, at),
-    body: JSON.stringify({ query: "SELECT conversion_action.name, conversion_action.type, conversion_action.primary_for_goal FROM conversion_action WHERE conversion_action.status = 'ENABLED'" }), signal: AbortSignal.timeout(20000) });
+    body: JSON.stringify({ query: "SELECT conversion_action.name, conversion_action.category, conversion_action.primary_for_goal FROM conversion_action WHERE conversion_action.status = 'ENABLED'" }), signal: AbortSignal.timeout(20000) });
   const d = await r.json().catch(() => ({}));
   if (!r.ok) return { bekend: false, aantal: 0, namen: [] as string[] };
-  const lijst = (d.results || []).filter((x: any) => x.conversionAction?.primaryForGoal !== false);
+  const ECHT = ["PURCHASE", "SUBMIT_LEAD_FORM", "PHONE_CALL_LEAD", "CONTACT", "REQUEST_QUOTE", "BOOK_APPOINTMENT", "QUALIFIED_LEAD", "CONVERTED_LEAD", "IMPORTED_LEAD", "STORE_VISIT", "STORE_SALE", "GET_DIRECTIONS", "SIGNUP"];
+  const lijst = (d.results || []).filter((x: any) => x.conversionAction?.primaryForGoal !== false && ECHT.includes(x.conversionAction?.category));
   return { bekend: true, aantal: lijst.length, namen: lijst.map((x: any) => x.conversionAction.name).slice(0, 5) };
 }
 
