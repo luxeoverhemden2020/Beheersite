@@ -527,7 +527,9 @@ async function vbFixVul(paneel, problemen, klantId) {
         e.target.disabled = true; e.target.textContent = "Versturen…";
         const urls = urlsVan(x).slice(0, 10);
         try { await api("verzoek_nieuw", { tekst: `Uit de website-check: ${x.tekst}\n${x.oplossing ? "Oplossing: " + x.oplossing + "\n" : ""}${urls.length ? "Pagina's:\n" + urls.map((u) => "- " + u).join("\n") : ""}`, fotos: [] });
-          vak.innerHTML = `<div class="melding ok">Verstuurd. Sitehulpje gaat ermee aan de slag; je ziet de voortgang bij Iets laten aanpassen.</div>`; }
+          vak.innerHTML = `<div class="melding ok">Verstuurd. Sitehulpje gaat ermee aan de slag.<br><a href="portaal" class="knop klein" data-naar-verzoeken style="margin-top:10px;display:inline-flex">Bekijk de voortgang →</a></div>`;
+          const nv = vak.querySelector("[data-naar-verzoeken]");
+          if (nv && typeof kpNaar === "function") nv.onclick = (e) => { e.preventDefault(); kpNaar("verzoeken"); }; }
         catch (err) { toonMelding(vak.querySelector("[data-fixmeld]"), err.message); e.target.disabled = false; e.target.textContent = "Laat Sitehulpje dit oplossen"; }
       };
     } else vak.innerHTML = "";
