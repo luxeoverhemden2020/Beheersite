@@ -1,5 +1,5 @@
 // Advertenties starten (Supabase Edge Function "sr-ads-start")
-// - voorstel: maakt automatisch een advertentievoorstel (zonder AI, kost niets) of geeft het bestaande terug
+// - voorstel: maakt eenmalig een advertentievoorstel (teksten met AI, een paar cent) of geeft het bestaande terug; opnieuw alleen door Jan
 // - keuzes: klant past het voorstel aan (teksten, zoekwoorden, budget, doel)
 // - akkoord: klant geeft akkoord -> mail naar Jan. Zet NIETS aan in Google Ads.
 // - aanvraag/status: oude eenvoudige aanvraag (blijft werken)
@@ -63,7 +63,8 @@ async function handel(req: Request, b: any) {
 
   if (a === "voorstel") {
     let [v] = await sql`select id, data, keuzes, status, gemaakt, akkoord_op from beheersite.ads_voorstellen where klant_id = ${kid} and status in ('concept','akkoord') order by gemaakt desc limit 1`;
-    if (!v || (b.opnieuw && v.status === "concept")) {
+    // alleen Jan mag opnieuw laten maken; de klant krijgt altijd het bewaarde voorstel (ook na verversen)
+    if (!v || (b.opnieuw && g.rol === "admin" && v.status === "concept")) {
       const data = await maakVoorstel(sql, kid);
       if (v) [v] = await sql`update beheersite.ads_voorstellen set data = ${sql.json(data)}, keuzes = '{}'::jsonb, gemaakt = now(), bijgewerkt = now() where id = ${v.id} returning id, data, keuzes, status, gemaakt, akkoord_op`;
       else [v] = await sql`insert into beheersite.ads_voorstellen (klant_id, data) values (${kid}, ${sql.json(data)}) returning id, data, keuzes, status, gemaakt, akkoord_op`;
