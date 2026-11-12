@@ -274,7 +274,7 @@ function opbouw(d) {
     ${a.werk ? `<h3 style="font-size:17px;margin:0">Hoe snel je site op orde is, per pakket</h3>
       <p class="zacht" style="margin:4px 0 0;font-size:14.5px">Gerekend met de ${a.werk} pagina's met verbeterpunten uit deze check. Daarna gaan we verder met de rest van je site.</p>
       <div class="rp-balken">${["basis", "plus", "pro"].map(balk).join("")}</div>` : ""}
-    <p style="margin:12px 0 0"><b>Sitehulpje ${p[0]}: €${p[2]} per maand</b> <span class="zacht">· eerste jaar 10% korting · je website laten aanpassen zit erin. Prijzen exclusief btw, minimaal 3 maanden.</span></p>
+    <p style="margin:12px 0 0"><b>Sitehulpje ${p[0]}: €${p[2]} per maand</b> <span class="zacht">· eerste jaar 10% korting · je website laten aanpassen zit erin. Prijzen exclusief btw, minimaal 3 maanden, daarna maandelijks opzegbaar.</span></p>
     <div class="rp-cta"><a class="knop groot-knop" href="bestellen?pakket=${encodeURIComponent(PAKKET[a.pakket] ? a.pakket : "plus")}${d.sitehulpje ? "&sh=1" : ""}${/^[0-9a-f-]{36}$/.test(q.get("id") || "") ? "&ref=check:" + q.get("id") : ""}">Start met ${p[0]} &rarr;</a><a class="knop rand groot-knop" href="/#prijs">Bekijk alle pakketten</a></div>
   </section>
   <p class="rp-voet">Vragen? Bel of app Jan: 06 27 25 43 83 · info@sitehulpje.nl<br>Sitehulpje is een dienst van Siteregelaar · Markt 9, 7551 CG Hengelo · KvK 55667147<br>Niemand kan een plek bovenaan in Google garanderen. Resultaat zie je meestal na 2 tot 6 maanden.</p>`;

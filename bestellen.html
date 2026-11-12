@@ -282,8 +282,8 @@ function teken() {
   const maand = nu.toLocaleDateString("nl-NL", { month: "long" });
   $("#vandaag").innerHTML = tot ? `Vandaag betaal je <b>${eur(incl, 2)}</b> incl. btw voor de rest van ${maand} (${rest} van ${dagen} dagen). Daarna elke maand automatisch.${af && korting.maanden ? ` Na de kortingscode wordt het ${eur(bruto, bruto % 1 ? 2 : 0)} per maand.` : ""}${p ? ` Na het eerste jaar betaal je ${eur(p.prijs)} per maand.` : ""}` : "";
   $("#vandaag").hidden = !tot;
-  $("#looptijd").textContent = ", met een minimale looptijd van 3 maanden";
-  $("#punten").innerHTML = ["Minimaal 3 maanden", "Elke maand een factuur per mail", "Prijzen exclusief 21% btw"].map((x) => `<li>${x}</li>`).join("");
+  $("#looptijd").textContent = ", met een minimale looptijd van 3 maanden, daarna maandelijks opzegbaar";
+  $("#punten").innerHTML = ["Minimaal 3 maanden, daarna maandelijks opzegbaar", "Elke maand een factuur per mail", "Prijzen exclusief 21% btw"].map((x) => `<li>${x}</li>`).join("");
   try { localStorage.setItem("sh_bestel", JSON.stringify({ pakket })); } catch {}
 }
 // voorkeuze uit de link (bestellen?pakket=plus&sh=1) of van vorige keer

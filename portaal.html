@@ -542,16 +542,16 @@ function shAanbodLaad() {
       <div id="sha_meld"></div>
       <div class="kaart"><span class="kp-mono">ook los mogelijk · advertenties in Google (zit al in Pro)</span><h2 style="margin:4px 0">Sneller klanten via Google</h2>
         <p class="zacht" style="margin:0">Jij kiest een budget, wij regelen de advertenties (ook Google Shopping). Je ziet één getal: wat je erin stopte en wat het opleverde.</p>
-        <div class="sha-prijs" style="margin:10px 0"><s>€ 99</s><b style="font-size:24px">€ 79,20</b><span class="zacht">/maand beheer het eerste jaar · geen opstartkosten · minimaal 3 maanden</span></div>
+        <div class="sha-prijs" style="margin:10px 0"><s>€ 99</s><b style="font-size:24px">€ 79,20</b><span class="zacht">/maand beheer het eerste jaar · geen opstartkosten · minimaal 3 maanden, daarna maandelijks opzegbaar</span></div>
         <p class="zacht" style="margin:0 0 12px;font-size:13px">Advertentiebudget betaal je apart en bepaal je zelf. Het beheer betaal je maandelijks: de eerste keer met iDEAL, daarna automatisch.</p>
         <button type="button" class="knop rand" id="sha_ads">Meer over advertenties</button></div>
       <button type="button" class="knop rand" id="sha_terug2" style="margin-top:16px">Nu niet, terug naar mijn verzoeken</button>
-      <p class="zacht" style="font-size:13px;margin:14px 0 0">Prijzen per maand, excl. btw. Minimale looptijd 3 maanden. De korting geldt het eerste jaar.</p>`;
+      <p class="zacht" style="font-size:13px;margin:14px 0 0">Prijzen per maand, excl. btw. Minimale looptijd 3 maanden, daarna maandelijks opzegbaar. De korting geldt het eerste jaar.</p>`;
     $("#sha_terug").onclick = $("#sha_terug2").onclick = () => kpNaar("verzoeken");
     $("#sha_ads").onclick = () => { shaApi({ actie: "ads" }).catch(() => {}); kpNaar("advertenties"); };
     $("#vbpromo").querySelectorAll("[data-sha]").forEach((b) => (b.onclick = async () => {
       const k = b.dataset.sha, n = P[k];
-      if (!confirm(`Overstappen naar Sitehulpje ${n.naam} voor ${shaEu(n.met_korting)} per maand het eerste jaar (daarna ${shaEu(n.prijs)}, excl. btw, minimaal 3 maanden)? Sitehulpje zit erin.`)) return;
+      if (!confirm(`Overstappen naar Sitehulpje ${n.naam} voor ${shaEu(n.met_korting)} per maand het eerste jaar (daarna ${shaEu(n.prijs)}, excl. btw, minimaal 3 maanden, daarna maandelijks opzegbaar)? Sitehulpje zit erin.`)) return;
       b.disabled = true; b.textContent = "Bezig…";
       try { await shaApi({ actie: "kies", pakket: k }); toonMelding($("#sha_meld"), `Geregeld! Je hebt nu Sitehulpje ${n.naam}. Je krijgt een bevestiging per mail. We zetten nu alles voor je klaar…`, "ok"); setTimeout(() => location.reload(), 2500); }
       catch (e) { toonMelding($("#sha_meld"), e.message); b.disabled = false; b.textContent = `Kies ${n.naam}`; }
@@ -572,13 +572,13 @@ async function shWebbeheerAanbod() {
     <span class="kp-mono">voor jou · eerste jaar 10% korting</span>
     <h2 style="margin:4px 0 8px">Iets laten aanpassen? Stap over naar Sitehulpje ${naam}.</h2>
     <p class="zacht" style="margin:0 0 10px">Alles wat je nu hebt blijft hetzelfde, en je website laten aanpassen zit erbij: teksten, foto's, prijzen, openingstijden, nieuwe pagina's. Gewoon intypen of inspreken, 24/7. Je bekijkt het eerst op een testsite en zet het met één klik live. Ook terugdraaien kan altijd.</p>
-    <div class="sha-prijs" style="margin:6px 0"><s>${shaEu(vol)}</s><b style="font-size:26px">${shaEu(kort)}</b><span class="zacht">/maand het eerste jaar, daarna ${shaEu(vol)} · nu betaal je ${shaEu(vb.prijs)} · minimaal 3 maanden</span></div>
+    <div class="sha-prijs" style="margin:6px 0"><s>${shaEu(vol)}</s><b style="font-size:26px">${shaEu(kort)}</b><span class="zacht">/maand het eerste jaar, daarna ${shaEu(vol)} · nu betaal je ${shaEu(vb.prijs)} · minimaal 3 maanden, daarna maandelijks opzegbaar</span></div>
     <div id="shwb_meld"></div>
     <button class="knop" type="button" id="shwb_knop" style="margin-top:8px">Stap over naar Sitehulpje ${naam}</button>
     <p class="zacht" style="margin:10px 0 0;font-size:13px">Het nieuwe bedrag gaat mee met je maandelijkse incasso. Liever eerst iets vragen? Mail info@sitehulpje.nl of bel 06 27 25 43 83.</p></section>`;
   kpTekenMenu();
   $("#shwb_knop").onclick = async () => {
-    if (!confirm(`Overstappen naar Sitehulpje ${naam} voor ${shaEu(kort)} per maand het eerste jaar (daarna ${shaEu(vol)}, excl. btw, minimaal 3 maanden)?`)) return;
+    if (!confirm(`Overstappen naar Sitehulpje ${naam} voor ${shaEu(kort)} per maand het eerste jaar (daarna ${shaEu(vol)}, excl. btw, minimaal 3 maanden, daarna maandelijks opzegbaar)?`)) return;
     const b = $("#shwb_knop"); b.disabled = true; b.textContent = "Bezig…";
     try { await vbfApi("wissel", { sitehulpje: true }); toonMelding($("#shwb_meld"), `Geregeld! Je hebt nu Sitehulpje ${naam}. Je kunt meteen je eerste aanpassing doorgeven.`, "ok"); setTimeout(() => location.reload(), 2200); }
     catch (e) { toonMelding($("#shwb_meld"), e.message); b.disabled = false; b.textContent = `Stap over naar Sitehulpje ${naam}`; }
@@ -588,7 +588,7 @@ async function shWebbeheerAanbod() {
 // klanten die al Vindbaarheid hebben maar nog geen advertenties: alleen het advertentie-aanbod
 function shAdsAanbod(a) {
   shAanbod = { ...a, alleenAds: true, korting_pct: 20 }; kpTekenMenu(); // advertentiebeheer: 20% korting het eerste jaar
-  const prijsRij = `<div class="sha-prijs" style="margin:8px 0"><s>€ 99</s><b style="font-size:24px">€ 79,20</b><span class="zacht">/maand beheer het eerste jaar · geen opstartkosten · minimaal 3 maanden</span></div>`;
+  const prijsRij = `<div class="sha-prijs" style="margin:8px 0"><s>€ 99</s><b style="font-size:24px">€ 79,20</b><span class="zacht">/maand beheer het eerste jaar · geen opstartkosten · minimaal 3 maanden, daarna maandelijks opzegbaar</span></div>`;
   let later = 0; try { later = Number(localStorage.getItem("sh_ads_later") || 0); } catch {}
   if (Date.now() - later > 7 * 86400000) {
     $("#shaanbod").innerHTML = `<section class="sha-ban" aria-label="Aanbieding"><div><span class="sha-lab">Voor jou · 20% korting op het beheer</span>
@@ -960,7 +960,7 @@ async function kpAdsStart(opnieuw) {
       ${d.webshop && shop.gekoppeld !== null && shop.gekoppeld !== undefined ? kaart(`<h2>Google Shopping</h2><p class="zacht" style="font-size:15px;line-height:1.6;margin:0">${shop.gekoppeld ? "Je producten staan al in Google Merchant Center. Wij zetten ze ook in Google Shopping, met foto en prijs." : "Je producten staan nog niet in Google Merchant Center. Dat zetten wij voor je klaar, daarna komen ze ook in Google Shopping."}</p>`) : ""}
       ${ok ? "" : `<div class="ad-knoppen"><button type="button" class="knop groot" id="adakkoord">Akkoord, zet het klaar</button></div>
       <p class="ad-klein" id="admeld">Er gaat nog niets live en je betaalt nog niets. Wij zetten alles klaar en laten het je weten voordat het start.</p>
-      <p class="ad-klein">Kosten zodra de advertenties lopen: het advertentiebudget dat je kiest (dat gaat 1-op-1 naar Google) plus beheer ${shAanbod?.korting_pct ? `<s>€ 99</s> <b>€ 79,20</b> per maand het eerste jaar` : `<b>€ 99</b> per maand`} (excl. btw, geen opstartkosten, minimaal 3 maanden). Het beheer betaal je de eerste keer met iDEAL, daarna automatisch.</p>
+      <p class="ad-klein">Kosten zodra de advertenties lopen: het advertentiebudget dat je kiest (dat gaat 1-op-1 naar Google) plus beheer ${shAanbod?.korting_pct ? `<s>€ 99</s> <b>€ 79,20</b> per maand het eerste jaar` : `<b>€ 99</b> per maand`} (excl. btw, geen opstartkosten, minimaal 3 maanden, daarna maandelijks opzegbaar). Het beheer betaal je de eerste keer met iDEAL, daarna automatisch.</p>
       <button type="button" class="ad-terug" id="adopnieuw" style="align-self:flex-start">Opnieuw maken met de nieuwste cijfers</button>`}
     </div></div>`;
   bindTerug();
