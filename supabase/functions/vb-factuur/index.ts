@@ -714,6 +714,22 @@ async function handel(req: Request, b: any) {
       ...(isAdmin ? { korting_eur: k.korting_eur, korting_pct: k.korting_pct, korting_tot: k.korting_tot, korting_van: k.korting_van, korting_reden: k.korting_reden } : {}),
       komend: (() => { const nv = nuAms(), v = abonnement(k, maandVan(new Date(nv.getFullYear(), nv.getMonth() + 1, 1))); return v.korting !== ab.korting ? { korting: v.korting, netto: v.excl, reden: k.korting_reden } : null; })() };
   }
+  if (a === "pakket_zet") {
+    // beheer: abonnement van een klant instellen (uit, alleen Sitehulpje, of Sitehulpje Basis/Plus/Pro)
+    if (!isAdmin || !klantId) throw new Fout(403, "Geen toegang");
+    const keuze = String(b.keuze || ""), korting = b.korting === true;
+    if (keuze === "uit") await sql`update beheersite.klanten set bundel = null, bundel_korting_tot = null, sh_prijs = null where id = ${klantId}`;
+    else if (keuze === "los") await sql`update beheersite.klanten set bundel = null, bundel_korting_tot = null where id = ${klantId}`;
+    else if (keuze === "sitehulpje") await sql`update beheersite.klanten set bundel = null, bundel_korting_tot = null, vindbaarheid = false, vb_pakket = null, sh_prijs = 125 where id = ${klantId}`;
+    else if (BUNDEL[keuze]) {
+      const tot = korting ? iso(new Date(nuAms().getTime() + 365 * 86400_000)) : null;
+      await sql`update beheersite.klanten set bundel = ${keuze}, vb_pakket = ${keuze}, vindbaarheid = true, vb_start = coalesce(vb_start, now()), sh_prijs = 75,
+        bundel_korting_tot = ${tot} where id = ${klantId}`;
+    } else throw new Fout(400, "Onbekende keuze.");
+    const [k] = await sql`select * from beheersite.klanten where id = ${klantId}`;
+    const ab = abonnement(k, maandVan(nuAms()));
+    return { ok: true, naam: ab.naam, netto: ab.excl };
+  }
   if (a === "opzeggen") {
     if (isAdmin) throw new Fout(400, "Opzeggen doet de klant zelf; jij kunt dit in beheer regelen.");
     const wat = (Array.isArray(b.wat) ? b.wat : []).map(String);

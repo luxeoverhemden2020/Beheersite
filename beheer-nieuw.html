@@ -339,10 +339,34 @@ async function openKlantPagina(id, tab = "cijfers") {
   $("#klijst").hidden = true; $("#kdetail").hidden = false;
   $("#kdnaam").innerHTML = `${esc(k?.naam || v.naam || id)} <span class="zacht" style="font-weight:400;font-size:14px">${esc((k?.site || v.site || "").replace(/^https?:\/\//, ""))}</span>`;
   // cijfers & seo: pakket aan/uit en (als Vindbaarheid aan staat) het dashboard zoals de klant het ziet
-  $("#kdpakket").innerHTML = `<div class="kaart"><div class="rij"><b class="vul">Vindbaarheid</b>
-    <select id="kdpk" style="width:auto"><option value="">Uit</option>${Object.entries(VB_PAKKET).map(([w, n]) => `<option value="${w}" ${v.vindbaarheid && v.vb_pakket === w ? "selected" : ""}>${n}</option>`).join("")}</select></div>
-    <p class="zacht vb-klein" style="margin:6px 0 0">${v.status === "ok" ? `Google gekoppeld (${esc(v.google_email || "")}) · laatst bijgewerkt ${v.laatst_opgehaald ? datum(v.laatst_opgehaald) : "–"}` : v.vindbaarheid ? "Google is nog niet gekoppeld. Dat doet de klant in zijn startstappen." : "Zet een pakket aan om Vindbaarheid voor deze klant te starten."}</p></div>`;
-  $("#kdpk").onchange = async (e) => { try { await vbApi("beheer_zet", { klant_id: id, aan: !!e.target.value, pakket: e.target.value || null }); await laadKlanten(); openKlantPagina(id, "cijfers"); } catch (err) { meld(err.message); } };
+  // abonnement: uit, alleen Sitehulpje, Sitehulpje Basis/Plus/Pro (pakket), of de oude losse Vindbaarheid
+  const PK_OPT = [["uit", "Uit"], ["sitehulpje", "Alleen Sitehulpje (€125)"], ["basis", "Sitehulpje Basis (€169)"], ["plus", "Sitehulpje Plus (€239)"], ["pro", "Sitehulpje Pro (€369)"]];
+  $("#kdpakket").innerHTML = `<div class="kaart"><div class="rij"><b class="vul">Abonnement</b>
+    <select id="kdpk" style="width:auto">${PK_OPT.map(([w, n]) => `<option value="${w}">${n}</option>`).join("")}
+      <optgroup label="Oude losse opzet">${Object.entries(VB_PAKKET).map(([w, n]) => `<option value="oud-${w}">Vindbaarheid ${n} (los)</option>`).join("")}</optgroup></select></div>
+    <label class="vb-klein" style="display:flex;gap:6px;align-items:center;font-weight:400;margin-top:6px"><input type="checkbox" id="kdkort" style="width:auto"> 10% korting het eerste jaar (alleen bij Basis, Plus en Pro)</label>
+    <p class="zacht vb-klein" style="margin:6px 0 0">${v.status === "ok" ? `Google gekoppeld (${esc(v.google_email || "")}) · laatst bijgewerkt ${v.laatst_opgehaald ? datum(v.laatst_opgehaald) : "–"}` : v.vindbaarheid ? "Google is nog niet gekoppeld. Dat doet de klant in zijn startstappen." : "Kies een abonnement om te starten. De prijs gaat mee met de volgende factuur."}</p><div id="kdpkmeld"></div></div>`;
+  const kdpk = $("#kdpk"), kdkort = $("#kdkort");
+  kdpk.value = v.vindbaarheid && v.vb_pakket ? "oud-" + v.vb_pakket : "uit";
+  let kdHuidig = kdpk.value;
+  vbfApi("abonnement", { klant_id: id }).then((ab) => {
+    const ids = (ab.delen || []).map((x) => x.id), pk = (ab.delen || []).find((x) => x.id === "pakket");
+    kdHuidig = pk ? String(pk.naam).replace("Sitehulpje ", "").toLowerCase() : ids.includes("vindbaarheid") ? kdpk.value : ids.includes("sitehulpje") ? "sitehulpje" : "uit";
+    kdpk.value = kdHuidig; kdkort.checked = !!pk && ab.bruto < pk.prijs;
+  }).catch(() => {});
+  const kdZet = async () => {
+    const w = kdpk.value, bun = ["basis", "plus", "pro"].includes(w), oud = w.startsWith("oud-");
+    const naam = kdpk.selectedOptions[0].textContent;
+    if (!confirm(`Abonnement van ${k?.naam || id} zetten op: ${naam}${bun && kdkort.checked ? " met 10% korting het eerste jaar" : ""}? De prijs gaat mee met de volgende factuur. De klant krijgt hier geen mail van.`)) { kdpk.value = kdHuidig; return; }
+    try {
+      await vbApi("beheer_zet", { klant_id: id, aan: bun || oud, pakket: bun ? w : oud ? w.slice(4) : null });
+      const r = await vbfApi("pakket_zet", { klant_id: id, keuze: oud ? "los" : w, korting: kdkort.checked });
+      kdHuidig = w; toonMelding($("#kdpkmeld"), `Opgeslagen: ${r.naam || "geen abonnement"}${r.netto ? ` · ${vbfEuro(r.netto)} per maand` : ""}.`, "ok");
+      await laadKlanten(); setTimeout(() => openKlantPagina(id, "cijfers"), 1200);
+    } catch (err) { kdpk.value = kdHuidig; meld(err.message); }
+  };
+  kdpk.onchange = kdZet;
+  kdkort.onchange = () => { if (["basis", "plus", "pro"].includes(kdpk.value)) kdZet(); };
   if (v.vindbaarheid) vbBeheerBekijk(id, vbKlanten); else $("#vbdetail").innerHTML = "";
   vbfAbonnementVoor($("#kdabon"), id);
   klantForm(k);
