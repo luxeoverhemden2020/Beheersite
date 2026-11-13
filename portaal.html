@@ -959,9 +959,21 @@ async function kpAdsStart(opnieuw) {
       ${kaart(`<h2>Zoekwoorden</h2><p class="ad-klein">Waar je advertentie bij verschijnt. ${google ? "Zoekopdrachten en klikprijs komen van Google." : "De klikprijs is een schatting."}</p>
         <div class="ad-woorden">${(d.zoekwoorden || []).map((z) => `<label class="ad-woord"><input type="checkbox" value="${esc(z.term)}"${uit.has(z.term) ? "" : " checked"}${dis}><span><b>${esc(z.term)}</b><span class="zacht">${z.volume ? getal(z.volume) + " zoekopdrachten per maand" : z.voorgesteld ? "voorgesteld op basis van je website" : getal(z.vertoningen) + " keer getoond in Google"}${z.cpc ? " · ongeveer " + eu(z.cpc, 2) + " per klik" : ""}</span></span></label>`).join("") || `<p class="zacht" style="margin:0">Nog geen zoekwoorden gevonden. Wij kiezen ze voor je.</p>`}</div>`)}
       ${d.webshop && shop.gekoppeld !== null && shop.gekoppeld !== undefined ? kaart(`<h2>Google Shopping</h2><p class="zacht" style="font-size:15px;line-height:1.6;margin:0">${shop.gekoppeld ? "Je producten staan al in Google Merchant Center. Wij zetten ze ook in Google Shopping, met foto en prijs." : "Je producten staan nog niet in Google Merchant Center. Dat zetten wij voor je klaar, daarna komen ze ook in Google Shopping."}</p>`) : ""}
-      ${ok ? "" : `<div class="ad-knoppen"><button type="button" class="knop groot" id="adakkoord">Akkoord, zet het klaar</button></div>
-      <p class="ad-klein" id="admeld">Er gaat nog niets live en je betaalt nog niets. Wij zetten alles klaar en laten het je weten voordat het start.</p>
-      <p class="ad-klein">Kosten zodra de advertenties lopen: het advertentiebudget dat je kiest (dat gaat 1-op-1 naar Google) plus beheer ${shAanbod?.korting_pct ? `<s>€ 99</s> <b>€ 79,20</b> per maand het eerste jaar` : `<b>€ 99</b> per maand`} (excl. btw, geen opstartkosten, minimaal 3 maanden, daarna maandelijks opzegbaar). Het beheer betaal je de eerste keer met iDEAL, daarna automatisch.</p>`}
+      ${ok ? "" : (() => {
+        const pct = Number(shAanbod?.korting_pct) || 0, nu = Math.round(99 * (1 - pct / 100) * 100) / 100;
+        const bedrag = (x) => "€ " + x.toLocaleString("nl-NL", { minimumFractionDigits: Number.isInteger(x) ? 0 : 2, maximumFractionDigits: 2 });
+        const v = (t) => `<div><span style="color:#1D9E75;font-weight:700;margin-right:6px">✓</span>${t}</div>`;
+        return `<div style="border:2px solid ${pct ? "#1D9E75" : "var(--rand, #d6dbe6)"};border-radius:14px;padding:18px 18px 16px">
+        ${pct ? `<span style="display:inline-block;background:#E1F5EE;color:#085041;font-size:13px;font-weight:600;padding:4px 10px;border-radius:8px;margin-bottom:10px">🎁 Aanbieding: je bent al klant bij Sitehulpje</span>` : ""}
+        <p class="zacht" style="margin:0;font-size:15px">Wij beheren je advertenties</p>
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:4px 0 2px">
+          ${pct ? `<s class="zacht" style="font-size:20px">${bedrag(99)}</s>` : ""}<b style="font-size:36px;line-height:1.1">${bedrag(nu)}</b><span class="zacht" style="font-size:15px">per maand</span></div>
+        ${pct ? `<p style="margin:0 0 12px;font-size:15px;color:#0F6E56;font-weight:600">${pct}% korting, het hele eerste jaar</p>` : `<div style="height:10px"></div>`}
+        <div class="zacht" style="font-size:14px;line-height:1.8">${v("Geen opstartkosten")}${v("Wij houden je advertenties elke dag bij")}${v("Je budget bewaken we elk uur")}${v("Er gaat niets live zonder dat je het weet")}</div></div>
+      <p class="ad-klein" style="margin-top:10px">Prijzen excl. btw, minimaal 3 maanden. Daarnaast het advertentiebudget dat je zelf kiest; dat gaat 1-op-1 naar Google. Het beheer betaal je de eerste keer met iDEAL, daarna automatisch.</p>
+      <div class="ad-knoppen"><button type="button" class="knop groot" id="adakkoord">Akkoord, zet het klaar</button></div>
+      <p class="ad-klein" id="admeld">Er gaat nog niets live en je betaalt nog niets. Wij zetten alles klaar en laten het je weten voordat het start.</p>`;
+      })()}
     </div></div>`;
   bindTerug();
   const klik = () => { const b = Number(el.querySelector("[name=budget]:checked")?.value || 0); $("#adklik").textContent = b && d.cpc_gem ? `Daarmee krijg je ongeveer ${getal(Math.round(b / d.cpc_gem))} klikken per maand (gemiddeld ${eu(d.cpc_gem, 2)} per klik${google ? ", volgens Google" : ", geschat"}). Bedragen zijn excl. btw.` : "Bedragen zijn excl. btw."; };
