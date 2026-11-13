@@ -1197,7 +1197,8 @@ async function kpRapport(opnieuw) {
     }
   }
   stop();
-  const T = r.tools || {};
+  // mail en server (DNS, hosting) regelt Jan zelf buiten de website: die punten ziet de klant niet
+  const T = Object.fromEntries(Object.entries(r.tools || {}).filter(([t]) => !["mail", "veiligheid"].includes(t)));
   if (!Object.keys(T).length) { vak.innerHTML = `<p class="zacht" style="margin:0">We weten het adres van je website nog niet. Stuur ons een berichtje via "Iets laten aanpassen", dan zetten we de controle aan.</p>`; return; }
   // wie lost wat op: Sitehulpje (de website zelf), het SEO-pakket (gevonden worden) of Jan (mail en server, buiten de website)
   const DEEL = { snelheid: "sh", mobiel: "sh", links: "sh", toegankelijkheid: "sh", mail: "jan", veiligheid: "jan" };
