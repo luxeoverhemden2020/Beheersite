@@ -199,4 +199,68 @@
     document.body.prepend(el);
   };
   if (document.body) balk(); else document.addEventListener("DOMContentLoaded", balk);
+
+  // ---------- menu in de volgorde van het verhaal: eerst wat het oplevert, dan hoe makkelijk het is, dan gerustheid ----------
+  window.SH_DEMO_MENU = [
+    ["overzicht", "Overzicht", []],
+    ["klanten", "Klanten", [["acties", "Telefoontjes en routes"], ["reviews", "Reviews"]]],
+    ["gevonden", "Gevonden worden", [["maps", "Google Maps"], ["ai", "ChatGPT en andere AI"], ["concurrenten", "Je concurrenten"], ["zoekwoorden", "In Google zoeken"]]],
+    ["verzoeken", "Iets laten aanpassen", []],
+    ["website", "Je website", [["voorstellen", "Klaar om goed te keuren"], ["gezondheid", "Werkt alles goed?"], ["paginas", "Meest bekeken pagina's"]]],
+    ["advertenties", "Advertenties", []],
+    ["rapporten", "Rapporten", []], ["-"],
+    ["inst", "Instellingen", [["koppelingen", "Google-account"], ["abonnement", "Abonnement"]]]];
+
+  // ---------- rondleiding ----------
+  if (!/portaal/.test(location.pathname)) return;
+  const STAP = [
+    ["overzicht", "Zo staat je bedrijf ervoor", "In één oogopslag zie je hoe vaak je gevonden wordt in Google. Bij Studio Lente gaat het duidelijk de goede kant op."],
+    ["acties", "Dit levert het op", "Telefoontjes, routebeschrijvingen en aanvragen: echte klanten die via Google bij je terechtkomen."],
+    ["maps", "Gevonden in Google Maps", "Wij houden je Google-bedrijfsprofiel compleet en plaatsen er elke week een bericht op. Zo blijf je zichtbaar in de buurt."],
+    ["ai", "Aangeraden door ChatGPT", "Steeds meer mensen vragen AI om een tip. Wij meten elke week of jij genoemd wordt, en zorgen dat het steeds vaker gebeurt."],
+    ["concurrenten", "Jij tegen je concurrenten", "Elke week zie je hoe je ervoor staat tegenover je concurrenten, en waar je ze voorbij gaat."],
+    ["verzoeken", "Iets aanpassen? Gewoon vragen", "Typ, spreek in of stuur een foto. Sitehulpje past je website aan, meestal binnen een minuut. Zo te zien deed Studio Lente dat al vaak."],
+    ["voorstellen", "Jij houdt de regie", "Wij schrijven verbeteringen en nieuwe pagina's voor je. Er gaat niets online zonder jouw akkoord: één klik op Goedkeuren."],
+    ["reviews", "Reviews in één klik beantwoord", "Bij elke nieuwe review staat een antwoord voor je klaar. Even nakijken, op Plaatsen klikken, klaar."],
+    ["advertenties", "Sneller klanten met advertenties", "Wij maken je Google-advertenties en sturen ze elke week bij. Je ziet precies wat het kost en wat het oplevert."],
+    ["gezondheid", "Wij houden alles in de gaten", "Elke week controleren we je website op 14 punten, en elk half uur of hij bereikbaar is. Gaat er iets mis, dan lossen we het op."],
+    ["rapporten", "Elke maand een rapport", "In gewone taal: wat er beter ging en wat we voor je deden. Het komt vanzelf in je mail."]];
+  let nr = 0; try { nr = Math.min(+sessionStorage.getItem("sh_demo_stap") || 0, STAP.length - 1); } catch {}
+  const css = document.createElement("style");
+  css.textContent = `#demotour{position:fixed;right:20px;bottom:20px;z-index:9998;width:min(370px,calc(100vw - 24px));background:#0c1a36;color:#fff;border-radius:20px;padding:18px 18px 14px;
+      box-shadow:0 20px 60px rgba(4,17,26,.45);border:1px solid rgba(34,227,196,.45);font:15px/1.5 system-ui,Arial,sans-serif;animation:dtIn .35s ease}
+    @keyframes dtIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+    #demotour .dt-tel{font:12px/1 ui-monospace,Menlo,monospace;color:#22e3c4;letter-spacing:.04em}
+    #demotour h3{margin:6px 0 6px;font-size:19px;color:#fff}#demotour p{margin:0 0 12px;color:#c9d6ea}
+    #demotour .dt-balk{height:4px;border-radius:9px;background:rgba(255,255,255,.12);margin:0 0 12px;overflow:hidden}#demotour .dt-balk i{display:block;height:100%;background:linear-gradient(90deg,#22e3c4,#3b82f6,#8b5cf6);transition:width .3s}
+    #demotour .dt-rij{display:flex;gap:8px;align-items:center}#demotour button,#demotour a.dt-knop{font:600 14px system-ui,Arial,sans-serif;border-radius:999px;padding:9px 16px;cursor:pointer;border:0;text-decoration:none}
+    #demotour .dt-volg{background:linear-gradient(135deg,#22e3c4,#3b82f6);color:#04111a;margin-left:auto}#demotour .dt-terug{background:transparent;color:#c9d6ea;border:1px solid rgba(255,255,255,.25)}
+    #demotour .dt-x{position:absolute;top:10px;right:12px;background:none;color:#8aa0bf;font-size:20px;padding:2px 6px}
+    #demostart{position:fixed;right:20px;bottom:20px;z-index:9998;background:linear-gradient(135deg,#22e3c4,#3b82f6);color:#04111a;border:0;border-radius:999px;padding:12px 18px;font:700 15px system-ui,Arial,sans-serif;cursor:pointer;box-shadow:0 12px 30px rgba(59,130,246,.45)}
+    @media (max-width:640px){#demotour{right:12px;bottom:12px;padding:14px 14px 12px}#demotour h3{font-size:17px}#demotour p{font-size:14px}#demostart{right:12px;bottom:12px}}`;
+  const bewaar = () => { try { sessionStorage.setItem("sh_demo_stap", nr); } catch {} };
+  const weg = () => { document.getElementById("demotour")?.remove(); document.getElementById("demostart")?.remove(); };
+  const startKnop = () => {
+    weg(); const b = document.createElement("button"); b.id = "demostart"; b.textContent = "▶ Rondleiding";
+    b.onclick = () => { nr = 0; toon(); }; document.body.append(b);
+  };
+  const toon = () => {
+    weg(); bewaar();
+    const [p, titel, tekst] = STAP[nr], laatste = nr === STAP.length - 1;
+    if (typeof window.kpNaar === "function" && document.body.dataset.pagina !== p) window.kpNaar(p);
+    const el = document.createElement("div"); el.id = "demotour"; el.setAttribute("role", "dialog"); el.setAttribute("aria-label", "Rondleiding");
+    el.innerHTML = `<button class="dt-x" aria-label="Rondleiding sluiten">×</button><span class="dt-tel">RONDLEIDING · ${nr + 1} VAN ${STAP.length}</span>
+      <h3>${titel}</h3><div class="dt-balk"><i style="width:${((nr + 1) / STAP.length) * 100}%"></i></div><p>${tekst}</p>
+      <div class="dt-rij">${nr ? `<button class="dt-terug">← Vorige</button>` : ""}${laatste ? `<a class="dt-knop dt-volg" href="/#prijs">Bekijk de pakketten →</a>` : `<button class="dt-volg">Volgende →</button>`}</div>`;
+    el.querySelector(".dt-x").onclick = startKnop;
+    const t = el.querySelector(".dt-terug"); if (t) t.onclick = () => { nr--; toon(); };
+    const v = el.querySelector("button.dt-volg"); if (v) v.onclick = () => { nr++; toon(); };
+    document.body.append(el);
+  };
+  // wachten tot het portaal klaar is (menu getekend), dan de rondleiding starten
+  const wacht = () => {
+    if (typeof window.kpNaar === "function" && document.body?.dataset.pagina && document.getElementById("kpnav")?.children.length) { document.head.append(css); toon(); }
+    else setTimeout(wacht, 200);
+  };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wacht); else wacht();
 })();
