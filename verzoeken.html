@@ -25,7 +25,7 @@
   <div id="appTip"></div>
   <div id="vbpauze"></div>
   <div id="shstart"></div>
-  <div class="hooftabs verborgen" id="hooftabs"><button class="aan" data-hoofd="verzoeken">Verzoeken</button><button data-hoofd="vindbaarheid">Vindbaarheid</button></div>
+  <div class="hooftabs verborgen" id="hooftabs"><button class="aan" data-hoofd="verzoeken">Verzoeken</button><button data-hoofd="vindbaarheid">SEO</button></div>
   <div id="vindbaarheid" class="verborgen"></div>
   <div id="verzoekenDeel">
   <div class="kaart">
@@ -49,10 +49,10 @@
 .vb-aanbod .rij{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .vriend-link{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}.vriend-link input{flex:1 1 220px;min-width:0;font-family:var(--mono,monospace);font-size:13px}</style>
 <script src="assets/basis.js?v=20261113a"></script>
-<script src="assets/vindbaarheid.js?v=20261112b"></script>
-<script src="assets/vb-start.js?v=20261111a"></script>
-<script src="assets/vb-site.js"></script>
-<script src="assets/vb-factuur.js?v=20261112b"></script>
+<script src="assets/vindbaarheid.js?v=20261113b"></script>
+<script src="assets/vb-start.js?v=20261113b"></script>
+<script src="assets/vb-site.js?v=20261113b"></script>
+<script src="assets/vb-factuur.js?v=20261113b"></script>
 <script>
 let open = new Set(), cache = {}, timer = null;
 const SNELKNOPPEN = [
@@ -204,16 +204,16 @@ api("ik").then((d) => {
   $("#site").textContent = d.klant ? `${d.klant.naam} · ${d.klant.site.replace(/^https?:\/\//, "")}` : "";
   laad();
   appTip($("#appTip"));
-  // Vindbaarheid: alleen als de klant dit pakket heeft
+  // SEO: alleen als de klant dit pakket heeft
   if (d.klant) { vbfPauzeMelding($("#vbpauze")); vbfOpzegKlant($("#abonnement")); shStart($("#shstart")); vbfKlussen($("#klussen")); vbfVriend($("#vriend")); }
-  // Geen Vindbaarheid (en niet op pauze)? Laat dan een tab zien met uitleg en een link naar de pakketten.
+  // Geen SEO-pakket (en niet op pauze)? Laat dan een tab zien met uitleg en een link naar de pakketten.
   const vbPromo = () => vbfApi("status").then((p) => {
     if (p.pauze || !d.klant) return;
     const tabs = $("#hooftabs"); tabs.classList.remove("verborgen");
-    tabs.querySelector('[data-hoofd="vindbaarheid"]').innerHTML = 'Vindbaarheid <span class="vbs-label" style="margin-left:4px">nieuw</span>';
+    tabs.querySelector('[data-hoofd="vindbaarheid"]').innerHTML = 'SEO <span class="vbs-label" style="margin-left:4px">nieuw</span>';
     $("#vindbaarheid").innerHTML = `<div class="kaart" style="margin-top:12px">
       <h2 style="margin:0 0 6px">Beter gevonden worden in Google én AI</h2>
-      <p class="zacht" style="margin:0 0 10px">Met Vindbaarheid controleren we je website elke week, verbeteren we je teksten voor Google en zie je in een helder dashboard hoe vaak je gevonden wordt. Ook in ChatGPT en andere AI-diensten.</p>
+      <p class="zacht" style="margin:0 0 10px">Met het SEO-pakket controleren we je website elke week, verbeteren we je teksten voor Google en zie je in een helder dashboard hoe vaak je gevonden wordt. Ook in ChatGPT en andere AI-diensten.</p>
       <ul class="vb-goed" style="margin-bottom:12px"><li>Elke week een website-check</li><li>Betere titels en omschrijvingen, jij keurt goed met één klik</li><li>Je cijfers uit Google en Bing</li><li>Elke maand een rapport in gewone taal</li></ul>
       <p style="margin:0 0 12px"><b>In een pakket met Sitehulpje vanaf €169 per maand.</b> <span class="zacht">Je website laten aanpassen zit erin. Eerste jaar 10% korting.</span></p>
       <a class="knop" href="/#prijs">Bekijk de pakketten</a></div>`;
@@ -238,10 +238,10 @@ api("ik").then((d) => {
     };
     tabs.querySelectorAll("button").forEach((b) => (b.onclick = () => kies(b.dataset.hoofd)));
     if (location.hash === "#vindbaarheid" || new URLSearchParams(location.search).get("google")) kies("vindbaarheid");
-    // nieuwe klant: zolang de startstappen niet af zijn, meteen naar Vindbaarheid
+    // nieuwe klant: zolang de startstappen niet af zijn, meteen naar het SEO-pakket
     vbsApi("status").then((st) => {
       if (st.klant_klaar) return;
-      tabs.querySelector('[data-hoofd="vindbaarheid"]').innerHTML = 'Vindbaarheid <span class="vbs-label" style="margin-left:4px">start</span>';
+      tabs.querySelector('[data-hoofd="vindbaarheid"]').innerHTML = 'SEO <span class="vbs-label" style="margin-left:4px">start</span>';
       kies("vindbaarheid");
     }).catch(() => {});
   }).catch((e) => { if (/staat niet aan/.test(e.message || "")) vbPromo(); });

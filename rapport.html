@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Vindbaarheidsrapport – Sitehulpje</title>
+<title>SEO-rapport – Sitehulpje</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
@@ -132,7 +132,7 @@ function vergelijking(d) {
     d.nu.ga4.dagen ? rij("Acties op je site", (t) => pd(t, "ga4", "acties")) : "",
   ].join("");
   return `<div class="blok"><h2><span class="tag">&gt;_</span>Vergelijking</h2>
-    <p class="zacht klein" style="margin-top:-4px">Omgerekend naar 30 dagen, zodat een korte maand eerlijk naast een lange staat.${d.nulmeting ? " De start is de laatste maand voordat Sitehulpje Vindbaarheid begon." : ""}</p>
+    <p class="zacht klein" style="margin-top:-4px">Omgerekend naar 30 dagen, zodat een korte maand eerlijk naast een lange staat.${d.nulmeting ? " De start is de laatste maand voordat het SEO-pakket begon." : ""}</p>
     <div class="tabel-scroll"><table class="verg"><thead><tr><th></th>${kol.map((k) => `<th class="r${k.nu ? " nu" : ""}">${esc(k.n)}</th>`).join("")}</tr></thead><tbody>${rijen}</tbody></table></div></div>`;
 }
 
@@ -164,10 +164,10 @@ function teken(d) {
   if (d.gezondheid) zin += ` Je website scoort <b>${d.gezondheid.score} van 100</b> op gezondheid${d.gezondheid.vorige != null ? ` (vorige keer ${d.gezondheid.vorige})` : ""}.`;
   if (d.werk.length) zin += ` Sitehulpje voerde <b>${d.werk.length} aanpassing${d.werk.length > 1 ? "en" : ""}</b> uit.`;
 
-  document.title = `Vindbaarheidsrapport ${d.maand_naam} – ${d.klant.naam}`;
+  document.title = `SEO-rapport ${d.maand_naam} – ${d.klant.naam}`;
   document.getElementById("vel").innerHTML = `
   ${d.tussenstand ? `<div class="melding">Dit is een tussenstand: de maand is nog niet voorbij. Het definitieve rapport komt begin volgende maand.</div>` : ""}
-  <div class="kop"><div><h1>Vindbaarheidsrapport ${esc(d.maand_naam)}</h1>
+  <div class="kop"><div><h1>SEO-rapport ${esc(d.maand_naam)}</h1>
     <div class="sub">${esc(d.klant.naam)} · ${esc((d.klant.site || "").replace(/^https?:\/\//, "").replace(/\/$/, ""))}</div></div>
     <div class="logo">Site<b>hulpje</b><small>door Siteregelaar</small></div></div>
 

@@ -1,4 +1,4 @@
-// Sitehulpje – website koppelen. Eén scherm voor alle klanten (Vindbaarheid en alleen-Sitehulpje).
+// Sitehulpje – website koppelen. Eén scherm voor alle klanten (SEO en alleen-Sitehulpje).
 // WordPress: één klik op Goedkeuren in de eigen WordPress. Andere systemen: uitnodigen, webbouwer, of "iets anders".
 const VBSITE_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-site";
 const VBSITE_TEGELS = ["wordpress", "woocommerce", "shopify", "wix", "webflow", "lightspeed", "magento", "prestashop", "joomla", "squarespace", "ccvshop", "mijnwebwinkel", "jouwweb", "jimdo"];

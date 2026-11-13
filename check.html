@@ -111,7 +111,7 @@
 <link rel="stylesheet" href="assets/tools.css?v=20261110u">
 <main class="rp" id="rp"><div class="kaart rp-wacht"><p class="zacht">Rapport laden…</p></div></main>
 <script src="assets/basis.js?v=20261113a"></script>
-<script src="assets/rapport.js?v=20261110a"></script>
+<script src="assets/rapport.js?v=20261113b"></script>
 <script>
 // ---------- alle extra checks en de vergelijking met de concurrent (onderdelen: assets/rapport.js) ----------
 // top 5, voor/na in Google en "noemt AI jou?" (Claude, met plafond; bij misbruik of plafond gewoon weggelaten)
@@ -129,12 +129,12 @@ async function rpAdvies(na, R) {
       <p style="font-size:20px;margin:6px 0 12px"><b>Je wordt ${n} van de ${x.ai.length} keer genoemd.</b></p>
       ${x.ai.map((a) => `<div class="rp-tool"><div class="rp-toolkop"><b>${R.e(a.vraag)}</b><span class="rp-door ${a.genoemd ? "sh" : "vb"}">${a.genoemd ? "✓ Jij wordt genoemd" : "✗ Jij wordt niet genoemd"}</span></div>
         <p class="zacht" style="margin:0">AI raadt aan: ${a.bedrijven.length ? a.bedrijven.map((b) => R.e(b.naam)).join(", ") : "geen bedrijven gevonden"}</p></div>`).join("")}
-      ${n < x.ai.length ? `<p style="margin:10px 0 0">Met <b>Vindbaarheid</b> zorgen we dat AI-diensten jouw bedrijf leren kennen en aanraden.</p>` : ""}`;
+      ${n < x.ai.length ? `<p style="margin:10px 0 0">Met het <b>SEO-pakket</b> zorgen we dat AI-diensten jouw bedrijf leren kennen en aanraden.</p>` : ""}`;
   }
   if (x.top5?.length) h += `<h2 style="margin-top:${h ? "26px" : "0"}">⭐ Jouw top 5</h2><p class="zacht" style="margin-top:-6px">Als je maar 5 dingen aanpakt, doe dan deze.</p>
     <ol style="padding-left:20px;margin:6px 0 0">${x.top5.map((t) => `<li style="margin:8px 0"><b>${R.e(t.titel)}</b><br><span class="zacht">${R.e(t.uitleg)}</span></li>`).join("")}</ol>`;
   if (x.titel && x.oud && R.EXTRA["google-voorbeeld"]) h += `<h2 style="margin-top:26px">🔎 Zo kun je eruitzien in Google</h2><p class="zacht" style="margin-top:-6px">Een voorbeeld van wat wij voor je homepage zouden schrijven.</p>
-    <div class="rp-wie-rij"><div style="display:block"><p class="label mono" style="margin:0 0 6px">Nu</p>${R.EXTRA["google-voorbeeld"](x.oud)}</div><div style="display:block"><p class="label mono" style="margin:0 0 6px">Met Vindbaarheid</p>${R.EXTRA["google-voorbeeld"]({ ...x.oud, titel: x.titel, omschrijving: x.omschrijving })}</div></div>`;
+    <div class="rp-wie-rij"><div style="display:block"><p class="label mono" style="margin:0 0 6px">Nu</p>${R.EXTRA["google-voorbeeld"](x.oud)}</div><div style="display:block"><p class="label mono" style="margin:0 0 6px">Met het SEO-pakket</p>${R.EXTRA["google-voorbeeld"]({ ...x.oud, titel: x.titel, omschrijving: x.omschrijving })}</div></div>`;
   s.innerHTML = h || ""; if (!h) s.remove();
   rpGidsen(s, R);
 }
@@ -153,7 +153,7 @@ async function rpGidsen(na, R) {
       <p class="zacht" style="margin:0">${go.gevonden ? regel(go) + (go.sterren ? ` · ${R.e(go.sterren)} sterren${go.reviews ? ` (${R.e(go.reviews)} reviews)` : ""}` : "") : "We vonden geen Google-bedrijfsprofiel. Daarmee verschijn je in Google Maps; het is gratis en voor lokale bedrijven het belangrijkst."}</p></div>
     ${g.gidsen.map((x) => `<div class="rp-tool"><div class="rp-toolkop"><b>${R.e(x.site)}</b><span class="rp-door ${x.gevonden && x.klopt ? "sh" : "vb"}">${!x.gevonden ? "Niet gevonden" : x.klopt ? "✓ Klopt" : "✗ Klopt niet"}</span></div>
       <p class="zacht" style="margin:0">${x.gevonden ? (x.klopt ? regel(x) : R.e(sc(x.verschil) || "Gegevens wijken af van je website.")) : "Je staat hier (nog) niet."}</p></div>`).join("")}
-    <p style="margin:12px 0 0">${g.fout ? `<b>${g.fout} ${g.fout === 1 ? "vermelding klopt" : "vermeldingen kloppen"} niet.</b> ` : ""}Met <b>Vindbaarheid Plus</b> controleren we dit elk kwartaal en houden we je Google-bedrijfsprofiel actief met een bericht per week.</p>`;
+    <p style="margin:12px 0 0">${g.fout ? `<b>${g.fout} ${g.fout === 1 ? "vermelding klopt" : "vermeldingen kloppen"} niet.</b> ` : ""}Met <b>SEO-pakket Plus</b> controleren we dit elk kwartaal en houden we je Google-bedrijfsprofiel actief met een bericht per week.</p>`;
 }
 async function rpExtra(d) {
   const el = document.createElement("section"); el.className = "kaart"; el.id = "rpalles";
@@ -178,7 +178,7 @@ async function rpExtra(d) {
   const link = `bestellen?${nvb ? "pakket=" + pk + "&" : "pakket=&"}${nsh ? "sh=1&" : ""}ref=check:${encodeURIComponent(q.get("id"))}`;
   const wie = document.createElement("section"); wie.className = "kaart rp-wie";
   wie.innerHTML = `<p class="label mono">Wie lost wat op</p><h2>${nvb + nsh} verbeterpunten, allemaal op te lossen</h2>
-    <div class="rp-wie-rij"><div><b>${nvb}</b><span><b>Vindbaarheid</b> regelt de teksten en gegevens voor Google en AI: titels, omschrijvingen, beschrijvingen bij foto's en je bedrijfsgegevens. Jij keurt goed met één klik.</span></div>
+    <div class="rp-wie-rij"><div><b>${nvb}</b><span><b>Het SEO-pakket</b> regelt de teksten en gegevens voor Google en AI: titels, omschrijvingen, beschrijvingen bij foto's en je bedrijfsgegevens. Jij keurt goed met één klik.</span></div>
     <div><b>${nsh}</b><span><b>Sitehulpje</b> regelt alles aan de website zelf: snelheid, beveiliging, links, je mail-instellingen en teksten op de pagina.</span></div></div>
     <p class="zacht" style="margin:4px 0 0">${nvb && nsh ? "Samen in één pakket: Sitehulpje Basis, Plus of Pro, vanaf €169 per maand (eerste jaar 10% korting)." : nsh ? "Sitehulpje: €125 per maand." : "Sitehulpje-pakket vanaf €169 per maand (eerste jaar 10% korting)."} Prijzen excl. btw.</p>
     <div class="rp-cta"><a class="knop groot-knop" href="${link}">Laat Sitehulpje alles oplossen &rarr;</a></div>

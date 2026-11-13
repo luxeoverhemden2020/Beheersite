@@ -1,4 +1,4 @@
-// Sitehulpje Vindbaarheid – dashboard (klantpagina en beheer gebruiken dit allebei)
+// Sitehulpje SEO-pakket – dashboard (klantpagina en beheer gebruiken dit allebei)
 const VB_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vindbaarheid";
 
 async function vbApi(actie, data = {}) {
@@ -222,7 +222,7 @@ async function vbToon(el, klantId, beginTab) {
   const pakketKaart = `<div class="kaart"><h2><span class="tag">&gt;_</span>Jouw pakket: ${pk.naam}</h2>
     <ul class="vb-goed">${pk.punten.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
     ${pk.later.length ? `<p class="zacht vb-klein" style="margin:10px 0 4px"><b>Komt eraan</b> (zonder extra kosten):</p><ul class="lijst vb-klein zacht" style="margin:0;padding-left:18px">${pk.later.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
-    <p class="zacht vb-klein" style="margin-bottom:0">Ander pakket? Neem contact op met Jan. · <a href="uitleg-vindbaarheid">Uitleg: hoe werkt Vindbaarheid?</a></p></div>`;
+    <p class="zacht vb-klein" style="margin-bottom:0">Ander pakket? Neem contact op met Jan. · <a href="uitleg-vindbaarheid">Uitleg: hoe werkt het SEO-pakket?</a></p></div>`;
   const koppelKaart = pakketKaart + `<div class="kaart vb-koppel">
     <h2><span class="tag">&gt;_</span>Koppelingen</h2>
     <ul class="vb-bronnen">

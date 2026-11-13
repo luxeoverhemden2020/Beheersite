@@ -1,4 +1,4 @@
-// Sitehulpje Vindbaarheid – startstappen (klant) en overzicht daarvan (beheer)
+// Sitehulpje SEO-pakket – startstappen (klant) en overzicht daarvan (beheer)
 const VBS_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-start";
 const VBS_ADRES = "info@sitehulpje.nl";
 
@@ -72,7 +72,7 @@ function vbsScanInhoud(s, d) {
     <textarea id="vbs_diensten" name="diensten" rows="4" required placeholder="Eén per regel, het belangrijkste eerst">${esc(o.diensten || "")}</textarea>${!o.diensten ? VBS_MIST : ""}
     <h3 class="vbs-kop">Waarop wil je gevonden worden in Google?</h3>
     <textarea id="vbs_zoekwoorden" name="zoekwoorden" rows="5" placeholder="Eén zoekterm per regel">${esc((o.zoekwoorden || []).join("\n"))}</textarea>
-    <p class="zacht vbs-klein">Dit zijn de zoektermen waarop wij elke maand gaan werken. Voeg gerust toe wat je mist of haal weg wat niet past. <b>Je kunt dit later altijd aanvullen of aanpassen</b> bij Vindbaarheid → "Je bedrijf en zoekwoorden".</p>
+    <p class="zacht vbs-klein">Dit zijn de zoektermen waarop wij elke maand gaan werken. Voeg gerust toe wat je mist of haal weg wat niet past. <b>Je kunt dit later altijd aanvullen of aanpassen</b> bij het SEO-pakket → "Je bedrijf en zoekwoorden".</p>
     <h3 class="vbs-kop">Je concurrenten</h3>
     <textarea id="vbs_concurrenten" name="concurrenten" rows="3" placeholder="Eén per regel (mag leeg)">${esc((o.concurrenten || []).join("\n"))}</textarea>
     <p class="zacht vbs-klein">${(o.concurrenten || []).length ? "Dit is een voorstel op basis van een zoekopdracht in jouw regio. Klopt er een niet? Haal hem weg of vervang hem." : "We vonden geen duidelijke concurrenten. Ken je ze zelf? Vul ze in (mag ook leeg)."} Later aanvullen kan ook altijd.</p>
@@ -189,7 +189,7 @@ function vbsStapInhoud(s, d, admin) {
     if (s.status === "klaar") return `<p>Bevestigd door ${esc(d.akkoord.naam)} op ${new Date(d.akkoord.datum).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" })}.</p>`;
     const pk = typeof vbPakket === "function" ? vbPakket(d.klant.pakket).naam : d.klant.pakket;
     return `<ul class="vbs-afspraken">
-        <li><b>Pakket:</b> Vindbaarheid ${esc(pk)}${d.klant.prijs ? `, €${d.klant.prijs} per maand (excl. btw)` : ""}.</li>
+        <li><b>Pakket:</b> SEO-pakket ${esc(pk)}${d.klant.prijs ? `, €${d.klant.prijs} per maand (excl. btw)` : ""}.</li>
         <li><b>Looptijd:</b> minimaal 3 maanden. Daarna per maand opzegbaar.</li>
         <li><b>Betalen:</b> de eerste (deel)maand betaal je met iDEAL; daarmee geef je ook toestemming voor de automatische incasso. Daarna gaat het elke maand vanzelf. Je krijgt de factuur een dag van tevoren, samen met je rapport.</li>
         <li><b>Geen garantie op een plek in Google:</b> niemand kan dat beloven. Wel doen we elke maand het werk uit je pakket en laten we precies zien wat het oplevert.</li>

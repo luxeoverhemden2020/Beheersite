@@ -325,11 +325,11 @@ body{background:var(--bg);color:var(--tekst)}
 .vriend-link{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}.vriend-link input{flex:1 1 220px;min-width:0;font-family:var(--mono,monospace);font-size:13px}</style>
 <script src="assets/basis.js?v=20261113a"></script>
 <script>document.documentElement.dataset.thema = "licht"; // portaal is altijd licht (Siteregelaar-stijl)</script>
-<script src="assets/rapport.js?v=20261110a"></script>
-<script src="assets/vindbaarheid.js?v=20261112b"></script>
-<script src="assets/vb-start.js?v=20261111a"></script>
-<script src="assets/vb-site.js"></script>
-<script src="assets/vb-factuur.js?v=20261112b"></script>
+<script src="assets/rapport.js?v=20261113b"></script>
+<script src="assets/vindbaarheid.js?v=20261113b"></script>
+<script src="assets/vb-start.js?v=20261113b"></script>
+<script src="assets/vb-site.js?v=20261113b"></script>
+<script src="assets/vb-factuur.js?v=20261113b"></script>
 <script>
 let open = new Set(), cache = {}, timer = null;
 const SNELKNOPPEN = [
@@ -477,6 +477,7 @@ async function shStart(el) {
   vbSiteToon(el.querySelector("[data-vbsite]"), undefined, {});
 }
 api("ik").then((d) => {
+  window.KP_IK = d;
   if (d.gebruiker.rol === "admin" && !d.klant) { location.href = "beheer"; return; }
   $("#site").textContent = d.klant ? `${d.klant.naam} · ${d.klant.site.replace(/^https?:\/\//, "")}` : "";
   laad();
@@ -487,7 +488,7 @@ api("ik").then((d) => {
     kpMenu(false);
     $("#vbpromo").innerHTML = `<div class="kaart">
       <h2 style="margin:0 0 6px">Beter gevonden worden in Google én AI</h2>
-      <p class="zacht" style="margin:0 0 10px">Met Vindbaarheid controleren we je website elke week, verbeteren we je teksten voor Google en zie je in een helder overzicht hoe vaak je gevonden wordt. Ook in ChatGPT en andere AI.</p>
+      <p class="zacht" style="margin:0 0 10px">Met het SEO-pakket controleren we je website elke week, verbeteren we je teksten voor Google en zie je in een helder overzicht hoe vaak je gevonden wordt. Ook in ChatGPT en andere AI.</p>
       <ul class="vb-goed" style="margin-bottom:12px"><li>Elke week een website-check</li><li>Betere teksten voor Google, jij keurt goed met één klik</li><li>Je cijfers uit Google en Bing</li><li>Elke maand een rapport in gewone taal</li></ul>
       <p style="margin:0 0 12px"><b>In een pakket met Sitehulpje vanaf €169 per maand.</b> <span class="zacht">Je website laten aanpassen zit erin. Eerste jaar 10% korting.</span></p>
       <a class="knop" href="/#prijs">Bekijk de pakketten</a></div>`;
@@ -497,8 +498,8 @@ api("ik").then((d) => {
     if (!s.klant.aan) return vbPromo();
     kpMenu(true);
     vbsApi("status").then((st) => { if (!st.klant_klaar) { kpStartOpen = true; kpNaar("overzicht"); } }).catch(() => {});
-    shAanbodLaad(); // klant met Vindbaarheid: eventueel het advertentie-aanbod
-    if (d.klant && d.klant.id !== "luxe-overhemden") shWebbeheerAanbod(); // alleen Vindbaarheid: geen verzoeken, wel aanbod webbeheer
+    shAanbodLaad(); // klant met het SEO-pakket: eventueel het advertentie-aanbod
+    if (d.klant && d.klant.id !== "luxe-overhemden") shWebbeheerAanbod(); // alleen SEO: geen verzoeken, wel aanbod webbeheer
   }).catch((e) => { if (/staat niet aan/.test(e.message || "")) vbPromo(); });
 });
 
@@ -559,12 +560,12 @@ function shAanbodLaad() {
   }).catch(() => {});
 }
 
-// klanten met alleen Vindbaarheid (zonder Sitehulpje): geen verzoekformulier, wel het aanbod om over te stappen naar het pakket met Sitehulpje erin
+// klanten met alleen SEO (zonder Sitehulpje): geen verzoekformulier, wel het aanbod om over te stappen naar het pakket met Sitehulpje erin
 async function shWebbeheerAanbod() {
   let ab; try { ab = await vbfApi("abonnement"); } catch { return; }
   const vb = ab?.delen?.find((x) => x.id === "vindbaarheid");
   if (!vb || ab.delen.some((x) => x.id === "sitehulpje" || x.id === "pakket")) return;
-  const naam = String(vb.naam).replace(/^Vindbaarheid\s*/, ""), BUN = { Basis: 169, Plus: 239, Pro: 369 }, vol = BUN[naam];
+  const naam = String(vb.naam).replace(/^(?:Vindbaarheid|SEO-pakket|SEO)\s*/, ""), BUN = { Basis: 169, Plus: 239, Pro: 369 }, vol = BUN[naam];
   if (!vol) return;
   const kort = Math.round(vol * 90) / 100;
   $("#verzoekenDeel").dataset.kp = "verborgen-blok";
@@ -585,7 +586,7 @@ async function shWebbeheerAanbod() {
   };
 }
 
-// klanten die al Vindbaarheid hebben maar nog geen advertenties: alleen het advertentie-aanbod
+// klanten die al SEO hebben maar nog geen advertenties: alleen het advertentie-aanbod
 function shAdsAanbod(a) {
   shAanbod = { ...a, alleenAds: true, korting_pct: 20 }; kpTekenMenu(); // advertentiebeheer: 20% korting het eerste jaar
   const prijsRij = `<div class="sha-prijs" style="margin:8px 0"><s>€ 99</s><b style="font-size:24px">€ 79,20</b><span class="zacht">/maand beheer het eerste jaar · geen opstartkosten · minimaal 3 maanden, daarna maandelijks opzegbaar</span></div>`;
@@ -1177,22 +1178,42 @@ async function kpRapport(opnieuw) {
   stop();
   const T = r.tools || {};
   if (!Object.keys(T).length) { vak.innerHTML = `<p class="zacht" style="margin:0">We weten het adres van je website nog niet. Stuur ons een berichtje via "Iets laten aanpassen", dan zetten we de controle aan.</p>`; return; }
-  const n = rpPunten(T), dat = r.datum ? new Date(r.datum).toLocaleDateString("nl-NL", { day: "numeric", month: "long" }) : "";
-  const lijst = Object.entries(T).flatMap(([t, u]) => (u.items || []).filter((i) => i.status !== "goed").map((i) => `- ${RP_NAAM[t]}: ${i.titel}`));
-  vak.innerHTML = `<div class="rij"><div class="vul"><h2 style="margin:0">${n ? n + (n === 1 ? " punt kan beter" : " punten kunnen beter") : "Alles is in orde 🎉"}</h2>
+  // wie lost wat op: Sitehulpje (de website zelf), het SEO-pakket (gevonden worden) of Jan (mail en server, buiten de website)
+  const DEEL = { snelheid: "sh", mobiel: "sh", links: "sh", toegankelijkheid: "sh", mail: "jan", veiligheid: "jan" };
+  // geen echte klus: samenvattingen ("26 van de 27 links werken", "... 89 van 100") en nep-links uit stukjes code
+  const echt = (t, i) => i.status !== "goed" && !/^\d+ van de \d+ links werken/i.test(i.titel) && !/\b\d+ van 100$/.test(i.titel)
+    && !(t === "links" && /(state|item|props|data|this)\.\w|\$\{|\{\{|%7B/i.test(i.titel));
+  const punten = { sh: [], vb: [], jan: [] };
+  for (const [t, u] of Object.entries(T)) for (const i of u.items || []) if (echt(t, i)) punten[DEEL[t] || "vb"].push(`- ${RP_NAAM[t]}: ${i.titel}`);
+  const n = punten.sh.length + punten.vb.length + punten.jan.length, dat = r.datum ? new Date(r.datum).toLocaleDateString("nl-NL", { day: "numeric", month: "long" }) : "";
+  const mv = (x, een, meer) => `${x} ${x === 1 ? een : meer}`;
+  vak.innerHTML = `<div class="rij"><div class="vul"><h2 style="margin:0">${n ? mv(n, "punt kan beter", "punten kunnen beter") : "Alles is in orde 🎉"}</h2>
     <p class="zacht" style="margin:4px 0 0">Gecontroleerd op ${dat}. We doen dit elke week opnieuw.</p></div>
     <button class="knop rand klein" type="button" id="kprpnu">Nu opnieuw controleren</button></div><div id="kprpcats"></div>
-    ${n ? `<div class="kaart" style="margin-top:14px;background:var(--bg2)"><b>Wil je dat wij deze punten oplossen?</b><p class="zacht" style="margin:4px 0 10px">Met één klik sturen we alle punten naar je webbeheerder. Je hoeft niets uit te leggen. Teksten voor Google en AI krijg je eerst te zien om goed te keuren.</p>
-    <button class="knop" type="button" id="kprpfix">Laat alles oplossen</button><span id="kprpok" class="zacht" style="margin-left:10px"></span></div>` : ""}`;
+    ${punten.sh.length || punten.jan.length ? `<div class="kaart" style="margin-top:14px;background:var(--bg2)"><b>Wil je dat wij ${punten.sh.length ? mv(punten.sh.length, "punt aan je website", "punten aan je website") : "deze punten"} oplossen?</b>
+      <p class="zacht" style="margin:4px 0 10px">${punten.sh.length ? "Met één klik sturen we ze naar Sitehulpje. Je hoeft niets uit te leggen." : ""}${punten.jan.length ? ` ${mv(punten.jan.length, "punt zit", "punten zitten")} buiten je website (mail of server). ${punten.jan.length === 1 ? "Dat" : "Die"} geven we door aan Jan, hij regelt het met je.` : ""}</p>
+      <button class="knop" type="button" id="kprpfix">${punten.sh.length ? "Laat het oplossen" : "Geef door aan Jan"}</button><span id="kprpok" class="zacht" style="margin-left:10px"></span></div>` : ""}
+    ${punten.vb.length ? `<div class="kaart" style="margin-top:14px;background:var(--bg2)">${kpHeeftVb
+      ? `<b>${mv(punten.vb.length, "punt gaat", "punten gaan")} over gevonden worden in Google en AI.</b><p class="zacht" style="margin:4px 0 0">Die pakt je SEO-pakket vanzelf op. Je hoeft niets te doen.</p>`
+      : `<b>${mv(punten.vb.length, "punt gaat", "punten gaan")} over gevonden worden in Google en AI.</b><p class="zacht" style="margin:4px 0 10px">Daarvoor hebben we het SEO-pakket Basis. Dat lost dit direct op en houdt het daarna elke week bij, zodat het niet opnieuw misgaat.</p>
+        <button class="knop" type="button" id="kprpseo">Bekijk het SEO-pakket</button>`}</div>` : ""}`;
   rpCategorieen($("#kprpcats"), T, { door: false });
   $("#kprpnu").onclick = () => kpRapport(true);
+  const seo = $("#kprpseo");
+  if (seo) seo.onclick = () => { kpNaar("promo"); window.scrollTo(0, 0); };
   const fix = $("#kprpfix");
   if (fix) fix.onclick = async () => {
     fix.disabled = true; fix.textContent = "Even geduld…";
     try {
-      await api("verzoek_nieuw", { tekst: `Graag de verbeterpunten uit de controle van ${dat} oplossen (${n} punten):\n${lijst.join("\n")}`, fotos: [] });
-      fix.textContent = "Verstuurd ✓"; $("#kprpok").textContent = "Je ziet het verzoek bij \"Iets laten aanpassen\".";
-    } catch (e) { fix.disabled = false; fix.textContent = "Laat alles oplossen"; $("#kprpok").textContent = e.message || "Dat lukte niet, probeer het nog eens."; }
+      if (punten.jan.length) {
+        const ik = window.KP_IK || {}, g = ik.gebruiker || {}, k = ik.klant || {};
+        await api("contact", { naam: g.naam || k.naam || "Klant", contact: g.email || "", bedrijf: k.naam || "", site: k.site || "", bron: "sitehulpje.nl",
+          bericht: `Uit de controle van ${dat}: deze punten zitten buiten de website en moeten via jou:\n${punten.jan.join("\n")}` });
+      }
+      if (punten.sh.length) await api("verzoek_nieuw", { tekst: `Graag deze punten uit de controle van ${dat} oplossen:\n${punten.sh.join("\n")}`, fotos: [] });
+      fix.textContent = "Verstuurd ✓";
+      $("#kprpok").textContent = punten.sh.length ? "Je ziet het verzoek bij \"Iets laten aanpassen\"." : "Jan neemt contact met je op.";
+    } catch (e) { fix.disabled = false; fix.textContent = punten.sh.length ? "Laat het oplossen" : "Geef door aan Jan"; $("#kprpok").textContent = e.message || "Dat lukte niet, probeer het nog eens."; }
   };
 }
 function kpAutoBlok(p) {
@@ -1206,7 +1227,7 @@ $("#kpsluit").onclick = kpDicht; $("#kpdek").onclick = kpDicht;
 window.vbNaarPagina = (t) => { const p = { overzicht: "overzicht", zoekwoorden: "zoekwoorden", paginas: "paginas", reviews: "reviews", voorstellen: "voorstellen", gezondheid: "gezondheid", rapporten: "rapporten", koppelingen: "koppelingen" }[t]; if (p) { kpNaar(p); return true; } return false; };
 try { $("#kopbot2").innerHTML = robotSvg("rust"); } catch {}
 
-// ---- Vindbaarheid laden en over de pagina's verdelen
+// ---- SEO laden en over de pagina's verdelen
 async function kpLaadVb() {
   const el = $("#vindbaarheid");
   el.innerHTML = `<div id="kpstart"></div><div id="kpoverzicht" data-kp="overzicht"></div><div id="kpacties" data-kp="acties"></div><div id="vbdash"></div>`;
@@ -1220,7 +1241,7 @@ async function kpLaadVb() {
   vbStartToon(startEl, undefined, { stil: true, klaar: aanpassen }).then((s) => { if (s?.klant_klaar) aanpassen(); });
   const dash = $("#vbdash");
   await vbToon(dash);
-  // onderdelen van het Vindbaarheid-dashboard aan de juiste menupagina hangen.
+  // onderdelen van het SEO-dashboard aan de juiste menupagina hangen.
   // Opnieuw doen telkens als het dashboard zichzelf ververst (bijv. na een review beantwoorden), anders valt alles weg.
   const kpTagVb = () => {
     const tag = (sel, kp) => dash.querySelectorAll(sel).forEach((x) => (x.dataset.kp = kp));

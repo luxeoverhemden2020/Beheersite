@@ -198,11 +198,11 @@ tr.klik{cursor:pointer}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="assets/basis.js?v=20261113a"></script>
-<script src="assets/vindbaarheid.js?v=20261112b"></script>
-<script src="assets/vb-start.js?v=20261111a"></script>
-<script src="assets/vb-site.js"></script>
-<script src="assets/vb-factuur.js?v=20261112b"></script>
-<script src="assets/vb-check.js"></script>
+<script src="assets/vindbaarheid.js?v=20261113b"></script>
+<script src="assets/vb-start.js?v=20261113b"></script>
+<script src="assets/vb-site.js?v=20261113b"></script>
+<script src="assets/vb-factuur.js?v=20261113b"></script>
+<script src="assets/vb-check.js?v=20261113b"></script>
 <script>
 const WIEJAN = { klant: "Klant", webbeheer: "Sitehulpje", jan: "Jij (Jan)" };
 let data = null, ik = null, openVerzoek = null, paneelTimer = null;
@@ -256,7 +256,7 @@ function tekenKlanten() {
   $("#ktabel").innerHTML = lijst.length ? `<table><thead><tr><th>Klant</th><th>Diensten</th><th class="r">Per maand</th><th class="r">Klikken Google</th><th class="r">Verzoeken</th><th></th></tr></thead><tbody>
     ${lijst.map((k) => {
       const v = vbKlanten.find((x) => x.id === k.id) || {}, x = extraKlanten[k.id] || {};
-      const diensten = [v.vindbaarheid && v.vb_pakket ? `<span class="chip klaar">Vindbaarheid ${VB_PAKKET[v.vb_pakket]}</span>` : "",
+      const diensten = [v.vindbaarheid && v.vb_pakket ? `<span class="chip klaar">SEO-pakket ${VB_PAKKET[v.vb_pakket]}</span>` : "",
         x.sh_prijs > 0 || k.deurbel_ingesteld ? `<span class="chip">Sitehulpje</span>` : ""].filter(Boolean).join(" ") || '<span class="zacht">–</span>';
       const pct = v.klikken_vorige ? Math.round(((v.klikken_28 - v.klikken_vorige) / v.klikken_vorige) * 100) : null;
       return `<tr class="klik" data-kopen="${esc(k.id)}"><td><b>${esc(k.naam)}</b>${k.actief ? "" : ' <span class="zacht">(uit)</span>'}${x.opzeg_per ? ' <span class="vb-af vb-klein">opgezegd</span>' : ""}${x.vb_pauze ? ' <span class="vb-af vb-klein">pauze</span>' : ""}<br><span class="zacht vb-klein">${esc((k.site || "").replace(/^https?:\/\//, ""))}</span></td>
@@ -282,10 +282,10 @@ async function openKlantPagina(id, tab = "cijfers") {
   const k = data.klanten.find((x) => x.id === id), v = vbKlanten.find((x) => x.id === id) || {};
   $("#klijst").hidden = true; $("#kdetail").hidden = false;
   $("#kdnaam").innerHTML = `${esc(k?.naam || v.naam || id)} <span class="zacht" style="font-weight:400;font-size:14px">${esc((k?.site || v.site || "").replace(/^https?:\/\//, ""))}</span>`;
-  // cijfers & seo: pakket aan/uit en (als Vindbaarheid aan staat) het dashboard zoals de klant het ziet
-  $("#kdpakket").innerHTML = `<div class="kaart"><div class="rij"><b class="vul">Vindbaarheid</b>
+  // cijfers & seo: pakket aan/uit en (als SEO aan staat) het dashboard zoals de klant het ziet
+  $("#kdpakket").innerHTML = `<div class="kaart"><div class="rij"><b class="vul">SEO</b>
     <select id="kdpk" style="width:auto"><option value="">Uit</option>${Object.entries(VB_PAKKET).map(([w, n]) => `<option value="${w}" ${v.vindbaarheid && v.vb_pakket === w ? "selected" : ""}>${n}</option>`).join("")}</select></div>
-    <p class="zacht vb-klein" style="margin:6px 0 0">${v.status === "ok" ? `Google gekoppeld (${esc(v.google_email || "")}) · laatst bijgewerkt ${v.laatst_opgehaald ? datum(v.laatst_opgehaald) : "–"}` : v.vindbaarheid ? "Google is nog niet gekoppeld. Dat doet de klant in zijn startstappen." : "Zet een pakket aan om Vindbaarheid voor deze klant te starten."}</p></div>`;
+    <p class="zacht vb-klein" style="margin:6px 0 0">${v.status === "ok" ? `Google gekoppeld (${esc(v.google_email || "")}) · laatst bijgewerkt ${v.laatst_opgehaald ? datum(v.laatst_opgehaald) : "–"}` : v.vindbaarheid ? "Google is nog niet gekoppeld. Dat doet de klant in zijn startstappen." : "Zet een pakket aan om het SEO-pakket voor deze klant te starten."}</p></div>`;
   $("#kdpk").onchange = async (e) => { try { await vbApi("beheer_zet", { klant_id: id, aan: !!e.target.value, pakket: e.target.value || null }); await laadKlanten(); openKlantPagina(id, "cijfers"); } catch (err) { meld(err.message); } };
   if (v.vindbaarheid) vbBeheerBekijk(id, vbKlanten); else $("#vbdetail").innerHTML = "";
   vbfAbonnementVoor($("#kdabon"), id);
@@ -314,13 +314,13 @@ async function vbMeldingen() {
   } catch { el.innerHTML = ""; }
 }
 async function vbKosten(el) {
-  // AI-kosten van Vindbaarheid, apart van de Sitehulpje-limiet; alleen voor Jan
+  // AI-kosten van het SEO-pakket, apart van de Sitehulpje-limiet; alleen voor Jan
   try {
     const { kosten } = await vbVsApi("kosten");
     if (!kosten.length) { el.innerHTML = ""; return; }
     const eur = (n) => "€" + Number(n || 0).toFixed(2).replace(".", ",");
     const tot = kosten.reduce((s, k) => s + k.deze, 0);
-    el.innerHTML = `<div class="kaart tabel-scroll"><h2 style="font-size:16px"><span class="tag">€</span>AI-kosten Vindbaarheid</h2>
+    el.innerHTML = `<div class="kaart tabel-scroll"><h2 style="font-size:16px"><span class="tag">€</span>AI-kosten SEO-pakket</h2>
       <p class="zacht vb-klein" style="margin-top:-4px">Telt niet mee in de €5-limiet van Sitehulpje. Gaat van het API-tegoed af. Bij 80% van de grens krijg je een mail; bij de grens wachten nieuwe verbeteringen tot volgende maand.</p>
       <table><thead><tr><th>Klant</th><th>Pakket</th><th class="r">Deze maand</th><th class="r">Grens</th><th class="r">Vorige maand</th></tr></thead><tbody>
       ${kosten.map((k) => { const pct = k.grens ? Math.round((k.deze / k.grens) * 100) : 0;

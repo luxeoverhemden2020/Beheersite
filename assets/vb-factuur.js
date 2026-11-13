@@ -1,4 +1,4 @@
-// Sitehulpje Vindbaarheid – facturen (beheer) en pauzemelding (klant)
+// Sitehulpje SEO-pakket – facturen (beheer) en pauzemelding (klant)
 const VBF_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-factuur";
 async function vbfApi(actie, data = {}) {
   const r = await fetch(VBF_API, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, ...data }) })
@@ -10,12 +10,12 @@ async function vbfApi(actie, data = {}) {
 const vbfEuro = (n) => "€" + Number(n).toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const VBF_STATUS = { concept: ["concept", "zacht"], open: ["open", "vb-let"], betaald: ["betaald", "vb-op"], teruggeboekt: ["teruggeboekt", "vb-af"], mislukt: ["niet betaald", "vb-af"] };
 
-// Klantpagina: staat Vindbaarheid op pauze door een openstaande factuur? Toon dan een melding met betaallink.
+// Klantpagina: staat SEO op pauze door een openstaande factuur? Toon dan een melding met betaallink.
 async function vbfPauzeMelding(el) {
   try {
     const s = await vbfApi("status");
     if (!s.pauze) { el.innerHTML = ""; return; }
-    el.innerHTML = `<div class="melding let"><b>Vindbaarheid staat op pauze.</b> ${s.open.length
+    el.innerHTML = `<div class="melding let"><b>Je SEO-pakket staat op pauze.</b> ${s.open.length
       ? `Er staat nog een factuur open: ${s.open.map((f) => `${esc(f.nummer)} (${vbfEuro(f.totaal)})${f.betaallink ? ` · <a href="${esc(f.betaallink)}">Nu betalen</a>` : ""}`).join(", ")}. Na betaling gaat alles meteen weer verder.`
       : "Neem contact op met Jan via info@sitehulpje.nl."}</div>`;
   } catch { el.innerHTML = ""; }
@@ -204,7 +204,7 @@ async function vbgApi(actie, data = {}) {
   return d;
 }
 async function vbfKlussen(el) {
-  // alleen voor klanten met Vindbaarheid zonder webbeheer; met webbeheer vraag je dit gewoon als verzoek
+  // alleen voor klanten met het SEO-pakket zonder webbeheer; met webbeheer vraag je dit gewoon als verzoek
   let d, ab; try { [d, ab] = await Promise.all([vbgApi("klussen"), vbfApi("abonnement")]); } catch { el.innerHTML = ""; return; }
   const ids = (ab.delen || []).map((x) => x.id);
   if (!d.klussen?.length || !ids.includes("vindbaarheid") || ids.includes("sitehulpje")) { el.innerHTML = ""; return; }
@@ -267,7 +267,7 @@ async function vbgOmzet(el, modus = "alles") {
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">
       ${tegel("Per maand (excl. btw)", vbfEuro(d.mrr), d.korting ? `na ${vbfEuro(d.korting)} korting` : "")}
       ${tegel("Binnen deze maand", vbfEuro(d.binnen_deze_maand), "incl. btw")}
-      ${tegel("Betalende klanten", d.klanten.totaal, `${d.klanten.vindbaarheid} Vindbaarheid · ${d.klanten.sitehulpje} Sitehulpje`)}
+      ${tegel("Betalende klanten", d.klanten.totaal, `${d.klanten.vindbaarheid} SEO · ${d.klanten.sitehulpje} Sitehulpje`)}
       ${tegel("Pakketten", `${pp.basis || 0} / ${pp.plus || 0} / ${pp.pro || 0}`, "Basis / Plus / Pro")}
       ${tegel("AI-kosten deze maand", "$" + Number(d.ai_kosten_usd).toFixed(2), "alleen voor jou")}
     </div>
@@ -290,8 +290,8 @@ async function vbgInstellingen(el) {
       <div><label for="vbi_pct">Vriendenkorting (% op de eerste volle maand, voor allebei)</label><input id="vbi_pct" inputmode="numeric" value="${esc(d.vriend_korting_pct ?? 50)}"></div>
       <div><label for="vbi_review">Link naar je Google-review (na 60 dagen gemaild)</label><input id="vbi_review" placeholder="https://g.page/r/..." value="${esc(d.review_link || "")}"></div>
     </div>
-    <label class="vinkje" style="margin-top:8px"><input type="checkbox" id="vbi_mb"${d.maandbericht_alle === "aan" ? " checked" : ""}><span>Maandbericht (“dit hebben we vorige maand voor je gedaan”) ook naar klanten met Vindbaarheid sturen</span></label>
-    <h3 style="margin-top:16px">Losse klussen</h3><p class="zacht vb-klein" style="margin:0">Prijzen excl. btw. Alleen klanten met Vindbaarheid zonder webbeheer zien deze lijst en betalen meteen met iDEAL. Een nieuwe pagina en een blogartikel voert Sitehulpje automatisch uit (als de site gekoppeld is); andere klussen doe je zelf.</p>
+    <label class="vinkje" style="margin-top:8px"><input type="checkbox" id="vbi_mb"${d.maandbericht_alle === "aan" ? " checked" : ""}><span>Maandbericht (“dit hebben we vorige maand voor je gedaan”) ook naar klanten met het SEO-pakket sturen</span></label>
+    <h3 style="margin-top:16px">Losse klussen</h3><p class="zacht vb-klein" style="margin:0">Prijzen excl. btw. Alleen klanten met het SEO-pakket zonder webbeheer zien deze lijst en betalen meteen met iDEAL. Een nieuwe pagina en een blogartikel voert Sitehulpje automatisch uit (als de site gekoppeld is); andere klussen doe je zelf.</p>
     <div id="vbi_klussen">${(d.klussen || []).map(rij).join("")}</div>
     <button class="knop rand klein" type="button" id="vbi_plus" style="margin-top:8px">+ Klus toevoegen</button>
     <div style="margin-top:14px"><button class="knop" id="vbi_bewaar">Bewaren</button></div><div id="vbi_meld"></div></div>`;

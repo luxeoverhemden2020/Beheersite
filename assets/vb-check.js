@@ -1,4 +1,4 @@
-// Sitehulpje Vindbaarheid – gratis website-checks van nieuwe bezoekers (beheer)
+// Sitehulpje SEO-pakket – gratis website-checks van nieuwe bezoekers (beheer)
 const VBC_API = "https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/vb-check";
 async function vbcApi(actie, data = {}) {
   const r = await fetch(VBC_API, { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie, ...data }) })
@@ -26,7 +26,7 @@ async function vbbBestellingen(el) {
       return `<tr><td>${new Date(b.aangemaakt).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}<br><span class="zacht vb-klein">${new Date(b.aangemaakt).toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })}</span></td>
         <td><b>${esc(b.bedrijf || "")}</b><br><span class="zacht vb-klein">${esc((b.site || "").replace(/^https?:\/\//, ""))}</span></td>
         <td class="vb-klein">${esc(b.contact || "")}<br>${esc(b.email || "")}${b.telefoon ? "<br>" + esc(b.telefoon) : ""}</td>
-        <td class="vb-klein">${[b.pakket ? "Vindbaarheid " + (VBC_PAKKET[b.pakket] || b.pakket) : "", b.sitehulpje ? "Sitehulpje" : ""].filter(Boolean).join(" + ")}${b.bericht ? `<br><span class="zacht">${esc(b.bericht.slice(0, 120))}</span>` : ""}</td>
+        <td class="vb-klein">${[b.pakket ? "SEO-pakket " + (VBC_PAKKET[b.pakket] || b.pakket) : "", b.sitehulpje ? "Sitehulpje" : ""].filter(Boolean).join(" + ")}${b.bericht ? `<br><span class="zacht">${esc(b.bericht.slice(0, 120))}</span>` : ""}</td>
         <td><span class="${kl}">${st}</span>${b.fout ? `<br><span class="vb-af vb-klein">${esc(b.fout)}</span>` : ""}</td></tr>`; }).join("")}</tbody></table></div>`;
 }
 
@@ -48,7 +48,7 @@ async function vbcBeheer(el, open) {
         ${["fout", "klaar", "verstuurd"].includes(c.status) ? `<button class="knop rand klein" data-vbc="opnieuw" title="Check opnieuw doen">↻</button>` : ""}</td></tr>`;
   };
   el.innerHTML = `<div class="kaart tabel-scroll"><h2>Gratis website-checks${klaar ? ` <span class="vb-op vb-klein">${klaar} klaar om te versturen</span>` : ""}</h2>
-    <p class="zacht vb-klein" style="margin-top:-4px">Aanvragen via de Vindbaarheid-pagina. De check loopt vanzelf en het rapport gaat 2 uur na klaar vanzelf naar de aanvrager, tenzij je het tegenhoudt.</p>
+    <p class="zacht vb-klein" style="margin-top:-4px">Aanvragen via de SEO-pagina. De check loopt vanzelf en het rapport gaat 2 uur na klaar vanzelf naar de aanvrager, tenzij je het tegenhoudt.</p>
     <form id="vbcstart" class="rij" style="gap:8px;align-items:flex-end;margin:6px 0 12px;flex-wrap:wrap">
       <div style="flex:1;min-width:180px"><label for="vbc_site" class="vb-klein">Website checken</label><input id="vbc_site" inputmode="url" placeholder="www.hunbedrijf.nl" required></div>
       <div style="flex:1;min-width:180px"><label for="vbc_email" class="vb-klein">E-mailadres klant</label><input id="vbc_email" type="email" placeholder="naam@hunbedrijf.nl" required></div>
@@ -104,7 +104,7 @@ async function vbkCodes(el, data) {
       <div><label for="kc_soort">Soort</label><select id="kc_soort"><option value="pct">Procent</option><option value="eur">Euro per maand</option><option value="deel">Per onderdeel</option></select></div>
       <div data-kc-een><label for="kc_waarde">Korting</label><input id="kc_waarde" type="number" min="1" step="0.01" placeholder="20" style="width:90px"></div>
       <div data-kc-deel hidden><label for="kc_psh">% op Sitehulpje</label><input id="kc_psh" type="number" min="0" max="100" placeholder="70" style="width:110px"></div>
-      <div data-kc-deel hidden><label for="kc_pvb">% op Vindbaarheid</label><input id="kc_pvb" type="number" min="0" max="100" placeholder="50" style="width:120px"></div>
+      <div data-kc-deel hidden><label for="kc_pvb">% op het SEO-pakket</label><input id="kc_pvb" type="number" min="0" max="100" placeholder="50" style="width:120px"></div>
       <div><label for="kc_mnd">Aantal maanden</label><input id="kc_mnd" type="number" min="1" max="60" placeholder="leeg = altijd" style="width:120px"></div>
       <div><label for="kc_tot">Geldig tot</label><input id="kc_tot" type="date"></div>
       <div><label for="kc_max">Max. keer</label><input id="kc_max" type="number" min="1" placeholder="leeg = onbeperkt" style="width:130px"></div>
