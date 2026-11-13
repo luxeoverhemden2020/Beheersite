@@ -39,6 +39,51 @@ async function mailJan(i: Record<string, string>, onderwerp: string, html: strin
   } catch (e) { console.error("mail", e); }
 }
 
+// ---------- mail aan de klant als het budget benut is: positief, met resultaat en advies (zonder AI, kost niets) ----------
+async function mailKlantBudgetOp(i: Record<string, string>, kid: string, s: any, testAan?: string) {
+  try {
+    if (!i.resend_sleutel) return;
+    const [u] = await sql`select email, naam, inloglink from beheersite.gebruikers where klant_id = ${kid} and rol = 'klant' and actief order by aangemaakt limit 1`;
+    if (!u?.email) return;
+    const [k] = await sql`select naam, ads_tellen_vanaf from beheersite.klanten where id = ${kid}`;
+    const [c] = await sql`select coalesce(sum(vertoningen),0)::int vert, coalesce(sum(klikken),0)::int klik, coalesce(sum(conversies),0)::float conv
+      from beheersite.ads_dag where klant_id = ${kid} and (${k?.ads_tellen_vanaf}::date is null or datum >= ${k?.ads_tellen_vanaf}::date)`;
+    const [best] = await sql`select term from beheersite.ads_zoektermen where klant_id = ${kid} and (conversies > 0 or klikken > 0) order by conversies desc, klikken desc limit 1`;
+    const [laatst] = await sql`select bedrag_excl::float bedrag, dagen, betaald_op from beheersite.ads_tegoed where klant_id = ${kid} and status = 'betaald' order by betaald_op desc limit 1`;
+    // budgetadvies: was het eerder op dan gepland, dan een bedrag waarmee je de hele periode zichtbaar blijft
+    const rond = (x: number) => Math.max(100, Math.ceil(x / 50) * 50);
+    let advies = rond(laatst?.bedrag || 100), vroeg = false;
+    if (laatst?.betaald_op && laatst.dagen) {
+      const gebruikt = Math.max(1, (Date.now() - new Date(laatst.betaald_op).getTime()) / 864e5);
+      if (gebruikt < laatst.dagen - 1) { vroeg = true; advies = rond(Math.min(3, laatst.dagen / gebruikt) * laatst.bedrag); }
+    }
+    const conv = Math.round(c.conv), getal = (n: number) => n.toLocaleString("nl-NL");
+    const tegel = (t: string, w: string) => `<td style="background:#E1F5EE;border-radius:8px;padding:10px;width:50%"><div style="font-size:12px;color:#0F6E56">${t}</div><div style="font-size:20px;font-weight:bold;color:#085041">${w}</div></td>`;
+    const tegels = [tegel("Bekeken", getal(c.vert) + "×"), tegel("Klikken", getal(c.klik)),
+      ...(conv > 0 ? [tegel("Aanvragen en belletjes", getal(conv)), tegel("Per aanvraag", euro(s.uitgegeven / conv))] : [])];
+    const rijen = []; for (let x = 0; x < tegels.length; x += 2) rijen.push(`<tr>${tegels[x]}${tegels[x + 1] || "<td></td>"}</tr>`);
+    const link = (i.platform_url || "https://sitehulpje.nl").replace(/\/$/, "") + (u.inloglink ? `/?link=${u.inloglink}` : "/portaal#advertenties");
+    const voornaam = String(u.naam || "").trim().split(/\s+/)[0];
+    const onderwerp = conv > 0 ? `Je advertenties deden het goed: ${getal(conv)} ${conv === 1 ? "aanvraag" : "aanvragen"}` : `Je advertenties deden het goed: ${getal(c.klik)} bezoekers`;
+    const html = `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#0B1B3F;max-width:560px">
+<div style="background:#0B1B3F;color:#fff;padding:14px 18px;font-size:18px;font-weight:bold;border-radius:10px 10px 0 0">Site<span style="color:#5DCAA5">hulpje</span></div>
+<div style="padding:18px;border:1px solid #e3e7ef;border-top:0;border-radius:0 0 10px 10px">
+<p>Hoi${voornaam ? " " + esc(voornaam) : ""},</p>
+<p>Goed nieuws: je advertentiebudget van <b>${euro(s.gestort)}</b> is helemaal benut. Zo veel mensen zochten naar jouw diensten.</p>
+<table style="width:100%;border-spacing:8px;margin:0 -8px 8px">${rijen.join("")}</table>
+<p style="margin:0 0 6px"><b>Ons advies</b></p>
+${best?.term ? `<p style="margin:0 0 6px">"${esc(best.term)}" leverde ${conv > 0 ? "de meeste aanvragen" : "de meeste bezoekers"} op. Daar zoeken mensen echt op, dus het is een goed moment om door te gaan.</p>` : ""}
+<p style="margin:0 0 16px">${vroeg ? `Je budget was eerder op dan gepland. Met <b>${euro(advies)}</b> blijf je de hele periode zichtbaar, ook in het weekend wanneer veel mensen zoeken.` : `Met <b>${euro(advies)}</b> ga je op dezelfde voet verder en blijf je zichtbaar voor nieuwe klanten.`}</p>
+<p style="text-align:center;margin:0 0 6px"><a href="${link}" style="display:inline-block;background:#0F6E56;color:#fff;text-decoration:none;font-weight:bold;padding:12px 28px;border-radius:8px">Vul je budget aan</a></p>
+<p style="text-align:center;font-size:12px;color:#5F5E5A;margin:0 0 14px">Binnen een uur na betaling staan je advertenties weer aan.</p>
+<p style="font-size:13px;color:#5F5E5A">Je advertenties staan nu even op pauze, zodat je nooit meer uitgeeft dan je wilt.${s.over > 0.01 ? ` Er blijft ${euro(s.over)} tegoed staan.` : ""}</p>
+<p>Groet,<br>Jan van Siteregelaar</p></div></div>`;
+    const van = (i.mail_van || "Sitehulpje <info@sitehulpje.nl>").replace(/^[^<]*</, "Sitehulpje <");
+    await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${i.resend_sleutel}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: van, to: [testAan || u.email], reply_to: "info@sitehulpje.nl", subject: (testAan ? "[TEST] " : "") + onderwerp, html }) });
+  } catch (e) { console.error("mail klant", e); }
+}
+
 // ---------- Google Ads ----------
 async function toegang(i: Record<string, string>) {
   if (!i.ads_token_id) throw new Fout(409, "Google Ads is nog niet gekoppeld.");
@@ -265,6 +310,7 @@ async function handel(req: Request, b: any) {
         if (s.over <= grens) {
           await zetStatus(i, at, k.id, false);
           await mailJan(i, `Advertenties gepauzeerd: ${k.naam}, budget op`, `<p>Het advertentiebudget van <b>${esc(k.naam)}</b> is (bijna) op: ${euro(s.uitgegeven)} van ${euro(s.gestort)} gebruikt, ${euro(s.over)} blijft als tegoed staan. De campagne is automatisch gepauzeerd.</p>`);
+          await mailKlantBudgetOp(i, k.id, s);
           log.push(`${k.id}: gepauzeerd`);
         } else if (k.soort === "totaal" && k.eind && new Date(k.eind).getTime() < Date.now() && s.over >= 5) {
           const r = await totaalBijwerken(i, at, k.id, true);
@@ -280,9 +326,11 @@ async function handel(req: Request, b: any) {
   if (!kid) throw new Fout(400, "Geen klant");
 
   if (a === "saldo") return await saldo(kid);
+  if (a === "testmail_budget_op" && g.rol === "admin") { const s = await saldo(kid); await mailKlantBudgetOp(i, kid, s, i.jan_email); return { ok: true, naar: i.jan_email }; }
   if (a === "betaal") {
     const bedrag = r2(Number(b.bedrag));
-    if (!isFinite(bedrag) || bedrag < 5 || bedrag > 10000) throw new Fout(400, "Kies een bedrag tussen €5 en €10.000.");
+    const minimum = g.rol === "admin" ? 5 : 100; // klanten minimaal €100, Jan kan kleiner testen
+    if (!isFinite(bedrag) || bedrag < minimum || bedrag > 10000) throw new Fout(400, `Kies een bedrag tussen €${minimum} en €10.000.`);
     const btw = r2(bedrag * 0.21), totaal = r2(bedrag + btw);
     const [k] = await sql`select naam from beheersite.klanten where id = ${kid}`;
     const dagen = Math.max(3, Math.min(30, Math.round(Number(b.dagen) || 14)));
