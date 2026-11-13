@@ -15,7 +15,7 @@ async function vbfPauzeMelding(el) {
   try {
     const s = await vbfApi("status");
     if (!s.pauze) { el.innerHTML = ""; return; }
-    el.innerHTML = `<div class="melding let"><b>Je SEO-pakket staat op pauze.</b> ${s.open.length
+    el.innerHTML = `<div class="melding let"><b>Je Sitehulpje SEO staat op pauze.</b> ${s.open.length
       ? `Er staat nog een factuur open: ${s.open.map((f) => `${esc(f.nummer)} (${vbfEuro(f.totaal)})${f.betaallink ? ` · <a href="${esc(f.betaallink)}">Nu betalen</a>` : ""}`).join(", ")}. Na betaling gaat alles meteen weer verder.`
       : "Neem contact op met Jan via info@sitehulpje.nl."}</div>`;
   } catch { el.innerHTML = ""; }

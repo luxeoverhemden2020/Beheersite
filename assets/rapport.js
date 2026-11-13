@@ -1,7 +1,7 @@
 // Gedeeld: de 14 checks als 7 onderdelen tonen (gratis website-check en klantportaal). Heeft assets/tools.js nodig (SR_RENDER).
 const RP_CAT = [
   ["Snelheid", "⚡", ["snelheid", "afbeeldingen"]], ["Op de telefoon", "📱", ["mobiel"]], ["Gevonden in Google", "🔎", ["google-voorbeeld", "indexeerbaar", "koppen"]],
-  ["Vindbaar in AI", "🤖", ["ai", "bedrijfsgegevens"]], ["Veiligheid", "🛡️", ["veiligheid", "links"]], ["Je mail", "✉️", ["mail"]], ["Teksten en delen", "💬", ["leesbaarheid", "social", "toegankelijkheid"]]];
+  ["Gevonden in AI", "🤖", ["ai", "bedrijfsgegevens"]], ["Veiligheid", "🛡️", ["veiligheid", "links"]], ["Je mail", "✉️", ["mail"]], ["Teksten en delen", "💬", ["leesbaarheid", "social", "toegankelijkheid"]]];
 const RP_NAAM = { snelheid: "Snelheid", afbeeldingen: "Afbeeldingen", mobiel: "Telefoon", "google-voorbeeld": "Zo zie je eruit in Google", indexeerbaar: "Toegang voor Google", koppen: "Opbouw van je pagina",
   ai: "ChatGPT en andere AI", bedrijfsgegevens: "Bedrijfsgegevens", veiligheid: "Beveiliging", links: "Links", mail: "Komt je mail aan?", leesbaarheid: "Leesbaarheid", social: "Delen in WhatsApp en social media", toegankelijkheid: "Bruikbaar voor iedereen" };
 
@@ -26,7 +26,7 @@ function rpCategorieen(el, T, opties = {}) {
   const toon = (i) => {
     el.querySelectorAll(".rp-cat").forEach((b) => b.classList.toggle("aan", +b.dataset.cat === i));
     const [n, ico, ts] = RP_CAT[i];
-    el.querySelector(".rp-catdetail").innerHTML = `<div class="rp-catvak"><h3>${ico} ${n}</h3>${ts.filter((t) => T[t]).map((t) => `<div class="rp-tool"><div class="rp-toolkop"><b>${RP_NAAM[t]}</b>${opties.door === false ? "" : `<span class="rp-door ${rpDoor(T, t)}">${rpDoor(T, t) === "vb" ? "Lost het SEO-pakket op" : "Lost Sitehulpje op"}</span>`}</div>
+    el.querySelector(".rp-catdetail").innerHTML = `<div class="rp-catvak"><h3>${ico} ${n}</h3>${ts.filter((t) => T[t]).map((t) => `<div class="rp-tool"><div class="rp-toolkop"><b>${RP_NAAM[t]}</b>${opties.door === false ? "" : `<span class="rp-door ${rpDoor(T, t)}">${rpDoor(T, t) === "vb" ? "Lost Sitehulpje SEO op" : "Lost Sitehulpje op"}</span>`}</div>
       ${R.EXTRA[t] && T[t].extra && ["google-voorbeeld", "social", "ai"].includes(t) ? R.EXTRA[t](T[t].extra) : ""}${R.itemsHtml(T[t].items || [])}</div>`).join("")}</div>`;
   };
   el.querySelectorAll(".rp-cat").forEach((b) => (b.onclick = () => toon(+b.dataset.cat)));

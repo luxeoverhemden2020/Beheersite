@@ -1,4 +1,4 @@
-// Sitehulpje Vindbaarheid – facturen en automatische incasso via Mollie (Supabase Edge Function "vb-factuur")
+// Sitehulpje SEO – facturen en automatische incasso via Mollie (Supabase Edge Function "vb-factuur")
 // Modus "concept" (standaard): facturen worden alleen als concept gemaakt en naar Jan gemaild; er wordt niets afgeschreven.
 // Modus "aan" + MOLLIE_API_KEY: echte factuurnummers, incasso via Mollie, pauze bij terugboeking of mislukte betaling.
 import postgres from "npm:postgres@3.4.5";
@@ -40,7 +40,7 @@ function abonnement(k: any, periode?: string) {
   const adsVol = k.ads_tellen_vanaf && bun !== "pro" ? Number(k.ads_prijs ?? ADS_PRIJS) : 0;
   const adsKort = adsVol > 0 && !!k.ads_korting_tot && (!periode || `${periode}-01` <= dag(k.ads_korting_tot));
   const ads = adsVol > 0 ? (adsKort ? Math.round(adsVol * 80) / 100 : adsVol) : 0;
-  const delen = [bundel ? `Sitehulpje ${PAKKET[bun]}${bunKort ? " (10% korting eerste jaar)" : ""}` : "", vb ? `Sitehulpje Vindbaarheid ${PAKKET[k.vb_pakket]}` : "", sh ? "Sitehulpje" : "", ads ? `Google Advertenties beheer${adsKort ? " (20% korting)" : ""}` : ""].filter(Boolean);
+  const delen = [bundel ? `Sitehulpje ${PAKKET[bun]}${bunKort ? " (10% korting eerste jaar)" : ""}` : "", vb ? `Sitehulpje SEO ${PAKKET[k.vb_pakket]}` : "", sh ? "Sitehulpje" : "", ads ? `Google Advertenties beheer${adsKort ? " (20% korting)" : ""}` : ""].filter(Boolean);
   const bruto = Math.round((bundel + vb + sh + ads) * 100) / 100;
   // korting_van: korting die pas later ingaat (pauzemaand, vriendenkorting); korting_tot: tot en met die datum
   const geldig = !periode || ((!k.korting_tot || `${periode}-01` <= dag(k.korting_tot)) && (!k.korting_van || `${periode}-01` >= dag(k.korting_van).slice(0, 7) + "-01"));
@@ -142,7 +142,7 @@ async function hervat(klantId: string) {
   const open = await sql`select 1 from beheersite.vb_facturen where klant_id = ${klantId} and status in ('teruggeboekt','mislukt')`;
   if (open.length) return false;
   const [k] = await sql`update beheersite.klanten set vindbaarheid = true, vb_pauze = null, vb_pauze_reden = null where id = ${klantId} and vb_pauze is not null returning id, naam`;
-  if (k) await mailJan(`Weer actief: ${k.naam}`, `<p><b>${esc(k.naam)}</b> heeft betaald. Vindbaarheid loopt weer door.</p>`);
+  if (k) await mailJan(`Weer actief: ${k.naam}`, `<p><b>${esc(k.naam)}</b> heeft betaald. Sitehulpje SEO loopt weer door.</p>`);
   return !!k;
 }
 
@@ -184,7 +184,7 @@ async function verwerkBetaling(id: string) {
     await logRegel(f, "Teruggeboekt via Mollie, klant op pauze");
     const link = await betaallink(f, k).catch(() => null);
     await mail(await klantMailAdres(k.id), `Je betaling voor factuur ${f.nummer} is teruggeboekt`, kader(`<p>Hoi,</p>
-      <p>De automatische betaling van factuur <b>${esc(f.nummer)}</b> (${euro(f.totaal)}) is teruggeboekt. Daarom staat Sitehulpje Vindbaarheid voor <b>${esc(k.naam)}</b> even op pauze.</p>
+      <p>De automatische betaling van factuur <b>${esc(f.nummer)}</b> (${euro(f.totaal)}) is teruggeboekt. Daarom staat Sitehulpje SEO voor <b>${esc(k.naam)}</b> even op pauze.</p>
       <p>Was dit een vergissing? Betaal dan hieronder; daarna gaat alles meteen weer verder.</p>${link ? knop(link, "Betaal " + euro(f.totaal)) : ""}
       <p style="color:#5a6b82;font-size:13px">Vragen? Beantwoord deze mail.</p>`, "Betaling teruggeboekt", `Factuur ${esc(f.nummer)}`));
     await mailJan(`Teruggeboekt: ${k.naam}`, `<p><b>${esc(k.naam)}</b> heeft factuur ${esc(f.nummer)} (${euro(f.totaal)}) teruggeboekt. De klant staat op pauze en heeft een betaallink gekregen.</p>`);
@@ -203,7 +203,7 @@ async function verwerkBetaling(id: string) {
     await logRegel(f, `Betaling ${p.status}, klant op pauze`);
     const link = await betaallink(f, k).catch(() => null);
     await mail(await klantMailAdres(k.id), `Je betaling voor factuur ${f.nummer} is niet gelukt`, kader(`<p>Hoi,</p>
-      <p>De automatische betaling van factuur <b>${esc(f.nummer)}</b> (${euro(f.totaal)}) is niet gelukt. Daarom staat Sitehulpje Vindbaarheid voor <b>${esc(k.naam)}</b> even op pauze.</p>
+      <p>De automatische betaling van factuur <b>${esc(f.nummer)}</b> (${euro(f.totaal)}) is niet gelukt. Daarom staat Sitehulpje SEO voor <b>${esc(k.naam)}</b> even op pauze.</p>
       <p>Betaal hieronder, dan gaat alles meteen weer verder.</p>${link ? knop(link, "Betaal " + euro(f.totaal)) : ""}`, "Betaling niet gelukt", `Factuur ${esc(f.nummer)}`));
     await mailJan(`Betaling mislukt: ${k.naam}`, `<p>De incasso voor factuur ${esc(f.nummer)} van <b>${esc(k.naam)}</b> is mislukt (${esc(p.status)}). De klant staat op pauze en heeft een betaallink gekregen.</p>`);
     return { ok: true, status: "mislukt" };
@@ -327,7 +327,7 @@ async function herinneringen() {
     const welke = dagen >= 14 && !f.herinnerd_14 ? 14 : dagen >= 7 && !f.herinnerd_7 ? 7 : 0;
     if (!welke) continue;
     await mail(aan, `Herinnering: factuur ${f.nummer} staat nog open`, kader(`<p>Hoi,</p>
-      <p>Factuur <b>${esc(f.nummer)}</b> (${euro(f.totaal)}) staat nog open. Sitehulpje Vindbaarheid voor <b>${esc(f.naam)}</b> staat daarom op pauze.</p>${knop(f.betaallink, "Betaal " + euro(f.totaal))}`, "Herinnering", `Factuur ${esc(f.nummer)}`));
+      <p>Factuur <b>${esc(f.nummer)}</b> (${euro(f.totaal)}) staat nog open. Sitehulpje SEO voor <b>${esc(f.naam)}</b> staat daarom op pauze.</p>${knop(f.betaallink, "Betaal " + euro(f.totaal))}`, "Herinnering", `Factuur ${esc(f.nummer)}`));
     if (welke === 7) await sql`update beheersite.vb_facturen set herinnerd_7 = now() where id = ${f.id}`;
     else await sql`update beheersite.vb_facturen set herinnerd_14 = now(), herinnerd_7 = coalesce(herinnerd_7, now()) where id = ${f.id}`;
     uit[f.id] = `herinnering ${welke}`;
@@ -413,7 +413,7 @@ async function abonnementVan(klantId: string) {
   } else if (k.vb_pakket && (k.vindbaarheid || k.vb_pauze)) {
     const st = k.vb_start ? new Date(k.vb_start) : nu;
     const min = Number(o?.akkoord?.minimaal_maanden || 3);
-    delen.push({ id: "vindbaarheid", naam: `Vindbaarheid ${PAKKET[k.vb_pakket]}`, prijs: PRIJS[k.vb_pakket], minEind: iso(laatsteDag(st.getFullYear(), st.getMonth() + min - 1)) });
+    delen.push({ id: "vindbaarheid", naam: `Sitehulpje SEO ${PAKKET[k.vb_pakket]}`, prijs: PRIJS[k.vb_pakket], minEind: iso(laatsteDag(st.getFullYear(), st.getMonth() + min - 1)) });
   }
   if (!k.bundel && Number(k.sh_prijs) > 0) {
     // Sitehulpje webbeheer: ook minimaal 3 maanden, gerekend vanaf de maand van het akkoord
@@ -436,7 +436,7 @@ async function opzeggen(g: any, wat: string[], reden: string) {
   if (teVroeg.length) {
     const d = teVroeg[0], eind = new Date(d.minEind!), vanaf = new Date(Date.UTC(eind.getUTCFullYear(), eind.getUTCMonth(), 1));
     await mail(aan, `Over het opzeggen van ${d.naam}`, mooi(`<p style="margin:0 0 12px">Hoi,</p>
-      <p style="margin:0 0 12px">Je wilt <b>${esc(d.naam)}</b> opzeggen. ${d.id === "vindbaarheid" ? "Vindbaarheid heeft een minimale looptijd van 3 maanden, omdat resultaat in Google tijd nodig heeft." : `${esc(d.naam)} heeft een minimale looptijd van 3 maanden.`}</p>
+      <p style="margin:0 0 12px">Je wilt <b>${esc(d.naam)}</b> opzeggen. ${d.id === "vindbaarheid" ? "Sitehulpje SEO heeft een minimale looptijd van 3 maanden, omdat resultaat in Google tijd nodig heeft." : `${esc(d.naam)} heeft een minimale looptijd van 3 maanden.`}</p>
       <p style="margin:0 0 12px"><b>Vanaf ${NL_DATUM(vanaf)}</b> kun je opzeggen. Het abonnement stopt dan op ${NL_DATUM(eind)}.</p>
       <p style="margin:0;color:#5a6b82;font-size:14px">Twijfel je of gaat er iets niet goed? Beantwoord deze mail of bel 06 27 25 43 83, dan kijken we samen.</p>`, "Opzeggen", esc(k.naam)));
     await mailJan(`Wil opzeggen (te vroeg): ${k.naam}`, `<p><b>${esc(k.naam)}</b> wilde ${esc(d.naam)} opzeggen, maar zit nog in de minimale looptijd (kan vanaf ${NL_DATUM(vanaf)}).${reden ? ` Reden: ${esc(reden)}` : ""}</p><p>Misschien even bellen?</p>`);
@@ -493,7 +493,7 @@ async function klusBestel(g: any, klusId: string, toelichting: string) {
   if (!klus) throw new Fout(404, "Deze klus bestaat niet (meer).");
   const [k] = await sql`select * from beheersite.klanten where id = ${g.klant_id}`;
   if (!k) throw new Fout(404, "Account niet gevonden.");
-  if (Number(k.sh_prijs) > 0 || !k.vindbaarheid) throw new Fout(400, "Dit kun je gewoon als verzoek doorgeven; het zit al in je Sitehulpje webbeheer.");
+  if (Number(k.sh_prijs) > 0 || !k.vindbaarheid) throw new Fout(400, "Dit kun je gewoon als verzoek doorgeven; het zit al in je Sitehulpje.");
   if (toelichting.trim().length < 10) throw new Fout(400, "Vertel in een paar woorden wat je precies wilt, dan kan Sitehulpje meteen aan de slag.");
   const b = bedragen(Number(klus.prijs));
   const p = await mollie("payments", {
@@ -812,7 +812,7 @@ async function handel(req: Request, b: any) {
     await sql`delete from beheersite.vb_facturen where klant_id = ${k.id} and periode = ${periode} and soort = 'los' and status = 'concept'`;
     const g = await klantGegevens(k.id), bb = bedragen(PRIJS[k.vb_pakket]);
     const [f] = await sql`insert into beheersite.vb_facturen (klant_id, periode, soort, omschrijving, bedrag_excl, btw, totaal, status, gegevens)
-      values (${k.id}, ${periode}, 'los', ${`Sitehulpje Vindbaarheid ${PAKKET[k.vb_pakket]} – ${maandNaam(periode)}`}, ${bb.excl}, ${bb.btw}, ${bb.totaal}, 'concept',
+      values (${k.id}, ${periode}, 'los', ${`Sitehulpje SEO ${PAKKET[k.vb_pakket]} – ${maandNaam(periode)}`}, ${bb.excl}, ${bb.btw}, ${bb.totaal}, 'concept',
       ${sql.json({ klant: { naam: g.bedrijf?.naam || k.naam, contact: g.bedrijf?.contact || "", straat: g.bedrijf?.straat || "", postcode: g.bedrijf?.postcode || "", plaats: g.bedrijf?.plaats || "", kvk: g.bedrijf?.kvk || "", btw: g.bedrijf?.btw || "", email: g.bedrijf?.factuur_email || "" }, verkoper: VERKOPER, pakket: k.vb_pakket })}) returning id`;
     return { ok: true, id: f.id };
   }
