@@ -28,6 +28,7 @@
   <div class="kaart" id="koppeling"><p class="zacht" style="margin:0">Laden…</p></div>
   <div class="kaart" id="klanten" hidden></div>
   <div class="kaart" id="campagnes" hidden></div>
+  <div class="kaart" id="voorstellen" hidden></div>
   <div class="kaart" id="cijfers" hidden></div>
   <div id="meld" class="verborgen"></div>
 </main>
@@ -58,7 +59,7 @@ async function laad() {
   try { acc = (await ads("accounts")).accounts; } catch (e) { toonMelding($("#meld"), "Accounts ophalen lukte niet: " + e.message); }
   const opties = (huidig) => `<option value="">Geen advertenties</option>` + acc.map((a) => `<option value="${a.id}" ${a.id === huidig ? "selected" : ""}>${esc(a.naam || a.id)} (${a.id.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3")})</option>`).join("")
     + (huidig && !acc.some((a) => a.id === huidig) ? `<option value="${huidig}" selected>${huidig} (niet onder Siteregelaar)</option>` : "");
-  $("#klanten").hidden = false; abKlanten = s.klanten; abCijfers(); abCampagnes(s.klanten.filter((k) => k.ads_klant));
+  $("#klanten").hidden = false; abKlanten = s.klanten; abCijfers(); abCampagnes(s.klanten.filter((k) => k.ads_klant)); abVoorstellen();
   $("#klanten").innerHTML = `<h2 style="margin-top:0">Klanten en hun Google Ads-account</h2><p class="zacht" style="margin:0 0 8px">${acc.length} account(s) onder Siteregelaar. Nieuwe klant? Koppel eerst zijn account onder Siteregelaar in Google Ads.</p>`
     + s.klanten.map((k) => `<div class="ab-rij"><div><b>${esc(k.naam)}</b><br><span class="zacht" style="font-size:13px">${k.ads_fout ? "⚠ " + esc(k.ads_fout) : k.ads_laatst ? "Bijgewerkt " + new Date(k.ads_laatst).toLocaleString("nl-NL") : k.ads_klant ? "Nog niet opgehaald" : ""}</span></div>
       <select data-klant="${esc(k.id)}" aria-label="Google Ads-account voor ${esc(k.naam)}">${opties(k.ads_klant || "")}</select>
@@ -77,6 +78,22 @@ const geld = async (actie, data = {}) => {
   const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-ads-geld", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("beheer") }, body: JSON.stringify({ actie, ...data }) });
   const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d;
 };
+// ---------- voorstellen: zoekwoorden met klikprijs (alleen voor Jan; klanten zien de klikprijs niet) ----------
+async function abVoorstellen() {
+  const el = $("#voorstellen");
+  let d; try {
+    const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-ads-start", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("beheer") }, body: JSON.stringify({ actie: "lijst" }) });
+    d = await r.json(); if (!r.ok) throw 0;
+  } catch { return; }
+  if (!d.voorstellen?.length) return;
+  const eu = (n) => "€" + Number(n || 0).toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  el.hidden = false;
+  el.innerHTML = `<h2 style="margin-top:0">Voorstellen en klikprijzen</h2><p class="zacht" style="margin:0 0 8px">Alleen voor jou: klanten zien geen klikprijzen. ${"Bron per voorstel: Google (echte cijfers) of schatting."}</p>`
+    + d.voorstellen.map((v) => { const x = v.data || {}, uit = new Set(v.keuzes?.uit || []), budget = v.keuzes?.budget ?? x.advies;
+      return `<details class="ab-rij" style="display:block"><summary style="cursor:pointer"><b>${esc(v.naam)}</b> <span class="zacht" style="font-size:13px">· ${v.status === "akkoord" ? "akkoord" : "concept"} · ${x.bron === "google" ? "cijfers van Google" : "schatting"} · gem. ${eu(x.cpc_gem)} per klik · budget ${budget ? "€" + Number(budget).toLocaleString("nl-NL") : "–"}${budget && x.cpc_gem ? ` (± ${Math.round(budget / x.cpc_gem)} klikken)` : ""}</span></summary>
+        <table style="width:100%;font-size:13px;margin-top:6px"><tr class="zacht"><td>Zoekwoord</td><td style="text-align:right">Zoekopdr./mnd</td><td style="text-align:right">Klikprijs</td></tr>
+        ${(x.zoekwoorden || []).map((z) => `<tr${uit.has(z.term) ? ' style="opacity:.45"' : ""}><td>${esc(z.term)}${uit.has(z.term) ? " (uit)" : ""}</td><td style="text-align:right">${z.volume ? Number(z.volume).toLocaleString("nl-NL") : "–"}</td><td style="text-align:right">${z.cpc ? eu(z.cpc) : "–"}</td></tr>`).join("")}</table></details>`; }).join("");
+}
 async function abCampagnes(lijst) {
   const el = $("#campagnes"); if (!lijst.length) return; el.hidden = false;
   const rijen = await Promise.all(lijst.map(async (k) => ({ k, s: await geld("saldo", { klant_id: k.id }).catch(() => null) })));

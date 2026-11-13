@@ -837,7 +837,7 @@ async function kpAds() {
   const m30 = d.d30, rij = (a, b) => `<div class="ad-rij"><span class="zacht">${a}</span><b>${b}</b></div>`;
   h += kaart(`<h2>Alle details</h2><p class="ad-klein">Afgelopen 30 dagen</p>
     <div class="ad-details"><div>${rij("Kosten bij Google", eu(m30.kosten, 2))}${rij(`${omzet ? "Bestellingen" : "Aanvragen"} via advertenties`, nl(m30.conversies))}${rij(`Kosten per ${omzet ? "bestelling" : "aanvraag"}`, m30.conversies ? eu(m30.kosten / m30.conversies, 2) : "–")}</div>
-    <div>${rij("Klikken", m30.klikken.toLocaleString("nl-NL"))}${rij("Keer getoond in Google", m30.vertoningen.toLocaleString("nl-NL"))}${omzet ? rij("Omzet via advertenties", eu(m30.waarde)) : rij("Kosten per klik", m30.klikken ? eu(m30.kosten / m30.klikken, 2) : "–")}</div></div>
+    <div>${rij("Klikken", m30.klikken.toLocaleString("nl-NL"))}${rij("Keer getoond in Google", m30.vertoningen.toLocaleString("nl-NL"))}${omzet ? rij("Omzet via advertenties", eu(m30.waarde)) : ""}</div></div>
     <p class="ad-klein">Kosten bij Google zijn precies wat Google rekent, zonder onze vergoeding.${omzet ? " Omzet is wat klanten via een advertentie bij je kochten, geen winst." : ""}</p>`);
   h += `<div class="ad-knoppen"><button type="button" class="knop rand" id="admeer">Meer details →</button></div>` + bijgewerkt;
   el.innerHTML = h;
@@ -964,8 +964,8 @@ async function kpAdsStart(opnieuw) {
         <label class="ad-veld" style="margin-top:10px">Bijvoorbeeld een merk of productgroep<input type="text" maxlength="300" id="adniet" value="${esc(k.niet || "")}" placeholder="Bijvoorbeeld: sale-artikelen"></label>
         <label class="ad-veld" style="margin-top:10px">Nog iets dat wij moeten weten?<textarea rows="3" maxlength="1000" id="adopm">${esc(k.opmerking || "")}</textarea></label></details>`}
     </div><div style="display:flex;flex-direction:column;gap:16px">
-      ${kaart(`<h2>Zoekwoorden</h2><p class="ad-klein">Waar je advertentie bij verschijnt. ${google ? "Zoekopdrachten en klikprijs komen van Google." : "De klikprijs is een schatting."}</p>
-        <div class="ad-woorden">${(d.zoekwoorden || []).map((z) => `<label class="ad-woord"><input type="checkbox" value="${esc(z.term)}"${uit.has(z.term) ? "" : " checked"}${dis}><span><b>${esc(z.term)}</b><span class="zacht">${z.volume ? getal(z.volume) + " zoekopdrachten per maand" : z.voorgesteld ? "voorgesteld op basis van je website" : getal(z.vertoningen) + " keer getoond in Google"}${z.cpc ? " · ongeveer " + eu(z.cpc, 2) + " per klik" : ""}</span></span></label>`).join("") || `<p class="zacht" style="margin:0">Nog geen zoekwoorden gevonden. Wij kiezen ze voor je.</p>`}</div>`)}
+      ${kaart(`<h2>Zoekwoorden</h2><p class="ad-klein">Waar je advertentie bij verschijnt.${google ? " Het aantal zoekopdrachten komt van Google." : ""}</p>
+        <div class="ad-woorden">${(d.zoekwoorden || []).map((z) => `<label class="ad-woord"><input type="checkbox" value="${esc(z.term)}"${uit.has(z.term) ? "" : " checked"}${dis}><span><b>${esc(z.term)}</b><span class="zacht">${z.volume ? getal(z.volume) + " zoekopdrachten per maand" : z.voorgesteld ? "voorgesteld op basis van je website" : getal(z.vertoningen) + " keer getoond in Google"}</span></span></label>`).join("") || `<p class="zacht" style="margin:0">Nog geen zoekwoorden gevonden. Wij kiezen ze voor je.</p>`}</div>`)}
       ${d.webshop && shop.gekoppeld !== null && shop.gekoppeld !== undefined ? kaart(`<h2>Google Shopping</h2><p class="zacht" style="font-size:15px;line-height:1.6;margin:0">${shop.gekoppeld ? "Je producten staan al in Google Merchant Center. Wij zetten ze ook in Google Shopping, met foto en prijs." : "Je producten staan nog niet in Google Merchant Center. Dat zetten wij voor je klaar, daarna komen ze ook in Google Shopping."}</p>`) : ""}
       ${ok ? "" : (() => {
         const pct = Number(shAanbod?.korting_pct) || 0, nu = Math.round(99 * (1 - pct / 100) * 100) / 100;
@@ -984,7 +984,7 @@ async function kpAdsStart(opnieuw) {
       })()}
     </div></div>`;
   bindTerug();
-  const klik = () => { const b = adGekozenBudget(el); $("#adklik").textContent = b && d.cpc_gem ? `Daarmee krijg je ongeveer ${getal(Math.round(b / d.cpc_gem))} klikken per maand (gemiddeld ${eu(d.cpc_gem, 2)} per klik${google ? ", volgens Google" : ", geschat"}). Bedragen zijn excl. btw.` : "Bedragen zijn excl. btw."; };
+  const klik = () => { const b = adGekozenBudget(el); $("#adklik").textContent = b && d.cpc_gem ? `Daarmee krijg je naar verwachting zo'n ${getal(Math.round(b / d.cpc_gem / 10) * 10)} bezoekers per maand.` : ""; };
   klik();
   if (ok) return;
   // keuzes bewaren (even wachten na typen)
