@@ -35,3 +35,6 @@ create table if not exists beheersite.ads_ip_uit (
 
 alter table beheersite.ads_klikken enable row level security;
 alter table beheersite.ads_ip_uit enable row level security;
+
+-- elk uur verdachte IP's zoeken (modus: alleen melden)
+-- select cron.schedule('klikfraude-controle', '27 * * * *', $$select beheersite.roep('sr-klikfraude','controle',60000)$$);
