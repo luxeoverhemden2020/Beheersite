@@ -30,6 +30,7 @@
   <div class="kaart" id="campagnes" hidden></div>
   <div class="kaart" id="voorstellen" hidden></div>
   <div class="kaart" id="cijfers" hidden></div>
+  <div class="kaart" id="klikfraude" hidden></div>
   <div id="meld" class="verborgen"></div>
 </main>
 <script src="assets/basis.js?v=20261113a"></script>
@@ -59,7 +60,7 @@ async function laad() {
   try { acc = (await ads("accounts")).accounts; } catch (e) { toonMelding($("#meld"), "Accounts ophalen lukte niet: " + e.message); }
   const opties = (huidig) => `<option value="">Geen advertenties</option>` + acc.map((a) => `<option value="${a.id}" ${a.id === huidig ? "selected" : ""}>${esc(a.naam || a.id)} (${a.id.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3")})</option>`).join("")
     + (huidig && !acc.some((a) => a.id === huidig) ? `<option value="${huidig}" selected>${huidig} (niet onder Siteregelaar)</option>` : "");
-  $("#klanten").hidden = false; abKlanten = s.klanten; abCijfers(); abCampagnes(s.klanten.filter((k) => k.ads_klant)); abVoorstellen();
+  $("#klanten").hidden = false; abKlanten = s.klanten; abCijfers(); abCampagnes(s.klanten.filter((k) => k.ads_klant)); abVoorstellen(); abKlikfraude();
   $("#klanten").innerHTML = `<h2 style="margin-top:0">Klanten en hun Google Ads-account</h2><p class="zacht" style="margin:0 0 8px">${acc.length} account(s) onder Siteregelaar. Nieuwe klant? Koppel eerst zijn account onder Siteregelaar in Google Ads.</p>`
     + s.klanten.map((k) => `<div class="ab-rij"><div><b>${esc(k.naam)}</b><br><span class="zacht" style="font-size:13px">${k.ads_fout ? "⚠ " + esc(k.ads_fout) : k.ads_laatst ? "Bijgewerkt " + new Date(k.ads_laatst).toLocaleString("nl-NL") : k.ads_klant ? "Nog niet opgehaald" : ""}</span></div>
       <select data-klant="${esc(k.id)}" aria-label="Google Ads-account voor ${esc(k.naam)}">${opties(k.ads_klant || "")}</select>
@@ -181,6 +182,33 @@ async function abCijfers(klant, periode) {
   };
 }
 laad();
+
+// ---------- klikfraude: klikken en verdachte IP-adressen (sr-klikfraude) ----------
+const kf = async (actie, data = {}) => {
+  const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-klikfraude", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("beheer") }, body: JSON.stringify({ actie, ...data }) });
+  const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d;
+};
+async function abKlikfraude() {
+  const el = $("#klikfraude"); el.hidden = false;
+  let d; try { d = await kf("overzicht"); } catch (e) { el.innerHTML = `<h2 style="margin-top:0">Verdachte klikken</h2><p class="zacht" style="margin:0">${esc(e.message)}</p>`; return; }
+  const dt = (x) => x ? new Date(x).toLocaleString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
+  const STATUS = { voorstel: "wacht op campagne", actief: "uitgesloten", verlopen: "verlopen", wit: "nooit uitsluiten" };
+  const ips = d.ips.map((x) => `<tr class="${x.status === "actief" ? "weg" : ""}"><td>${esc(x.ip)}<br><span class="zacht" style="font-size:12px">${esc(x.klant_id)}</span></td><td>${esc(x.reden || "")}</td><td>${esc(STATUS[x.status] || x.status)}${x.tot && x.status === "actief" ? "<br><span class='zacht' style='font-size:12px'>tot " + dt(x.tot) + "</span>" : ""}</td>
+    <td>${x.status === "wit" ? `<button class="knop rand klein" data-terug="${esc(x.ip)}" data-k="${esc(x.klant_id)}">Van lijst af</button>` : `<button class="knop rand klein" data-wit="${esc(x.ip)}" data-k="${esc(x.klant_id)}">Nooit uitsluiten</button>`}</td></tr>`).join("");
+  const kl = d.klikken.slice(0, 30).map((x) => `<tr class="${x.verdacht ? "weg" : ""}"><td>${dt(x.tijd)}${x.test ? " <span class='zacht'>(test)</span>" : ""}</td><td>${esc(x.ip || "")}</td><td>${esc(x.zoekwoord || "")}</td><td>${esc(x.toestel || "")}</td><td>${esc(x.klant_id)}</td></tr>`).join("");
+  el.innerHTML = `<h2 style="margin-top:0">Verdachte klikken</h2>
+    <p class="zacht" style="margin:0 0 10px">${d.modus === "aan" ? "Staat aan: verdachte IP-adressen worden 30 dagen uitgesloten in de lopende campagnes." : "Alleen melden: er wordt niets uitgesloten."} Regel: hetzelfde IP 3× binnen 24 uur of 5× binnen 7 dagen. Klikken worden na 30 dagen gewist.</p>
+    <div class="ab-tegels" style="margin-bottom:12px"><div><b>${d.tel.klikken}</b><span>advertentieklikken (30 dagen)</span></div><div><b>${d.tel.verdacht}</b><span>verdacht</span></div><div><b>${d.ips.filter((x) => x.status === "actief").length}</b><span>IP's nu uitgesloten</span></div></div>
+    <h3 style="margin:8px 0">IP-adressen</h3>
+    ${ips ? `<div class="ab-scroll"><table class="ab-tabel"><tr><th>IP</th><th>Waarom</th><th>Status</th><th></th></tr>${ips}</table></div>` : `<p class="zacht" style="margin:0">Nog geen verdachte IP-adressen.</p>`}
+    <div class="ab-kies" style="margin:10px 0 4px"><input id="kf-ip" placeholder="IP-adres, bijv. van de winkel" style="width:auto"><select id="kf-k">${(abKlanten || []).filter((k) => k.ads_klant).map((k) => `<option value="${esc(k.id)}">${esc(k.naam)}</option>`).join("")}</select><button class="knop rand klein" id="kf-wit">Nooit uitsluiten</button></div>
+    <h3 style="margin:14px 0 8px">Laatste klikken</h3>
+    ${kl ? `<div class="ab-scroll"><table class="ab-tabel"><tr><th>Tijd</th><th>IP</th><th>Zoekwoord</th><th>Toestel</th><th>Klant</th></tr>${kl}</table></div>` : `<p class="zacht" style="margin:0">Nog geen klikken.</p>`}`;
+  const doe = async (actie, ip, k) => { try { await kf(actie, { ip, klant_id: k }); toonMelding($("#meld"), "Opgeslagen.", "ok"); abKlikfraude(); } catch (e) { toonMelding($("#meld"), e.message); } };
+  el.querySelectorAll("[data-wit]").forEach((b) => b.onclick = () => doe("wit", b.dataset.wit, b.dataset.k));
+  el.querySelectorAll("[data-terug]").forEach((b) => b.onclick = () => doe("terug", b.dataset.terug, b.dataset.k));
+  $("#kf-wit").onclick = () => { const ip = $("#kf-ip").value.trim(); if (ip) doe("wit", ip, $("#kf-k").value); };
+}
 </script>
 </body>
 </html>
