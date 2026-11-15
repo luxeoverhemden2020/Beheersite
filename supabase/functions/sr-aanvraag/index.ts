@@ -1,5 +1,5 @@
 // Aanvragenbak (Supabase Edge Function "sr-aanvraag")
-// - "nieuw" (openbaar, vanuit aanvraag.js op de klantsite): ingevuld formulier opslaan + e-mail naar de ondernemer
+// - "nieuw" (openbaar, vanuit aanvraag.js op de klantsite): ingevuld formulier opslaan (geen mail; staat in portaal en maandrapport)
 // - portaal (sessie): "lijst", "status" (klant / geen klant). Bij "klant" met een Google-klik (gclid):
 //   melden aan Google Ads als conversie "Werd klant (Sitehulpje)", zodat Google leert welke klikken klanten opleveren.
 // - cron "voorbereiden": conversieactie "Werd klant (Sitehulpje)" aanmaken in elk gekoppeld Ads-account
@@ -84,7 +84,9 @@ async function nieuw(req: Request, b: any) {
   }
   const [a] = await sql`insert into beheersite.aanvragen (klant_id, naam, email, telefoon, bericht, velden, pagina, gclid, ip)
     values (${kl.id}, ${naam}, ${email}, ${telefoon}, ${bericht}, ${sql.json(v)}, ${pagina}, ${gclid}, ${ip}::inet) returning id`;
-  await mailOndernemer(kl, v, { naam, email, telefoon, bericht, gclid, pagina });
+  // Geen mail per aanvraag (de site mailt zelf al): aanvragen staan in het portaal en in het maandrapport.
+  // Alleen als instelling "aanvraag_mail" = "aan" (voor later, bijv. sites waarvan de eigen mail niet goed werkt).
+  if ((await inst()).aanvraag_mail === "aan") await mailOndernemer(kl, v, { naam, email, telefoon, bericht, gclid, pagina });
   return { ok: true, id: a.id };
 }
 

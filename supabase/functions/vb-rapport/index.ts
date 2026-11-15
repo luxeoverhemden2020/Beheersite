@@ -187,6 +187,11 @@ async function maak(k: { id: string; naam: string; site: string; vb_pakket: stri
   const adsSom = async (m: string) => (await sql`select coalesce(sum(kosten),0)::float kosten, coalesce(sum(klikken),0)::int klikken, coalesce(sum(conversies),0)::float conversies,
       coalesce(sum(waarde),0)::float waarde, count(distinct datum)::int dagen from beheersite.ads_dag where klant_id = ${k.id} and datum between ${m + "-01"}::date and ${eindVan(m)}::date`)[0];
   const adsNu = await adsSom(maand), adsVorig = await adsSom(vorigeMaand(maand));
+  // Aanvragen via de website (sr-aanvraag) in deze maand
+  const [av] = await sql`select count(*)::int totaal, count(*) filter (where gclid is not null)::int advertentie, count(*) filter (where status = 'klant')::int klant,
+      count(*) filter (where status = 'nieuw')::int open
+    from beheersite.aanvragen where klant_id = ${k.id}
+      and tijd >= (${maand + "-01"}::date::timestamp at time zone 'Europe/Amsterdam') and tijd < ((${maand + "-01"}::date + interval '1 month')::timestamp at time zone 'Europe/Amsterdam')`;
   // Automatisch bijsturen (sr-bijsturen) in deze maand
   const [bs] = await sql`select count(*) filter (where soort = 'auto_uitsluiten')::int uitgesloten, count(*) filter (where soort = 'auto_budget')::int budget,
       coalesce(sum(besparing_eur) filter (where soort = 'auto_uitsluiten'), 0)::float per_week
@@ -218,6 +223,7 @@ async function maak(k: { id: string; naam: string; site: string; vb_pakket: stri
       problemen: (gz.uitslag.problemen || []).slice(0, 8).map((p: any) => ({ ernst: p.ernst, tekst: p.tekst, groep: p.groep })),
       goed: (gz.uitslag.goed || []).slice(0, 6), snelheid: gz.uitslag.snelheid?.score ?? null } : null,
     werk: werk.map((w) => ({ nr: w.nr, onderwerp: w.onderwerp, datum: w.bijgewerkt })),
+    aanvragen: av && av.totaal > 0 ? av : null,
     advertenties: adsNu.kosten > 0 || adsNu.klikken > 0 ? { nu: adsNu, vorig: adsVorig } : null,
     bijsturen: bs && (bs.uitgesloten || bs.budget) ? { uitgesloten: bs.uitgesloten, budget: bs.budget, per_week: Math.round(bs.per_week) } : null,
     klikfraude: kf && kf.klikken > 0 ? { klikken: kf.klikken, verdacht: kf.verdacht, uitgesloten: kf.uitgesloten } : null,
@@ -244,6 +250,7 @@ async function mail(k: any, d: any, naarKlant: boolean) {
     d.nu.ga4.dagen ? `Acties op je site: ${getal(d.nu.ga4.acties)}${pct(d.nu.ga4.acties, d.vorig.ga4.acties)}` : null,
     d.jaar?.gsc?.dagen && d.nu.gsc.dagen ? `Tegenover ${d.jaar_naam}: ${pct(d.nu.gsc.klikken, d.jaar.gsc.klikken).trim().replace(/[()]/g, "") || "geen vergelijking"} klikken` : null,
     d.gezondheid ? `Website-gezondheid: ${d.gezondheid.score} van 100` : null,
+    d.aanvragen ? `Aanvragen via je website: ${getal(d.aanvragen.totaal)}${d.aanvragen.advertentie ? `, waarvan ${getal(d.aanvragen.advertentie)} via je advertentie` : ""}${d.aanvragen.klant ? `; ${getal(d.aanvragen.klant)} werd klant` : ""}${d.aanvragen.open ? ` (${getal(d.aanvragen.open)} nog niet afgehandeld in je portaal)` : ""}` : null,
     d.advertenties ? `Advertenties: €${getal(d.advertenties.nu.kosten)} uitgegeven, ${getal(d.advertenties.nu.klikken)} klikken${d.advertenties.nu.waarde > 0 ? `, €${getal(d.advertenties.nu.waarde)} omzet` : d.advertenties.nu.conversies >= 1 ? `, ${getal(d.advertenties.nu.conversies)} aanvragen` : ""}` : null,
     d.bijsturen ? `Automatisch bijgestuurd: ${d.bijsturen.uitgesloten ? `${d.bijsturen.uitgesloten} zoekopdracht${d.bijsturen.uitgesloten > 1 ? "en" : ""} uitgesloten (± €${getal(d.bijsturen.per_week)} per week bespaard)` : ""}${d.bijsturen.uitgesloten && d.bijsturen.budget ? ", " : ""}${d.bijsturen.budget ? `${d.bijsturen.budget}× budget verschoven naar wat het meest oplevert` : ""}` : null,
     d.klikfraude ? `Advertentieklikken: ${getal(d.klikfraude.klikken)}, waarvan ${getal(d.klikfraude.verdacht)} verdacht${d.klikfraude.uitgesloten ? ` (${getal(d.klikfraude.uitgesloten)} adres${d.klikfraude.uitgesloten > 1 ? "sen" : ""} uitgesloten)` : ""}` : null,

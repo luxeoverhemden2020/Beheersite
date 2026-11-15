@@ -743,7 +743,7 @@ async function kpAanvragen() {
       </div></section>`;
   };
   el.innerHTML = `<section class="kaart" style="margin:0 0 16px"><h2 style="margin:0 0 6px">Aanvragen via je website</h2>
-    <p style="margin:0">Elk ingevuld formulier op je website komt hier binnen; je krijgt er ook meteen een mail van. Werd het een klant? Druk op <b>Werd klant</b>. Kwam die persoon via je Google-advertentie, dan geven we dat door aan Google, zodat je advertenties vaker aan dit soort mensen worden getoond.</p>
+    <p style="margin:0">Elk ingevuld formulier op je website komt hier binnen. Werd het een klant? Druk op <b>Werd klant</b>. Kwam die persoon via je Google-advertentie, dan geven we dat door aan Google, zodat je advertenties vaker aan dit soort mensen worden getoond.</p>
     ${d.lijst.length ? `<p class="zacht" style="margin:8px 0 0">${d.lijst.length} aanvragen · ${nieuw} nog niet afgehandeld · ${klant} klant geworden</p>` : ""}</section>
     ${d.lijst.length ? d.lijst.map(kaartje).join("") : `<section class="kaart"><p class="zacht" style="margin:0">Nog geen aanvragen binnen. Zodra iemand een formulier op je website invult, staat het hier.</p></section>`}`;
   el.querySelectorAll("[data-st]").forEach((b) => b.onclick = async () => {
