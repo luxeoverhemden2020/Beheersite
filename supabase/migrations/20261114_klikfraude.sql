@@ -50,3 +50,9 @@ create table if not exists beheersite.ads_klik_maand (
   primary key (klant_id, maand)
 );
 alter table beheersite.ads_klik_maand enable row level security;
+
+-- serveradressen van datacenters (AWS, Google Cloud, Azure, Oracle, DigitalOcean); wekelijks ververst door sr-klikfraude "lijsten"
+create table if not exists beheersite.ads_dc (net cidr primary key, bron text not null, bijgewerkt timestamptz not null default now());
+create index if not exists ads_dc_net on beheersite.ads_dc using gist (net inet_ops);
+alter table beheersite.ads_dc enable row level security;
+-- select cron.schedule('klikfraude-lijsten', '43 3 * * 0', $$select beheersite.roep('sr-klikfraude','lijsten',120000)$$);

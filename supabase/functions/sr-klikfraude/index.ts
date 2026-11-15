@@ -4,6 +4,8 @@
 // - "controle" (elk uur): verdachte IP-adressen zoeken in beheersite.ads_klikken.
 //   Modus "aan" (instelling klikfraude_modus): verdachte IP's 30 dagen uitsluiten in alle lopende campagnes (max. 500 per campagne).
 //   Modus "melden": alleen als voorstel in ads_ip_uit + mail aan Jan.
+// - "lijsten" (wekelijks): serveradressen van datacenters ophalen (AWS, Google Cloud, Azure, Oracle, DigitalOcean).
+//   Een advertentieklik vanaf zo'n adres is meteen verdacht (bots, klikprogramma's).
 // - beheer (admin, sessie): "overzicht", "wit" (nooit uitsluiten), "terug" (witte lijst eraf)
 // deno-lint-ignore-file no-explicit-any
 import postgres from "npm:postgres@3.4.5";
@@ -80,18 +82,19 @@ async function template(i: Record<string, string>) {
 }
 
 // alleen echte advertentieklikken tellen (met gclid; pings zonder gclid zijn bijv. controles van Google)
-// verdachte IP's: zelfde IP ≥ 3 klikken binnen 24 uur of ≥ 5 binnen 7 dagen (testklikken en de witte lijst tellen niet mee)
+// verdachte IP's: zelfde IP ≥ 3 klikken binnen 24 uur of ≥ 5 binnen 7 dagen, of een klik vanaf een datacenter (testklikken en de witte lijst tellen niet mee)
 async function controle(i: Record<string, string>) {
   const rijen = await sql`
     with tel as (
-      select klant_id, ip,
-        count(*) filter (where tijd > now() - interval '24 hours')::int d1,
-        count(*)::int d7
-      from beheersite.ads_klikken where not test and gclid is not null and ip is not null and tijd > now() - interval '7 days'
+      select c.klant_id, c.ip,
+        count(*) filter (where c.tijd > now() - interval '24 hours')::int d1,
+        count(*)::int d7,
+        (select d.bron from beheersite.ads_dc d where d.net >>= c.ip limit 1) dc
+      from beheersite.ads_klikken c where not c.test and c.gclid is not null and c.ip is not null and c.tijd > now() - interval '7 days'
       group by 1, 2)
     insert into beheersite.ads_ip_uit (klant_id, ip, reden, klikken)
-    select klant_id, ip, case when d1 >= 3 then d1 || ' klikken binnen 24 uur' else d7 || ' klikken binnen 7 dagen' end, d7
-    from tel where d1 >= 3 or d7 >= 5
+    select klant_id, ip, case when dc is not null then 'klik vanaf een datacenter (' || dc || ')' when d1 >= 3 then d1 || ' klikken binnen 24 uur' else d7 || ' klikken binnen 7 dagen' end, d7
+    from tel where d1 >= 3 or d7 >= 5 or dc is not null
     on conflict (klant_id, ip, campagne) do update set klikken = excluded.klikken, reden = excluded.reden, status = 'voorstel',
       sinds = case when beheersite.ads_ip_uit.status = 'verlopen' then now() else beheersite.ads_ip_uit.sinds end
       where beheersite.ads_ip_uit.status in ('voorstel', 'verlopen')
@@ -158,6 +161,49 @@ async function uitsluiten(i: Record<string, string>) {
   return log;
 }
 
+// ---------- datacenterlijsten ----------
+async function haal(url: string) {
+  const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (Sitehulpje klikfraude)" }, signal: AbortSignal.timeout(60000) });
+  if (!r.ok) throw new Error(`${url}: ${r.status}`);
+  return r;
+}
+async function lijsten() {
+  const uit: Record<string, number | string> = {};
+  const bronnen: [string, () => Promise<string[]>][] = [
+    ["AWS", async () => { const d = await (await haal("https://ip-ranges.amazonaws.com/ip-ranges.json")).json();
+      return [...(d.prefixes || []).map((x: any) => x.ip_prefix), ...(d.ipv6_prefixes || []).map((x: any) => x.ipv6_prefix)]; }],
+    ["Google Cloud", async () => { const d = await (await haal("https://www.gstatic.com/ipranges/cloud.json")).json();
+      return (d.prefixes || []).map((x: any) => x.ipv4Prefix || x.ipv6Prefix); }],
+    ["Oracle", async () => { const d = await (await haal("https://docs.oracle.com/iaas/tools/public_ip_ranges.json")).json();
+      return (d.regions || []).flatMap((r: any) => (r.cidrs || []).map((c: any) => c.cidr)); }],
+    ["DigitalOcean", async () => (await (await haal("https://digitalocean.com/geo/google.csv")).text()).split("\n").map((l) => l.split(",")[0].trim())],
+    ["Azure", async () => {
+      // de downloadlink verandert elke week: eerst op de downloadpagina zoeken
+      const pag = await (await haal("https://www.microsoft.com/en-us/download/details.aspx?id=56519")).text();
+      const url = pag.match(/https:\/\/download\.microsoft\.com\/download\/[^"']+ServiceTags_Public_\d+\.json/)?.[0];
+      if (!url) throw new Error("downloadlink niet gevonden");
+      const d = await (await haal(url)).json();
+      return (d.values || []).find((v: any) => v.name === "AzureCloud")?.properties?.addressPrefixes || [];
+    }],
+  ];
+  for (const [bron, f] of bronnen) {
+    try {
+      const nets = [...new Set((await f()).filter((x) => typeof x === "string" && /^[0-9a-f:.]+\/\d{1,3}$/i.test(x)))];
+      if (nets.length < 10) throw new Error(`te weinig adressen (${nets.length})`);
+      // alleen vervangen als het ophalen gelukt is
+      await sql.begin(async (t: any) => {
+        await t`delete from beheersite.ads_dc where bron = ${bron}`;
+        for (let x = 0; x < nets.length; x += 2000) {
+          const deel = nets.slice(x, x + 2000);
+          await t`insert into beheersite.ads_dc (net, bron) select n::cidr, ${bron} from unnest(${deel}::text[]) n on conflict (net) do nothing`;
+        }
+      });
+      uit[bron] = nets.length;
+    } catch (e) { uit[bron] = "fout: " + String((e as Error).message).slice(0, 120); }
+  }
+  return uit;
+}
+
 // ---------- beheer ----------
 async function overzicht(i: Record<string, string>) {
   const klikken = await sql`select klant_id, tijd, host(ip) ip, zoekwoord, toestel, plaats, test, verdacht from beheersite.ads_klikken order by tijd desc limit 100`;
@@ -188,6 +234,7 @@ Deno.serve(async (req) => {
     if (!i.cron_sleutel || req.headers.get("x-cron-key") !== i.cron_sleutel) return json({ fout: "Geen toegang" }, 401);
     if (b.actie === "template") return json({ ok: true, log: await template(i) });
     if (b.actie === "controle") return json({ ok: true, ...(await controle(i)) });
+    if (b.actie === "lijsten") return json({ ok: true, ...(await lijsten()) });
     return json({ fout: "Onbekende actie" }, 400);
   } catch (e) { console.error(e); return json({ fout: String((e as Error).message).slice(0, 300) }, 500); }
 });
