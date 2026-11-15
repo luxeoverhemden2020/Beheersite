@@ -210,6 +210,9 @@ function teken(d) {
     ${d.gezondheid.goed.length ? `<p style="margin:12px 0 2px"><b>In orde</b></p><ul class="lijst goed">${d.gezondheid.goed.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
   </div>` : ""}
 
+  ${d.klikfraude ? `<div class="blok"><h2><span class="tag">&gt;_</span>Verdachte klikken op je advertenties</h2>
+    <p style="margin:0 0 6px">Je advertenties werden <b>${d.klikfraude.klikken}×</b> aangeklikt. Daarvan zagen we <b>${d.klikfraude.verdacht}</b> als verdacht: hetzelfde adres klikte steeds opnieuw.${d.klikfraude.uitgesloten ? ` We hebben <b>${d.klikfraude.uitgesloten} adres${d.klikfraude.uitgesloten > 1 ? "sen" : ""}</b> 30 dagen uitgesloten, zodat je daar niet meer voor betaalt.` : ""}</p>
+    <p class="zacht klein" style="margin:0">Google filtert zelf ook al ongeldige klikken; wij doen er een laag bovenop. Alles tegenhouden kan niemand, maar zo beperken we de verspilling.</p></div>` : ""}
   <div class="blok"><h2><span class="tag">&gt;_</span>Uitgevoerd door Sitehulpje</h2>
     ${d.werk.length ? `<ul class="lijst">${d.werk.map((w) => `<li>#${w.nr} ${esc(w.onderwerp)} <span class="zacht klein">(${new Date(w.datum).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })})</span></li>`).join("")}</ul>`
       : `<p class="leeg">Deze maand geen aanpassingen via Sitehulpje.</p>`}</div>

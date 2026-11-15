@@ -38,3 +38,15 @@ alter table beheersite.ads_ip_uit enable row level security;
 
 -- elk uur verdachte IP's zoeken (modus: alleen melden)
 -- select cron.schedule('klikfraude-controle', '27 * * * *', $$select beheersite.roep('sr-klikfraude','controle',60000)$$);
+
+-- maandtellers voor het maandrapport (blijven bewaard; de losse klikken worden na 30 dagen gewist)
+create table if not exists beheersite.ads_klik_maand (
+  klant_id text not null references beheersite.klanten(id) on delete cascade,
+  maand text not null,
+  klikken int not null default 0,
+  verdacht int not null default 0,
+  uitgesloten int not null default 0,
+  bijgewerkt timestamptz not null default now(),
+  primary key (klant_id, maand)
+);
+alter table beheersite.ads_klik_maand enable row level security;

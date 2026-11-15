@@ -79,6 +79,7 @@ async function template(i: Record<string, string>) {
   return log;
 }
 
+// alleen echte advertentieklikken tellen (met gclid; pings zonder gclid zijn bijv. controles van Google)
 // verdachte IP's: zelfde IP ≥ 3 klikken binnen 24 uur of ≥ 5 binnen 7 dagen (testklikken en de witte lijst tellen niet mee)
 async function controle(i: Record<string, string>) {
   const rijen = await sql`
@@ -86,7 +87,7 @@ async function controle(i: Record<string, string>) {
       select klant_id, ip,
         count(*) filter (where tijd > now() - interval '24 hours')::int d1,
         count(*)::int d7
-      from beheersite.ads_klikken where not test and ip is not null and tijd > now() - interval '7 days'
+      from beheersite.ads_klikken where not test and gclid is not null and ip is not null and tijd > now() - interval '7 days'
       group by 1, 2)
     insert into beheersite.ads_ip_uit (klant_id, ip, reden, klikken)
     select klant_id, ip, case when d1 >= 3 then d1 || ' klikken binnen 24 uur' else d7 || ' klikken binnen 7 dagen' end, d7
@@ -101,6 +102,16 @@ async function controle(i: Record<string, string>) {
   const aan = i.klikfraude_modus === "aan";
   let uit: string[] = [];
   if (aan) uit = await uitsluiten(i);
+  // maandtellers voor het maandrapport (nooit omlaag: oude klikken worden na 30 dagen gewist)
+  await sql`insert into beheersite.ads_klik_maand (klant_id, maand, klikken, verdacht, uitgesloten)
+    select c.klant_id, to_char(now() at time zone 'Europe/Amsterdam', 'YYYY-MM'), count(*) filter (where not c.test and c.gclid is not null)::int, count(*) filter (where c.verdacht and not c.test)::int,
+      (select count(*)::int from beheersite.ads_ip_uit u where u.klant_id = c.klant_id and u.status in ('actief','verlopen')
+        and u.tot >= date_trunc('month', now() at time zone 'Europe/Amsterdam') at time zone 'Europe/Amsterdam')
+    from beheersite.ads_klikken c
+    where c.tijd >= date_trunc('month', now() at time zone 'Europe/Amsterdam') at time zone 'Europe/Amsterdam'
+    group by c.klant_id
+    on conflict (klant_id, maand) do update set klikken = greatest(beheersite.ads_klik_maand.klikken, excluded.klikken),
+      verdacht = greatest(beheersite.ads_klik_maand.verdacht, excluded.verdacht), uitgesloten = greatest(beheersite.ads_klik_maand.uitgesloten, excluded.uitgesloten), bijgewerkt = now()`;
   if (nieuw.length) await mailJan(i, `Klikfraude: ${nieuw.length} verdacht IP-adres${nieuw.length > 1 ? "sen" : ""}${aan ? "" : " (alleen gemeld)"}`,
     `<p>Deze IP-adressen klikten verdacht vaak op advertenties. ${aan ? "Ze worden 30 dagen uitgesloten in de lopende campagnes." : "Er is <b>niets</b> uitgesloten in Google Ads (modus: alleen melden)."}</p>
 <ul>${nieuw.map((x: any) => `<li>${esc(x.klant_id)}: ${esc(x.ip)} – ${esc(x.reden)}</li>`).join("")}</ul><p>Klopt er een niet (bijv. de winkel zelf)? Zet hem in het beheer bij Advertenties op "nooit uitsluiten".</p>`);
@@ -151,7 +162,7 @@ async function uitsluiten(i: Record<string, string>) {
 async function overzicht(i: Record<string, string>) {
   const klikken = await sql`select klant_id, tijd, host(ip) ip, zoekwoord, toestel, plaats, test, verdacht from beheersite.ads_klikken order by tijd desc limit 100`;
   const ips = await sql`select klant_id, host(ip) ip, status, reden, klikken, sinds, tot from beheersite.ads_ip_uit order by sinds desc limit 200`;
-  const [tel] = await sql`select count(*) filter (where not test)::int klikken, count(*) filter (where verdacht)::int verdacht from beheersite.ads_klikken where tijd > now() - interval '30 days'`;
+  const [tel] = await sql`select count(*) filter (where not test and gclid is not null)::int klikken, count(*) filter (where verdacht)::int verdacht from beheersite.ads_klikken where tijd > now() - interval '30 days'`;
   return { modus: i.klikfraude_modus === "aan" ? "aan" : "melden", klikken, ips, tel };
 }
 
