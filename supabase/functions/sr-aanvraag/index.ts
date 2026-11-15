@@ -76,26 +76,51 @@ async function nieuw(req: Request, b: any) {
   const bericht = zoekVeld(v, /bericht|message|opmerking|vraag|comment|omschrijving|toelichting/i);
   const gclid = typeof b.gclid === "string" && /^[\w-]{10,200}$/.test(b.gclid) ? b.gclid : null;
   const pagina = typeof b.pagina === "string" ? b.pagina.slice(0, 500) : null;
+  if (b.test) { // proefmail (alleen met cron-sleutel): niets opslaan
+    const i = await inst();
+    if (!i.cron_sleutel || req.headers.get("x-cron-key") !== i.cron_sleutel) return { ok: false };
+    await mailOndernemer(kl, v, { naam, email, telefoon, bericht, gclid, pagina }, b.test_aan);
+    return { ok: true, test: true };
+  }
   const [a] = await sql`insert into beheersite.aanvragen (klant_id, naam, email, telefoon, bericht, velden, pagina, gclid, ip)
     values (${kl.id}, ${naam}, ${email}, ${telefoon}, ${bericht}, ${sql.json(v)}, ${pagina}, ${gclid}, ${ip}::inet) returning id`;
-  // e-mail naar de ondernemer
-  const i = await inst();
-  const aan = (await sql`select email from beheersite.gebruikers where klant_id = ${kl.id} and rol = 'klant' and actief and email is not null`).map((x: any) => x.email);
-  if (i.resend_sleutel && aan.length) {
-    const link = (i.platform_url || "https://sitehulpje.nl").replace(/\/$/, "") + "/portaal#aanvragen";
-    const rijen = Object.entries(v).map(([k2, w]) => `<tr><td style="padding:4px 10px 4px 0;color:#5a6b82;vertical-align:top">${esc(k2)}</td><td style="padding:4px 0">${esc(w).replace(/\n/g, "<br>")}</td></tr>`).join("");
-    const html = `<div style="font-family:Arial,sans-serif;max-width:560px;color:#0b1a2e">
-      <h2 style="margin:0 0 6px">Nieuwe aanvraag via je website</h2>
-      <p style="margin:0 0 14px;color:#5a6b82">${gclid ? "Deze bezoeker kwam via je Google-advertentie." : "Via je website."}${pagina ? ` Pagina: ${esc(pagina)}` : ""}</p>
-      <table style="border-collapse:collapse;font-size:15px">${rijen}</table>
-      <p style="margin:18px 0">Snel reageren levert meer klanten op.${email ? ` <a href="mailto:${esc(email)}">Mail terug</a>` : ""}${telefoon ? ` · <a href="tel:${esc(telefoon.replace(/\s/g, ""))}">Bel ${esc(telefoon)}</a>` : ""}</p>
-      <p style="margin:0 0 6px"><a href="${link}" style="background:#0b9f8a;color:#fff;padding:11px 16px;border-radius:9px;text-decoration:none;font-weight:bold">Werd het een klant? Geef het door</a></p>
-      <p style="color:#5a6b82;font-size:13px">Met één klik in je omgeving leert Google welke advertenties echte klanten opleveren.</p></div>`;
-    await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${i.resend_sleutel}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: (i.mail_van || "Sitehulpje <info@sitehulpje.nl>").replace(/^[^<]*</, "Sitehulpje <"), to: aan, ...(email ? { reply_to: email } : {}),
-        subject: `Nieuwe aanvraag${naam ? " van " + naam : ""} via je website`, html }) }).catch((e) => console.error("mail", e));
-  }
+  await mailOndernemer(kl, v, { naam, email, telefoon, bericht, gclid, pagina });
   return { ok: true, id: a.id };
+}
+
+// nette mail in de Sitehulpje-stijl (zelfde opmaak als de budgetmail)
+const LABEL: [RegExp, string][] = [[/^(your-)?(naam|name|full.?name)$/i, "Naam"], [/voornaam|first.?name/i, "Voornaam"], [/achternaam|last.?name/i, "Achternaam"],
+  [/e-?mail/i, "E-mail"], [/tel|phone|mobiel|gsm/i, "Telefoon"], [/bericht|message|opmerking|comment/i, "Bericht"], [/onderwerp|subject/i, "Onderwerp"],
+  [/bedrijf|company/i, "Bedrijf"], [/adres|address|straat/i, "Adres"], [/postcode|zip/i, "Postcode"], [/plaats|city|woonplaats/i, "Plaats"], [/datum|date/i, "Datum"]];
+const label = (k: string) => LABEL.find(([re]) => re.test(k))?.[1] || (k.replace(/^your[-_]/i, "").replace(/[-_\[\]]+/g, " ").trim().replace(/^./, (c) => c.toUpperCase()) || k);
+async function mailOndernemer(kl: any, v: Record<string, string>, x: any, testAan?: string) {
+  const i = await inst();
+  const aan = testAan ? [testAan] : (await sql`select email from beheersite.gebruikers where klant_id = ${kl.id} and rol = 'klant' and actief and email is not null`).map((r: any) => r.email);
+  if (!i.resend_sleutel || !aan.length) return;
+  const link = (i.platform_url || "https://sitehulpje.nl").replace(/\/$/, "") + "/portaal#aanvragen";
+  const pad = (() => { try { const u = new URL(x.pagina); return u.pathname === "/" ? "de homepage" : u.pathname; } catch { return ""; } })();
+  // bekende velden eerst, het bericht apart en groot
+  const rest = Object.entries(v).filter(([, w]) => w !== x.bericht);
+  rest.sort((a, b) => { const o = (k: string) => ["Naam", "Voornaam", "Achternaam", "Bedrijf", "Telefoon", "E-mail"].indexOf(label(k)); const oa = o(a[0]), ob = o(b[0]); return (oa < 0 ? 99 : oa) - (ob < 0 ? 99 : ob); });
+  const rij = (k: string, w: string) => `<tr><td style="padding:7px 12px 7px 0;color:#5F5E5A;font-size:14px;vertical-align:top;white-space:nowrap">${esc(label(k))}</td><td style="padding:7px 0;font-size:15px;color:#0B1B3F">${esc(w).replace(/\n/g, "<br>")}</td></tr>`;
+  const knop = (href: string, tekst: string, kleur: string) => `<a href="${href}" style="display:inline-block;background:${kleur};color:#fff;text-decoration:none;font-weight:bold;padding:12px 20px;border-radius:8px;margin:0 8px 8px 0;font-size:15px">${tekst}</a>`;
+  const voornaam = String(x.naam || "").trim();
+  const html = `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#0B1B3F;max-width:560px">
+<div style="background:#0B1B3F;color:#fff;padding:14px 18px;font-size:18px;font-weight:bold;border-radius:10px 10px 0 0">Site<span style="color:#5DCAA5">hulpje</span></div>
+<div style="padding:20px 18px;border:1px solid #e3e7ef;border-top:0;border-radius:0 0 10px 10px">
+<p style="margin:0 0 4px;font-size:20px;font-weight:bold">Nieuwe aanvraag${voornaam ? " van " + esc(voornaam) : ""}</p>
+<p style="margin:0 0 16px;color:#5F5E5A;font-size:14px">${x.gclid ? `<span style="display:inline-block;background:#E1F5EE;color:#085041;border-radius:20px;padding:2px 10px;font-weight:bold;margin-right:6px">Via je Google-advertentie</span>` : ""}Ingevuld op ${esc(kl.naam || "je website")}${pad ? ", " + esc(pad) : ""}</p>
+${x.bericht ? `<div style="background:#F4F6FA;border-radius:10px;padding:14px 16px;margin:0 0 16px;font-size:15px">${esc(x.bericht).replace(/\n/g, "<br>")}</div>` : ""}
+<table style="border-collapse:collapse;margin:0 0 18px">${rest.map(([k, w]) => rij(k, w)).join("")}</table>
+<div style="margin:0 0 10px">${x.telefoon ? knop(`tel:${esc(x.telefoon.replace(/[^\d+]/g, ""))}`, "Bel " + esc(x.telefoon), "#0F6E56") : ""}${x.email ? knop(`mailto:${esc(x.email)}`, "Mail terug", "#0B1B3F") : ""}</div>
+<p style="margin:0 0 18px;color:#5F5E5A;font-size:14px">Tip: wie binnen een uur reageert, krijgt veel vaker de klus.</p>
+<div style="border-top:1px solid #e3e7ef;padding-top:14px">
+<p style="margin:0 0 10px;font-size:14px">Werd het een klant? Geef het door met één klik. Dan leert Google welke advertenties echte klanten opleveren.</p>
+<a href="${link}" style="color:#0F6E56;font-weight:bold;text-decoration:none">Naar je aanvragen →</a></div>
+</div></div>`;
+  await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${i.resend_sleutel}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ from: (i.mail_van || "Sitehulpje <info@sitehulpje.nl>").replace(/^[^<]*</, "Sitehulpje <"), to: aan, ...(x.email ? { reply_to: x.email } : {}),
+      subject: `${testAan ? "[TEST] " : ""}Nieuwe aanvraag${voornaam ? " van " + voornaam : ""} via je website`, html }) }).catch((e) => console.error("mail", e));
 }
 
 // ---------- conversieactie "Werd klant" ----------
