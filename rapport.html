@@ -180,7 +180,13 @@ function teken(d) {
     ${a.dagen ? tegel("Bezoeken via Google", getal(a.organisch), verschil(a.organisch, av.organisch)) : ""}
     ${a.dagen ? tegel("Acties op je site", getal(a.acties), verschil(a.acties, av.acties)) : ""}
     ${!a.dagen && g.positie ? tegel("Gemiddelde positie", pos(g.positie), gv.positie ? posVerschil(g.positie, gv.positie) + ' <span class="gelijk">t.o.v. vorige maand</span>' : "") : ""}
-  </div>` : `<p class="leeg">Er zijn nog geen cijfers uit Google voor deze maand. Zodra Search Console en Analytics gekoppeld zijn, staan ze hier.</p>`}
+  </div>` : d.advertenties ? "" : `<p class="leeg">Er zijn nog geen cijfers uit Google voor deze maand. Zodra Search Console en Analytics gekoppeld zijn, staan ze hier.</p>`}
+
+  ${d.advertenties ? (() => { const n = d.advertenties.nu, v = d.advertenties.vorig; return `<div class="blok"><h2><span class="tag">&gt;_</span>Advertenties</h2><div class="tegels">
+    ${tegel("Uitgegeven bij Google", "€" + getal(n.kosten), v.kosten ? verschil(n.kosten, v.kosten) : "")}
+    ${tegel("Klikken op je advertenties", getal(n.klikken), v.klikken ? verschil(n.klikken, v.klikken) : "")}
+    ${n.waarde > 0 ? tegel("Omzet via advertenties", "€" + getal(n.waarde), v.waarde ? verschil(n.waarde, v.waarde) : "") : tegel("Aanvragen via advertenties", getal(n.conversies), v.conversies ? verschil(n.conversies, v.conversies) : "")}
+  </div>${n.waarde > 0 ? `<p class="zacht klein" style="margin:8px 0 0">Omzet is geen winst: van de omzet gaan nog je inkoop en andere kosten af.</p>` : ""}</div>`; })() : ""}
 
 
   ${vergelijking(d)}

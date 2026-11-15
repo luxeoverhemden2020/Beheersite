@@ -6,6 +6,10 @@
 //   2. maandag: budget verschuiven tussen campagnes met een eigen dagbudget (max. 10% per week, totaal blijft gelijk)
 //      nooit bij de campagne met tegoed van sr-ads-geld (die heeft een vast totaalbudget)
 //   Alles wordt vastgelegd in ads_acties (status "uitgevoerd", soort "auto_*") met de gegevens om het terug te draaien.
+//   3. uitverkocht: advertentiegroepen pauzeren waarvan de landingspagina uitverkocht is (schema.org OutOfStock) of niet meer bestaat (404/410);
+//      weer aanzetten zodra het product terug is. De homepage wordt nooit gepauzeerd. (Shopping regelt Google zelf via Merchant Center.)
+//   4. concurrent-alarm: daalt het aandeel bovenaan op de eigen merknaam flink of wordt een klik op de naam veel duurder,
+//      dan adverteert er mogelijk een ander op de naam van de klant (Google geeft concurrentnamen niet via de API).
 // - beheer (admin, sessie): "lijst", "terug" (wijziging terugdraaien)
 // Instelling bijsturen_modus: "aan" (standaard) of "uit".
 // deno-lint-ignore-file no-explicit-any
@@ -69,15 +73,19 @@ async function zoek(i: Record<string, string>, at: string, cid: string, query: s
   return rijen;
 }
 const maandag = () => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return isoDag(d); };
+const merkVan = (k: any) => {
+  const merk = new Set<string>();
+  for (const w of norm(k.naam || "").split(" ")) if (w.length >= 4) merk.add(w);
+  try { const host = new URL(k.site || "").hostname.replace(/^www\./, "").split(".")[0]; if (host.length >= 4) merk.add(norm(host).replace(/ /g, "")); } catch { /* geen site */ }
+  return merk;
+};
 const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
 
 // ---------- 1. zoekopdrachten uitsluiten ----------
 async function uitsluiten(i: Record<string, string>, at: string, k: any, log: string[]) {
   const cid = String(k.ads_klant).replace(/\D/g, "");
   // merknaam: woorden uit de klantnaam en de domeinnaam (min. 4 tekens)
-  const merk = new Set<string>();
-  for (const w of norm(k.naam || "").split(" ")) if (w.length >= 4) merk.add(w);
-  try { const host = new URL(k.site || "").hostname.replace(/^www\./, "").split(".")[0]; if (host.length >= 4) merk.add(norm(host).replace(/ /g, "")); } catch { /* geen site */ }
+  const merk = merkVan(k);
   // campagnes die oud genoeg zijn (≥ 14 dagen met kosten)
   const oud = new Set((await sql`select campagne_id from beheersite.ads_dag where klant_id = ${k.id} and kosten > 0 group by 1 having min(datum) <= current_date - 14`).map((r: any) => r.campagne_id));
   if (!oud.size) return 0;
@@ -160,6 +168,98 @@ async function budget(i: Record<string, string>, at: string, k: any, log: string
   return 1;
 }
 
+// ---------- 3. uitverkochte producten ----------
+async function voorraad(url: string): Promise<"op" | "weg" | "ok"> {
+  try {
+    const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (compatible; Sitehulpje-voorraadcheck)" }, redirect: "follow", signal: AbortSignal.timeout(15000) });
+    if (r.status === 404 || r.status === 410) return "weg";
+    if (!r.ok) return "ok"; // bij twijfel (storing, blokkade) niets doen
+    const html = (await r.text()).slice(0, 600000);
+    const op = /schema\.org\/(OutOfStock|SoldOut|Discontinued)|"availability"\s*:\s*"(OutOfStock|SoldOut|Discontinued)"/i.test(html);
+    const wel = /schema\.org\/(InStock|LimitedAvailability|PreOrder|BackOrder)|"availability"\s*:\s*"(InStock|LimitedAvailability|PreOrder|BackOrder)"/i.test(html);
+    return op && !wel ? "op" : "ok";
+  } catch { return "ok"; }
+}
+async function uitverkocht(i: Record<string, string>, at: string, k: any, log: string[]) {
+  const cid = String(k.ads_klant).replace(/\D/g, "");
+  // 1. eerder gepauzeerde groepen: is het product terug?
+  const gepauzeerd = await sql`select id, data from beheersite.ads_acties where klant_id = ${k.id} and soort = 'auto_pauze' and status = 'uitgevoerd'`;
+  for (const a of gepauzeerd) {
+    if (await voorraad(a.data.url) !== "ok") continue;
+    try {
+      await gads(i, at, `customers/${cid}/googleAds:mutate`, { mutateOperations: [{ adGroupOperation: { update: { resourceName: a.data.adgroep, status: "ENABLED" }, updateMask: "status" } }] });
+      await sql`update beheersite.ads_acties set status = 'hervat' where id = ${a.id}`;
+      log.push(`${k.id}: "${a.data.naam}" weer aangezet, product is terug`);
+    } catch (e) { log.push(`${k.id}: weer aanzetten "${a.data.naam}" lukte niet: ${(e as Error).message}`); }
+  }
+  // 2. lopende groepen controleren
+  const ads = await zoek(i, at, cid, `SELECT ad_group.resource_name, ad_group.name, ad_group_ad.ad.final_urls FROM ad_group_ad
+    WHERE campaign.status = 'ENABLED' AND campaign.advertising_channel_type = 'SEARCH' AND ad_group.status = 'ENABLED' AND ad_group_ad.status = 'ENABLED'`);
+  const groepen = new Map<string, { naam: string; urls: Set<string> }>();
+  for (const r of ads) {
+    const g = groepen.get(r.adGroup.resourceName) || { naam: r.adGroup.name, urls: new Set<string>() };
+    for (const u of r.adGroupAd?.ad?.finalUrls || []) g.urls.add(u);
+    groepen.set(r.adGroup.resourceName, g);
+  }
+  // groepen die Jan zelf weer heeft aangezet, laten we met rust
+  const zelf = new Set((await sql`select data->>'adgroep' rn from beheersite.ads_acties where klant_id = ${k.id} and soort = 'auto_pauze' and status = 'teruggedraaid'`).map((r: any) => r.rn));
+  let n = 0, getest = 0;
+  for (const [rn, g] of groepen) {
+    if (zelf.has(rn)) continue;
+    if (g.urls.size !== 1 || getest >= 40) continue; // alleen groepen met één landingspagina
+    const url = [...g.urls][0];
+    try { if (new URL(url).pathname.replace(/\/+$/, "") === "") continue; } catch { continue; } // homepage nooit
+    getest++;
+    const v = await voorraad(url);
+    if (v === "ok") continue;
+    try {
+      await gads(i, at, `customers/${cid}/googleAds:mutate`, { mutateOperations: [{ adGroupOperation: { update: { resourceName: rn, status: "PAUSED" }, updateMask: "status" } }] });
+      await sql`insert into beheersite.ads_acties (klant_id, week, soort, tekst, waarom, status, data)
+        values (${k.id}, ${maandag()}, 'auto_pauze', ${`Advertentie voor "${g.naam}" gepauzeerd`},
+          ${v === "op" ? "Dit product is uitverkocht. Zodra het terug is, zetten we de advertentie vanzelf weer aan." : "Deze pagina bestaat niet meer. Klikken zouden op een foutpagina uitkomen."}, 'uitgevoerd',
+          ${sql.json({ cid, adgroep: rn, naam: g.naam, url, reden: v })})`;
+      log.push(`${k.id}: "${g.naam}" gepauzeerd (${v === "op" ? "uitverkocht" : "pagina weg"})`); n++;
+    } catch (e) { log.push(`${k.id}: pauzeren "${g.naam}" lukte niet: ${(e as Error).message}`); }
+  }
+  return n;
+}
+
+// ---------- 4. concurrent-alarm op de eigen merknaam ----------
+async function concurrent(i: Record<string, string>, at: string, k: any, log: string[]) {
+  const [al] = await sql`select 1 from beheersite.ads_acties where klant_id = ${k.id} and soort = 'concurrent' and aangemaakt > now() - interval '14 days'`;
+  if (al) return 0;
+  const merk = merkVan(k);
+  if (!merk.size) return 0;
+  const cid = String(k.ads_klant).replace(/\D/g, "");
+  const dag = (n: number) => { const d = new Date(); d.setDate(d.getDate() - n); return isoDag(d); };
+  const periode = async (van: string, tot: string) => {
+    const r = await zoek(i, at, cid, `SELECT ad_group_criterion.keyword.text, metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.search_top_impression_share
+      FROM keyword_view WHERE segments.date BETWEEN '${van}' AND '${tot}' AND campaign.status = 'ENABLED'`);
+    let vert = 0, klik = 0, kosten = 0, top = 0;
+    for (const x of r) {
+      const t = norm(x.adGroupCriterion?.keyword?.text || "").replace(/ /g, "");
+      if (![...merk].some((m) => t.includes(m))) continue;
+      const v = Number(x.metrics?.impressions || 0);
+      vert += v; klik += Number(x.metrics?.clicks || 0); kosten += Number(x.metrics?.costMicros || 0) / 1e6;
+      top += v * Number(x.metrics?.searchTopImpressionShare || 0);
+    }
+    return { vert, klik, cpc: klik ? kosten / klik : 0, top: vert ? top / vert : 0 };
+  };
+  const nu = await periode(dag(7), dag(1)), voor = await periode(dag(35), dag(8));
+  if (nu.vert < 30 || voor.vert < 30) return 0;
+  const topDaling = (voor.top - nu.top) * 100, cpcStijging = voor.cpc ? (nu.cpc / voor.cpc - 1) * 100 : 0;
+  if (topDaling < 15 && cpcStijging < 50) return 0;
+  const pct = (x: number) => Math.round(x * 100) + "%";
+  const waarom = [topDaling >= 15 ? `je advertentie stond minder vaak bovenaan (${pct(voor.top)} → ${pct(nu.top)})` : "",
+    cpcStijging >= 50 ? `een klik op je naam werd duurder (${euro(voor.cpc)} → ${euro(nu.cpc)})` : ""].filter(Boolean).join(" en ");
+  await sql`insert into beheersite.ads_acties (klant_id, week, soort, tekst, waarom, status, data)
+    values (${k.id}, ${maandag()}, 'concurrent', 'Mogelijk adverteert een ander op jouw bedrijfsnaam.',
+      ${`Bij zoekopdrachten op je naam ${waarom}. Dat gebeurt meestal als een concurrent op je naam biedt. We houden het in de gaten en zorgen dat je zelf bovenaan blijft staan.`}, 'melding',
+      ${sql.json({ nu, voor })})`;
+  log.push(`${k.id}: concurrent-alarm: ${waarom}`);
+  return 1;
+}
+
 async function dagelijks(i: Record<string, string>) {
   if (i.bijsturen_modus === "uit") return { ok: true, uit: "bijsturen staat uit" };
   const klanten = await sql`select id, naam, site, ads_klant, ads_campagne from beheersite.klanten where actief and ads_klant is not null`;
@@ -168,8 +268,10 @@ async function dagelijks(i: Record<string, string>) {
   for (const k of klanten) {
     try { await uitsluiten(i, at, k, log); } catch (e) { log.push(`${k.id}: uitsluiten: ${(e as Error).message}`); }
     try { await budget(i, at, k, log); } catch (e) { log.push(`${k.id}: budget: ${(e as Error).message}`); }
+    try { await uitverkocht(i, at, k, log); } catch (e) { log.push(`${k.id}: uitverkocht: ${(e as Error).message}`); }
+    try { await concurrent(i, at, k, log); } catch (e) { log.push(`${k.id}: concurrent: ${(e as Error).message}`); }
   }
-  const gedaan = log.filter((l) => !/lukte niet|: uitsluiten:|: budget:/.test(l));
+  const gedaan = log.filter((l) => !/lukte niet|: (uitsluiten|budget|uitverkocht|concurrent):/.test(l));
   if (log.length) await mailJan(i, `Bijgestuurd: ${gedaan.length} wijziging${gedaan.length === 1 ? "" : "en"} in Google Ads`,
     `<p>Vandaag automatisch bijgestuurd:</p><ul>${log.map((l) => `<li>${esc(l)}</li>`).join("")}</ul><p>Terugdraaien kan in je beheer bij Advertenties.</p>`);
   return { ok: true, log };
@@ -187,6 +289,8 @@ async function terug(i: Record<string, string>, id: number) {
       { campaignBudgetOperation: { update: { resourceName: d.van.budget, amountMicros: String(Math.round(d.van.oud * 1e6)) }, updateMask: "amount_micros" } },
       { campaignBudgetOperation: { update: { resourceName: d.naar.budget, amountMicros: String(Math.round(d.naar.oud * 1e6)) }, updateMask: "amount_micros" } },
     ] });
+  if (a.soort === "auto_pauze")
+    await gads(i, at, `customers/${d.cid}/googleAds:mutate`, { mutateOperations: [{ adGroupOperation: { update: { resourceName: d.adgroep, status: "ENABLED" }, updateMask: "status" } }] });
   await sql`update beheersite.ads_acties set status = 'teruggedraaid' where id = ${id}`;
   return { ok: true };
 }

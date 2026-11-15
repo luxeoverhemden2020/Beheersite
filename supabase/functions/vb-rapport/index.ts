@@ -20,6 +20,7 @@ const eindVan = (m: string) => { const d = new Date(Date.UTC(+m.slice(0, 4), +m.
 // Naam voor de klant: Sitehulpje Basis/Plus/Pro (Sitehulpje zit erin), of Sitehulpje SEO Basis/Plus/Pro (alleen SEO)
 const PK: Record<string, string> = { basis: "Basis", plus: "Plus", pro: "Pro" };
 const pakketNaam = (k: any) => {
+  if (k.vindbaarheid === false) return "Google-advertenties"; // alleen advertenties, geen SEO-pakket
   const n = PK[k.bundel || k.vb_pakket || ""] || "";
   return ((k.bundel || Number(k.sh_prijs) > 0) ? `Sitehulpje ${n}` : `Sitehulpje SEO ${n}`).trim();
 };
@@ -38,9 +39,9 @@ async function gebruikerVan(req: Request) {
 }
 async function klantVoor(g: any, gevraagd?: string) {
   const id = g.rol === "admin" ? String(gevraagd || g.klant_id || "") : g.klant_id;
-  const [k] = id ? await sql`select id, naam, site, vindbaarheid, vb_pakket, bundel, sh_prijs, vb_rapport_mail, vb_start from beheersite.klanten where id = ${id}` : [];
+  const [k] = id ? await sql`select id, naam, site, vindbaarheid, ads_klant, vb_pakket, bundel, sh_prijs, vb_rapport_mail, vb_start from beheersite.klanten where id = ${id}` : [];
   if (!k) throw new Fout(404, "Klant niet gevonden.");
-  if (!k.vindbaarheid && g.rol !== "admin") throw new Fout(403, "Sitehulpje SEO staat niet aan voor jouw account.");
+  if (!k.vindbaarheid && !k.ads_klant && g.rol !== "admin") throw new Fout(403, "Er is nog geen maandrapport voor jouw account.");
   return k;
 }
 
@@ -182,6 +183,10 @@ async function maak(k: { id: string; naam: string; site: string; vb_pakket: stri
 
   // Klikfraude-bescherming (advertenties): maandtellers uit sr-klikfraude
   const [kf] = await sql`select klikken, verdacht, uitgesloten from beheersite.ads_klik_maand where klant_id = ${k.id} and maand = ${maand}`;
+  // Advertenties: kosten en opbrengst deze maand en de maand ervoor
+  const adsSom = async (m: string) => (await sql`select coalesce(sum(kosten),0)::float kosten, coalesce(sum(klikken),0)::int klikken, coalesce(sum(conversies),0)::float conversies,
+      coalesce(sum(waarde),0)::float waarde, count(distinct datum)::int dagen from beheersite.ads_dag where klant_id = ${k.id} and datum between ${m + "-01"}::date and ${eindVan(m)}::date`)[0];
+  const adsNu = await adsSom(maand), adsVorig = await adsSom(vorigeMaand(maand));
   // Automatisch bijsturen (sr-bijsturen) in deze maand
   const [bs] = await sql`select count(*) filter (where soort = 'auto_uitsluiten')::int uitgesloten, count(*) filter (where soort = 'auto_budget')::int budget,
       coalesce(sum(besparing_eur) filter (where soort = 'auto_uitsluiten'), 0)::float per_week
@@ -213,6 +218,7 @@ async function maak(k: { id: string; naam: string; site: string; vb_pakket: stri
       problemen: (gz.uitslag.problemen || []).slice(0, 8).map((p: any) => ({ ernst: p.ernst, tekst: p.tekst, groep: p.groep })),
       goed: (gz.uitslag.goed || []).slice(0, 6), snelheid: gz.uitslag.snelheid?.score ?? null } : null,
     werk: werk.map((w) => ({ nr: w.nr, onderwerp: w.onderwerp, datum: w.bijgewerkt })),
+    advertenties: adsNu.kosten > 0 || adsNu.klikken > 0 ? { nu: adsNu, vorig: adsVorig } : null,
     bijsturen: bs && (bs.uitgesloten || bs.budget) ? { uitgesloten: bs.uitgesloten, budget: bs.budget, per_week: Math.round(bs.per_week) } : null,
     klikfraude: kf && kf.klikken > 0 ? { klikken: kf.klikken, verdacht: kf.verdacht, uitgesloten: kf.uitgesloten } : null,
     stappen,
@@ -238,6 +244,7 @@ async function mail(k: any, d: any, naarKlant: boolean) {
     d.nu.ga4.dagen ? `Acties op je site: ${getal(d.nu.ga4.acties)}${pct(d.nu.ga4.acties, d.vorig.ga4.acties)}` : null,
     d.jaar?.gsc?.dagen && d.nu.gsc.dagen ? `Tegenover ${d.jaar_naam}: ${pct(d.nu.gsc.klikken, d.jaar.gsc.klikken).trim().replace(/[()]/g, "") || "geen vergelijking"} klikken` : null,
     d.gezondheid ? `Website-gezondheid: ${d.gezondheid.score} van 100` : null,
+    d.advertenties ? `Advertenties: €${getal(d.advertenties.nu.kosten)} uitgegeven, ${getal(d.advertenties.nu.klikken)} klikken${d.advertenties.nu.waarde > 0 ? `, €${getal(d.advertenties.nu.waarde)} omzet` : d.advertenties.nu.conversies >= 1 ? `, ${getal(d.advertenties.nu.conversies)} aanvragen` : ""}` : null,
     d.bijsturen ? `Automatisch bijgestuurd: ${d.bijsturen.uitgesloten ? `${d.bijsturen.uitgesloten} zoekopdracht${d.bijsturen.uitgesloten > 1 ? "en" : ""} uitgesloten (± €${getal(d.bijsturen.per_week)} per week bespaard)` : ""}${d.bijsturen.uitgesloten && d.bijsturen.budget ? ", " : ""}${d.bijsturen.budget ? `${d.bijsturen.budget}× budget verschoven naar wat het meest oplevert` : ""}` : null,
     d.klikfraude ? `Advertentieklikken: ${getal(d.klikfraude.klikken)}, waarvan ${getal(d.klikfraude.verdacht)} verdacht${d.klikfraude.uitgesloten ? ` (${getal(d.klikfraude.uitgesloten)} adres${d.klikfraude.uitgesloten > 1 ? "sen" : ""} uitgesloten)` : ""}` : null,
     d.werk.length ? `Uitgevoerd door Sitehulpje: ${d.werk.length} aanpassing${d.werk.length > 1 ? "en" : ""}` : null,
@@ -271,7 +278,7 @@ async function handel(req: Request, b: any) {
     const i = await inst();
     if (!i.cron_sleutel || req.headers.get("x-cron-key") !== i.cron_sleutel) throw new Fout(401, "Geen toegang");
     const maand = vorigeMaand(new Date().toISOString().slice(0, 7));
-    const ks = await sql`select id, naam, site, vb_pakket, bundel, sh_prijs, vb_rapport_mail, vb_start from beheersite.klanten where vindbaarheid and actief`;
+    const ks = await sql`select id, naam, site, vindbaarheid, ads_klant, vb_pakket, bundel, sh_prijs, vb_rapport_mail, vb_start from beheersite.klanten where actief and (vindbaarheid or ads_klant is not null)`;
     const uit: Record<string, unknown> = {};
     for (const k of ks) {
       try {
