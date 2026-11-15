@@ -182,6 +182,12 @@ async function maak(k: { id: string; naam: string; site: string; vb_pakket: stri
 
   // Klikfraude-bescherming (advertenties): maandtellers uit sr-klikfraude
   const [kf] = await sql`select klikken, verdacht, uitgesloten from beheersite.ads_klik_maand where klant_id = ${k.id} and maand = ${maand}`;
+  // Automatisch bijsturen (sr-bijsturen) in deze maand
+  const [bs] = await sql`select count(*) filter (where soort = 'auto_uitsluiten')::int uitgesloten, count(*) filter (where soort = 'auto_budget')::int budget,
+      coalesce(sum(besparing_eur) filter (where soort = 'auto_uitsluiten'), 0)::float per_week
+    from beheersite.ads_acties where klant_id = ${k.id} and status = 'uitgevoerd' and soort like 'auto_%'
+      and aangemaakt >= (${maand + "-01"}::date::timestamp at time zone 'Europe/Amsterdam')
+      and aangemaakt < ((${maand + "-01"}::date + interval '1 month')::timestamp at time zone 'Europe/Amsterdam')`;
 
   // Volgende stappen: belangrijkste gezondheidspunten + zoekwoordkansen
   const stappen: string[] = [];
@@ -207,6 +213,7 @@ async function maak(k: { id: string; naam: string; site: string; vb_pakket: stri
       problemen: (gz.uitslag.problemen || []).slice(0, 8).map((p: any) => ({ ernst: p.ernst, tekst: p.tekst, groep: p.groep })),
       goed: (gz.uitslag.goed || []).slice(0, 6), snelheid: gz.uitslag.snelheid?.score ?? null } : null,
     werk: werk.map((w) => ({ nr: w.nr, onderwerp: w.onderwerp, datum: w.bijgewerkt })),
+    bijsturen: bs && (bs.uitgesloten || bs.budget) ? { uitgesloten: bs.uitgesloten, budget: bs.budget, per_week: Math.round(bs.per_week) } : null,
     klikfraude: kf && kf.klikken > 0 ? { klikken: kf.klikken, verdacht: kf.verdacht, uitgesloten: kf.uitgesloten } : null,
     stappen,
   };
@@ -231,6 +238,7 @@ async function mail(k: any, d: any, naarKlant: boolean) {
     d.nu.ga4.dagen ? `Acties op je site: ${getal(d.nu.ga4.acties)}${pct(d.nu.ga4.acties, d.vorig.ga4.acties)}` : null,
     d.jaar?.gsc?.dagen && d.nu.gsc.dagen ? `Tegenover ${d.jaar_naam}: ${pct(d.nu.gsc.klikken, d.jaar.gsc.klikken).trim().replace(/[()]/g, "") || "geen vergelijking"} klikken` : null,
     d.gezondheid ? `Website-gezondheid: ${d.gezondheid.score} van 100` : null,
+    d.bijsturen ? `Automatisch bijgestuurd: ${d.bijsturen.uitgesloten ? `${d.bijsturen.uitgesloten} zoekopdracht${d.bijsturen.uitgesloten > 1 ? "en" : ""} uitgesloten (± €${getal(d.bijsturen.per_week)} per week bespaard)` : ""}${d.bijsturen.uitgesloten && d.bijsturen.budget ? ", " : ""}${d.bijsturen.budget ? `${d.bijsturen.budget}× budget verschoven naar wat het meest oplevert` : ""}` : null,
     d.klikfraude ? `Advertentieklikken: ${getal(d.klikfraude.klikken)}, waarvan ${getal(d.klikfraude.verdacht)} verdacht${d.klikfraude.uitgesloten ? ` (${getal(d.klikfraude.uitgesloten)} adres${d.klikfraude.uitgesloten > 1 ? "sen" : ""} uitgesloten)` : ""}` : null,
     d.werk.length ? `Uitgevoerd door Sitehulpje: ${d.werk.length} aanpassing${d.werk.length > 1 ? "en" : ""}` : null,
   ].filter(Boolean);

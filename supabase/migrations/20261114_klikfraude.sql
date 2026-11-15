@@ -56,3 +56,6 @@ create table if not exists beheersite.ads_dc (net cidr primary key, bron text no
 create index if not exists ads_dc_net on beheersite.ads_dc using gist (net inet_ops);
 alter table beheersite.ads_dc enable row level security;
 -- select cron.schedule('klikfraude-lijsten', '43 3 * * 0', $$select beheersite.roep('sr-klikfraude','lijsten',120000)$$);
+
+-- dagelijks bijsturen (sr-bijsturen), na de nachtelijke cijfers van sr-ads (04:37)
+-- select cron.schedule('ads-bijsturen', '17 5 * * *', $$select beheersite.roep('sr-bijsturen','dagelijks',300000)$$);

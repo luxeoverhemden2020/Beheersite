@@ -30,6 +30,7 @@
   <div class="kaart" id="campagnes" hidden></div>
   <div class="kaart" id="voorstellen" hidden></div>
   <div class="kaart" id="cijfers" hidden></div>
+  <div class="kaart" id="bijsturen" hidden></div>
   <div class="kaart" id="klikfraude" hidden></div>
   <div id="meld" class="verborgen"></div>
 </main>
@@ -60,7 +61,7 @@ async function laad() {
   try { acc = (await ads("accounts")).accounts; } catch (e) { toonMelding($("#meld"), "Accounts ophalen lukte niet: " + e.message); }
   const opties = (huidig) => `<option value="">Geen advertenties</option>` + acc.map((a) => `<option value="${a.id}" ${a.id === huidig ? "selected" : ""}>${esc(a.naam || a.id)} (${a.id.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3")})</option>`).join("")
     + (huidig && !acc.some((a) => a.id === huidig) ? `<option value="${huidig}" selected>${huidig} (niet onder Siteregelaar)</option>` : "");
-  $("#klanten").hidden = false; abKlanten = s.klanten; abCijfers(); abCampagnes(s.klanten.filter((k) => k.ads_klant)); abVoorstellen(); abKlikfraude();
+  $("#klanten").hidden = false; abKlanten = s.klanten; abCijfers(); abCampagnes(s.klanten.filter((k) => k.ads_klant)); abVoorstellen(); abBijsturen(); abKlikfraude();
   $("#klanten").innerHTML = `<h2 style="margin-top:0">Klanten en hun Google Ads-account</h2><p class="zacht" style="margin:0 0 8px">${acc.length} account(s) onder Siteregelaar. Nieuwe klant? Koppel eerst zijn account onder Siteregelaar in Google Ads.</p>`
     + s.klanten.map((k) => `<div class="ab-rij"><div><b>${esc(k.naam)}</b><br><span class="zacht" style="font-size:13px">${k.ads_fout ? "⚠ " + esc(k.ads_fout) : k.ads_laatst ? "Bijgewerkt " + new Date(k.ads_laatst).toLocaleString("nl-NL") : k.ads_klant ? "Nog niet opgehaald" : ""}</span></div>
       <select data-klant="${esc(k.id)}" aria-label="Google Ads-account voor ${esc(k.naam)}">${opties(k.ads_klant || "")}</select>
@@ -208,6 +209,27 @@ async function abKlikfraude() {
   el.querySelectorAll("[data-wit]").forEach((b) => b.onclick = () => doe("wit", b.dataset.wit, b.dataset.k));
   el.querySelectorAll("[data-terug]").forEach((b) => b.onclick = () => doe("terug", b.dataset.terug, b.dataset.k));
   $("#kf-wit").onclick = () => { const ip = $("#kf-ip").value.trim(); if (ip) doe("wit", ip, $("#kf-k").value); };
+}
+
+// ---------- automatisch bijsturen: logboek + terugdraaien (sr-bijsturen) ----------
+async function abBijsturen() {
+  const el = $("#bijsturen"); el.hidden = false;
+  const bs = async (actie, data = {}) => {
+    const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-bijsturen", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("beheer") }, body: JSON.stringify({ actie, ...data }) });
+    const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d;
+  };
+  let d; try { d = await bs("lijst"); } catch (e) { el.innerHTML = `<h2 style="margin-top:0">Automatisch bijgestuurd</h2><p class="zacht" style="margin:0">${esc(e.message)}</p>`; return; }
+  const dt = (x) => new Date(x).toLocaleString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  const rij = (a) => `<tr class="${a.status === "teruggedraaid" ? "weg" : ""}"><td>${dt(a.aangemaakt)}<br><span class="zacht" style="font-size:12px">${esc(a.klant)}</span></td><td><b>${esc(a.tekst)}</b><br><span class="zacht" style="font-size:13px">${esc(a.waarom || "")}</span></td>
+    <td>${a.status === "uitgevoerd" ? `<button class="knop rand klein" data-terugbs="${a.id}">Terugdraaien</button>` : esc(a.status)}</td></tr>`;
+  el.innerHTML = `<h2 style="margin-top:0">Automatisch bijgestuurd</h2>
+    <p class="zacht" style="margin:0 0 10px">${d.modus === "aan" ? "Staat aan" : "Staat uit"}: elke ochtend worden zoekopdrachten die alleen geld kosten uitgesloten, en op maandag wordt budget verschoven naar de campagne die het meest oplevert (max. 10% per week, totaal blijft gelijk). Campagnes jonger dan 14 dagen en de merknaam blijven altijd met rust.</p>
+    ${d.lijst.length ? `<div class="ab-scroll"><table class="ab-tabel"><tr><th>Wanneer</th><th>Wat en waarom</th><th></th></tr>${d.lijst.map(rij).join("")}</table></div>` : `<p class="zacht" style="margin:0">Nog niets bijgestuurd.</p>`}`;
+  el.querySelectorAll("[data-terugbs]").forEach((b) => b.onclick = async () => {
+    b.disabled = true; b.textContent = "Bezig…";
+    try { await bs("terug", { id: Number(b.dataset.terugbs) }); toonMelding($("#meld"), "Teruggedraaid in Google Ads.", "ok"); abBijsturen(); }
+    catch (e) { toonMelding($("#meld"), e.message); b.disabled = false; b.textContent = "Terugdraaien"; }
+  });
 }
 </script>
 </body>
