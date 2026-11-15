@@ -26,9 +26,12 @@
     }
   } catch (e) {}
   var VERBODEN = /pass|wachtw|token|nonce|captcha|honeypot|iban|creditcard|card|cvc|bsn|form_key|_wp/i;
+  // nooit: account, afrekenen, winkelwagen, nieuwsbrief, reviews, inloggen en zoeken (dat zijn geen aanvragen)
+  var NIET = /customer|account|checkout|afrekenen|cart|winkelwagen|wishlist|verlanglijst|newsletter|nieuwsbrief|review|login|inloggen|register|search|zoek|wp-admin|wp-login/i;
   document.addEventListener("submit", function (e) {
     var f = e.target;
     if (!f || f.tagName !== "FORM" || f.querySelector('input[type="password"]') || (f.getAttribute("role") === "search")) return;
+    if (f.hasAttribute("data-sh-niet") || NIET.test(location.pathname) || NIET.test(f.getAttribute("action") || "") || NIET.test(f.id || "") || NIET.test(f.className || "")) return;
     var v = {}, n = 0;
     for (var i = 0; i < f.elements.length; i++) {
       var el = f.elements[i], naam = el.name || el.id;
