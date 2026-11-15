@@ -296,6 +296,7 @@ body{background:var(--bg);color:var(--tekst)}
   <div id="kpinhoud" data-kp="voorstellen"></div>
   <div id="shaads" data-kp="advertenties"></div>
   <div id="kpads" data-kp="advertenties"></div>
+  <div id="kpaanvragen" data-kp="aanvragen"></div>
   <div id="kplokaal" data-kp="maps"></div>
   <div id="kpconc" data-kp="concurrenten"></div>
   <div id="kpaivm" data-kp="ai"></div>
@@ -655,17 +656,19 @@ function kpMenu(vb) {
     ["website", "Je website", [["gezondheid", "Werkt alles goed?"], ["voorstellen", "Klaar om goed te keuren"], ["paginas", "Meest bekeken pagina's"]]],
     ["klanten", "Klanten", [["reviews", "Reviews"], ["acties", "Telefoontjes en routes"]]],
     ["advertenties", "Advertenties", []],
+    ["aanvragen", "Aanvragen", []],
     ["rapporten", "Rapporten", []], ["-"],
     ["inst", "Instellingen", [["bedrijf", "Over je bedrijf"], ["koppelingen", "Google-account"], ["abonnement", "Abonnement"]]] ] : [
     ["verzoeken", "Iets laten aanpassen", []],
     ["gezondheid", "Werkt alles goed?", []],
-    ["advertenties", "Advertenties", []], ["-"],
+    ["advertenties", "Advertenties", []],
+    ["aanvragen", "Aanvragen", []], ["-"],
     ["promo", "Beter gevonden worden", []], ["-"],
     ["abonnement", "Abonnement", []] ];
   if (vb && window.SH_DEMO_MENU) KP_MENU = window.SH_DEMO_MENU; // demo: volgorde van de rondleiding
   // CSS: per pagina alleen de blokken met die pagina laten zien
   const alle = KP_MENU.flatMap((m) => m[2]?.length ? m[2].map((x) => x[0]) : [m[0]]).filter((x) => x !== "-");
-  document.querySelectorAll('[data-kp="VBALLE"]').forEach((x) => (x.dataset.kp = alle.filter((p) => !["verzoeken", "abonnement", "promo", "advertenties"].includes(p)).join(" ")));
+  document.querySelectorAll('[data-kp="VBALLE"]').forEach((x) => (x.dataset.kp = alle.filter((p) => !["verzoeken", "abonnement", "promo", "advertenties", "aanvragen"].includes(p)).join(" ")));
   let css = alle.map((p) => `body[data-pagina="${p}"] [data-kp~="${p}"]{display:block}body[data-pagina="${p}"] #vindbaarheid [data-vb-paneel][data-kp~="${p}"]{display:block!important}`).join("");
   let st = $("#kpcss"); if (!st) { st = document.createElement("style"); st.id = "kpcss"; document.head.append(st); } st.textContent = css;
   kpTekenMenu();
@@ -704,6 +707,7 @@ function kpNaar(p) {
   kpTekenMenu(); kpDicht();
   const vbPagina = kpHeeftVb && !["verzoeken", "abonnement", "promo", "advertenties"].includes(p);
   if (p === "advertenties") kpAds();
+  if (p === "aanvragen") kpAanvragen();
   if (p === "verzoeken" || p === "reviews") kpReviewVraag(p === "reviews" ? $("#reviewvraag2") : $("#reviewvraag"));
   if (p === "concurrenten" || p === "ai") kpVolg();
   if (p === "voorstellen") kpInhoud();
@@ -713,6 +717,39 @@ function kpNaar(p) {
   kpAutoBlok(p);
   try { history.replaceState(null, "", location.pathname + location.search + (p === "verzoeken" ? "" : "#" + p)); } catch {}
   scrollTo(0, 0);
+}
+
+// ---------- aanvragen (sr-aanvraag): formulieren van de website + "Werd klant" ----------
+async function kpAanvragen() {
+  const el = $("#kpaanvragen");
+  const api = async (actie, data = {}) => {
+    const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-aanvraag", { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessieVan("klant") }, body: JSON.stringify({ actie, ...data }) });
+    const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.fout || "Er ging iets mis."); return d;
+  };
+  el.innerHTML = `<section class="kaart"><p class="zacht">Even laden…</p></section>`;
+  let d; try { d = await api("lijst"); } catch (e) { el.innerHTML = `<section class="kaart"><p>${esc(e.message)}</p></section>`; return; }
+  const dt = (x) => new Date(x).toLocaleString("nl-NL", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  const nieuw = d.lijst.filter((a) => a.status === "nieuw").length, klant = d.lijst.filter((a) => a.status === "klant").length;
+  const kaartje = (a) => {
+    const extra = Object.entries(a.velden || {}).filter(([k, v]) => ![a.naam, a.email, a.telefoon, a.bericht].includes(v)).map(([k, v]) => `<div class="zacht" style="font-size:13px">${esc(k)}: ${esc(v)}</div>`).join("");
+    return `<section class="kaart" style="margin:0 0 12px">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><b>${esc(a.naam || a.email || "Aanvraag")}</b><span class="zacht" style="font-size:13px">${dt(a.tijd)}${a.via_advertentie ? " · via je advertentie" : ""}</span></div>
+      ${a.bericht ? `<p style="margin:8px 0;white-space:pre-line">${esc(a.bericht)}</p>` : ""}
+      <div style="margin:6px 0">${a.email ? `<a href="mailto:${esc(a.email)}">${esc(a.email)}</a>` : ""}${a.email && a.telefoon ? " · " : ""}${a.telefoon ? `<a href="tel:${esc(a.telefoon.replace(/\s/g, ""))}">${esc(a.telefoon)}</a>` : ""}</div>
+      ${extra}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
+        ${a.status === "nieuw" ? `<button class="knop klein" data-st="klant" data-id="${a.id}">Werd klant</button><button class="knop rand klein" data-st="geen" data-id="${a.id}">Geen klant</button>`
+          : `<span class="zacht">${a.status === "klant" ? "✓ Werd klant" + (a.google && a.google.startsWith("gemeld") ? " (doorgegeven aan Google)" : "") : "Geen klant"}</span><button class="knop rand klein" data-st="nieuw" data-id="${a.id}">Wijzigen</button>`}
+      </div></section>`;
+  };
+  el.innerHTML = `<section class="kaart" style="margin:0 0 16px"><h2 style="margin:0 0 6px">Aanvragen via je website</h2>
+    <p style="margin:0">Elk ingevuld formulier op je website komt hier binnen; je krijgt er ook meteen een mail van. Werd het een klant? Druk op <b>Werd klant</b>. Kwam die persoon via je Google-advertentie, dan geven we dat door aan Google, zodat je advertenties vaker aan dit soort mensen worden getoond.</p>
+    ${d.lijst.length ? `<p class="zacht" style="margin:8px 0 0">${d.lijst.length} aanvragen · ${nieuw} nog niet afgehandeld · ${klant} klant geworden</p>` : ""}</section>
+    ${d.lijst.length ? d.lijst.map(kaartje).join("") : `<section class="kaart"><p class="zacht" style="margin:0">Nog geen aanvragen binnen. Zodra iemand een formulier op je website invult, staat het hier.</p></section>`}`;
+  el.querySelectorAll("[data-st]").forEach((b) => b.onclick = async () => {
+    b.disabled = true;
+    try { await api("status", { id: Number(b.dataset.id), status: b.dataset.st }); kpAanvragen(); } catch (e) { alert(e.message); b.disabled = false; }
+  });
 }
 
 // ---------- advertenties (Google Ads) ----------

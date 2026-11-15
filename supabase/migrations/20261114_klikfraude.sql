@@ -59,3 +59,18 @@ alter table beheersite.ads_dc enable row level security;
 
 -- dagelijks bijsturen (sr-bijsturen), na de nachtelijke cijfers van sr-ads (04:37)
 -- select cron.schedule('ads-bijsturen', '17 5 * * *', $$select beheersite.roep('sr-bijsturen','dagelijks',300000)$$);
+
+-- aanvragenbak (sr-aanvraag + aanvraag.js) en conversieactie "Werd klant (Sitehulpje)"
+create table if not exists beheersite.aanvragen (
+  id bigint generated always as identity primary key,
+  klant_id text not null references beheersite.klanten(id) on delete cascade,
+  tijd timestamptz not null default now(),
+  naam text, email text, telefoon text, bericht text,
+  velden jsonb, pagina text, gclid text, ip inet,
+  status text not null default 'nieuw' check (status in ('nieuw','klant','geen')),
+  status_op timestamptz, google text
+);
+create index if not exists aanvragen_klant on beheersite.aanvragen (klant_id, tijd desc);
+alter table beheersite.aanvragen enable row level security;
+alter table beheersite.klanten add column if not exists ads_conv_klant text;
+-- select cron.schedule('aanvraag-voorbereiden', '47 5 * * *', $$select beheersite.roep('sr-aanvraag','voorbereiden',60000)$$);
