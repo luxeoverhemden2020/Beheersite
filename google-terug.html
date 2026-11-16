@@ -34,6 +34,18 @@
     let t = null; try { t = sessionStorage.getItem("vb_ga4_terug"); sessionStorage.removeItem("vb_ga4_terug"); } catch { /* geen opslag */ }
     location.replace(t || "portaal?google=ga4#vindbaarheid"); return;
   }
+  if ((p.get("state") || "").startsWith("adscheck.")) { // gratis Google Ads-check van siteregelaar.nl
+    const naarCheck = (q) => location.replace("https://siteregelaar.nl/google-ads-check" + q);
+    if (p.get("error")) { naarCheck("?fout=" + encodeURIComponent(p.get("error") === "access_denied" ? "Je hebt de koppeling geannuleerd. Er is niets veranderd." : "Google gaf een foutmelding. Probeer het opnieuw.")); return; }
+    $("#tekst").textContent = "Even geduld, we bekijken je advertenties van de afgelopen 90 dagen. Dit duurt meestal 10 tot 30 seconden…";
+    try {
+      const r = await fetch("https://dauvsivoxfdfzurmyuug.supabase.co/functions/v1/sr-ads-check", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actie: "terug", code: p.get("code") || "", state: p.get("state") || "" }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.token) throw new Error(d.fout || "De check lukte niet. Probeer het opnieuw.");
+      naarCheck("?r=" + encodeURIComponent(d.token));
+    } catch (e) { naarCheck("?fout=" + encodeURIComponent(e.message)); }
+    return;
+  }
   if (p.get("error")) { klaar(p.get("error") === "access_denied" ? "Je hebt de koppeling geannuleerd. Er is niets veranderd." : "Google gaf een foutmelding. Probeer het opnieuw.", "let"); return; }
   if ((p.get("state") || "").startsWith("ads.")) { // Google Ads-koppeling door de beheerder
     try {
