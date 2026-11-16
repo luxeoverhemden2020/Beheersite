@@ -294,6 +294,7 @@ function opbouw(d) {
     document.title = `Website-check ${d.site.replace(/^https?:\/\/(www\.)?/, "")} – Sitehulpje`;
     el.innerHTML = opbouw(d);
     rpExtra(d);
+    try { leesMeten({ soort: "website", id: q.get("id"), t: q.get("t") }); } catch {}
     try { document.getElementById("rpbot").innerHTML = robotSvg("rust"); } catch {}
     const t = document.getElementById("teller"), doel = Number(d.score) || 0, start = performance.now();
     const stap = (nu) => { const f = Math.min(1, (nu - start) / 1800); t.textContent = Math.round(doel * (1 - Math.pow(1 - f, 3))); if (f < 1) requestAnimationFrame(stap); };
@@ -302,6 +303,7 @@ function opbouw(d) {
   } catch (e) { el.innerHTML = `<div class="kaart rp-wacht"><p>${esc(e.message)}</p></div>`; }
 })();
 </script>
+<script src="assets/lees.js?v=20261116"></script>
 <script src="assets/zijmenu.js?v=20261111b"></script>
 </body>
 </html>

@@ -30,10 +30,37 @@ async function vbbBestellingen(el) {
         <td><span class="${kl}">${st}</span>${b.fout ? `<br><span class="vb-af vb-klein">${esc(b.fout)}</span>` : ""}</td></tr>`; }).join("")}</tbody></table></div>`;
 }
 
+// leesgedrag van de checkrapporten (hoe vaak geopend, hoe ver gelezen, waarop geklikt)
+async function vblOverzicht() {
+  try {
+    const r = await fetch(VBC_API.replace("vb-check", "vb-lees"), { method: "POST", headers: { "Content-Type": "application/json", "X-Sessie": sessie() }, body: JSON.stringify({ actie: "overzicht" }) });
+    return r.ok ? await r.json() : null;
+  } catch { return null; }
+}
+function vblTekst(lz, soort, id, gezien) {
+  const x = lz?.lezen?.find((r) => r.soort === soort && r.id === id);
+  if (!x) return gezien ? '<br><span class="zacht vb-klein">bekeken door klant</span>' : "";
+  const min = x.seconden >= 60 ? Math.round(x.seconden / 60) + " min" : x.seconden + " sec";
+  const wanneer = new Date(x.laatst).toLocaleString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  return `<br><span class="vb-op vb-klein">${x.keer}× geopend · ${x.diepte}% gelezen</span><br><span class="zacht vb-klein">${x.tot ? "tot “" + esc(x.tot) + "” · " : ""}${min} · laatst ${wanneer}${x.klikken?.length ? "<br>klikte op: " + x.klikken.map(esc).join(", ") : ""}</span>`;
+}
+function vblAds(lz) {
+  const l = lz?.ads || [];
+  if (!l.length) return "";
+  return `<div class="kaart tabel-scroll"><h2>Gratis Google Ads-checks</h2>
+    <p class="zacht vb-klein" style="margin-top:-4px">Via siteregelaar.nl/google-ads-check. Jouw eigen bezoeken tellen niet mee.</p>
+    <table><thead><tr><th>Datum</th><th>Wie</th><th>Verspild</th><th>Gelezen</th></tr></thead><tbody>
+    ${l.map((c) => `<tr><td>${new Date(c.aangemaakt).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}</td>
+      <td><b>${esc(c.bedrijf || c.account_naam || "")}</b><br><span class="zacht vb-klein">${esc(c.naam || "")}<br>${esc(c.email || "")}</span></td>
+      <td class="mono">${c.verspild_eur != null ? "€" + Math.round(c.verspild_eur).toLocaleString("nl-NL") : "–"}${c.status !== "klaar" ? `<br><span class="zacht vb-klein">${esc(c.status)}</span>` : ""}</td>
+      <td>${vblTekst(lz, "ads", c.id, c.gezien).replace(/^<br>/, "") || '<span class="zacht vb-klein">nog niet geopend</span>'}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
 async function vbcBeheer(el, open) {
   let d;
   try { d = await vbcApi("lijst"); } catch (e) { el.innerHTML = `<div class="kaart"><p>${esc(e.message)}</p></div>`; return; }
   const klaar = d.checks.filter((c) => c.status === "klaar").length;
+  const lz = await vblOverzicht();
   const rij = (c) => {
     const [st, kl] = VBC_STATUS[c.status] || [c.status, "zacht"];
     return `<tr data-id="${c.id}"${c.id === open ? ' style="outline:2px solid var(--accent)"' : ""}>
@@ -41,7 +68,7 @@ async function vbcBeheer(el, open) {
       <td><b>${esc(c.site.replace(/^https?:\/\//, ""))}</b><br><span class="zacht vb-klein">${esc(c.naam || "")}${c.bedrijf ? " · " + esc(c.bedrijf) : ""}<br>${esc(c.email)}</span></td>
       <td class="vb-klein">${esc((c.woorden || []).join(", ") || "–")}<br><span class="zacht">${esc(c.werkgebied || "")}${c.plaats ? " · " + esc(c.plaats) : ""}</span></td>
       <td class="mono">${c.score ?? "–"}</td><td>${c.pakket ? VBC_PAKKET[c.pakket] : "–"}${c.sitehulpje ? '<br><span class="zacht vb-klein">+ Sitehulpje</span>' : ""}</td>
-      <td><span class="${kl}">${st}</span>${c.status === "klaar" ? (c.auto ? `<br><span class="zacht vb-klein">gaat vanzelf rond ${autoOm(c)}</span>` : '<br><span class="zacht vb-klein">tegengehouden</span>') : ""}${c.via === "beheer" ? '<br><span class="zacht vb-klein">door jou gestart</span>' : ""}${c.gezien ? '<br><span class="zacht vb-klein">bekeken door klant</span>' : ""}${c.fout ? `<br><span class="vb-af vb-klein">${esc(c.fout)}</span>` : ""}</td>
+      <td><span class="${kl}">${st}</span>${c.status === "klaar" ? (c.auto ? `<br><span class="zacht vb-klein">gaat vanzelf rond ${autoOm(c)}</span>` : '<br><span class="zacht vb-klein">tegengehouden</span>') : ""}${c.via === "beheer" ? '<br><span class="zacht vb-klein">door jou gestart</span>' : ""}${vblTekst(lz, "website", c.id, c.gezien)}${c.fout ? `<br><span class="vb-af vb-klein">${esc(c.fout)}</span>` : ""}</td>
       <td style="white-space:nowrap">${["klaar", "verstuurd"].includes(c.status) ? `<a class="knop rand klein" href="${esc(c.rapport)}" target="_blank" rel="noopener">Bekijk</a> ` : ""}
         ${c.status === "klaar" ? `<button class="knop klein" data-vbc="verstuur">Verstuur nu</button> <button class="knop rand klein" data-vbc="houd" data-auto="${c.auto ? "" : "1"}">${c.auto ? "Tegenhouden" : "Toch vanzelf"}</button>` : ""}
         ${c.status === "verstuurd" ? `<button class="knop rand klein" data-vbc="verstuur">Opnieuw sturen</button>` : ""}
@@ -57,7 +84,7 @@ async function vbcBeheer(el, open) {
     </form>
     <div id="vbcmeld"></div>
     ${d.checks.length ? `<table><thead><tr><th>Datum</th><th>Website</th><th>Wat ze doen</th><th>Score</th><th>Advies</th><th>Status</th><th></th></tr></thead><tbody>${d.checks.map(rij).join("")}</tbody></table>`
-      : '<p class="zacht">Nog geen aanvragen.</p>'}</div>`;
+      : '<p class="zacht">Nog geen aanvragen.</p>'}</div>${vblAds(lz)}`;
   $("#vbcstart").onsubmit = async (e) => {
     e.preventDefault(); const k = $("#vbc_knop"); k.disabled = true; k.textContent = "Starten…";
     // het rapport meteen openen; het laat zien dat de check loopt en verschijnt vanzelf als hij klaar is (ongeveer 1 minuut)
