@@ -44,9 +44,14 @@ function schoon(k: any, data: any) {
   if (DOEL[k?.doel]) uit.doel = k.doel;
   if (k?.budget !== undefined) { const b = k.budget === null || k.budget === "" ? null : Number(k.budget); if (b === null || (isFinite(b) && b >= 0 && b <= 100000)) uit.budget = b; }
   if (Array.isArray(k?.uit)) { const ok = new Set((data.zoekwoorden || []).map((z: any) => z.term)); uit.uit = k.uit.map(String).filter((t: string) => ok.has(t)).slice(0, 50); }
-  if (Array.isArray(k?.advertenties)) uit.advertenties = k.advertenties.slice(0, 4).map((a: any) => ({
+  const ad = (a: any) => ({
     koppen: (Array.isArray(a?.koppen) ? a.koppen : []).map((x: any) => String(x || "").replace(/\s+/g, " ").trim().slice(0, 30)).filter(Boolean).slice(0, 3),
-    tekst: String(a?.tekst || "").replace(/\s+/g, " ").trim().slice(0, 90), aan: a?.aan !== false }));
+    tekst: String(a?.tekst || "").replace(/\s+/g, " ").trim().slice(0, 90), aan: a?.aan !== false });
+  if (Array.isArray(k?.advertenties)) uit.advertenties = k.advertenties.slice(0, 4).map(ad);
+  if (Array.isArray(k?.groepen) && Array.isArray(data.groepen)) uit.groepen = data.groepen.map((g: any, n: number) => {
+    const kg = k.groepen[n] || {};
+    return { aan: kg.aan !== false, advertenties: (Array.isArray(kg.advertenties) ? kg.advertenties : g.advertenties).slice(0, 3).map(ad) };
+  });
   if (k?.gebied?.soort === "land") uit.gebied = { soort: "land", landen: (Array.isArray(k.gebied.landen) ? k.gebied.landen : ["NL"]).filter((x: string) => ["NL", "BE"].includes(x)) };
   if (k?.gebied?.soort === "straal" && [10, 25, 50].includes(Number(k.gebied.km))) uit.gebied = { soort: "straal", km: Number(k.gebied.km) };
   if (k?.niet !== undefined) uit.niet = String(k.niet || "").trim().slice(0, 300);
@@ -80,8 +85,14 @@ async function handel(req: Request, b: any) {
     if (!v) throw new Fout(404, "Er is nog geen voorstel.");
     const keuzes = { ...(v.keuzes || {}), ...schoon(b.keuzes || {}, v.data) };
     if (a === "keuzes") { await sql`update beheersite.ads_voorstellen set keuzes = ${sql.json(keuzes)}, bijgewerkt = now() where id = ${v.id}`; return { ok: true }; }
-    const ads = (keuzes.advertenties || v.data.advertenties || []).filter((x: any) => x.aan !== false && x.koppen?.length && x.tekst);
-    if (!ads.length) throw new Fout(400, "Laat minstens één advertentie aan staan.");
+    const goed = (x: any) => x.aan !== false && x.koppen?.length && x.tekst;
+    // groepen (onderwerpen) met eigen zoekwoorden, advertenties en pagina; oude voorstellen hebben één lijst
+    const groepen = Array.isArray(v.data.groepen) ? v.data.groepen.map((g: any, n: number) => {
+      const kg = keuzes.groepen?.[n] || {};
+      return { naam: g.naam, pagina: g.pagina, aan: kg.aan !== false, termen: g.termen.filter((t: string) => !(keuzes.uit || []).includes(t)), ads: (kg.advertenties || g.advertenties).filter(goed) };
+    }).filter((g: any) => g.aan && g.termen.length && g.ads.length) : null;
+    const ads = groepen ? groepen.flatMap((g: any) => g.ads) : (keuzes.advertenties || v.data.advertenties || []).filter(goed);
+    if (!ads.length) throw new Fout(400, groepen ? "Laat minstens één onderwerp aan staan, met een zoekwoord en een advertentie." : "Laat minstens één advertentie aan staan.");
     const woorden = (v.data.zoekwoorden || []).filter((z: any) => !(keuzes.uit || []).includes(z.term));
     if (!woorden.length) throw new Fout(400, "Laat minstens één zoekwoord aan staan.");
     await sql`update beheersite.ads_voorstellen set keuzes = ${sql.json(keuzes)}, status = 'akkoord', akkoord_op = now(), bijgewerkt = now() where id = ${v.id}`;
@@ -90,7 +101,9 @@ async function handel(req: Request, b: any) {
     await mailJan(`Akkoord op advertenties: ${k?.naam || kid}`, `<p><b>${esc(k?.naam || kid)}</b> (${esc(k?.site || "")}) gaf akkoord op het advertentievoorstel.</p>
 <ul><li>Doel: ${esc(DOEL[keuzes.doel || v.data.doel] || "")}</li><li>Budget per maand: ${budget ? "€" + Number(budget).toLocaleString("nl-NL") + " excl. btw" : "weet ik nog niet"}</li>
 <li>Zoekwoorden (${woorden.length}): ${esc(woorden.map((z: any) => z.term).join(", "))}</li>${keuzes.niet ? `<li>Liever niet: ${esc(keuzes.niet)}</li>` : ""}${keuzes.opmerking ? `<li>Opmerking: ${esc(keuzes.opmerking)}</li>` : ""}</ul>
-${ads.map((x: any, n: number) => `<p><b>Advertentie ${n + 1}</b><br>${esc(x.koppen.join(" | "))}<br>${esc(x.tekst)}</p>`).join("")}
+${groepen ? groepen.map((g: any) => `<h3 style="margin:18px 0 4px">${esc(g.naam)}</h3><p style="margin:0">Pagina: ${esc(g.pagina)}<br>Zoekwoorden: ${esc(g.termen.join(", "))}</p>
+${g.ads.map((x: any, n: number) => `<p><b>Advertentie ${n + 1}</b><br>${esc(x.koppen.join(" | "))}<br>${esc(x.tekst)}</p>`).join("")}`).join("")
+  : ads.map((x: any, n: number) => `<p><b>Advertentie ${n + 1}</b><br>${esc(x.koppen.join(" | "))}<br>${esc(x.tekst)}</p>`).join("")}
 <p>Verkopen meten: ${v.data.meting?.bekend ? (v.data.meting.aantal ? "staat aan (" + esc(v.data.meting.namen.join(", ")) + ")" : "<b>staat nog NIET aan</b>, regel dit voor de start") : "onbekend"}.</p>
 <p>Er staat nog niets aan in Google Ads.</p>`);
     return { ok: true };

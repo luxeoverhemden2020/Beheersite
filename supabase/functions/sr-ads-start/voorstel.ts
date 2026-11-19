@@ -146,30 +146,34 @@ function heleZinnen(t: string, n: number) {
   let u = ""; for (const z of t.split(/(?<=[.!?])\s+/)) { if ((u ? u + " " + z : z).length > n) break; u = u ? u + " " + z : z; }
   return u;
 }
-async function aiAdvertenties(sql: any, klantId: string, d: { naam: string; site: string; titel: string; tekst: string; woorden: string[]; webshop: boolean; plaats: string }) {
+async function aiAdvertenties(sql: any, klantId: string, d: { naam: string; site: string; titel: string; tekst: string; woorden: { term: string; volume: number | null }[]; webshop: boolean; plaats: string }) {
   const [s] = await sql`select waarde from beheersite.instellingen where sleutel = 'anthropic_sleutel'`;
   if (!s?.waarde) return null;
   const inhoud = await homepageTekst(d.site + "/");
   if (!inhoud && !d.tekst) return null;
   const model = "claude-haiku-5-5";
+  const lijst = d.woorden.map((w) => `- ${w.term}${w.volume ? ` (${w.volume} zoekopdrachten per maand)` : ""}`).join("\n");
   const vraag = `Bedrijf: ${d.naam}\nWebsite: ${d.site}\nSoort: ${d.webshop ? "webshop" : "dienstverlener / lokaal bedrijf"}${d.plaats ? `\nPlaats: ${d.plaats}` : ""}
-Paginatitel: ${d.titel}\nOmschrijving: ${d.tekst}${d.woorden.length ? `\nZoekwoorden waarop ze al gevonden worden: ${d.woorden.slice(0, 12).join(", ")}` : ""}
+Paginatitel: ${d.titel}\nOmschrijving: ${d.tekst}
 Tekst van de homepage:\n${inhoud}
 
-Schrijf 4 verschillende Google-zoekadvertenties in het Nederlands die klanten opleveren.
-- Per advertentie 3 koppen van MAXIMAAL 30 tekens en 1 omschrijving van MAXIMAAL 85 tekens, als volledige zin(nen) (tel goed!).
-- Gewone Nederlandse schrijfwijze: alleen een hoofdletter aan het begin en bij namen (dus "Dak reinigen in Twente", niet "Dak Reinigen In Twente").
-- Koppen bevatten waar mensen echt op zoeken (de dienst of het product, liefst met plaats/regio), concrete voordelen of een duidelijke actie. Hooguit één kop per advertentie met de bedrijfsnaam.
-- Elke advertentie een eigen invalshoek (bijv. dienst + plaats, voordeel, vertrouwen, actie).
+${lijst ? `Zoekwoorden waarop dit bedrijf gaat adverteren:\n${lijst}` : "Er zijn nog geen zoekwoorden bekend."}
+
+Maak een Google Ads-opzet in het Nederlands, verdeeld in groepen per onderwerp.
+- Een groep = één onderwerp waar mensen op zoeken: één soort product, één dienst of één merk. Bijvoorbeeld "Overhemden", "Winterjassen", "Profuomo" of "Dakreiniging", "Gevelreiniging".
+- Zoekwoorden die hetzelfde bedoelen (enkelvoud/meervoud, andere woordvolgorde, aan elkaar geschreven) horen in dezelfde groep. Maak alleen een nieuwe groep als het echt een ander onderwerp is. 1 tot 4 groepen.
+${lijst ? "- Gebruik elk zoekwoord uit de lijst precies één keer, letterlijk zoals gegeven. Verzin er geen bij." : "- Bedenk per groep 3 tot 5 zoekwoorden (2 tot 4 woorden, kleine letters) waarop klanten echt zoeken, met plaats/regio waar dat past."}
+- Per groep 2 advertenties die precies over dat onderwerp gaan: wie op dat onderwerp zoekt, moet in de eerste kop zien dat hij goed zit. Per advertentie 3 koppen van MAXIMAAL 30 tekens en 1 omschrijving van MAXIMAAL 85 tekens, als volledige zin(nen) (tel goed!). De twee advertenties hebben elk een eigen invalshoek (bijv. aanbod, voordeel, vertrouwen, actie).
+- Gewone Nederlandse schrijfwijze: alleen een hoofdletter aan het begin en bij namen.
+- Hooguit één kop per advertentie met de bedrijfsnaam. Geen uitroeptekens in koppen.
 - Verzin niets: alleen wat uit de tekst blijkt (geen prijzen, kortingen of garanties die er niet staan).
-- Geen uitroeptekens in koppen, geen hoofdletters-schreeuwen.
-Geef ook: "zoekwoorden" = 10 zoektermen (2 tot 4 woorden, kleine letters) waarop deze klanten in Google zoeken, met plaats/regio waar dat past; "plaats" = de plaats of regio waar het bedrijf werkt (leeg als onbekend of landelijk) en "lokaal" = true als het bedrijf vooral in een regio werkt.
-Antwoord alleen met JSON: {"advertenties":[{"koppen":["","",""],"tekst":""}],"zoekwoorden":[""],"plaats":"","lokaal":true}`;
+Geef ook "plaats" = de plaats of regio waar het bedrijf werkt (leeg als onbekend of landelijk) en "lokaal" = true als het bedrijf vooral in een regio werkt.
+Antwoord alleen met JSON: {"groepen":[{"naam":"","zoekwoorden":[""],"advertenties":[{"koppen":["","",""],"tekst":""}]}],"plaats":"","lokaal":true}`;
   try {
     const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST",
       headers: { "x-api-key": s.waarde, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-      body: JSON.stringify({ model, max_tokens: 2000, thinking: { type: "disabled" }, system: "Je bent een ervaren Google Ads-tekstschrijver voor Nederlandse mkb-bedrijven. Antwoord alleen met JSON.", messages: [{ role: "user", content: vraag }] }),
-      signal: AbortSignal.timeout(45000) });
+      body: JSON.stringify({ model, max_tokens: 3000, thinking: { type: "disabled" }, system: "Je bent een ervaren Google Ads-specialist voor Nederlandse mkb-bedrijven. Antwoord alleen met JSON.", messages: [{ role: "user", content: vraag }] }),
+      signal: AbortSignal.timeout(60000) });
     const j = await r.json();
     if (!r.ok) { console.error("ai ads", r.status, JSON.stringify(j).slice(0, 300)); return null; }
     const u = j.usage || {}, inTok = (u.input_tokens || 0) + (u.cache_read_input_tokens || 0) + (u.cache_creation_input_tokens || 0);
@@ -177,13 +181,17 @@ Antwoord alleen met JSON: {"advertenties":[{"koppen":["","",""],"tekst":""}],"zo
     const t = (j.content || []).filter((x: any) => x.type === "text").map((x: any) => x.text).join("");
     const m = t.match(/\{[\s\S]*\}/); if (!m) { console.error("ai ads geen json", j.stop_reason); return null; }
     const o = JSON.parse(m[0]);
-    const ads = (o.advertenties || []).map((a: any) => ({
-      koppen: [...new Set((a.koppen || []).map((x: any) => String(x || "").replace(/\s+/g, " ").trim()).filter((x: string) => x && x.length <= 30))].slice(0, 3) as string[],
-      tekst: heleZinnen(String(a.tekst || ""), 90),
-    })).filter((a: any) => a.koppen.length >= 2 && a.tekst.length >= 20).slice(0, 4);
-    if (ads.length < 2) return null;
-    const zw = [...new Set((o.zoekwoorden || []).map((x: any) => String(x || "").toLowerCase().replace(/[^a-z0-9à-ÿ\s-]/g, "").replace(/\s+/g, " ").trim()).filter((x: string) => x.length >= 4 && x.split(" ").length <= 5))].slice(0, 10) as string[];
-    return { ads, zoekwoorden: zw, plaats: String(o.plaats || "").trim().slice(0, 40), lokaal: o.lokaal !== false };
+    const schoonAd = (a: any) => ({
+      koppen: [...new Set((a?.koppen || []).map((x: any) => String(x || "").replace(/\s+/g, " ").trim()).filter((x: string) => x && x.length <= 30))].slice(0, 3) as string[],
+      tekst: heleZinnen(String(a?.tekst || ""), 90),
+    });
+    const groepen = (o.groepen || []).map((g: any) => ({
+      naam: String(g?.naam || "").replace(/\s+/g, " ").trim().slice(0, 40),
+      zoekwoorden: [...new Set((g?.zoekwoorden || []).map((x: any) => String(x || "").toLowerCase().replace(/[^a-z0-9à-ÿ\s-]/g, "").replace(/\s+/g, " ").trim()).filter((x: string) => x.length >= 3 && x.split(" ").length <= 5))] as string[],
+      advertenties: (g?.advertenties || []).map(schoonAd).filter((a: any) => a.koppen.length >= 2 && a.tekst.length >= 20).slice(0, 3),
+    })).filter((g: any) => g.naam && g.advertenties.length).slice(0, 5);
+    if (!groepen.length) return null;
+    return { groepen, plaats: String(o.plaats || "").trim().slice(0, 40), lokaal: o.lokaal !== false };
   } catch (e) { console.error("ai ads", e); return null; }
 }
 
@@ -228,23 +236,45 @@ export async function maakVoorstel(sql: any, klantId: string) {
   const bedrijf = o?.b || {};
   const webshop = ["magento", "shopify", "woocommerce", "lightspeed"].includes(String(k.soort || "").toLowerCase());
   const woordLijst = [...zoekwoorden].sort((a: any, b: any) => b.vertoningen - a.vertoningen).map((z: any) => z.term);
-  // teksten: eerst AI (eenmalig, een paar cent), anders het gratis vangnet
-  const ai = await aiAdvertenties(sql, klantId, { naam: String(k.naam || ""), site, titel: p.titel, tekst: p.tekst, woorden: woordLijst, webshop, plaats: bedrijf.plaats || "" });
+  // teksten: eerst AI (eenmalig, ongeveer een cent), anders het gratis vangnet. Per onderwerp een groep met eigen advertenties en pagina.
+  const ai = await aiAdvertenties(sql, klantId, { naam: String(k.naam || ""), site, titel: p.titel, tekst: p.tekst, woorden: zoekwoorden.map((z: any) => ({ term: z.term, volume: z.volume })), webshop, plaats: bedrijf.plaats || "" });
   const plaats = bedrijf.plaats || ai?.plaats || "";
-  const advertenties = ai?.ads?.length ? ai.ads.map((a: any) => {
-      const reserve = maakAdvertenties(String(k.naam || ""), woordLijst, p.titel, p.tekst, webshop, plaats)[0].koppen;
-      const koppen = [...a.koppen]; for (const x of reserve) { if (koppen.length >= 3) break; if (!koppen.includes(x)) koppen.push(x); }
-      return { koppen, tekst: a.tekst };
-    })
-    : maakAdvertenties(String(k.naam || ""), woordLijst, p.titel, p.tekst, webshop, plaats);
-  // geen zoekwoorden uit Search Console: de door AI voorgestelde zoekwoorden gebruiken
-  if (!zoekwoorden.length && ai?.zoekwoorden?.length)
-    for (const t of ai.zoekwoorden) zoekwoorden.push({ term: t, volume: null, cpc: null, positie: null, vertoningen: 0, pagina: bestePagina(t, urls, site + "/"), voorgesteld: true });
+  const reserve = maakAdvertenties(String(k.naam || ""), woordLijst, p.titel, p.tekst, webshop, plaats);
+  const aanvul = (a: any) => { const koppen = [...a.koppen]; for (const x of reserve[0].koppen) { if (koppen.length >= 3) break; if (!koppen.includes(x)) koppen.push(x); } return { koppen, tekst: a.tekst }; };
+  let groepen: any[] = [];
+  if (ai?.groepen?.length) {
+    const bekend = new Map(zoekwoorden.map((z: any) => [z.term, z]));
+    const gebruikt = new Set<string>();
+    groepen = ai.groepen.map((g: any) => {
+      let termen: string[] = bekend.size ? g.zoekwoorden.filter((t: string) => bekend.has(t) && !gebruikt.has(t)) : g.zoekwoorden;
+      termen.forEach((t) => gebruikt.add(t));
+      return { naam: g.naam, termen, advertenties: g.advertenties.map(aanvul) };
+    });
+    // zoekwoorden die de AI vergat: bij de groep met het meeste overlap, anders de eerste
+    for (const z of zoekwoorden) if (!gebruikt.has(z.term)) {
+      const w = z.term.split(" ").map(stam2);
+      const score = (g: any) => g.termen.reduce((s: number, t: string) => s + t.split(" ").map(stam2).filter((x: string) => w.includes(x)).length, 0);
+      const best = groepen.reduce((b: any, g: any) => (score(g) > score(b) ? g : b), groepen[0]);
+      best.termen.push(z.term); gebruikt.add(z.term);
+    }
+    // zonder bekende zoekwoorden: de door AI bedachte zoekwoorden worden de lijst
+    if (!bekend.size) for (const g of groepen) for (const t of g.termen)
+      if (!zoekwoorden.some((z: any) => z.term === t)) zoekwoorden.push({ term: t, volume: null, cpc: null, positie: null, vertoningen: 0, pagina: bestePagina(t, urls, site + "/"), voorgesteld: true });
+    groepen = groepen.filter((g) => g.termen.length);
+  }
+  if (!groepen.length) groepen = [{ naam: "Alle zoekwoorden", termen: zoekwoorden.map((z: any) => z.term), advertenties: reserve }];
+  // pagina per groep: de beste eigen pagina van het grootste zoekwoord in die groep, anders de homepage
+  for (const g of groepen) {
+    const zw = zoekwoorden.filter((z: any) => g.termen.includes(z.term)).sort((a: any, b: any) => (b.volume ?? b.vertoningen ?? 0) - (a.volume ?? a.vertoningen ?? 0));
+    g.pagina = zw.find((z: any) => z.pagina && z.pagina.replace(/\/$/, "") !== site)?.pagina || site + "/";
+    g.weergave = g.pagina.replace(/^https?:\/\//, "").replace(/\/$/, "").replace(/\//g, " › ");
+  }
+  const advertenties = groepen.flatMap((g) => g.advertenties).slice(0, 12);
   const lokaal = !webshop && (!!bedrijf.plaats || (!!ai?.plaats && ai.lokaal));
   return {
     gemaakt: new Date().toISOString(), site, naam: k.naam, webshop, doel: webshop ? "kopen" : "bellen",
     zoekwoorden, bron, cpc_gem: Math.round(cpcGem * 100) / 100, advies,
-    advertenties, teksten_door: ai ? "ai" : "sjabloon",
+    groepen, advertenties, teksten_door: ai ? "ai" : "sjabloon",
     voorbeeld: { url: doelUrl, weergave: doelUrl.replace(/^https?:\/\//, "").replace(/\/$/, "").replace(/\//g, " › "), titel: p.titel || k.naam, tekst: p.tekst },
     shopping: webshop ? shopping : { gekoppeld: null, nvt: true },
     meting: meet,

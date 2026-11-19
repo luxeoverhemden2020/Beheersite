@@ -127,6 +127,14 @@ body[data-pagina="advertenties"] #kpads{display:flex}
 .ad-teller{font-size:12px;color:var(--zacht);justify-self:end}
 .ad-pas .ad-veld{display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:end}.ad-pas .ad-veld input,.ad-pas .ad-veld textarea{grid-column:1/-1}
 .ad-woorden{display:flex;flex-direction:column}
+.ad-groep-kop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.ad-groep-kop h2{margin:0}
+.ad-groep.uit .ad-groep-inh{opacity:.45}
+.ad-groep-inh{display:flex;flex-direction:column;gap:14px}
+.ad-pagina a{color:var(--accent);font-weight:600;text-decoration:none;overflow-wrap:anywhere}
+.ad-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ad-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1.5px solid var(--lijn);background:#fff;font-size:14px;cursor:pointer}
+.ad-chip input{accent-color:#0b9f8a;width:16px;height:16px;margin:0}.ad-chip .zacht{font-size:12.5px}
+.ad-chip:has(input:not(:checked)){opacity:.55}.ad-chip:has(input:not(:checked)) b{text-decoration:line-through}
 .ad-woord{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--lijn);cursor:pointer;font-size:15px}.ad-woord:last-child{border-bottom:0}
 .ad-woord input{accent-color:#0b9f8a;width:18px;height:18px;margin:2px 0 0;flex:none}
 .ad-woord>span{display:flex;flex-direction:column;gap:2px}.ad-woord .zacht{font-size:13px}
@@ -974,28 +982,45 @@ async function kpAdsStart(opnieuw) {
   const d = v.data, k = { ...(v.keuzes || {}) }, ok = v.status === "akkoord", dis = ok ? " disabled" : "";
   const eu = (n, dec = 0) => "€" + Number(n || 0).toLocaleString("nl-NL", { minimumFractionDigits: dec, maximumFractionDigits: dec });
   const getal = (n) => Number(n || 0).toLocaleString("nl-NL");
-  let ads = (k.advertenties || d.advertenties || []).map((a) => ({ koppen: [...a.koppen, "", "", ""].slice(0, 3), tekst: a.tekst || "", aan: a.aan !== false }));
+  const adStaat = (a) => ({ koppen: [...a.koppen, "", "", ""].slice(0, 3), tekst: a.tekst || "", aan: a.aan !== false });
+  let ads = (k.advertenties || d.advertenties || []).map(adStaat);
+  const heeftGroepen = Array.isArray(d.groepen) && d.groepen.length > 0;
+  const grp = heeftGroepen ? d.groepen.map((g, n) => { const kg = (k.groepen || [])[n] || {}; return { aan: kg.aan !== false, advertenties: (kg.advertenties || g.advertenties).map(adStaat) }; }) : [];
+  const zwVan = (t) => (d.zoekwoorden || []).find((z) => z.term === t) || { term: t };
+  const zwInfo = (z) => z.volume ? getal(z.volume) + " per maand" : z.voorgesteld ? "voorgesteld" : z.vertoningen ? getal(z.vertoningen) + "× getoond" : "";
+  const groepKaart = (g, n) => `<section class="kaart ad-groep${grp[n].aan ? "" : " uit"}" data-groepkaart="${n}">
+    <div class="ad-groep-kop"><div><span class="ad-mono">onderwerp ${n + 1} van ${d.groepen.length}</span><h2>${esc(g.naam)}</h2></div>
+      <label class="ad-schakel"><input type="checkbox" data-groepaan${grp[n].aan ? " checked" : ""}${dis}> gebruiken</label></div>
+    <div class="ad-groep-inh">
+      <div><p class="ad-klein" style="margin:0 0 8px">Je advertentie verschijnt als iemand zoekt op:</p>
+        <div class="ad-chips">${g.termen.map((t) => { const z = zwVan(t), i = zwInfo(z); return `<label class="ad-chip ad-woord"><input type="checkbox" value="${esc(t)}"${uit.has(t) ? "" : " checked"}${dis}><b>${esc(t)}</b>${i ? `<span class="zacht">${i}</span>` : ""}</label>`; }).join("")}</div></div>
+      <p class="ad-klein ad-pagina" style="margin:0">Na een klik komen mensen op: <a href="${esc(g.pagina)}" target="_blank" rel="noopener">${esc(g.weergave || g.pagina)}</a></p>
+      <div class="ad-advs">${grp[n].advertenties.map((a, i) => advKaart(a, i, n)).join("")}</div>
+    </div></section>`;
   const uit = new Set(k.uit || []), doel = k.doel || d.doel, budget = k.budget !== undefined ? k.budget : d.advies;
   const google = d.bron === "google";
-  const vbUrl = String(d.voorbeeld?.weergave || d.site || "").replace(/^https?:\/\//, "").replace(/\/$/, "");
-  const vbSite = vbUrl.split("/")[0].replace(/^www\./, "");
-  const voorbeeld = (a) => `<span class="gvb-spons">Gesponsord</span>
-    <span class="gvb-bron"><span class="gvb-ico">${esc((vbSite[0] || "S").toUpperCase())}</span><span class="gvb-naam"><span class="gvb-site">${esc(vbSite)}</span><span class="gvb-url">https://${esc(vbUrl)}</span></span></span>
-    <span class="gvb-kop">${esc(a.koppen.filter(Boolean).join(" | ") || "Je kop")}</span><span class="gvb-tekst">${esc(a.tekst || "Je omschrijving")}</span>`;
-  const advKaart = (a, n) => `<div class="ad-adv${a.aan ? "" : " uit"}" data-adv="${n}">
+  const voorbeeld = (a, url) => { let host = "", pad = [];
+    try { const u = new URL(url || d.voorbeeld?.url || d.site); host = u.host; pad = u.pathname.split("/").filter(Boolean).map((x) => x.replace(/\.html?$/, "")); } catch { host = String(d.site || "").replace(/^https?:\/\//, "").replace(/\/.*$/, ""); }
+    const vbSite = host.replace(/^www\./, "");
+    return `<span class="gvb-spons">Gesponsord</span>
+    <span class="gvb-bron"><span class="gvb-ico">${esc((vbSite[0] || "S").toUpperCase())}</span><span class="gvb-naam"><span class="gvb-site">${esc(vbSite)}</span><span class="gvb-url">https://${esc(host)}${pad.length ? " › " + esc(pad.join(" › ")) : ""}</span></span></span>
+    <span class="gvb-kop">${esc(a.koppen.filter(Boolean).join(" | ") || "Je kop")}</span><span class="gvb-tekst">${esc(a.tekst || "Je omschrijving")}</span>`; };
+  const advKaart = (a, n, g = -1) => `<div class="ad-adv${a.aan ? "" : " uit"}" data-adv="${n}" data-groep="${g}">
     <div class="ad-adv-kop"><b>Advertentie ${n + 1}</b><label class="ad-schakel"><input type="checkbox" data-aan${a.aan ? " checked" : ""}${dis}> gebruiken</label></div>
     ${ok ? "" : `<details class="ad-pas"><summary>Tekst aanpassen</summary>
       ${a.koppen.map((x, i) => `<label class="ad-veld">Kop ${i + 1} <span class="ad-teller" data-tel>${x.length}/${AD_KOP}</span><input type="text" maxlength="${AD_KOP}" data-kop="${i}" value="${esc(x)}"></label>`).join("")}
       <label class="ad-veld">Omschrijving <span class="ad-teller" data-tel>${a.tekst.length}/${AD_TEKST}</span><textarea rows="2" maxlength="${AD_TEKST}" data-tekst>${esc(a.tekst)}</textarea></label></details>`}
     <span class="gvb-label">Zo ziet het eruit in Google</span>
-    <div class="gvb" data-vb>${voorbeeld(a)}</div></div>`;
+    <div class="gvb" data-vb>${voorbeeld(a, g >= 0 ? d.groepen[g].pagina : null)}</div></div>`;
   const r = (naam, w, t, aan, extra = "") => `<label class="ad-keuze"><input type="radio" name="${naam}" value="${w}"${aan ? " checked" : ""}${dis}>${t}${extra}</label>`;
   const shop = d.shopping || {};
   el.innerHTML = terug
     + kaart(`<div class="ad-kop"><div><span class="ad-mono">jouw voorstel · automatisch gemaakt</span><h1>${ok ? "Je akkoord is binnen." : "Zo komen je advertenties eruit te zien."}</h1></div>${ok ? `<span class="ad-pil ok">akkoord</span>` : `<span class="ad-pil grijs">nog niet live</span>`}</div>
       <p class="ad-uitleg">${ok ? "Wij zetten alles klaar. Je advertenties starten zodra er budget is: dat vul je aan op de pagina Advertenties. Je betaalt vooraf en nooit meer dan je stort." : "Gemaakt uit je eigen website en je Google-cijfers. Pas aan wat je wilt en geef akkoord. Pas daarna gaat er iets live."}</p>`, "ad-held")
-    + kaart(`<h2>Je advertenties</h2><p class="ad-klein">Google wisselt deze teksten af en laat vaker zien wat het beste werkt. Een kop mag ${AD_KOP} tekens hebben, een omschrijving ${AD_TEKST}.</p>
-      <div class="ad-advs">${ads.map(advKaart).join("")}</div>`)
+    + (heeftGroepen
+      ? kaart(`<h2>Je advertenties per onderwerp</h2><p class="ad-klein" style="margin:0">Wij hebben je zoekwoorden verdeeld in ${d.groepen.length === 1 ? "één onderwerp" : d.groepen.length + " onderwerpen"}. Wie op een onderwerp zoekt, ziet een advertentie die daar precies over gaat en komt op de pagina die erbij past. Google wisselt de teksten af en laat vaker zien wat het beste werkt. Een kop mag ${AD_KOP} tekens hebben, een omschrijving ${AD_TEKST}.</p>`) + d.groepen.map(groepKaart).join("")
+      : kaart(`<h2>Je advertenties</h2><p class="ad-klein">Google wisselt deze teksten af en laat vaker zien wat het beste werkt. Een kop mag ${AD_KOP} tekens hebben, een omschrijving ${AD_TEKST}.</p>
+      <div class="ad-advs">${ads.map((a, i) => advKaart(a, i)).join("")}</div>`))
     + `<div class="ad-twee" style="align-items:start"><div style="display:flex;flex-direction:column;gap:16px">
       ${kaart(`<h2>Wat moeten mensen doen na een klik?</h2><div class="ad-keuzes" role="radiogroup" aria-label="Doel">${Object.entries(AD_DOEL).map(([w, t]) => r("doel", w, t, w === doel)).join("")}</div>`)}
       ${kaart(`<h2>Budget per maand</h2><div class="ad-keuzes rij3" role="radiogroup" aria-label="Budget">${[100, 250, 500, 1000].map((b) => r("budget", b, eu(b), Number(budget) === b, b === d.advies ? ` <span class="ad-pil" style="margin-left:auto;padding:3px 8px;font-size:11.5px">ons advies</span>` : "")).join("")}${r("budget", "eigen", "Ander bedrag", !!budget && ![100, 250, 500, 1000].includes(Number(budget)))}</div>
@@ -1010,7 +1035,7 @@ async function kpAdsStart(opnieuw) {
         <label class="ad-veld" style="margin-top:10px">Bijvoorbeeld een merk of productgroep<input type="text" maxlength="300" id="adniet" value="${esc(k.niet || "")}" placeholder="Bijvoorbeeld: sale-artikelen"></label>
         <label class="ad-veld" style="margin-top:10px">Nog iets dat wij moeten weten?<textarea rows="3" maxlength="1000" id="adopm">${esc(k.opmerking || "")}</textarea></label></details>`}
     </div><div style="display:flex;flex-direction:column;gap:16px">
-      ${kaart(`<h2>Zoekwoorden</h2><p class="ad-klein">Waar je advertentie bij verschijnt.${google ? " Het aantal zoekopdrachten komt van Google." : ""}</p>
+      ${heeftGroepen ? "" : kaart(`<h2>Zoekwoorden</h2><p class="ad-klein">Waar je advertentie bij verschijnt.${google ? " Het aantal zoekopdrachten komt van Google." : ""}</p>
         <div class="ad-woorden">${(d.zoekwoorden || []).map((z) => `<label class="ad-woord"><input type="checkbox" value="${esc(z.term)}"${uit.has(z.term) ? "" : " checked"}${dis}><span><b>${esc(z.term)}</b><span class="zacht">${z.volume ? getal(z.volume) + " zoekopdrachten per maand" : z.voorgesteld ? "voorgesteld op basis van je website" : getal(z.vertoningen) + " keer getoond in Google"}</span></span></label>`).join("") || `<p class="zacht" style="margin:0">Nog geen zoekwoorden gevonden. Wij kiezen ze voor je.</p>`}</div>`)}
       ${d.webshop && shop.gekoppeld !== null && shop.gekoppeld !== undefined ? kaart(`<h2>Google Shopping</h2><p class="zacht" style="font-size:15px;line-height:1.6;margin:0">${shop.gekoppeld ? "Je producten staan al in Google Merchant Center. Wij zetten ze ook in Google Shopping, met foto en prijs." : "Je producten staan nog niet in Google Merchant Center. Dat zetten wij voor je klaar, daarna komen ze ook in Google Shopping."}</p>`) : ""}
       ${ok ? "" : (() => {
@@ -1036,15 +1061,17 @@ async function kpAdsStart(opnieuw) {
   // keuzes bewaren (even wachten na typen)
   let tijd;
   const keuzes = () => ({ doel: el.querySelector("[name=doel]:checked")?.value, budget: adGekozenBudget(el) || null,
-    uit: [...el.querySelectorAll(".ad-woord input:not(:checked)")].map((x) => x.value), advertenties: ads, gebied: (() => { const g = el.querySelector("[name=gebied]:checked")?.value || "NL"; return g.startsWith("s") ? { soort: "straal", km: Number(g.slice(1)) } : { soort: "land", landen: g.split("+") }; })(), niet: $("#adniet").value, opmerking: $("#adopm").value });
+    uit: [...el.querySelectorAll(".ad-woord input:not(:checked)")].map((x) => x.value), ...(heeftGroepen ? { groepen: grp } : { advertenties: ads }), gebied: (() => { const g = el.querySelector("[name=gebied]:checked")?.value || "NL"; return g.startsWith("s") ? { soort: "straal", km: Number(g.slice(1)) } : { soort: "land", landen: g.split("+") }; })(), niet: $("#adniet").value, opmerking: $("#adopm").value });
   const bewaar = () => { clearTimeout(tijd); tijd = setTimeout(() => adsStartApi({ actie: "keuzes", keuzes: keuzes() }).catch(() => {}), 700); };
   el.querySelectorAll("[data-adv]").forEach((blok) => {
-    const n = Number(blok.dataset.adv), a = ads[n];
-    const teken = () => { blok.querySelector("[data-vb]").innerHTML = voorbeeld(a); blok.querySelectorAll("[data-tel]").forEach((t, i) => (t.textContent = (i < 3 ? a.koppen[i].length + "/" + AD_KOP : a.tekst.length + "/" + AD_TEKST))); };
+    const n = Number(blok.dataset.adv), g = Number(blok.dataset.groep), a = g >= 0 ? grp[g].advertenties[n] : ads[n];
+    const teken = () => { blok.querySelector("[data-vb]").innerHTML = voorbeeld(a, g >= 0 ? d.groepen[g].pagina : null); blok.querySelectorAll("[data-tel]").forEach((t, i) => (t.textContent = (i < 3 ? a.koppen[i].length + "/" + AD_KOP : a.tekst.length + "/" + AD_TEKST))); };
     blok.querySelectorAll("[data-kop]").forEach((inp) => (inp.oninput = () => { a.koppen[Number(inp.dataset.kop)] = inp.value; teken(); bewaar(); }));
     blok.querySelector("[data-tekst]").oninput = (e) => { a.tekst = e.target.value; teken(); bewaar(); };
     blok.querySelector("[data-aan]").onchange = (e) => { a.aan = e.target.checked; blok.classList.toggle("uit", !a.aan); bewaar(); };
   });
+  el.querySelectorAll("[data-groepkaart]").forEach((kaartEl) => { const n = Number(kaartEl.dataset.groepkaart);
+    kaartEl.querySelector("[data-groepaan]").onchange = (e) => { grp[n].aan = e.target.checked; kaartEl.classList.toggle("uit", !grp[n].aan); bewaar(); }; });
   el.querySelectorAll("[name=doel],[name=budget],[name=gebied],.ad-woord input").forEach((x) => (x.onchange = () => { const v = el.querySelector("#adbudgetveld"); if (v) v.hidden = el.querySelector("[name=budget]:checked")?.value !== "eigen"; klik(); bewaar(); }));
   const eigenB = el.querySelector("#adbudgeteigen"); if (eigenB) eigenB.onchange = () => { klik(); bewaar(); };
   $("#adniet").oninput = bewaar; $("#adopm").oninput = bewaar;
