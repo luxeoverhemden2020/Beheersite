@@ -127,9 +127,31 @@ body[data-pagina="advertenties"] #kpads{display:flex}
 .ad-teller{font-size:12px;color:var(--zacht);justify-self:end}
 .ad-pas .ad-veld{display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:end}.ad-pas .ad-veld input,.ad-pas .ad-veld textarea{grid-column:1/-1}
 .ad-woorden{display:flex;flex-direction:column}
-.ad-groep-kop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.ad-groep-kop h2{margin:0}
-.ad-groep.uit .ad-groep-inh{opacity:.45}
-.ad-groep-inh{display:flex;flex-direction:column;gap:14px}
+.ag-lijst{display:flex;flex-direction:column;border-top:1px solid var(--lijn)}
+.ag{border-bottom:1px solid var(--lijn)}
+.ag-rij{display:flex;align-items:center;gap:14px;padding:16px 0}
+.ag-schakel{position:relative;flex:none;width:44px;height:26px;cursor:pointer}
+.ag-schakel input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.ag-schakel span{position:absolute;inset:0;border-radius:13px;background:#c8d3e2;transition:background .2s}
+.ag-schakel span:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .2s}
+.ag-schakel input:checked+span{background:#0b9f8a}.ag-schakel input:checked+span:after{transform:translateX(18px)}
+.ag-schakel input:focus-visible+span{outline:2px solid #0b9f8a;outline-offset:2px}
+.ag-knop{flex:1;display:flex;align-items:center;gap:12px;background:none;border:0;padding:0;cursor:pointer;text-align:left;color:inherit;font:inherit}
+.ag-tekst{flex:1;display:flex;flex-direction:column;gap:2px}.ag-tekst b{font-size:16px;font-weight:600}.ag-tekst span{font-size:13.5px;color:var(--zacht)}
+.ag-knop svg{flex:none;transition:transform .2s}.ag-knop[aria-expanded=true] svg{transform:rotate(180deg)}
+.ag-inh{padding:0 0 22px 58px;display:flex;flex-direction:column;gap:12px}
+.ag.uit .ag-tekst b{color:var(--zacht)}
+.ag-acties{display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-size:14px}
+.ag-versie{display:flex;align-items:center;gap:6px;color:var(--zacht)}
+.ag-versie button{width:32px;height:32px;border-radius:8px;border:1px solid var(--lijn);background:#fff;cursor:pointer;color:var(--tekst);font-size:16px}
+.ag-link{background:none;border:0;padding:0;font:inherit;font-weight:600;color:var(--accent);cursor:pointer}
+.ag-blok{display:flex;flex-direction:column;gap:10px;padding:14px;border:1px solid var(--lijn);border-radius:12px;background:var(--bel)}
+.ag-blok .ad-veld{display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:end}.ag-blok .ad-veld input,.ag-blok .ad-veld textarea{grid-column:1/-1}
+.ad-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ad-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1.5px solid var(--lijn);background:#fff;font-size:14px;cursor:pointer}
+.ad-chip input{accent-color:#0b9f8a;width:16px;height:16px;margin:0}.ad-chip .zacht{font-size:12.5px}
+.ad-chip:has(input:not(:checked)){opacity:.55}.ad-chip:has(input:not(:checked)) b{text-decoration:line-through}
+@media (max-width:560px){.ag-inh{padding-left:0}}
 .ad-pagina a{color:var(--accent);font-weight:600;text-decoration:none;overflow-wrap:anywhere}
 .ad-chips{display:flex;flex-wrap:wrap;gap:8px}
 .ad-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1.5px solid var(--lijn);background:#fff;font-size:14px;cursor:pointer}
@@ -988,15 +1010,21 @@ async function kpAdsStart(opnieuw) {
   const grp = heeftGroepen ? d.groepen.map((g, n) => { const kg = (k.groepen || [])[n] || {}; return { aan: kg.aan !== false, advertenties: (kg.advertenties || g.advertenties).map(adStaat) }; }) : [];
   const zwVan = (t) => (d.zoekwoorden || []).find((z) => z.term === t) || { term: t };
   const zwInfo = (z) => z.volume ? getal(z.volume) + " per maand" : z.voorgesteld ? "voorgesteld" : z.vertoningen ? getal(z.vertoningen) + "× getoond" : "";
-  const groepKaart = (g, n) => `<section class="kaart ad-groep${grp[n].aan ? "" : " uit"}" data-groepkaart="${n}">
-    <div class="ad-groep-kop"><div><span class="ad-mono">onderwerp ${n + 1} van ${d.groepen.length}</span><h2>${esc(g.naam)}</h2></div>
-      <label class="ad-schakel"><input type="checkbox" data-groepaan${grp[n].aan ? " checked" : ""}${dis}> gebruiken</label></div>
-    <div class="ad-groep-inh">
-      <div><p class="ad-klein" style="margin:0 0 8px">Je advertentie verschijnt als iemand zoekt op:</p>
-        <div class="ad-chips">${g.termen.map((t) => { const z = zwVan(t), i = zwInfo(z); return `<label class="ad-chip ad-woord"><input type="checkbox" value="${esc(t)}"${uit.has(t) ? "" : " checked"}${dis}><b>${esc(t)}</b>${i ? `<span class="zacht">${i}</span>` : ""}</label>`; }).join("")}</div></div>
-      <p class="ad-klein ad-pagina" style="margin:0">Na een klik komen mensen op: <a href="${esc(g.pagina)}" target="_blank" rel="noopener">${esc(g.weergave || g.pagina)}</a></p>
-      <div class="ad-advs">${grp[n].advertenties.map((a, i) => advKaart(a, i, n)).join("")}</div>
-    </div></section>`;
+  const groepSub = (g, n) => { if (!grp[n].aan) return "Staat uit";
+    const v = Math.max(0, ...g.termen.map((t) => zwVan(t).volume || 0));
+    return v ? `Zo'n ${getal(v)} zoekopdrachten per maand` : `${g.termen.length} ${g.termen.length === 1 ? "zoekwoord" : "zoekwoorden"}`; };
+  const groepRij = (g, n) => `<div class="ag${grp[n].aan ? "" : " uit"}" data-groep="${n}">
+    <div class="ag-rij"><label class="ag-schakel"><input type="checkbox" role="switch" data-groepaan aria-label="${esc(g.naam)} gebruiken"${grp[n].aan ? " checked" : ""}${dis}><span></span></label>
+      <button type="button" class="ag-knop" data-open aria-expanded="false" aria-controls="ag-inh-${n}"><span class="ag-tekst"><b>${esc(g.naam)}</b><span data-sub>${groepSub(g, n)}</span></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
+    <div class="ag-inh" id="ag-inh-${n}" hidden>
+      <div class="gvb" data-vb></div>
+      <div class="ag-acties">${grp[n].advertenties.length > 1 ? `<span class="ag-versie"><button type="button" data-vorige aria-label="Vorige versie">‹</button><span data-versie></span><button type="button" data-volgende aria-label="Volgende versie">›</button></span>` : ""}
+        <span style="flex:1"></span>${ok ? "" : `<button type="button" class="ag-link" data-pas aria-expanded="false">Tekst aanpassen</button>`}<button type="button" class="ag-link" data-zw aria-expanded="false">Zoekwoorden (${g.termen.length})</button></div>
+      ${ok ? "" : `<div class="ag-blok" data-pasblok hidden></div>`}
+      <div class="ag-blok" data-zwblok hidden><div class="ad-chips">${g.termen.map((t) => { const z = zwVan(t), i = zwInfo(z); return `<label class="ad-chip ad-woord"><input type="checkbox" value="${esc(t)}"${uit.has(t) ? "" : " checked"}${dis}><b>${esc(t)}</b>${i ? `<span class="zacht">${i}</span>` : ""}</label>`; }).join("")}</div>
+        <p class="ad-klein ad-pagina" style="margin:0">Na een klik komen mensen op: <a href="${esc(g.pagina)}" target="_blank" rel="noopener">${esc(g.weergave || g.pagina)}</a></p></div>
+    </div></div>`;
   const uit = new Set(k.uit || []), doel = k.doel || d.doel, budget = k.budget !== undefined ? k.budget : d.advies;
   const google = d.bron === "google";
   const voorbeeld = (a, url) => { let host = "", pad = [];
@@ -1018,7 +1046,9 @@ async function kpAdsStart(opnieuw) {
     + kaart(`<div class="ad-kop"><div><span class="ad-mono">jouw voorstel · automatisch gemaakt</span><h1>${ok ? "Je akkoord is binnen." : "Zo komen je advertenties eruit te zien."}</h1></div>${ok ? `<span class="ad-pil ok">akkoord</span>` : `<span class="ad-pil grijs">nog niet live</span>`}</div>
       <p class="ad-uitleg">${ok ? "Wij zetten alles klaar. Je advertenties starten zodra er budget is: dat vul je aan op de pagina Advertenties. Je betaalt vooraf en nooit meer dan je stort." : "Gemaakt uit je eigen website en je Google-cijfers. Pas aan wat je wilt en geef akkoord. Pas daarna gaat er iets live."}</p>`, "ad-held")
     + (heeftGroepen
-      ? kaart(`<h2>Je advertenties per onderwerp</h2><p class="ad-klein" style="margin:0">Wij hebben je zoekwoorden verdeeld in ${d.groepen.length === 1 ? "één onderwerp" : d.groepen.length + " onderwerpen"}. Wie op een onderwerp zoekt, ziet een advertentie die daar precies over gaat en komt op de pagina die erbij past. Google wisselt de teksten af en laat vaker zien wat het beste werkt. Een kop mag ${AD_KOP} tekens hebben, een omschrijving ${AD_TEKST}.</p>`) + d.groepen.map(groepKaart).join("")
+      ? kaart(`<h2>Je advertenties</h2><p class="ad-klein" style="margin:0">${d.groepen.length === 1 ? "Je advertentie gaat over één onderwerp." : `We hebben ze verdeeld in ${d.groepen.length} onderwerpen. Wie op een onderwerp zoekt, krijgt de advertentie die daarbij past.`}</p>
+        <div class="ag-lijst">${d.groepen.map(groepRij).join("")}</div>
+        <p class="ad-klein" style="margin:0">Google wisselt de versies af en laat vaker zien wat het beste werkt.</p>`)
       : kaart(`<h2>Je advertenties</h2><p class="ad-klein">Google wisselt deze teksten af en laat vaker zien wat het beste werkt. Een kop mag ${AD_KOP} tekens hebben, een omschrijving ${AD_TEKST}.</p>
       <div class="ad-advs">${ads.map((a, i) => advKaart(a, i)).join("")}</div>`))
     + `<div class="ad-twee" style="align-items:start"><div style="display:flex;flex-direction:column;gap:16px">
@@ -1057,6 +1087,33 @@ async function kpAdsStart(opnieuw) {
   bindTerug();
   const klik = () => { const b = adGekozenBudget(el); $("#adklik").textContent = b && d.cpc_gem ? `Daarmee krijg je naar verwachting zo'n ${getal(Math.round(b / d.cpc_gem / 10) * 10)} bezoekers per maand.` : ""; };
   klik();
+  // onderwerpen: één tegelijk open, versies bladeren, tekst en zoekwoorden achter een link
+  const grpVersie = grp.map(() => 0);
+  el.querySelectorAll(".ag").forEach((rij) => {
+    const n = Number(rij.dataset.groep), g = d.groepen[n], inh = rij.querySelector(".ag-inh"), knop = rij.querySelector("[data-open]");
+    const ad = () => grp[n].advertenties[grpVersie[n]];
+    const pasBlok = rij.querySelector("[data-pasblok]"), zwBlok = rij.querySelector("[data-zwblok]");
+    const velden = () => { if (!pasBlok) return; const a = ad();
+      pasBlok.innerHTML = a.koppen.map((x, i) => `<label class="ad-veld">Kop ${i + 1} <span class="ad-teller" data-tel>${x.length}/${AD_KOP}</span><input type="text" maxlength="${AD_KOP}" data-kop="${i}" value="${esc(x)}"></label>`).join("")
+        + `<label class="ad-veld">Omschrijving <span class="ad-teller" data-tel>${a.tekst.length}/${AD_TEKST}</span><textarea rows="2" maxlength="${AD_TEKST}" data-tekst>${esc(a.tekst)}</textarea></label>`;
+      const tel = () => pasBlok.querySelectorAll("[data-tel]").forEach((t, i) => (t.textContent = i < 3 ? a.koppen[i].length + "/" + AD_KOP : a.tekst.length + "/" + AD_TEKST));
+      pasBlok.querySelectorAll("[data-kop]").forEach((inp) => (inp.oninput = () => { a.koppen[Number(inp.dataset.kop)] = inp.value; tel(); teken(); bewaar(); }));
+      pasBlok.querySelector("[data-tekst]").oninput = (e) => { a.tekst = e.target.value; tel(); teken(); bewaar(); }; };
+    const teken = () => { rij.querySelector("[data-vb]").innerHTML = voorbeeld(ad(), g.pagina);
+      const v = rij.querySelector("[data-versie]"); if (v) v.textContent = `Versie ${grpVersie[n] + 1} van ${grp[n].advertenties.length}`; };
+    const blader = (stap) => { const m = grp[n].advertenties.length; grpVersie[n] = (grpVersie[n] + stap + m) % m; teken(); velden(); };
+    teken(); velden();
+    knop.onclick = () => { const open = knop.getAttribute("aria-expanded") !== "true";
+      el.querySelectorAll(".ag").forEach((r) => { r.querySelector(".ag-inh").hidden = true; r.querySelector("[data-open]").setAttribute("aria-expanded", "false"); });
+      inh.hidden = !open; knop.setAttribute("aria-expanded", String(open)); };
+    const vo = rij.querySelector("[data-vorige]"), vn = rij.querySelector("[data-volgende]");
+    if (vo) vo.onclick = () => blader(-1); if (vn) vn.onclick = () => blader(1);
+    const schakel = (b, blok) => { if (!b) return; b.onclick = () => { const open = blok.hidden; blok.hidden = !open; b.setAttribute("aria-expanded", String(open)); }; };
+    schakel(rij.querySelector("[data-pas]"), pasBlok); schakel(rij.querySelector("[data-zw]"), zwBlok);
+    rij.querySelector("[data-groepaan]").onchange = (e) => { grp[n].aan = e.target.checked; rij.classList.toggle("uit", !grp[n].aan);
+      rij.querySelector("[data-sub]").textContent = groepSub(g, n); bewaar(); };
+  });
+  const eerste = el.querySelector(".ag:not(.uit) [data-open]"); if (eerste) eerste.click();
   if (ok) return;
   // keuzes bewaren (even wachten na typen)
   let tijd;
@@ -1070,8 +1127,6 @@ async function kpAdsStart(opnieuw) {
     blok.querySelector("[data-tekst]").oninput = (e) => { a.tekst = e.target.value; teken(); bewaar(); };
     blok.querySelector("[data-aan]").onchange = (e) => { a.aan = e.target.checked; blok.classList.toggle("uit", !a.aan); bewaar(); };
   });
-  el.querySelectorAll("[data-groepkaart]").forEach((kaartEl) => { const n = Number(kaartEl.dataset.groepkaart);
-    kaartEl.querySelector("[data-groepaan]").onchange = (e) => { grp[n].aan = e.target.checked; kaartEl.classList.toggle("uit", !grp[n].aan); bewaar(); }; });
   el.querySelectorAll("[name=doel],[name=budget],[name=gebied],.ad-woord input").forEach((x) => (x.onchange = () => { const v = el.querySelector("#adbudgetveld"); if (v) v.hidden = el.querySelector("[name=budget]:checked")?.value !== "eigen"; klik(); bewaar(); }));
   const eigenB = el.querySelector("#adbudgeteigen"); if (eigenB) eigenB.onchange = () => { klik(); bewaar(); };
   $("#adniet").oninput = bewaar; $("#adopm").oninput = bewaar;
