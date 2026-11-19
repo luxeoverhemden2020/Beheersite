@@ -951,7 +951,7 @@ function adAanvKaart(v) {
     <h2>${ok ? "Je akkoord is binnen" : "Je voorstel staat klaar"}</h2>
     <p class="zacht" style="font-size:15px;line-height:1.6;margin:0">${ok ? "Wij zetten alles klaar. Je advertenties starten zodra er budget is: dat vul je aan op de pagina Advertenties. Je betaalt vooraf en nooit meer dan je stort." : "Bekijk je advertenties, pas aan wat je wilt en geef akkoord. Er gaat niets live zonder jouw akkoord."}</p>
     ${budget ? `<div class="ad-rij"><span class="zacht">Budget per maand</span><b>€${Number(budget).toLocaleString("nl-NL")} excl. btw</b></div>` : ""}
-    <div class="ad-knoppen"><button type="button" class="knop${ok ? " rand klein" : ""}" data-adstart>${ok ? "Bekijk je voorstel" : "Bekijk en geef akkoord"}</button></div></section>`;
+    <div class="ad-knoppen"><button type="button" class="knop${ok ? " rand klein" : ""}" data-adstart>${ok ? "Bekijk je voorstel" : "Bekijk je voorstel"}</button></div></section>`;
 }
 const AD_KOP = 30, AD_TEKST = 90;
 // gekozen budget in het voorstel: vaste keuze of zelf ingevuld (minimaal €100; lager telt niet)
